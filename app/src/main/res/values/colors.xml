@@ -1,5 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Brand Colors from Figma -->
+    <color name="color_pistachio">#84C788</color>
+    <color name="color_jade1">#11B067</color>
+    <color name="color_jade2">#11A968</color>
+    <color name="color_sunglow">#FDC94A</color>
+    <color name="color_xanthous">#F8B929</color>
+    <color name="color_hunyadi_yellow">#EDA62D</color>
+    <color name="color_midnight_green">#1A4B5F</color>
+    <color name="color_charcoal">#123C50</color>
+    <color name="color_old_lace">#FEF3E1</color>
+
+    <!-- UI Colors -->
+    <color name="white">#FFFFFF</color>
+    <color name="text_primary">#123C50</color>
+    <color name="text_secondary">#1A4B5F</color>
+    <color name="border_gray">#D9D9D9</color>
+
+    <!-- Custom Toast Colors -->
+    <color name="color_success_bg">#10B981</color>
+    <color name="color_error_bg">#EF4444</color>
+    <color name="color_info_bg">#3B82F6</color>
+    <color name="color_warning_bg">#F59E0B</color>
 </resources>

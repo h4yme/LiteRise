@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.LiteRise" parent="Base.Theme.LiteRise" />
+
+    <style name="Theme.LiteRise.NoActionBar">
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
+
 </resources>

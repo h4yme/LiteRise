@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">LiteRise</string>
+    <string name="tagline">Read • Learn • Rise!</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="login_subtitle">Log in to continue your reading adventure</string>
+    <string name="email_hint">Email Address</string>
+    <string name="password_hint">Password</string>
+    <string name="remember_me">Remember me</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="login_button">Let\'s Read!</string>
+    <string name="new_user">New to LiteRise? </string>
+    <string name="sign_up_link">Sign Up Here!</string>
 </resources>
