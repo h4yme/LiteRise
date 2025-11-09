@@ -9,13 +9,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://10.141.133.239/api/"; // same as your browser test
+    private static final String BASE_URL = "http://10.248.215.210/api/";
     private static Retrofit retrofit;
 
     public static Retrofit getClient() {
         if (retrofit == null) {
 
-            // Logging interceptor to see request/response in Logcat
+            // logcat
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 

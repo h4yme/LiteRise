@@ -1,19 +1,40 @@
 package com.example.literise.activities;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.Question;
+import com.example.literise.models.ResponseModel;
+import com.example.literise.models.SubmitRequest; // ✅ new wrapper class
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PreAssessmentActivity extends AppCompatActivity {
 
-    private TextView tvWelcome;
-    private Button btnLogout;
+    private TextView tvTitle, tvProgress, tvPassage, tvPassageText, tvQuestion, tvContinue;
+    private Button btnOptionA, btnOptionB, btnOptionC, btnOptionD;
+    private ImageView ivMic;
+    private ProgressBar progressBar;
+
+    private List<Question> questionList = new ArrayList<>();
+    private List<ResponseModel> responses = new ArrayList<>();
+    private int currentIndex = 0;
     private SessionManager session;
 
     @Override
@@ -21,28 +42,127 @@ public class PreAssessmentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_layout_pre_assessment);
 
-        tvWelcome = findViewById(R.id.tvWelcome);
-        btnLogout = findViewById(R.id.btnLogout);
-
-        // Initialize session
         session = new SessionManager(this);
+        initializeViews();
+        loadQuestions();
+    }
 
-        // Show student name
-        if (session.isLoggedIn()) {
-            tvWelcome.setText("Welcome " + session.getFullname() + "!");
-        } else {
-            // If not logged in, redirect to LoginActivity
-            startActivity(new Intent(this, LoginActivity.class));
-            finish();
+    private void initializeViews() {
+        tvTitle = findViewById(R.id.tvTitle);
+        tvProgress = findViewById(R.id.tvProgress);
+        tvPassage = findViewById(R.id.tvPassage);
+        tvPassageText = findViewById(R.id.tvPassageText);
+        tvQuestion = findViewById(R.id.tvQuestion);
+        tvContinue = findViewById(R.id.tvContinue);
+
+        btnOptionA = findViewById(R.id.btnOptionA);
+        btnOptionB = findViewById(R.id.btnOptionB);
+        btnOptionC = findViewById(R.id.btnOptionC);
+        btnOptionD = findViewById(R.id.btnOptionD);
+        ivMic = findViewById(R.id.ivMic);
+        progressBar = findViewById(R.id.progressBar);
+
+        btnOptionA.setOnClickListener(v -> selectAnswer("A"));
+        btnOptionB.setOnClickListener(v -> selectAnswer("B"));
+        btnOptionC.setOnClickListener(v -> selectAnswer("C"));
+        btnOptionD.setOnClickListener(v -> selectAnswer("D"));
+        tvContinue.setOnClickListener(v -> goToNextQuestion());
+    }
+
+    private void loadQuestions() {
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.getPreAssessmentItems().enqueue(new Callback<List<Question>>() {
+            @Override
+            public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    questionList = response.body();
+                    showQuestion();
+                } else {
+                    Toast.makeText(PreAssessmentActivity.this, "Failed to load questions", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Question>> call, Throwable t) {
+                Toast.makeText(PreAssessmentActivity.this, "Connection error", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void showQuestion() {
+        if (currentIndex >= questionList.size()) {
+            submitResponses();
+            return;
         }
 
-        // Logout button
-        btnLogout.setOnClickListener(v -> {
-            session.logout(); // clear session
-            Intent intent = new Intent(PreAssessmentActivity.this, LoginActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+        Question q = questionList.get(currentIndex);
+        tvTitle.setText("Placement Test");
+        tvQuestion.setText(q.getQuestionText());
+        tvPassageText.setText(q.getPassageText() == null ? "" : q.getPassageText());
+
+        btnOptionA.setText("a) " + q.getOptionA());
+        btnOptionB.setText("b) " + q.getOptionB());
+        btnOptionC.setText("c) " + q.getOptionC());
+        btnOptionD.setText("d) " + q.getOptionD());
+
+        tvProgress.setText((currentIndex + 1) + "/" + questionList.size() + " Questions");
+        progressBar.setProgress((int) (((float) (currentIndex + 1) / questionList.size()) * 100));
+
+        enableOptions();
+    }
+
+    private void selectAnswer(String choice) {
+        Question q = questionList.get(currentIndex);
+        ResponseModel response = new ResponseModel();
+
+        response.setItemId(q.getItemId()); // ✅ corrected
+        response.setSelectedOption(choice);
+        response.setCorrect(q.getCorrectOption().equalsIgnoreCase(choice));
+
+        responses.add(response);
+        disableOptions();
+    }
+
+    private void disableOptions() {
+        btnOptionA.setEnabled(false);
+        btnOptionB.setEnabled(false);
+        btnOptionC.setEnabled(false);
+        btnOptionD.setEnabled(false);
+    }
+
+    private void enableOptions() {
+        btnOptionA.setEnabled(true);
+        btnOptionB.setEnabled(true);
+        btnOptionC.setEnabled(true);
+        btnOptionD.setEnabled(true);
+    }
+
+    private void goToNextQuestion() {
+        if (currentIndex < questionList.size() - 1) {
+            currentIndex++;
+            showQuestion();
+        } else {
+            submitResponses();
+        }
+    }
+
+    private void submitResponses() {
+        int studentId = session.getStudentId();
+        SubmitRequest submitRequest = new SubmitRequest(studentId, responses);
+
+        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        apiService.submitResponses(submitRequest).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                Toast.makeText(PreAssessmentActivity.this, "Assessment complete!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                Toast.makeText(PreAssessmentActivity.this, "Failed to submit responses", Toast.LENGTH_SHORT).show();
+            }
         });
     }
 }
