@@ -25,6 +25,9 @@ public class Students {
     @SerializedName("password")
     private String password;
 
+    @SerializedName("token")
+    private String token;
+
     // Getters and Setters
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
@@ -46,5 +49,9 @@ public class Students {
 
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+
+    public String getToken() { return token; }
+
+    public void setToken(String token) { this.token = token; }
 }
 

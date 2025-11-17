@@ -32,4 +32,5 @@
     <color name="color_error_bg">#EF4444</color>
     <color name="color_info_bg">#3B82F6</color>
     <color name="color_warning_bg">#F59E0B</color>
+    <color name="color_grey">#3D3C3C</color>
 </resources>

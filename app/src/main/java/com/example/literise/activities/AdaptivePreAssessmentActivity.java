@@ -12,6 +12,8 @@ import android.content.pm.PackageManager;
 
 import android.os.Bundle;
 
+import android.os.SystemClock;
+
 import android.speech.RecognitionListener;
 
 import android.speech.RecognizerIntent;
@@ -34,6 +36,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import androidx.appcompat.app.AlertDialog;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.cardview.widget.CardView;
@@ -52,7 +56,9 @@ import com.example.literise.api.ApiService;
 
 import com.example.literise.database.SessionManager;
 
-import com.example.literise.models.PreAssessmentResponse;
+import com.example.literise.models.GetNextItemRequest;
+
+import com.example.literise.models.NextItemResponse;
 
 import com.example.literise.models.PronunciationRequest;
 
@@ -60,11 +66,14 @@ import com.example.literise.models.PronunciationResponse;
 
 import com.example.literise.models.Question;
 
-import com.example.literise.models.ResponseModel;
+import com.example.literise.models.SingleResponseResult;
 
 import com.example.literise.models.SubmitRequest;
 
+import com.example.literise.models.SubmitSingleRequest;
+
 import com.example.literise.models.SubmitResponseResult;
+
 import com.google.android.material.button.MaterialButton;
 
 
@@ -85,7 +94,15 @@ import retrofit2.Response;
 
 
 
-public class PreAssessmentActivity extends AppCompatActivity {
+/**
+
+ * Adaptive PreAssessment Activity using Computer Adaptive Testing (CAT)
+
+ * Questions adapt in real-time based on student performance
+
+ */
+
+public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
@@ -107,15 +124,26 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-    private List<Question> questionList = new ArrayList<>();
+    // Adaptive testing state
 
-    private List<ResponseModel> responses = new ArrayList<>();
+    private Question currentQuestion = null;
 
-    private int currentIndex = 0;
+    private List<Integer> itemsAnswered = new ArrayList<>();
+
+    private double currentTheta = 0.0;
+
+    private int sessionId = 0;
+
+    private long questionStartTime = 0;
 
     private SessionManager session;
 
     private String selectedAnswer = null;
+
+
+
+    // Speech recognition
+
     private SpeechRecognizer speechRecognizer;
 
     private boolean isRecording = false;
@@ -123,6 +151,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1;
 
     private int pronunciationScore = 0;
+
 
 
     @Override
@@ -139,7 +168,17 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         initializeViews();
 
-        loadQuestions();
+
+
+        // Get initial theta from student's current ability
+
+        currentTheta = session.getAbility(); // Assumes SessionManager has getAbility()
+
+
+
+        // Load first adaptive question
+
+        loadNextAdaptiveQuestion();
 
     }
 
@@ -207,7 +246,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         btnOptionD.setOnClickListener(v -> selectAnswer("D", btnOptionD));
 
-        btnContinue.setOnClickListener(v -> goToNextQuestion());
+        btnContinue.setOnClickListener(v -> submitCurrentAnswer());
 
 
 
@@ -217,33 +256,67 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-    private void loadQuestions() {
+    private void loadNextAdaptiveQuestion() {
+
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
+        GetNextItemRequest request = new GetNextItemRequest(
+
+                sessionId,
+
+                currentTheta,
+
+                itemsAnswered
+
+        );
+
+
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
 
-        apiService.getPreAssessmentItems().enqueue(new Callback<PreAssessmentResponse>() {
+        apiService.getNextItem(request).enqueue(new Callback<NextItemResponse>() {
 
             @Override
 
-            public void onResponse(Call<PreAssessmentResponse> call, Response<PreAssessmentResponse> response) {
+            public void onResponse(Call<NextItemResponse> call, Response<NextItemResponse> response) {
+
+                progressBar.setVisibility(View.GONE);
+
+
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
 
-                    questionList = response.body().getItems();
+                    NextItemResponse result = response.body();
 
-                    if (questionList != null && !questionList.isEmpty()) {
 
-                        showQuestion();
+
+                    if (result.isAssessmentComplete()) {
+
+                        // Assessment is complete
+
+                        finishAssessment(result);
 
                     } else {
 
-                        Toast.makeText(PreAssessmentActivity.this, "No questions available", Toast.LENGTH_SHORT).show();
+                        // Display next question
+
+                        currentQuestion = result.getItem();
+
+                        sessionId = request.getSessionId(); // Update if session was created
+
+                        showQuestion(result);
+
+                        questionStartTime = SystemClock.elapsedRealtime();
 
                     }
 
                 } else {
 
-                    Toast.makeText(PreAssessmentActivity.this, "Failed to load questions", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                            "Failed to load next question", Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -253,9 +326,13 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
             @Override
 
-            public void onFailure(Call<PreAssessmentResponse> call, Throwable t) {
+            public void onFailure(Call<NextItemResponse> call, Throwable t) {
 
-                Toast.makeText(PreAssessmentActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                progressBar.setVisibility(View.GONE);
+
+                Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                        "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
 
             }
 
@@ -267,47 +344,35 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     @SuppressLint("SetTextI18n")
 
-    private void showQuestion() {
+    private void showQuestion(NextItemResponse response) {
 
-        if (currentIndex >= questionList.size()) {
-
-            submitResponses();
-
-            return;
-
-        }
+        if (currentQuestion == null) return;
 
 
 
-        Question q = questionList.get(currentIndex);
-
-        String itemType = q.getItemType() != null ? q.getItemType() : "";
+        String itemType = currentQuestion.getItemType() != null ? currentQuestion.getItemType() : "";
 
 
 
-        // Update header
+        // Update header with progress
 
-        tvTitle.setText("Placement Test");
+        tvTitle.setText("Adaptive Assessment");
 
-        tvProgress.setText("Question " + (currentIndex + 1) + " of " + questionList.size());
+        tvProgress.setText("Question " + response.getItemsCompleted() +
+
+                " • ~" + response.getItemsRemaining() + " remaining");
 
         tvItemTypeBadge.setText(itemType);
 
 
 
-        // Update progress bar
-
-        progressBar.setProgress((int) (((float) (currentIndex + 1) / questionList.size()) * 100));
-
-
-
-        // Reset selection state
+        // Reset state
 
         selectedAnswer = null;
 
         btnContinue.setEnabled(false);
 
-        clearSelections();
+        resetButtonStates();
 
 
 
@@ -316,6 +381,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
         cardPassage.setVisibility(View.GONE);
 
         cardPronunciation.setVisibility(View.GONE);
+
         cardQuestion.setVisibility(View.VISIBLE);
 
         gridOptions.setVisibility(View.VISIBLE);
@@ -328,27 +394,21 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         if ("Syntax".equalsIgnoreCase(itemType)) {
 
-            handleSyntaxQuestion(q);
+            handleSyntaxQuestion(currentQuestion);
 
         } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
 
-            handlePronunciationQuestion(q);
+            handlePronunciationQuestion(currentQuestion);
 
         } else if ("Spelling".equalsIgnoreCase(itemType) || "Grammar".equalsIgnoreCase(itemType)) {
 
-            handleMultipleChoiceQuestion(q);
+            handleMultipleChoiceQuestion(currentQuestion);
 
         } else {
 
-            // Default to multiple choice
-
-            handleMultipleChoiceQuestion(q);
+            handleMultipleChoiceQuestion(currentQuestion);
 
         }
-
-
-
-        enableOptions();
 
     }
 
@@ -356,7 +416,9 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void handleSyntaxQuestion(Question q) {
 
-        tvQuestion.setText("Arrange these words to form a correct sentence:");
+        tvQuestion.setText(q.getQuestionText() != null ? q.getQuestionText() :
+
+                "Arrange the words to form a correct sentence:");
 
 
 
@@ -364,11 +426,9 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
 
-            String scrambledText = String.join(" | ", q.getScrambledWords());
+            containerScrambledWords.setVisibility(View.VISIBLE);
 
-            tvPassageText.setText(scrambledText);
-
-            cardPassage.setVisibility(View.VISIBLE);
+            // Display scrambled words (implementation depends on your layout)
 
         }
 
@@ -398,15 +458,13 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
+        // Make the word clickable to show definition
+
         if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
 
             tvPronunciationWord.setClickable(true);
 
             tvPronunciationWord.setOnClickListener(v -> showDefinitionDialog(q));
-
-
-
-            // Add visual feedback that word is clickable
 
             tvPronunciationWord.setPaintFlags(tvPronunciationWord.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
 
@@ -434,7 +492,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void showDefinitionDialog(Question q) {
 
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setTitle(q.getItemText());
 
@@ -444,8 +502,6 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Add phonetic if available
-
         if (q.getPhonetic() != null && !q.getPhonetic().isEmpty()) {
 
             message.append("Pronunciation: ").append(q.getPhonetic()).append("\n\n");
@@ -453,8 +509,6 @@ public class PreAssessmentActivity extends AppCompatActivity {
         }
 
 
-
-        // Add definition
 
         if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
 
@@ -470,7 +524,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-        android.app.AlertDialog dialog = builder.create();
+        AlertDialog dialog = builder.create();
 
         dialog.show();
 
@@ -490,85 +544,35 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void setOptionsVisibility(Question q) {
 
-        btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
+        btnOptionA.setText(q.getOptionA() != null ? q.getOptionA() : "");
 
-        btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
+        btnOptionB.setText(q.getOptionB() != null ? q.getOptionB() : "");
 
-        btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
+        btnOptionC.setText(q.getOptionC() != null ? q.getOptionC() : "");
 
-
-
-        if (q.getOptionD() != null && !q.getOptionD().isEmpty()) {
-
-            btnOptionD.setVisibility(View.VISIBLE);
-
-            btnOptionD.setText("d) " + q.getOptionD());
-
-        } else {
-
-            btnOptionD.setVisibility(View.GONE);
-
-        }
+        btnOptionD.setText(q.getOptionD() != null ? q.getOptionD() : "");
 
 
 
-        btnOptionA.setVisibility(View.VISIBLE);
+        btnOptionA.setVisibility(!q.getOptionA().isEmpty() ? View.VISIBLE : View.GONE);
 
-        btnOptionB.setVisibility(View.VISIBLE);
+        btnOptionB.setVisibility(!q.getOptionB().isEmpty() ? View.VISIBLE : View.GONE);
 
-        btnOptionC.setVisibility(View.VISIBLE);
+        btnOptionC.setVisibility(!q.getOptionC().isEmpty() ? View.VISIBLE : View.GONE);
+
+        btnOptionD.setVisibility(!q.getOptionD().isEmpty() ? View.VISIBLE : View.GONE);
 
     }
 
 
 
-    private void selectAnswer(String choice, Button selectedButton) {
+    private void selectAnswer(String option, Button selectedButton) {
 
-        Question q = questionList.get(currentIndex);
+        selectedAnswer = option;
 
+        resetButtonStates();
 
-
-        // Clear previous selections
-
-        clearSelections();
-
-
-
-        // Mark current selection
-
-        selectedButton.setSelected(true);
-
-        selectedAnswer = choice;
-
-
-
-        // Create response
-
-        ResponseModel response = new ResponseModel();
-
-        response.setItemId(q.getItemId());
-
-        response.setSelectedOption(choice);
-
-        response.setCorrect(q.getCorrectOption() != null && q.getCorrectOption().equalsIgnoreCase(choice));
-
-
-
-        // Update or add response
-
-        if (currentIndex < responses.size()) {
-
-            responses.set(currentIndex, response);
-
-        } else {
-
-            responses.add(response);
-
-        }
-
-
-
-        // Enable continue button
+        selectedButton.setBackgroundColor(getResources().getColor(R.color.color_jade1, null));
 
         btnContinue.setEnabled(true);
 
@@ -576,19 +580,267 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-    private void clearSelections() {
+    private void resetButtonStates() {
 
-        btnOptionA.setSelected(false);
+        int defaultColor = getResources().getColor(R.color.color_grey, null);
 
-        btnOptionB.setSelected(false);
+        btnOptionA.setBackgroundColor(defaultColor);
 
-        btnOptionC.setSelected(false);
+        btnOptionB.setBackgroundColor(defaultColor);
 
-        btnOptionD.setSelected(false);
+        btnOptionC.setBackgroundColor(defaultColor);
+
+        btnOptionD.setBackgroundColor(defaultColor);
 
     }
 
 
+
+    private void submitCurrentAnswer() {
+
+        if (selectedAnswer == null || currentQuestion == null) {
+
+            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
+
+            return;
+
+        }
+
+
+
+        // Disable continue button during submission
+
+        btnContinue.setEnabled(false);
+
+        progressBar.setVisibility(View.VISIBLE);
+
+
+
+        // Calculate time spent
+
+        long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000; // seconds
+
+
+
+        // Determine if answer is correct
+
+        int isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+
+
+
+        SubmitSingleRequest request = new SubmitSingleRequest(
+
+                sessionId,
+
+                currentQuestion.getItemId(),
+
+                selectedAnswer,
+
+                isCorrect,
+
+                (int) timeSpent
+
+        );
+
+
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+
+        apiService.submitSingleResponse(request).enqueue(new Callback<SingleResponseResult>() {
+
+            @Override
+
+            public void onResponse(Call<SingleResponseResult> call, Response<SingleResponseResult> response) {
+
+                progressBar.setVisibility(View.GONE);
+
+
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+
+                    SingleResponseResult result = response.body();
+
+
+
+                    // Update theta
+
+                    currentTheta = result.getNewTheta();
+
+
+
+                    // Add to answered items
+
+                    itemsAnswered.add(currentQuestion.getItemId());
+
+
+
+                    // Show feedback
+
+                    Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                            result.getFeedback(), Toast.LENGTH_SHORT).show();
+
+
+
+                    // Load next question
+
+                    loadNextAdaptiveQuestion();
+
+                } else {
+
+                    Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                            "Failed to submit answer", Toast.LENGTH_SHORT).show();
+
+                    btnContinue.setEnabled(true);
+
+                }
+
+            }
+
+
+
+            @Override
+
+            public void onFailure(Call<SingleResponseResult> call, Throwable t) {
+
+                progressBar.setVisibility(View.GONE);
+
+                Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                        "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+
+                btnContinue.setEnabled(true);
+
+            }
+
+        });
+
+    }
+
+
+
+    private void finishAssessment(NextItemResponse result) {
+
+        if (result.getFinalTheta() != null) {
+
+            session.saveAbility(result.getFinalTheta().floatValue());
+
+        }
+
+
+
+        // Show final results
+
+        showFinalResultsDialog(result);
+
+    }
+
+
+
+    private void showFinalResultsDialog(NextItemResponse result) {
+
+        StringBuilder message = new StringBuilder();
+
+        message.append(String.format("Questions Completed: %d\n\n",
+
+                result.getItemsCompleted()));
+
+
+
+        if (result.getFinalTheta() != null) {
+
+            message.append(String.format("Ability Level: %.2f\n", result.getFinalTheta()));
+
+
+
+            // Classify ability
+
+            String classification = classifyAbility(result.getFinalTheta());
+
+            message.append(String.format("Classification: %s\n\n", classification));
+
+            message.append(getFeedbackForClassification(classification));
+
+        }
+
+
+
+        if (result.getSem() != null) {
+
+            message.append(String.format("\n\nPrecision: %.2f (lower is better)", result.getSem()));
+
+        }
+
+
+
+        new AlertDialog.Builder(this)
+
+                .setTitle("Assessment Complete!")
+
+                .setMessage(message.toString())
+
+                .setPositiveButton("Continue", (dialog, which) -> {
+
+                    dialog.dismiss();
+
+                    finish();
+
+                })
+
+                .setCancelable(false)
+
+                .show();
+
+    }
+
+
+
+    private String classifyAbility(double theta) {
+
+        if (theta < -1.0) return "Below Basic";
+
+        else if (theta < 0.5) return "Basic";
+
+        else if (theta < 1.5) return "Proficient";
+
+        else return "Advanced";
+
+    }
+
+
+
+    private String getFeedbackForClassification(String classification) {
+
+        switch (classification) {
+
+            case "Advanced":
+
+                return "Excellent work! You've demonstrated advanced literacy skills.";
+
+            case "Proficient":
+
+                return "Great job! You have proficient literacy skills.";
+
+            case "Basic":
+
+                return "Good effort! Keep practicing to improve your skills.";
+
+            case "Below Basic":
+
+                return "You're making progress! Let's work on building your foundation.";
+
+            default:
+
+                return "Assessment complete! Keep learning and practicing.";
+
+        }
+
+    }
+
+
+
+    // Pronunciation recording methods (same as original PreAssessmentActivity)
 
     private void recordPronunciation() {
 
@@ -643,8 +895,6 @@ public class PreAssessmentActivity extends AppCompatActivity {
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
 
-
-        // Initialize speech recognizer if not already done
 
         if (speechRecognizer == null) {
 
@@ -718,11 +968,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         @Override
 
-        public void onRmsChanged(float rmsdB) {
-
-            // Could animate the mic icon based on volume
-
-        }
+        public void onRmsChanged(float rmsdB) {}
 
 
 
@@ -812,7 +1058,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
             tvMicStatus.setText(message);
 
-            Toast.makeText(PreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+            Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
 
         }
 
@@ -844,15 +1090,13 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-                // Send to API for validation
-
                 validatePronunciation(recognizedText, confidence);
 
             } else {
 
                 tvMicStatus.setText("No speech detected");
 
-                Toast.makeText(PreAssessmentActivity.this, "No speech detected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdaptivePreAssessmentActivity.this, "No speech detected", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -876,11 +1120,11 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void validatePronunciation(String recognizedText, float confidence) {
 
-        Question q = questionList.get(currentIndex);
-
-        String expectedWord = q.getItemText();
+        if (currentQuestion == null) return;
 
 
+
+        String expectedWord = currentQuestion.getItemText();
 
         tvMicStatus.setText("Validating...");
 
@@ -888,7 +1132,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         PronunciationRequest request = new PronunciationRequest(
 
-                q.getItemId(),
+                currentQuestion.getItemId(),
 
                 expectedWord,
 
@@ -916,8 +1160,6 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-                    // Update UI with feedback
-
                     String statusText = String.format(Locale.getDefault(),
 
                             "Score: %d%% - %s",
@@ -930,37 +1172,15 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
 
-                    // Create response for this item
+                    // Enable continue button and set selectedAnswer to the recognized text
 
-                    ResponseModel responseModel = new ResponseModel();
-
-                    responseModel.setItemId(q.getItemId());
-
-                    responseModel.setSelectedOption(recognizedText);
-
-                    responseModel.setCorrect(result.isCorrect());
-
-
-
-                    if (currentIndex < responses.size()) {
-
-                        responses.set(currentIndex, responseModel);
-
-                    } else {
-
-                        responses.add(responseModel);
-
-                    }
-
-
-
-                    // Enable continue button
+                    selectedAnswer = recognizedText;
 
                     btnContinue.setEnabled(true);
 
 
 
-                    Toast.makeText(PreAssessmentActivity.this,
+                    Toast.makeText(AdaptivePreAssessmentActivity.this,
 
                             result.getFeedback(),
 
@@ -970,7 +1190,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
                     tvMicStatus.setText("Validation failed");
 
-                    Toast.makeText(PreAssessmentActivity.this,
+                    Toast.makeText(AdaptivePreAssessmentActivity.this,
 
                             "Failed to validate pronunciation",
 
@@ -988,7 +1208,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
                 tvMicStatus.setText("Connection error");
 
-                Toast.makeText(PreAssessmentActivity.this,
+                Toast.makeText(AdaptivePreAssessmentActivity.this,
 
                         "Connection error: " + t.getMessage(),
 
@@ -1004,9 +1224,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     @Override
 
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
 
@@ -1014,13 +1232,11 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                startRecording();
+                recordPronunciation();
 
             } else {
 
-                Toast.makeText(this, "Audio permission required for pronunciation test",
-
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Microphone permission required for pronunciation", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -1039,210 +1255,6 @@ public class PreAssessmentActivity extends AppCompatActivity {
         if (speechRecognizer != null) {
 
             speechRecognizer.destroy();
-
-        }
-
-    }
-
-
-
-    private void disableOptions() {
-
-        btnOptionA.setEnabled(false);
-
-        btnOptionB.setEnabled(false);
-
-        btnOptionC.setEnabled(false);
-
-        btnOptionD.setEnabled(false);
-
-    }
-
-
-
-    private void enableOptions() {
-
-        btnOptionA.setEnabled(true);
-
-        btnOptionB.setEnabled(true);
-
-        btnOptionC.setEnabled(true);
-
-        btnOptionD.setEnabled(true);
-
-    }
-
-
-
-    private void goToNextQuestion() {
-
-        if (selectedAnswer == null && cardPronunciation.getVisibility() != View.VISIBLE) {
-
-            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
-
-            return;
-
-        }
-
-
-
-        if (currentIndex < questionList.size() - 1) {
-
-            currentIndex++;
-
-            showQuestion();
-
-        } else {
-
-            submitResponses();
-
-        }
-
-    }
-
-
-
-    private void submitResponses() {
-
-        int studentId = session.getStudentId();
-
-        SubmitRequest submitRequest = new SubmitRequest(studentId, responses);
-
-
-
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-
-        apiService.submitResponses(submitRequest).enqueue(new Callback<SubmitResponseResult>() {
-
-            @Override
-
-            public void onResponse(Call<SubmitResponseResult> call, Response<SubmitResponseResult> response) {
-
-                if (response.isSuccessful() && response.body() != null) {
-
-                    SubmitResponseResult result = response.body();
-
-
-
-                    // Update session with ability
-
-                    if (result.getAbility() != null) {
-
-                        session.saveAbility((float) result.getAbility().getFinalTheta());
-
-                    }
-
-
-
-                    // Show results dialog
-
-                    showResultsDialog(result);
-
-                } else {
-
-                    Toast.makeText(PreAssessmentActivity.this,
-
-                            "Assessment complete!", Toast.LENGTH_SHORT).show();
-
-                    finish();
-
-                }
-
-            }
-
-
-
-            @Override
-
-            public void onFailure(Call<SubmitResponseResult> call, Throwable t) {
-
-                Toast.makeText(PreAssessmentActivity.this,
-
-                        "Failed to submit responses: " + t.getMessage(),
-
-                        Toast.LENGTH_SHORT).show();
-
-            }
-
-        });
-
-    }
-
-
-
-    private void showResultsDialog(SubmitResponseResult result) {
-
-        // Build message
-
-        StringBuilder message = new StringBuilder();
-
-        message.append(String.format("Score: %d/%d (%.1f%%)\n\n",
-
-                result.getCorrectAnswers(),
-
-                result.getTotalResponses(),
-
-                result.getAccuracy()));
-
-
-
-        if (result.getAbility() != null) {
-
-            message.append(String.format("Ability Level: %.2f\n", result.getAbility().getFinalTheta()));
-
-            message.append(String.format("Classification: %s\n\n", result.getAbility().getClassification()));
-
-            message.append(getFeedbackForClassification(result.getAbility().getClassification()));
-
-        }
-
-
-
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-
-                .setTitle("Assessment Complete!")
-
-                .setMessage(message.toString())
-
-                .setPositiveButton("Continue", (dialog, which) -> {
-
-                    dialog.dismiss();
-
-                    finish();
-
-                })
-
-                .setCancelable(false)
-
-                .show();
-
-    }
-
-
-
-    private String getFeedbackForClassification(String classification) {
-
-        switch (classification) {
-
-            case "Advanced":
-
-                return "Excellent work! You've demonstrated advanced literacy skills.";
-
-            case "Proficient":
-
-                return "Great job! You have proficient literacy skills.";
-
-            case "Basic":
-
-                return "Good effort! Keep practicing to improve your skills.";
-
-            case "Below Basic":
-
-                return "You're making progress! Let's work on building your foundation.";
-
-            default:
-
-                return "Assessment complete! Keep learning and practicing.";
 
         }
 

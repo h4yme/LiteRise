@@ -8,6 +8,7 @@
     <!-- Optional: if you’ll use local storage or cached images -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
         android:allowBackup="true"
@@ -40,10 +41,9 @@
         android:theme="@style/Theme.LiteRise.NoActionBar" />
 
     <!-- ✅ Pre-Assessment Screen -->
-    <activity
-        android:name=".activities.PreAssessmentActivity"
-        android:exported="false"
-        android:theme="@style/Theme.LiteRise.NoActionBar" />
+        <activity
+            android:name=".activities.AdaptivePreAssessmentActivity"
+            android:label="Pre-Assessment" />
 
     <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
     <activity

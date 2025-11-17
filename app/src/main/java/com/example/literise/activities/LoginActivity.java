@@ -48,19 +48,38 @@ public class LoginActivity extends AppCompatActivity {
         student.setEmail(email);
         student.setPassword(password);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         apiService.login(student).enqueue(new Callback<Students>() {
             @Override
             public void onResponse(Call<Students> call, Response<Students> response) {
                 if (response.isSuccessful() && response.body() != null && response.body().getStudent_id() != 0) {
                     Students s = response.body();
 
-                    new SessionManager(LoginActivity.this)
-                            .saveStudent(s.getStudent_id(), s.getFullname(), s.getEmail());
+                    SessionManager sessionManager = new SessionManager(LoginActivity.this);
+
+                    sessionManager.saveStudent(s.getStudent_id(), s.getFullname(), s.getEmail());
+
+
+
+                    // Save token if available
+
+                    if (s.getToken() != null && !s.getToken().isEmpty()) {
+
+                        sessionManager.saveToken(s.getToken());
+
+                    }
+
+
+
+                    // Save ability and XP if available
+
+                    sessionManager.saveAbility(s.getAbility_score());
+
+                    sessionManager.saveXP(s.getXp());
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
-                    Intent intent = new Intent(LoginActivity.this, PreAssessmentActivity.class);
+                    Intent intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
