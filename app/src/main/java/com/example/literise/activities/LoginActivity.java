@@ -55,8 +55,17 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().getStudent_id() != 0) {
                     Students s = response.body();
 
-                    new SessionManager(LoginActivity.this)
-                            .saveStudent(s.getStudent_id(), s.getFullname(), s.getEmail());
+                    SessionManager sessionManager = new SessionManager(LoginActivity.this);
+                    sessionManager.saveStudent(s.getStudent_id(), s.getFullname(), s.getEmail());
+
+                    // Save token if available
+                    if (s.getToken() != null && !s.getToken().isEmpty()) {
+                        sessionManager.saveToken(s.getToken());
+                    }
+
+                    // Save ability and XP if available
+                    sessionManager.saveAbility(s.getAbility_score());
+                    sessionManager.saveXP(s.getXp());
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 

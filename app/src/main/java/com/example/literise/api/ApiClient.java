@@ -9,7 +9,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
 
-    private static final String BASE_URL = "http://10.248.215.210/api/";
+    // TODO: Change this to your XAMPP server IP address
+    // For local testing: http://10.0.2.2/api/ (Android emulator)
+    // For physical device: http://YOUR_PC_IP/api/ (e.g., http://192.168.1.100/api/)
+    private static final String BASE_URL = "http://10.0.2.2/api/";
     private static Retrofit retrofit;
 
     public static Retrofit getClient() {
