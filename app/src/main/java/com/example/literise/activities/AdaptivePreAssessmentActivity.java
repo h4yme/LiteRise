@@ -320,20 +320,27 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void selectAnswer(String option, Button selectedButton) {
         selectedAnswer = option;
-        resetButtonStates();
-        selectedButton.setBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+
+        // Clear all selections first
+        clearSelections();
+
+        // Mark the selected button as selected (triggers the selector drawable)
+        selectedButton.setSelected(true);
+
+        // Enable continue button
         btnContinue.setEnabled(true);
     }
 
     private void resetButtonStates() {
-        int defaultColor = getResources().getColor(R.color.color_grey, null);
-        btnOptionA.setBackgroundColor(defaultColor);
-        btnOptionB.setBackgroundColor(defaultColor);
-        btnOptionC.setBackgroundColor(defaultColor);
-        btnOptionD.setBackgroundColor(defaultColor);
+        // Reset all buttons to unselected state
+        btnOptionA.setSelected(false);
+        btnOptionB.setSelected(false);
+        btnOptionC.setSelected(false);
+        btnOptionD.setSelected(false);
     }
 
     private void clearSelections() {
+        // Reset all buttons to unselected state
         btnOptionA.setSelected(false);
         btnOptionB.setSelected(false);
         btnOptionC.setSelected(false);
