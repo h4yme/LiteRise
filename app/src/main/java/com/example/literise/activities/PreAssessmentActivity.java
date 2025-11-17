@@ -668,6 +668,16 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 500); // 0.5 seconds minimum
+
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true); // Use offline recognition if available
+
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
 
 
         speechRecognizer.startListening(intent);
@@ -862,7 +872,17 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         @Override
 
-        public void onPartialResults(Bundle partialResults) {}
+        public void onPartialResults(Bundle partialResults) {
+
+            ArrayList<String> matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+            if (matches != null && !matches.isEmpty()) {
+
+                tvMicStatus.setText("Heard: " + matches.get(0));
+
+            }
+
+        }
 
 
 

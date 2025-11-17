@@ -152,6 +152,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private int pronunciationScore = 0;
 
+    private String lastPartialResult = null;
 
 
     @Override
@@ -304,7 +305,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                         currentQuestion = result.getItem();
 
-                        sessionId = request.getSessionId(); // Update if session was created
+                        if (result.getSessionId() > 0) {
+
+                            sessionId = result.getSessionId();
+
+                        }
 
                         showQuestion(result);
 
@@ -354,15 +359,25 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Update header with progress
+        tvTitle.setText("Placement Test");
 
-        tvTitle.setText("Adaptive Assessment");
+        int questionsAnswered = itemsAnswered.size() + 1; // Already answered + current question
 
-        tvProgress.setText("Question " + response.getItemsCompleted() +
+        int estimatedRemaining = response.getItemsRemaining();
 
-                " • ~" + response.getItemsRemaining() + " remaining");
+        int estimatedTotal = questionsAnswered + estimatedRemaining;
+
+
+
+        tvProgress.setText(String.format("Question %d of ~%d", questionsAnswered, estimatedTotal));
 
         tvItemTypeBadge.setText(itemType);
+
+
+
+        // Update progress bar (approximate progress)
+
+        progressBar.setProgress((int) (((float) questionsAnswered / estimatedTotal) * 100));
 
 
 
@@ -371,6 +386,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         selectedAnswer = null;
 
         btnContinue.setEnabled(false);
+
+        clearSelections();
 
         resetButtonStates();
 
@@ -410,15 +427,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         }
 
+        enableOptions();
+
     }
 
 
 
     private void handleSyntaxQuestion(Question q) {
 
-        tvQuestion.setText(q.getQuestionText() != null ? q.getQuestionText() :
-
-                "Arrange the words to form a correct sentence:");
+        tvQuestion.setText("Arrange these words to form a correct sentence:");
 
 
 
@@ -426,8 +443,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
 
-            containerScrambledWords.setVisibility(View.VISIBLE);
+            String scrambledText = String.join(" | ", q.getScrambledWords());
 
+            tvPassageText.setText(scrambledText);
+
+            cardPassage.setVisibility(View.VISIBLE);
             // Display scrambled words (implementation depends on your layout)
 
         }
@@ -594,7 +614,45 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     }
 
+    private void clearSelections() {
 
+        btnOptionA.setSelected(false);
+
+        btnOptionB.setSelected(false);
+
+        btnOptionC.setSelected(false);
+
+        btnOptionD.setSelected(false);
+
+    }
+
+
+
+    private void enableOptions() {
+
+        btnOptionA.setEnabled(true);
+
+        btnOptionB.setEnabled(true);
+
+        btnOptionC.setEnabled(true);
+
+        btnOptionD.setEnabled(true);
+
+    }
+
+
+
+    private void disableOptions() {
+
+        btnOptionA.setEnabled(false);
+
+        btnOptionB.setEnabled(false);
+
+        btnOptionC.setEnabled(false);
+
+        btnOptionD.setEnabled(false);
+
+    }
 
     private void submitCurrentAnswer() {
 
@@ -608,9 +666,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Disable continue button during submission
-
         btnContinue.setEnabled(false);
+
+        disableOptions();
 
         progressBar.setVisibility(View.VISIBLE);
 
@@ -623,8 +681,20 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
         // Determine if answer is correct
+        int isCorrect;
+        if ("Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())) {
 
-        int isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+            // For pronunciation, use score >= 70% as correct
+
+            isCorrect = (pronunciationScore >= 70) ? 1 : 0;
+
+        } else {
+
+            // For multiple choice, compare to correct option
+
+            isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+
+        }
 
 
 
@@ -742,9 +812,33 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         StringBuilder message = new StringBuilder();
 
-        message.append(String.format("Questions Completed: %d\n\n",
+        // Show score if available
 
-                result.getItemsCompleted()));
+        if (result.getCorrectAnswers() != null && result.getTotalItems() != null) {
+
+            message.append(String.format("Score: %d/%d",
+
+                    result.getCorrectAnswers(),
+
+                    result.getTotalItems()));
+
+
+
+            if (result.getAccuracy() != null) {
+
+                message.append(String.format(" (%.1f%%)", result.getAccuracy()));
+
+            }
+
+            message.append("\n\n");
+
+        } else {
+
+            message.append(String.format("Questions Completed: %d\n\n",
+
+                    result.getItemsCompleted()));
+
+        }
 
 
 
@@ -889,7 +983,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
         isRecording = true;
-
+        lastPartialResult = null;
         tvMicStatus.setText("Listening...");
 
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
@@ -917,6 +1011,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
 
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 500); // 0.5 seconds minimum
+
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true); // Use offline recognition if available
+
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
 
 
@@ -997,16 +1101,32 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             isRecording = false;
 
             cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+// Check if we have a partial result to use as fallback
 
+            if (error == SpeechRecognizer.ERROR_NO_MATCH && lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
+
+                android.util.Log.d("SpeechRecognition", "ERROR_NO_MATCH but using partial result: " + lastPartialResult);
+
+                tvMicStatus.setText("Processing: " + lastPartialResult);
+
+                validatePronunciation(lastPartialResult.trim(), 0.8f); // Use 0.8 confidence for partial results
+
+                return;
+
+            }
 
 
             String message = "Recognition error";
+
+            boolean shouldRetry = false;
+
+
 
             switch (error) {
 
                 case SpeechRecognizer.ERROR_AUDIO:
 
-                    message = "Audio error";
+                    message = "Audio error - check microphone";
 
                     break;
 
@@ -1018,25 +1138,31 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
 
-                    message = "Insufficient permissions";
+                    message = "Microphone permission required";
 
                     break;
 
                 case SpeechRecognizer.ERROR_NETWORK:
 
-                    message = "Network error";
+                    message = "Network error - retrying offline...";
+
+                    shouldRetry = true;
 
                     break;
 
                 case SpeechRecognizer.ERROR_NO_MATCH:
 
-                    message = "No match found. Please try again.";
+                    // Don't show error for NO_MATCH - partial results might have captured speech
+
+                    message = "Couldn't understand - speak clearly and try again";
 
                     break;
 
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
 
-                    message = "Recognizer busy";
+                    message = "Recognizer busy - please wait";
+
+                    shouldRetry = true;
 
                     break;
 
@@ -1048,7 +1174,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
 
-                    message = "Speech timeout. Please try again.";
+                    message = "No speech detected - tap mic and speak";
 
                     break;
 
@@ -1058,7 +1184,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             tvMicStatus.setText(message);
 
-            Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+
+
+            // Only show toast for serious errors, not NO_MATCH
+
+            if (error != SpeechRecognizer.ERROR_NO_MATCH) {
+
+                Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+
+            }
 
         }
 
@@ -1080,9 +1214,23 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
+            // Log for debugging
+
+            android.util.Log.d("SpeechRecognition", "onResults called");
+
+            android.util.Log.d("SpeechRecognition", "Matches: " + (matches != null ? matches.size() : "null"));
+
             if (matches != null && !matches.isEmpty()) {
 
-                String recognizedText = matches.get(0);
+                android.util.Log.d("SpeechRecognition", "First match: " + matches.get(0));
+
+            }
+
+
+
+            if (matches != null && !matches.isEmpty() && matches.get(0) != null && !matches.get(0).trim().isEmpty()) {
+
+                String recognizedText = matches.get(0).trim();
 
                 float confidence = (confidenceScores != null && confidenceScores.length > 0)
 
@@ -1090,13 +1238,27 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-                validatePronunciation(recognizedText, confidence);
+                android.util.Log.d("SpeechRecognition", "Confidence: " + confidence);
 
+                validatePronunciation(recognizedText, confidence);
+            } else if (lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
+
+                // Fallback to partial result if final result is empty
+
+                android.util.Log.d("SpeechRecognition", "Empty results but using partial: " + lastPartialResult);
+
+                tvMicStatus.setText("Processing: " + lastPartialResult);
+
+                validatePronunciation(lastPartialResult.trim(), 0.8f);
             } else {
 
-                tvMicStatus.setText("No speech detected");
+                tvMicStatus.setText("No clear speech - try again");
 
-                Toast.makeText(AdaptivePreAssessmentActivity.this, "No speech detected", Toast.LENGTH_SHORT).show();
+                Toast.makeText(AdaptivePreAssessmentActivity.this,
+
+                        "Couldn't hear you clearly. Tap the microphone and speak louder.",
+
+                        Toast.LENGTH_LONG).show();
 
             }
 
@@ -1106,7 +1268,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         @Override
 
-        public void onPartialResults(Bundle partialResults) {}
+        public void onPartialResults(Bundle partialResults) {
+
+            ArrayList<String> matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+
+            if (matches != null && !matches.isEmpty() && matches.get(0) != null && !matches.get(0).trim().isEmpty()) {
+
+                lastPartialResult = matches.get(0); // Store for fallback
+
+                tvMicStatus.setText("Heard: " + matches.get(0));
+
+                android.util.Log.d("SpeechRecognition", "Partial result: " + matches.get(0));
+
+            }
+
+        }
 
 
 

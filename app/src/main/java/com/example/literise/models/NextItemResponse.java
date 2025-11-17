@@ -68,7 +68,20 @@ public class NextItemResponse {
 
     private Double sem;
 
+    @SerializedName("session_id")
+    private int sessionId;
 
+    @SerializedName("total_items")
+    private Integer totalItems;
+
+    @SerializedName("correct_answers")
+    private Integer correctAnswers;
+
+
+
+    @SerializedName("accuracy")
+
+    private Double accuracy;
 
     public NextItemResponse() {}
 
@@ -82,7 +95,17 @@ public class NextItemResponse {
 
     }
 
+    public int getSessionId() {
 
+        return sessionId;
+
+    }
+
+    public void setSessionId(int sessionId) {
+
+        this.sessionId = sessionId;
+
+    }
 
     public void setSuccess(boolean success) {
 
@@ -90,7 +113,51 @@ public class NextItemResponse {
 
     }
 
+    public Integer getTotalItems() {
 
+        return totalItems;
+
+    }
+
+
+
+    public void setTotalItems(Integer totalItems) {
+
+        this.totalItems = totalItems;
+
+    }
+
+
+
+    public Integer getCorrectAnswers() {
+
+        return correctAnswers;
+
+    }
+
+
+
+    public void setCorrectAnswers(Integer correctAnswers) {
+
+        this.correctAnswers = correctAnswers;
+
+    }
+
+
+
+    public Double getAccuracy() {
+
+        return accuracy;
+
+    }
+
+
+
+    public void setAccuracy(Double accuracy) {
+
+        this.accuracy = accuracy;
+
+    }
 
     public Question getItem() {
 
