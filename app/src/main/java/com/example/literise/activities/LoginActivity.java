@@ -69,7 +69,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
-                    Intent intent = new Intent(LoginActivity.this, PreAssessmentActivity.class);
+                    // 🎯 Launch Adaptive Assessment (personalized questions)
+                    Intent intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();

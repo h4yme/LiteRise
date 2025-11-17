@@ -25,40 +25,41 @@
         android:usesCleartextTraffic="true"
         android:networkSecurityConfig="@xml/network_security_config">
 
-    <!-- ✅ Splash Screen (Launcher) -->
-    <activity
-        android:name=".activities.SplashActivity"
-        android:exported="true"
-        android:theme="@style/Theme.LiteRise.NoActionBar">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-    </activity>
+        <!-- ✅ Splash Screen (Launcher) -->
+        <activity
+            android:name=".activities.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.LiteRise.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-    <!-- ✅ Login Screen -->
-    <activity
-        android:name=".activities.LoginActivity"
-        android:exported="false"
-        android:theme="@style/Theme.LiteRise.NoActionBar" />
+        <!-- ✅ Login Screen -->
+        <activity
+            android:name=".activities.LoginActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-    <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
-    <activity
-        android:name=".activities.PreAssessmentActivity"
-        android:exported="false"
-        android:theme="@style/Theme.LiteRise.NoActionBar" />
+        <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
+        <activity
+            android:name=".activities.PreAssessmentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-    <!-- ✅ Adaptive Pre-Assessment Screen (Adaptive Mode - 10-15 questions) -->
-    <activity
-        android:name=".activities.AdaptivePreAssessmentActivity"
-        android:exported="false"
-        android:theme="@style/Theme.LiteRise.NoActionBar" />
+        <!-- ✅ Adaptive Pre-Assessment Screen (Adaptive Mode - 10-15 questions) -->
+        <activity
+            android:name=".activities.AdaptivePreAssessmentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-    <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
-    <activity
-        android:name=".MainActivity"
-        android:exported="false"
-        android:theme="@style/Theme.LiteRise.NoActionBar" />
-</application>
+        <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-    </manifest>
+    </application>
+
+</manifest>
