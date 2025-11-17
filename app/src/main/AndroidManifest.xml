@@ -42,9 +42,15 @@
         android:exported="false"
         android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-    <!-- ✅ Pre-Assessment Screen -->
+    <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
     <activity
         android:name=".activities.PreAssessmentActivity"
+        android:exported="false"
+        android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+    <!-- ✅ Adaptive Pre-Assessment Screen (Adaptive Mode - 10-15 questions) -->
+    <activity
+        android:name=".activities.AdaptivePreAssessmentActivity"
         android:exported="false"
         android:theme="@style/Theme.LiteRise.NoActionBar" />
 
