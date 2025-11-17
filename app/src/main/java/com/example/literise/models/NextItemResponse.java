@@ -70,6 +70,12 @@ public class NextItemResponse {
 
 
 
+    @SerializedName("session_id")
+
+    private int sessionId;
+
+
+
     public NextItemResponse() {}
 
 
@@ -231,6 +237,22 @@ public class NextItemResponse {
     public void setSem(Double sem) {
 
         this.sem = sem;
+
+    }
+
+
+
+    public int getSessionId() {
+
+        return sessionId;
+
+    }
+
+
+
+    public void setSessionId(int sessionId) {
+
+        this.sessionId = sessionId;
 
     }
 

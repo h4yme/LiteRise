@@ -304,7 +304,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                         currentQuestion = result.getItem();
 
-                        sessionId = request.getSessionId(); // Update if session was created
+                        sessionId = result.getSessionId(); // Update from API response
 
                         showQuestion(result);
 
