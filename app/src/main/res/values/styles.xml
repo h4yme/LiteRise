@@ -17,7 +17,7 @@
     </style>
 
     <!-- ✅ New improved option button style -->
-    <style name="OptionButtonStyleNew">
+    <style name="OptionButtonStyleNew" parent="Widget.AppCompat.Button">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginBottom">10dp</item>
@@ -27,6 +27,7 @@
         <item name="android:gravity">center_vertical|start</item>
         <item name="android:textColor">@color/option_button_text_color</item>
         <item name="android:background">@drawable/option_button_background</item>
+        <item name="android:backgroundTint">@null</item>
         <item name="android:stateListAnimator">@null</item>
         <item name="android:textSize">15sp</item>
         <item name="android:fontFamily">sans-serif</item>
