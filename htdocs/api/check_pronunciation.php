@@ -64,7 +64,7 @@ try {
     $feedback = generatePronunciationFeedback($score);
 
     // Log the pronunciation attempt
-    logPronunciationAttempt($conn, $user['student_id'], $itemId, $expectedWord, $recognizedText, $score);
+    logPronunciationAttempt($conn, $user['studentID'], $itemId, $expectedWord, $recognizedText, $score);
 
     // Return result
     sendResponse([
