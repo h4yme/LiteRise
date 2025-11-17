@@ -2,6 +2,7 @@ package com.example.literise.activities;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
@@ -17,7 +19,8 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.PreAssessmentResponse;
 import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
-import com.example.literise.models.SubmitRequest; // ✅ new wrapper class
+import com.example.literise.models.SubmitRequest;
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,15 +31,20 @@ import retrofit2.Response;
 
 public class PreAssessmentActivity extends AppCompatActivity {
 
-    private TextView tvTitle, tvProgress, tvPassage, tvPassageText, tvQuestion, tvContinue;
+    private TextView tvTitle, tvProgress, tvPassage, tvPassageText, tvQuestion;
+    private TextView tvItemTypeBadge, tvPronunciationWord, tvPronunciationGuide, tvMicStatus;
     private Button btnOptionA, btnOptionB, btnOptionC, btnOptionD;
+    private MaterialButton btnContinue;
+    private CardView cardPassage, cardPronunciation, cardQuestion, cardMicButton;
     private ImageView ivMic;
     private ProgressBar progressBar;
+    private View gridOptions, containerScrambledWords;
 
     private List<Question> questionList = new ArrayList<>();
     private List<ResponseModel> responses = new ArrayList<>();
     private int currentIndex = 0;
     private SessionManager session;
+    private String selectedAnswer = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,20 +62,34 @@ public class PreAssessmentActivity extends AppCompatActivity {
         tvPassage = findViewById(R.id.tvPassage);
         tvPassageText = findViewById(R.id.tvPassageText);
         tvQuestion = findViewById(R.id.tvQuestion);
-        tvContinue = findViewById(R.id.tvContinue);
+        tvItemTypeBadge = findViewById(R.id.tvItemTypeBadge);
+        tvPronunciationWord = findViewById(R.id.tvPronunciationWord);
+        tvPronunciationGuide = findViewById(R.id.tvPronunciationGuide);
+        tvMicStatus = findViewById(R.id.tvMicStatus);
 
         btnOptionA = findViewById(R.id.btnOptionA);
         btnOptionB = findViewById(R.id.btnOptionB);
         btnOptionC = findViewById(R.id.btnOptionC);
         btnOptionD = findViewById(R.id.btnOptionD);
+        btnContinue = findViewById(R.id.btnContinue);
+
+        cardPassage = findViewById(R.id.cardPassage);
+        cardPronunciation = findViewById(R.id.cardPronunciation);
+        cardQuestion = findViewById(R.id.cardQuestion);
+        cardMicButton = findViewById(R.id.cardMicButton);
         ivMic = findViewById(R.id.ivMic);
         progressBar = findViewById(R.id.progressBar);
 
-        btnOptionA.setOnClickListener(v -> selectAnswer("A"));
-        btnOptionB.setOnClickListener(v -> selectAnswer("B"));
-        btnOptionC.setOnClickListener(v -> selectAnswer("C"));
-        btnOptionD.setOnClickListener(v -> selectAnswer("D"));
-        tvContinue.setOnClickListener(v -> goToNextQuestion());
+        gridOptions = findViewById(R.id.gridOptions);
+        containerScrambledWords = findViewById(R.id.containerScrambledWords);
+
+        btnOptionA.setOnClickListener(v -> selectAnswer("A", btnOptionA));
+        btnOptionB.setOnClickListener(v -> selectAnswer("B", btnOptionB));
+        btnOptionC.setOnClickListener(v -> selectAnswer("C", btnOptionC));
+        btnOptionD.setOnClickListener(v -> selectAnswer("D", btnOptionD));
+        btnContinue.setOnClickListener(v -> goToNextQuestion());
+
+        cardMicButton.setOnClickListener(v -> recordPronunciation());
     }
 
     private void loadQuestions() {
@@ -104,78 +126,142 @@ public class PreAssessmentActivity extends AppCompatActivity {
         Question q = questionList.get(currentIndex);
         String itemType = q.getItemType() != null ? q.getItemType() : "";
 
-        tvTitle.setText("Placement Test - " + itemType);
+        // Update header
+        tvTitle.setText("Placement Test");
+        tvProgress.setText("Question " + (currentIndex + 1) + " of " + questionList.size());
+        tvItemTypeBadge.setText(itemType);
+
+        // Update progress bar
+        progressBar.setProgress((int) (((float) (currentIndex + 1) / questionList.size()) * 100));
+
+        // Reset selection state
+        selectedAnswer = null;
+        btnContinue.setEnabled(false);
+        clearSelections();
+
+        // Hide all sections by default
+        cardPassage.setVisibility(View.GONE);
+        cardPronunciation.setVisibility(View.GONE);
+        gridOptions.setVisibility(View.VISIBLE);
+        containerScrambledWords.setVisibility(View.GONE);
 
         // Handle different question types
         if ("Syntax".equalsIgnoreCase(itemType)) {
-            // For sentence scrambling - show scrambled words
-            if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
-                tvQuestion.setText("Arrange these words to form a correct sentence:\n" +
-                    String.join(" | ", q.getScrambledWords()));
-            } else {
-                tvQuestion.setText(q.getQuestionText());
-            }
-
-            // For syntax, if we have answer choices in options, show them
-            // Otherwise, hide option D as it's usually empty
-            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
-            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
-            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
-            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
-                android.view.View.VISIBLE : android.view.View.GONE);
-            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
-                btnOptionD.setText("d) " + q.getOptionD());
-            }
-
+            handleSyntaxQuestion(q);
         } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
-            // For pronunciation - show the word and phonetic guide
-            tvQuestion.setText("Pronounce this word correctly:\n\n" +
-                q.getItemText() + "\n\n" +
-                "Pronunciation: " + (q.getPassageText() != null ? q.getPassageText() : ""));
-
-            // Show options if available (may have pronunciation variations)
-            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
-            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
-            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
-            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
-                android.view.View.VISIBLE : android.view.View.GONE);
-            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
-                btnOptionD.setText("d) " + q.getOptionD());
-            }
-
+            handlePronunciationQuestion(q);
+        } else if ("Spelling".equalsIgnoreCase(itemType) || "Grammar".equalsIgnoreCase(itemType)) {
+            handleMultipleChoiceQuestion(q);
         } else {
-            // For Spelling, Grammar, and other types - standard multiple choice
-            tvQuestion.setText(q.getQuestionText());
-
-            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
-            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
-            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
-            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
-                android.view.View.VISIBLE : android.view.View.GONE);
-            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
-                btnOptionD.setText("d) " + q.getOptionD());
-            }
+            // Default to multiple choice
+            handleMultipleChoiceQuestion(q);
         }
-
-        // Show passage text if available
-        tvPassageText.setText(q.getPassageText() == null ? "" : q.getPassageText());
-
-        tvProgress.setText((currentIndex + 1) + "/" + questionList.size() + " Questions");
-        progressBar.setProgress((int) (((float) (currentIndex + 1) / questionList.size()) * 100));
 
         enableOptions();
     }
 
-    private void selectAnswer(String choice) {
+    private void handleSyntaxQuestion(Question q) {
+        tvQuestion.setText("Arrange these words to form a correct sentence:");
+
+        // Show scrambled words if available
+        if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
+            String scrambledText = String.join(" | ", q.getScrambledWords());
+            tvPassageText.setText(scrambledText);
+            cardPassage.setVisibility(View.VISIBLE);
+        }
+
+        // Show answer options
+        setOptionsVisibility(q);
+    }
+
+    private void handlePronunciationQuestion(Question q) {
+        // Show pronunciation card
+        cardPronunciation.setVisibility(View.VISIBLE);
+        cardQuestion.setVisibility(View.GONE);
+
+        tvPronunciationWord.setText(q.getItemText() != null ? q.getItemText() : "");
+        tvPronunciationGuide.setText(q.getPassageText() != null ? "/" + q.getPassageText() + "/" : "");
+
+        // Auto-enable continue for pronunciation (after recording)
+        // For now, we'll treat mic tap as completion
+    }
+
+    private void handleMultipleChoiceQuestion(Question q) {
+        tvQuestion.setText(q.getQuestionText());
+        setOptionsVisibility(q);
+    }
+
+    private void setOptionsVisibility(Question q) {
+        btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
+        btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
+        btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
+
+        if (q.getOptionD() != null && !q.getOptionD().isEmpty()) {
+            btnOptionD.setVisibility(View.VISIBLE);
+            btnOptionD.setText("d) " + q.getOptionD());
+        } else {
+            btnOptionD.setVisibility(View.GONE);
+        }
+
+        btnOptionA.setVisibility(View.VISIBLE);
+        btnOptionB.setVisibility(View.VISIBLE);
+        btnOptionC.setVisibility(View.VISIBLE);
+    }
+
+    private void selectAnswer(String choice, Button selectedButton) {
+        Question q = questionList.get(currentIndex);
+
+        // Clear previous selections
+        clearSelections();
+
+        // Mark current selection
+        selectedButton.setSelected(true);
+        selectedAnswer = choice;
+
+        // Create response
+        ResponseModel response = new ResponseModel();
+        response.setItemId(q.getItemId());
+        response.setSelectedOption(choice);
+        response.setCorrect(q.getCorrectOption() != null && q.getCorrectOption().equalsIgnoreCase(choice));
+
+        // Update or add response
+        if (currentIndex < responses.size()) {
+            responses.set(currentIndex, response);
+        } else {
+            responses.add(response);
+        }
+
+        // Enable continue button
+        btnContinue.setEnabled(true);
+    }
+
+    private void clearSelections() {
+        btnOptionA.setSelected(false);
+        btnOptionB.setSelected(false);
+        btnOptionC.setSelected(false);
+        btnOptionD.setSelected(false);
+    }
+
+    private void recordPronunciation() {
+        // TODO: Implement pronunciation recording
+        // For now, just mark as recorded and enable continue
+        tvMicStatus.setText("Recorded ✓");
+        btnContinue.setEnabled(true);
+
+        // Create a placeholder response for pronunciation
         Question q = questionList.get(currentIndex);
         ResponseModel response = new ResponseModel();
+        response.setItemId(q.getItemId());
+        response.setSelectedOption("RECORDED"); // Placeholder
+        response.setCorrect(true); // For now, assume correct
 
-        response.setItemId(q.getItemId()); // ✅ corrected
-        response.setSelectedOption(choice);
-        response.setCorrect(q.getCorrectOption().equalsIgnoreCase(choice));
+        if (currentIndex < responses.size()) {
+            responses.set(currentIndex, response);
+        } else {
+            responses.add(response);
+        }
 
-        responses.add(response);
-        disableOptions();
+        Toast.makeText(this, "Pronunciation recorded", Toast.LENGTH_SHORT).show();
     }
 
     private void disableOptions() {
@@ -193,6 +279,11 @@ public class PreAssessmentActivity extends AppCompatActivity {
     }
 
     private void goToNextQuestion() {
+        if (selectedAnswer == null && cardPronunciation.getVisibility() != View.VISIBLE) {
+            Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         if (currentIndex < questionList.size() - 1) {
             currentIndex++;
             showQuestion();
