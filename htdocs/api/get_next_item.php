@@ -83,7 +83,6 @@ try {
     }
 
     // Get all available items (not yet answered)
-    $placeholders = str_repeat('?,', count($itemsAnswered) - 1) . '?';
     $query = "SELECT
                 ItemID,
                 ItemText,
@@ -102,6 +101,7 @@ try {
               WHERE IsActive = 1";
 
     if (!empty($itemsAnswered)) {
+        $placeholders = str_repeat('?,', count($itemsAnswered) - 1) . '?';
         $query .= " AND ItemID NOT IN ($placeholders)";
         $stmt = $conn->prepare($query);
         $stmt->execute($itemsAnswered);
