@@ -105,7 +105,7 @@ try {
         'XP' => (int)$student['TotalXP'], // Alias for Android
         'CurrentStreak' => (int)$student['CurrentStreak'],
         'LongestStreak' => (int)$student['LongestStreak'],
-        'LastLogin' => $student['LastLogin'],
+        'LastLogin' => $student['LastLogin'] ?? null,
         'token' => $token
     ];
 
