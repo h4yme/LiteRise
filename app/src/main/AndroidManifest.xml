@@ -72,12 +72,6 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-        <!-- ✅ Sentence Scramble Game Activity -->
-        <activity
-            android:name=".activities.SentenceScrambleActivity"
-            android:exported="false"
-            android:theme="@style/Theme.LiteRise.NoActionBar" />
-
     </application>
 
 </manifest>

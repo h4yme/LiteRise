@@ -92,11 +92,10 @@ public class LessonActivity extends AppCompatActivity {
         // Initialize available games pool (randomized)
         availableGames = new ArrayList<>(Arrays.asList(
                 "sentence_scramble",
-                "sentence_scramble", // More weight to implemented game
-                "timed_trail",       // Coming soon
-                "word_hunt",         // Coming soon
-                "shadow_read",       // Coming soon
-                "minimal_pairs"      // Coming soon
+                "timed_trail",
+                "word_hunt",
+                "shadow_read",
+                "minimal_pairs"
         ));
         Collections.shuffle(availableGames);
 
@@ -149,7 +148,8 @@ public class LessonActivity extends AppCompatActivity {
                 tvGameReward.setText("⭐ Earn up to 500 XP");
                 ivGameIcon.setImageResource(R.drawable.ic_edit);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_jade1, null));
-                btnStartGame.setEnabled(true);
+                btnStartGame.setEnabled(false);
+                btnStartGame.setText("Coming Soon");
                 break;
 
             case "timed_trail":
@@ -195,26 +195,8 @@ public class LessonActivity extends AppCompatActivity {
     }
 
     private void launchGame() {
-        Intent intent = null;
-
-        switch (currentGame) {
-            case "sentence_scramble":
-                intent = new Intent(this, SentenceScrambleActivity.class);
-                intent.putExtra("lesson_type", lessonType);
-                break;
-
-            // Add other game activities when implemented
-            case "timed_trail":
-            case "word_hunt":
-            case "shadow_read":
-            case "minimal_pairs":
-                CustomToast.showInfo(this, "This game is coming soon!");
-                return;
-        }
-
-        if (intent != null) {
-            startActivityForResult(intent, GAME_REQUEST_CODE);
-        }
+        // All games are "Coming Soon" for now
+        CustomToast.showInfo(this, "This game is coming soon!");
     }
 
     @Override
@@ -224,7 +206,7 @@ public class LessonActivity extends AppCompatActivity {
         if (requestCode == GAME_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
             // Get game results
             int xpEarned = data.getIntExtra("xp_earned", 0);
-            float accuracy = data.getFloatExtra("accuracy", 0);
+            float accuracy = data.getIntExtra("accuracy", 0);
 
             // Update totals
             totalXPEarned += xpEarned;
@@ -266,32 +248,9 @@ public class LessonActivity extends AppCompatActivity {
         float finalAccuracy = gamesPlayed > 0 ? (totalAccuracy / gamesPlayed) : 0;
         gameSession.setAccuracyPercentage(finalAccuracy);
 
-        // Show completion dialog
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_lesson_complete, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setView(dialogView);
-        builder.setCancelable(false);
-
-        AlertDialog dialog = builder.create();
-        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-
-        // Set data in dialog
-        TextView tvDialogXP = dialogView.findViewById(R.id.tvDialogTotalXP);
-        TextView tvDialogAccuracy = dialogView.findViewById(R.id.tvDialogAccuracy);
-        MaterialButton btnContinue = dialogView.findViewById(R.id.btnDialogContinue);
-
-        tvDialogXP.setText(String.valueOf(totalXPEarned));
-        tvDialogAccuracy.setText(String.format("%.1f%%", finalAccuracy));
-
-        btnContinue.setOnClickListener(v -> {
-            dialog.dismiss();
-            // TODO: Launch Post Assessment
-            CustomToast.showSuccess(this, "Lesson Complete! Post-assessment coming soon.");
-            finish();
-        });
-
-        dialog.show();
+        // For now, just show completion message
+        CustomToast.showSuccess(this, "Lesson Complete! Post-assessment coming soon.");
+        finish();
     }
 
     private void showExitConfirmation() {
