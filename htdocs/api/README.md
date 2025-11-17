@@ -431,6 +431,417 @@ curl -X POST http://localhost/api/update_ability.php \
 
 ---
 
+## 10. Get All Badges
+
+**Endpoint:** `GET /get_badges.php`
+
+**cURL Test:**
+```bash
+curl http://localhost/api/get_badges.php
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "count": 7,
+  "badges": [
+    {
+      "BadgeID": 1,
+      "BadgeName": "First Steps",
+      "Description": "Complete your first assessment",
+      "Icon": "🌟",
+      "XPRequired": 0,
+      "CreatedDate": "2025-01-15"
+    }
+  ]
+}
+```
+
+---
+
+## 11. Get Student Badges
+
+**Endpoint:** `GET /get_student_badges.php?StudentID=1` or `POST /get_student_badges.php`
+
+**Request (POST):**
+```json
+{
+  "StudentID": 1
+}
+```
+
+**cURL Test:**
+```bash
+curl http://localhost/api/get_student_badges.php?StudentID=1
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "StudentID": 1,
+  "count": 3,
+  "badges": [
+    {
+      "UnlockID": 1,
+      "BadgeID": 1,
+      "BadgeName": "First Steps",
+      "Description": "Complete your first assessment",
+      "Icon": "🌟",
+      "XPRequired": 0,
+      "UnlockedDate": "2025-01-15 10:30:00"
+    }
+  ]
+}
+```
+
+---
+
+## 12. Get Leaderboard
+
+**Endpoint:** `GET /get_leaderboard.php?GradeLevel=4&Limit=10`
+
+**Parameters:**
+- `GradeLevel` (optional): Filter by grade (0 = all grades)
+- `Limit` (optional): Number of results (default: 10, max: 100)
+
+**cURL Test:**
+```bash
+curl "http://localhost/api/get_leaderboard.php?GradeLevel=4&Limit=10"
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "filter": {
+    "GradeLevel": 4,
+    "Limit": 10
+  },
+  "count": 3,
+  "leaderboard": [
+    {
+      "Rank": 1,
+      "StudentID": 1,
+      "FullName": "Maria Santos",
+      "FirstName": "Maria",
+      "GradeLevel": 4,
+      "Section": "A",
+      "TotalXP": 500,
+      "CurrentStreak": 5,
+      "LongestStreak": 10,
+      "AbilityScore": 0.75
+    }
+  ]
+}
+```
+
+---
+
+## 13. Change Password
+
+**Endpoint:** `POST /change_password.php`
+
+**Request:**
+```json
+{
+  "StudentID": 1,
+  "OldPassword": "password123",
+  "NewPassword": "newpassword456"
+}
+```
+
+**cURL Test:**
+```bash
+curl -X POST http://localhost/api/change_password.php \
+  -H "Content-Type: application/json" \
+  -d '{
+    "StudentID": 1,
+    "OldPassword": "password123",
+    "NewPassword": "newpassword456"
+  }'
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "error": "Current password is incorrect"
+}
+```
+
+---
+
+## 14. Get Session History
+
+**Endpoint:** `GET /get_session_history.php?StudentID=1&Limit=20`
+
+**Parameters:**
+- `StudentID` (required): Student ID
+- `Limit` (optional): Number of sessions (default: 20, max: 100)
+
+**cURL Test:**
+```bash
+curl "http://localhost/api/get_session_history.php?StudentID=1&Limit=20"
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "StudentID": 1,
+  "count": 5,
+  "sessions": [
+    {
+      "SessionID": 5,
+      "SessionType": "PreAssessment",
+      "StartTime": "2025-01-15 14:30:00",
+      "EndTime": "2025-01-15 15:00:00",
+      "InitialTheta": 0.0,
+      "FinalTheta": 0.23,
+      "ThetaChange": 0.23,
+      "TotalQuestions": 20,
+      "CorrectAnswers": 15,
+      "Accuracy": 75.0,
+      "IsCompleted": true
+    }
+  ]
+}
+```
+
+---
+
+## 15. Teacher Login
+
+**Endpoint:** `POST /teacher_login.php`
+
+**Request:**
+```json
+{
+  "email": "elena.torres@teacher.com",
+  "password": "password123"
+}
+```
+
+**cURL Test:**
+```bash
+curl -X POST http://localhost/api/teacher_login.php \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "elena.torres@teacher.com",
+    "password": "password123"
+  }'
+```
+
+**Success Response (200):**
+```json
+{
+  "TeacherID": 1,
+  "FullName": "Elena Torres",
+  "FirstName": "Elena",
+  "LastName": "Torres",
+  "email": "elena.torres@teacher.com",
+  "Department": "Elementary",
+  "StudentCount": 15
+}
+```
+
+---
+
+## 16. Get Students by Teacher
+
+**Endpoint:** `GET /get_students_by_teacher.php?TeacherID=1`
+
+**cURL Test:**
+```bash
+curl http://localhost/api/get_students_by_teacher.php?TeacherID=1
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "TeacherID": 1,
+  "count": 3,
+  "students": [
+    {
+      "StudentID": 1,
+      "FullName": "Maria Santos",
+      "FirstName": "Maria",
+      "LastName": "Santos",
+      "Email": "maria.santos@student.com",
+      "GradeLevel": 4,
+      "Section": "A",
+      "CurrentAbility": 0.23,
+      "InitialAbility": 0.0,
+      "AbilityGrowth": 0.23,
+      "TotalXP": 150,
+      "CurrentStreak": 3,
+      "LongestStreak": 5,
+      "CompletedSessions": 2,
+      "BadgeCount": 1,
+      "LastLogin": "2025-01-15 10:00:00",
+      "MemberSince": "2025-01-01"
+    }
+  ]
+}
+```
+
+---
+
+## 17. Get Class Statistics
+
+**Endpoint:** `GET /get_class_statistics.php?TeacherID=1`
+
+**cURL Test:**
+```bash
+curl http://localhost/api/get_class_statistics.php?TeacherID=1
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "TeacherID": 1,
+  "overall": {
+    "TotalStudents": 15,
+    "AverageAbility": 0.4523,
+    "TotalClassXP": 2500,
+    "AverageXP": 166,
+    "LongestStreak": 10,
+    "TotalCompletedSessions": 45
+  },
+  "abilityDistribution": {
+    "Beginner": 2,
+    "Developing": 5,
+    "Intermediate": 6,
+    "Advanced": 2,
+    "Expert": 0
+  },
+  "recentActivity": {
+    "RecentSessions": 12,
+    "ActiveStudents": 8,
+    "Period": "Last 7 days"
+  },
+  "topStudents": [
+    {
+      "StudentID": 1,
+      "FullName": "Maria Santos",
+      "TotalXP": 500,
+      "CurrentAbility": 0.75
+    }
+  ],
+  "gradeBreakdown": [
+    {
+      "GradeLevel": 4,
+      "StudentCount": 8,
+      "AverageAbility": 0.45,
+      "AverageXP": 175
+    }
+  ]
+}
+```
+
+---
+
+## 18. Update Student Profile
+
+**Endpoint:** `POST /update_profile.php`
+
+**Request:**
+```json
+{
+  "StudentID": 1,
+  "FirstName": "Maria",
+  "LastName": "Santos",
+  "Email": "maria.new@student.com",
+  "Section": "B"
+}
+```
+
+**Note:** Only include fields you want to update
+
+**cURL Test:**
+```bash
+curl -X POST http://localhost/api/update_profile.php \
+  -H "Content-Type: application/json" \
+  -d '{
+    "StudentID": 1,
+    "Section": "B"
+  }'
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "student": {
+    "StudentID": 1,
+    "FullName": "Maria Santos",
+    "FirstName": "Maria",
+    "LastName": "Santos",
+    "Email": "maria.santos@student.com",
+    "GradeLevel": 4,
+    "Section": "B",
+    "AbilityScore": 0.23,
+    "XP": 150
+  }
+}
+```
+
+---
+
+## 19. Get Item Details
+
+**Endpoint:** `GET /get_item_details.php?ItemID=1`
+
+**cURL Test:**
+```bash
+curl http://localhost/api/get_item_details.php?ItemID=1
+```
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "item": {
+    "ItemID": 1,
+    "ItemType": "MultipleChoice",
+    "QuestionText": "What is the main idea?",
+    "PassageText": "Once upon a time...",
+    "AnswerChoices": ["Option A", "Option B", "Option C"],
+    "CorrectAnswer": "B",
+    "GradeLevel": 4,
+    "Skill": "Reading Comprehension",
+    "Topic": "Main Idea",
+    "IsActive": true,
+    "CreatedDate": "2025-01-01"
+  },
+  "irtParameters": {
+    "Difficulty": 0.0,
+    "Discrimination": 1.2,
+    "Guessing": 0.25
+  },
+  "statistics": {
+    "TimesUsed": 50,
+    "TimesCorrect": 35,
+    "SuccessRate": 70.0,
+    "AverageTimeSpent": 15.5
+  }
+}
+```
+
+---
+
 ## 🧪 Complete Test Flow
 
 ### Step 1: Login
