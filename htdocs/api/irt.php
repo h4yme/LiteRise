@@ -64,7 +64,17 @@ class ItemResponseTheory {
      * @return float Estimated theta
      */
     public function estimateAbility($responses, $initialTheta = 0.0, $maxIterations = 50, $tolerance = 0.01) {
-        $theta = $initialTheta;
+        // If starting from extreme values, use a more moderate starting point
+        // This prevents numerical issues and ceiling/floor effects
+        if ($initialTheta >= 2.5) {
+            error_log("IRT: Initial theta $initialTheta is very high, using 1.5 as starting point");
+            $theta = 1.5; // Start from Advanced level instead of ceiling
+        } elseif ($initialTheta <= -2.5) {
+            error_log("IRT: Initial theta $initialTheta is very low, using -1.5 as starting point");
+            $theta = -1.5; // Start from low but not floor
+        } else {
+            $theta = $initialTheta;
+        }
 
         for ($iteration = 0; $iteration < $maxIterations; $iteration++) {
             $firstDerivative = 0;
@@ -98,7 +108,17 @@ class ItemResponseTheory {
             if ($secondDerivative == 0) break;
 
             $thetaChange = -$firstDerivative / $secondDerivative;
+
+            // Limit step size to prevent overshooting
+            $maxStepSize = 1.0;
+            if (abs($thetaChange) > $maxStepSize) {
+                $thetaChange = $maxStepSize * ($thetaChange > 0 ? 1 : -1);
+            }
+
             $theta = $theta + $thetaChange;
+
+            // Constrain theta during iteration (not just at end)
+            $theta = max(-3.0, min(3.0, $theta));
 
             // Check convergence
             if (abs($thetaChange) < $tolerance) {
@@ -106,7 +126,7 @@ class ItemResponseTheory {
             }
         }
 
-        // Constrain theta to reasonable range (-3 to 3)
+        // Final constraint to reasonable range (-3 to 3)
         $theta = max(-3.0, min(3.0, $theta));
 
         return $theta;
