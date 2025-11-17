@@ -526,7 +526,7 @@
 
 
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
 
                         android:id="@+id/btnOptionA"
 
@@ -536,7 +536,7 @@
 
 
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
 
                         android:id="@+id/btnOptionB"
 
@@ -546,7 +546,7 @@
 
 
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
 
                         android:id="@+id/btnOptionC"
 
@@ -556,7 +556,7 @@
 
 
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
 
                         android:id="@+id/btnOptionD"
 

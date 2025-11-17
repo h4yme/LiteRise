@@ -75,7 +75,7 @@ import com.example.literise.models.SubmitSingleRequest;
 import com.example.literise.models.SubmitResponseResult;
 
 import com.google.android.material.button.MaterialButton;
-
+import com.example.literise.utils.CustomToast;
 
 
 import java.util.ArrayList;
@@ -734,8 +734,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Determine if answer is correct
-        int isCorrect;
+        final int isCorrect;
+
         if ("Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())) {
 
             // For pronunciation, use score >= 70% as correct
@@ -798,23 +798,27 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-                    // Show feedback
+                    // Show quick beautiful feedback
 
-                    Toast.makeText(AdaptivePreAssessmentActivity.this,
+                    if (isCorrect == 1) {
 
-                            result.getFeedback(), Toast.LENGTH_SHORT).show();
+                        CustomToast.showSuccess(AdaptivePreAssessmentActivity.this, "Correct!");
+
+                    } else {
+
+                        CustomToast.showError(AdaptivePreAssessmentActivity.this, "Incorrect");
+
+                    }
 
 
 
-                    // Load next question
+                    // Load next question immediately (don't wait for toast)
 
                     loadNextAdaptiveQuestion();
 
                 } else {
 
-                    Toast.makeText(AdaptivePreAssessmentActivity.this,
-
-                            "Failed to submit answer", Toast.LENGTH_SHORT).show();
+                    CustomToast.showError(AdaptivePreAssessmentActivity.this, "Failed to submit answer");
 
                     btnContinue.setEnabled(true);
 
@@ -830,9 +834,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 progressBar.setVisibility(View.GONE);
 
-                Toast.makeText(AdaptivePreAssessmentActivity.this,
-
-                        "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                CustomToast.showError(AdaptivePreAssessmentActivity.this, "Connection error");
 
                 btnContinue.setEnabled(true);
 
