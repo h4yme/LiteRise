@@ -524,17 +524,72 @@ public class PreAssessmentActivity extends AppCompatActivity {
         SubmitRequest submitRequest = new SubmitRequest(studentId, responses);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.submitResponses(submitRequest).enqueue(new Callback<Void>() {
+        apiService.submitResponses(submitRequest).enqueue(new Callback<SubmitResponseResult>() {
             @Override
-            public void onResponse(Call<Void> call, Response<Void> response) {
-                Toast.makeText(PreAssessmentActivity.this, "Assessment complete!", Toast.LENGTH_SHORT).show();
-                finish();
+            public void onResponse(Call<SubmitResponseResult> call, Response<SubmitResponseResult> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SubmitResponseResult result = response.body();
+
+                    // Update session with ability
+                    if (result.getAbility() != null) {
+                        session.saveAbility((float) result.getAbility().getFinalTheta());
+                    }
+
+                    // Show results dialog
+                    showResultsDialog(result);
+                } else {
+                    Toast.makeText(PreAssessmentActivity.this,
+                        "Assessment complete!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
 
             @Override
-            public void onFailure(Call<Void> call, Throwable t) {
-                Toast.makeText(PreAssessmentActivity.this, "Failed to submit responses", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<SubmitResponseResult> call, Throwable t) {
+                Toast.makeText(PreAssessmentActivity.this,
+                    "Failed to submit responses: " + t.getMessage(),
+                    Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void showResultsDialog(SubmitResponseResult result) {
+        // Build message
+        StringBuilder message = new StringBuilder();
+        message.append(String.format("Score: %d/%d (%.1f%%)\n\n",
+            result.getCorrectAnswers(),
+            result.getTotalResponses(),
+            result.getAccuracy()));
+
+        if (result.getAbility() != null) {
+            message.append(String.format("Ability Level: %.2f\n", result.getAbility().getFinalTheta()));
+            message.append(String.format("Classification: %s\n\n", result.getAbility().getClassification()));
+            message.append(getFeedbackForClassification(result.getAbility().getClassification()));
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("Assessment Complete!")
+            .setMessage(message.toString())
+            .setPositiveButton("Continue", (dialog, which) -> {
+                dialog.dismiss();
+                finish();
+            })
+            .setCancelable(false)
+            .show();
+    }
+
+    private String getFeedbackForClassification(String classification) {
+        switch (classification) {
+            case "Advanced":
+                return "Excellent work! You've demonstrated advanced literacy skills.";
+            case "Proficient":
+                return "Great job! You have proficient literacy skills.";
+            case "Basic":
+                return "Good effort! Keep practicing to improve your skills.";
+            case "Below Basic":
+                return "You're making progress! Let's work on building your foundation.";
+            default:
+                return "Assessment complete! Keep learning and practicing.";
+        }
     }
 }

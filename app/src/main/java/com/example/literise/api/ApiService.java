@@ -8,6 +8,7 @@ import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
 import com.example.literise.models.SubmitRequest;
+import com.example.literise.models.SubmitResponseResult;
 
 import java.util.List;
 
@@ -29,7 +30,7 @@ public interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST("submit_responses.php")
-    Call<Void> submitResponses(@Body SubmitRequest request);
+    Call<SubmitResponseResult> submitResponses(@Body SubmitRequest request);
 
     @Headers("Content-Type: application/json")
     @POST("check_pronunciation.php")
