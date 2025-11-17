@@ -345,7 +345,14 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000; // seconds
 
         // Determine if answer is correct
-        int isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+        int isCorrect;
+        if ("Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())) {
+            // For pronunciation, use score >= 70% as correct
+            isCorrect = (pronunciationScore >= 70) ? 1 : 0;
+        } else {
+            // For multiple choice, compare to correct option
+            isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+        }
 
         SubmitSingleRequest request = new SubmitSingleRequest(
                 sessionId,
