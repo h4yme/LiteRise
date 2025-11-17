@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
 import com.example.literise.database.SessionManager;
+import com.example.literise.utils.CustomToast;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 
 public class DashboardActivity extends AppCompatActivity {
@@ -160,7 +161,28 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void openSettings() {
-        // TODO: Navigate to settings
+        // Show logout confirmation dialog
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Settings")
+                .setMessage("Do you want to logout?")
+                .setPositiveButton("Logout", (dialog, which) -> logout())
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void logout() {
+        // Clear session
+        session.logout();
+
+        // Show logout message
+        CustomToast.showSuccess(this, "Logged out successfully");
+
+        // Navigate to login screen
+        Intent intent = new Intent(this, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
     }
 
     private void openAchievements() {
