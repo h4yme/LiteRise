@@ -53,6 +53,8 @@ try {
 
     // Format items to match Android app expectations
     $formattedItems = array_map(function($item) {
+        $itemType = $item['ItemType'] ?? '';
+
         // Parse AnswerChoices JSON if it exists
         $answerChoices = [];
         if (!empty($item['AnswerChoices'])) {
@@ -60,28 +62,44 @@ try {
             $answerChoices = $decoded ?? [];
         }
 
-        // Map answer choices to options (Android expects OptionA, OptionB, etc.)
-        $optionA = $answerChoices[0] ?? '';
-        $optionB = $answerChoices[1] ?? '';
-        $optionC = $answerChoices[2] ?? '';
-        $optionD = $answerChoices[3] ?? '';
-
-        // Determine correct option letter based on CorrectAnswer
+        // Handle different item types
+        $optionA = '';
+        $optionB = '';
+        $optionC = '';
+        $optionD = '';
         $correctOption = '';
-        if (!empty($item['CorrectAnswer'])) {
-            $correctAnswer = trim($item['CorrectAnswer']);
-            if ($correctAnswer === $optionA) $correctOption = 'A';
-            elseif ($correctAnswer === $optionB) $correctOption = 'B';
-            elseif ($correctAnswer === $optionC) $correctOption = 'C';
-            elseif ($correctAnswer === $optionD) $correctOption = 'D';
+        $scrambledWords = [];
+
+        if ($itemType === 'Syntax') {
+            // For Syntax (sentence scramble), split words
+            $scrambledWords = array_map('trim', explode(' / ', $item['ItemText']));
+            // For Syntax, the correct answer is the full sentence
+            $correctOption = $item['CorrectAnswer'] ?? '';
+        } else {
+            // For Spelling, Grammar, etc. - use answer choices
+            $optionA = $answerChoices[0] ?? '';
+            $optionB = $answerChoices[1] ?? '';
+            $optionC = $answerChoices[2] ?? '';
+            $optionD = $answerChoices[3] ?? '';
+
+            // Determine correct option letter based on CorrectAnswer
+            if (!empty($item['CorrectAnswer'])) {
+                $correctAnswer = trim($item['CorrectAnswer']);
+                if ($correctAnswer === $optionA) $correctOption = 'A';
+                elseif ($correctAnswer === $optionB) $correctOption = 'B';
+                elseif ($correctAnswer === $optionC) $correctOption = 'C';
+                elseif ($correctAnswer === $optionD) $correctOption = 'D';
+            }
         }
 
         return [
             'ItemID' => (int)$item['ItemID'],
             'ItemText' => $item['ItemText'] ?? '',
-            'QuestionText' => $item['ItemText'] ?? '', // Alias for Android
+            'QuestionText' => $itemType === 'Syntax'
+                ? 'Arrange the words to form a correct sentence:'
+                : ($item['ItemText'] ?? ''),
             'PassageText' => '', // Not used in current schema
-            'ItemType' => $item['ItemType'] ?? '',
+            'ItemType' => $itemType,
             'DifficultyLevel' => $item['DifficultyLevel'] ?? '',
             'Difficulty' => (float)($item['DifficultyParam'] ?? 0), // Alias
             'DifficultyParam' => (float)($item['DifficultyParam'] ?? 0),
@@ -89,6 +107,7 @@ try {
             'DiscriminationParam' => (float)($item['DiscriminationParam'] ?? 1.0),
             'GuessingParam' => (float)($item['GuessingParam'] ?? 0.25),
             'AnswerChoices' => $answerChoices,
+            'ScrambledWords' => $scrambledWords, // For Syntax type
             'OptionA' => $optionA,
             'OptionB' => $optionB,
             'OptionC' => $optionC,

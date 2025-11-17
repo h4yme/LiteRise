@@ -1,11 +1,18 @@
 package com.example.literise.models;
 
 import com.google.gson.annotations.SerializedName;
+import java.util.List;
 
 public class Question {
 
     @SerializedName("ItemID")
     private int itemId;
+
+    @SerializedName("ItemText")
+    private String itemText;
+
+    @SerializedName("ItemType")
+    private String itemType;
 
     @SerializedName("PassageText")
     private String passageText;
@@ -27,6 +34,18 @@ public class Question {
 
     @SerializedName("CorrectOption")
     private String correctOption;
+
+    @SerializedName("CorrectAnswer")
+    private String correctAnswer;
+
+    @SerializedName("ScrambledWords")
+    private List<String> scrambledWords;
+
+    @SerializedName("ImageURL")
+    private String imageURL;
+
+    @SerializedName("AudioURL")
+    private String audioURL;
 
     @SerializedName("Difficulty")
     private float difficulty;
@@ -55,6 +74,8 @@ public class Question {
 
     // ✅ Getters
     public int getItemId() { return itemId; }
+    public String getItemText() { return itemText; }
+    public String getItemType() { return itemType; }
     public String getPassageText() { return passageText; }
     public String getQuestionText() { return questionText; }
     public String getOptionA() { return optionA; }
@@ -62,11 +83,17 @@ public class Question {
     public String getOptionC() { return optionC; }
     public String getOptionD() { return optionD; }
     public String getCorrectOption() { return correctOption; }
+    public String getCorrectAnswer() { return correctAnswer; }
+    public List<String> getScrambledWords() { return scrambledWords; }
+    public String getImageURL() { return imageURL; }
+    public String getAudioURL() { return audioURL; }
     public float getDifficulty() { return difficulty; }
     public float getDiscrimination() { return discrimination; }
 
     // ✅ Setters (useful when building mock questions or local test data)
     public void setItemId(int itemId) { this.itemId = itemId; }
+    public void setItemText(String itemText) { this.itemText = itemText; }
+    public void setItemType(String itemType) { this.itemType = itemType; }
     public void setPassageText(String passageText) { this.passageText = passageText; }
     public void setQuestionText(String questionText) { this.questionText = questionText; }
     public void setOptionA(String optionA) { this.optionA = optionA; }
@@ -74,6 +101,10 @@ public class Question {
     public void setOptionC(String optionC) { this.optionC = optionC; }
     public void setOptionD(String optionD) { this.optionD = optionD; }
     public void setCorrectOption(String correctOption) { this.correctOption = correctOption; }
+    public void setCorrectAnswer(String correctAnswer) { this.correctAnswer = correctAnswer; }
+    public void setScrambledWords(List<String> scrambledWords) { this.scrambledWords = scrambledWords; }
+    public void setImageURL(String imageURL) { this.imageURL = imageURL; }
+    public void setAudioURL(String audioURL) { this.audioURL = audioURL; }
     public void setDifficulty(float difficulty) { this.difficulty = difficulty; }
     public void setDiscrimination(float discrimination) { this.discrimination = discrimination; }
 }

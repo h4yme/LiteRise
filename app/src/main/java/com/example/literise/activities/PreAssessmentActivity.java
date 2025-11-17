@@ -102,14 +102,63 @@ public class PreAssessmentActivity extends AppCompatActivity {
         }
 
         Question q = questionList.get(currentIndex);
-        tvTitle.setText("Placement Test");
-        tvQuestion.setText(q.getQuestionText());
-        tvPassageText.setText(q.getPassageText() == null ? "" : q.getPassageText());
+        String itemType = q.getItemType() != null ? q.getItemType() : "";
 
-        btnOptionA.setText("a) " + q.getOptionA());
-        btnOptionB.setText("b) " + q.getOptionB());
-        btnOptionC.setText("c) " + q.getOptionC());
-        btnOptionD.setText("d) " + q.getOptionD());
+        tvTitle.setText("Placement Test - " + itemType);
+
+        // Handle different question types
+        if ("Syntax".equalsIgnoreCase(itemType)) {
+            // For sentence scrambling - show scrambled words
+            if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
+                tvQuestion.setText("Arrange these words to form a correct sentence:\n" +
+                    String.join(" | ", q.getScrambledWords()));
+            } else {
+                tvQuestion.setText(q.getQuestionText());
+            }
+
+            // For syntax, if we have answer choices in options, show them
+            // Otherwise, hide option D as it's usually empty
+            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
+            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
+            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
+            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
+                android.view.View.VISIBLE : android.view.View.GONE);
+            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
+                btnOptionD.setText("d) " + q.getOptionD());
+            }
+
+        } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
+            // For pronunciation - show the word and phonetic guide
+            tvQuestion.setText("Pronounce this word correctly:\n\n" +
+                q.getItemText() + "\n\n" +
+                "Pronunciation: " + (q.getPassageText() != null ? q.getPassageText() : ""));
+
+            // Show options if available (may have pronunciation variations)
+            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
+            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
+            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
+            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
+                android.view.View.VISIBLE : android.view.View.GONE);
+            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
+                btnOptionD.setText("d) " + q.getOptionD());
+            }
+
+        } else {
+            // For Spelling, Grammar, and other types - standard multiple choice
+            tvQuestion.setText(q.getQuestionText());
+
+            btnOptionA.setText("a) " + (q.getOptionA() != null ? q.getOptionA() : ""));
+            btnOptionB.setText("b) " + (q.getOptionB() != null ? q.getOptionB() : ""));
+            btnOptionC.setText("c) " + (q.getOptionC() != null ? q.getOptionC() : ""));
+            btnOptionD.setVisibility(q.getOptionD() != null && !q.getOptionD().isEmpty() ?
+                android.view.View.VISIBLE : android.view.View.GONE);
+            if (btnOptionD.getVisibility() == android.view.View.VISIBLE) {
+                btnOptionD.setText("d) " + q.getOptionD());
+            }
+        }
+
+        // Show passage text if available
+        tvPassageText.setText(q.getPassageText() == null ? "" : q.getPassageText());
 
         tvProgress.setText((currentIndex + 1) + "/" + questionList.size() + " Questions");
         progressBar.setProgress((int) (((float) (currentIndex + 1) / questionList.size()) * 100));
