@@ -124,55 +124,61 @@ try {
         exit;
     }
 
-    // Check if we should stop (enough items and good precision)
-    $itemsCompleted = count($itemsAnswered);
+    // Fetch all responses for this session to get actual completion count
+    $stmt = $conn->prepare(
+        "SELECT
+            r.IsCorrect,
+            i.DiscriminationParam as a,
+            i.DifficultyParam as b,
+            i.GuessingParam as c
+         FROM Responses r
+         JOIN Items i ON r.ItemID = i.ItemID
+         WHERE r.SessionID = ?"
+    );
+    $stmt->execute([$sessionID]);
+    $responses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Use actual database count for items completed (more reliable than client-sent array)
+    $itemsCompleted = count($responses);
     $shouldStop = false;
 
-    if ($itemsCompleted >= $minItems) {
-        // Calculate current SEM if we have response data
-        $stmt = $conn->prepare(
-            "SELECT
-                r.IsCorrect,
-                i.DiscriminationParam as a,
-                i.DifficultyParam as b,
-                i.GuessingParam as c
-             FROM Responses r
-             JOIN Items i ON r.ItemID = i.ItemID
-             WHERE r.SessionID = ?"
-        );
-        $stmt->execute([$sessionID]);
-        $responses = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    error_log("get_next_item: sessionID=$sessionID, itemsCompleted=$itemsCompleted (from DB), itemsAnswered from request=" . count($itemsAnswered));
+    error_log("get_next_item: Found " . count($responses) . " responses in database for session $sessionID");
 
-        if (!empty($responses)) {
-            $irt = new ItemResponseTheory();
+    if ($itemsCompleted >= $minItems && !empty($responses)) {
+        // Calculate current SEM if we have enough items
+        $irt = new ItemResponseTheory();
 
-            // Convert to IRT format
-            $irtResponses = array_map(function($r) {
-                return [
-                    'isCorrect' => (bool)$r['IsCorrect'],
-                    'a' => (float)$r['a'],
-                    'b' => (float)$r['b'],
-                    'c' => (float)$r['c']
-                ];
-            }, $responses);
+        // Convert to IRT format
+        $irtResponses = array_map(function($r) {
+            return [
+                'isCorrect' => (bool)$r['IsCorrect'],
+                'a' => (float)$r['a'],
+                'b' => (float)$r['b'],
+                'c' => (float)$r['c']
+            ];
+        }, $responses);
 
-            $sem = $irt->calculateSEM($currentTheta, $irtResponses);
+        $sem = $irt->calculateSEM($currentTheta, $irtResponses);
 
-            if ($sem <= $targetSEM || $itemsCompleted >= $maxItems) {
-                $shouldStop = true;
-            }
+        if ($sem <= $targetSEM || $itemsCompleted >= $maxItems) {
+            $shouldStop = true;
         }
     }
 
     if ($shouldStop || $itemsCompleted >= $maxItems) {
         // Update TestSessions with final results
         $correctCount = 0;
-        foreach ($responses as $r) {
-            if ($r['IsCorrect']) {
-                $correctCount++;
+        if (!empty($responses)) {
+            foreach ($responses as $r) {
+                if ($r['IsCorrect']) {
+                    $correctCount++;
+                }
             }
         }
         $accuracy = $itemsCompleted > 0 ? ($correctCount / $itemsCompleted) * 100 : 0;
+
+        error_log("Assessment completion: items=$itemsCompleted, correct=$correctCount, accuracy=$accuracy%, theta=$currentTheta");
 
         $stmt = $conn->prepare(
             "UPDATE TestSessions
@@ -247,7 +253,7 @@ try {
         'session_id' => $sessionID,
         'item' => $formattedItem,
         'current_theta' => round($currentTheta, 3),
-        'items_completed' => $itemsCompleted,
+        'items_completed' => $itemsCompleted, // Now uses actual DB count
         'items_remaining' => min($maxItems - $itemsCompleted, count($availableItems)),
         'assessment_complete' => false,
         'progress_percentage' => round(($itemsCompleted / $maxItems) * 100, 1)
