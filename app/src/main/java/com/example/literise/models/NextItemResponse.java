@@ -7,6 +7,9 @@ public class NextItemResponse {
     @SerializedName("success")
     private boolean success;
 
+    @SerializedName("session_id")
+    private int sessionId;
+
     @SerializedName("item")
     private Question item;
 
@@ -43,6 +46,14 @@ public class NextItemResponse {
 
     public void setSuccess(boolean success) {
         this.success = success;
+    }
+
+    public int getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(int sessionId) {
+        this.sessionId = sessionId;
     }
 
     public Question getItem() {

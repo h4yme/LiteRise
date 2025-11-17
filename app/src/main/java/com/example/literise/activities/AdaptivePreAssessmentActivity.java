@@ -151,7 +151,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     } else {
                         // Display next question
                         currentQuestion = result.getItem();
-                        sessionId = request.getSessionId(); // Update if session was created
+                        // Update session ID if it was auto-created by the API
+                        if (result.getSessionId() > 0) {
+                            sessionId = result.getSessionId();
+                        }
                         showQuestion(result);
                         questionStartTime = SystemClock.elapsedRealtime();
                     }

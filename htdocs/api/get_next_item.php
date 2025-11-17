@@ -40,9 +40,32 @@ $maxItems = 20; // Maximum items in assessment
 $targetSEM = 0.3; // Target precision (stop when SEM is this low)
 $minItems = 10; // Minimum items before considering stopping
 
-// Validate session
-if (!$sessionID) {
-    sendError("session_id is required", 400);
+// Auto-create session if not provided (for Android app compatibility)
+$autoCreatedSession = false;
+if (!$sessionID || $sessionID == 0) {
+    error_log("Auto-creating PreAssessment session for student " . $authUser['studentID']);
+    try {
+        $stmt = $conn->prepare("EXEC SP_CreateTestSession @StudentID = :studentID, @Type = :type");
+        $stmt->bindValue(':studentID', $authUser['studentID'], PDO::PARAM_INT);
+        $stmt->bindValue(':type', 'PreAssessment', PDO::PARAM_STR);
+        $stmt->execute();
+
+        $session = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Close cursor to prevent "other threads running in session" error
+        $stmt->closeCursor();
+
+        if ($session) {
+            $sessionID = $session['SessionID'];
+            $autoCreatedSession = true;
+            error_log("Created session $sessionID for student " . $authUser['studentID']);
+        } else {
+            sendError("Failed to create session", 500);
+        }
+    } catch (Exception $e) {
+        error_log("Failed to create session: " . $e->getMessage());
+        sendError("Failed to create session", 500, $e->getMessage());
+    }
 }
 
 try {
@@ -92,6 +115,7 @@ try {
     if (empty($availableItems)) {
         sendResponse([
             'success' => true,
+            'session_id' => $sessionID,
             'assessment_complete' => true,
             'message' => 'No more items available',
             'final_theta' => $currentTheta
@@ -142,6 +166,7 @@ try {
     if ($shouldStop || $itemsCompleted >= $maxItems) {
         sendResponse([
             'success' => true,
+            'session_id' => $sessionID,
             'assessment_complete' => true,
             'message' => 'Assessment complete - sufficient precision achieved',
             'items_completed' => $itemsCompleted,
@@ -264,6 +289,7 @@ try {
 
     $response = [
         'success' => true,
+        'session_id' => $sessionID,
         'item' => $formattedItem,
         'current_theta' => round($currentTheta, 3),
         'items_completed' => $itemsCompleted,
