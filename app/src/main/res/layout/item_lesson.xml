@@ -20,25 +20,28 @@
 
         <!-- Progress Circle or Empty Circle -->
         <FrameLayout
-            android:layout_width="48dp"
-            android:layout_height="48dp">
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_marginEnd="4dp">
 
             <!-- Background Circle -->
             <View
                 android:id="@+id/circleBackground"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
                 android:background="@drawable/circle_progress_bg"/>
 
             <!-- Progress Indicator (CircularProgressIndicator) -->
             <com.google.android.material.progressindicator.CircularProgressIndicator
                 android:id="@+id/progressCircle"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
+                android:layout_gravity="center"
                 android:progress="0"
-                app:indicatorSize="48dp"
-                app:trackThickness="4dp"
-                app:trackColor="@color/gray_light"
+                app:indicatorSize="56dp"
+                app:trackThickness="5dp"
+                app:trackColor="@android:color/transparent"
                 app:indicatorColor="@color/color_jade1"
                 android:visibility="gone"/>
 
@@ -49,9 +52,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="65"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/color_jade1"
+                android:fontFamily="sans-serif-medium"
                 android:visibility="gone"/>
         </FrameLayout>
 
