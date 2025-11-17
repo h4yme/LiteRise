@@ -258,23 +258,46 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void showDefinitionDialog(Question q) {
+        // Inflate custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_word_definition, null);
+
+        // Create dialog with custom view
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(q.getItemText());
-
-        StringBuilder message = new StringBuilder();
-
-        if (q.getPhonetic() != null && !q.getPhonetic().isEmpty()) {
-            message.append("Pronunciation: ").append(q.getPhonetic()).append("\n\n");
-        }
-
-        if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
-            message.append("Definition:\n").append(q.getDefinition());
-        }
-
-        builder.setMessage(message.toString());
-        builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+        builder.setView(dialogView);
 
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Get views from custom layout
+        TextView tvWord = dialogView.findViewById(R.id.tvDialogWord);
+        TextView tvPhonetic = dialogView.findViewById(R.id.tvDialogPhonetic);
+        TextView tvDefinition = dialogView.findViewById(R.id.tvDialogDefinition);
+        View layoutPhonetic = dialogView.findViewById(R.id.layoutPhonetic);
+        View layoutDefinition = dialogView.findViewById(R.id.layoutDefinition);
+        com.google.android.material.button.MaterialButton btnClose = dialogView.findViewById(R.id.btnDialogClose);
+
+        // Set word
+        tvWord.setText(q.getItemText());
+
+        // Show phonetic if available
+        if (q.getPhonetic() != null && !q.getPhonetic().isEmpty()) {
+            tvPhonetic.setText(q.getPhonetic());
+            layoutPhonetic.setVisibility(View.VISIBLE);
+        } else {
+            layoutPhonetic.setVisibility(View.GONE);
+        }
+
+        // Show definition if available
+        if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
+            tvDefinition.setText(q.getDefinition());
+            layoutDefinition.setVisibility(View.VISIBLE);
+        } else {
+            layoutDefinition.setVisibility(View.GONE);
+        }
+
+        // Close button
+        btnClose.setOnClickListener(v -> dialog.dismiss());
+
         dialog.show();
     }
 
@@ -412,45 +435,75 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void showFinalResultsDialog(NextItemResponse result) {
-        StringBuilder message = new StringBuilder();
+        // Inflate custom dialog layout
+        View dialogView = getLayoutInflater().inflate(R.layout.dialog_assessment_complete, null);
 
-        // Show score if available
+        // Create dialog with custom view
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+        // Get views from custom layout
+        TextView tvScore = dialogView.findViewById(R.id.tvDialogScore);
+        TextView tvAccuracy = dialogView.findViewById(R.id.tvDialogAccuracy);
+        TextView tvAbility = dialogView.findViewById(R.id.tvDialogAbility);
+        TextView tvClassification = dialogView.findViewById(R.id.tvDialogClassification);
+        TextView tvFeedback = dialogView.findViewById(R.id.tvDialogFeedback);
+        TextView tvPrecision = dialogView.findViewById(R.id.tvDialogPrecision);
+        androidx.cardview.widget.CardView cardScore = dialogView.findViewById(R.id.cardScore);
+        View layoutAbility = dialogView.findViewById(R.id.layoutAbility);
+        com.google.android.material.button.MaterialButton btnContinue = dialogView.findViewById(R.id.btnDialogContinue);
+
+        // Populate score data
         if (result.getCorrectAnswers() != null && result.getTotalItems() != null) {
-            message.append(String.format("Score: %d/%d",
-                    result.getCorrectAnswers(),
-                    result.getTotalItems()));
+            tvScore.setText(String.format("%d/%d", result.getCorrectAnswers(), result.getTotalItems()));
 
             if (result.getAccuracy() != null) {
-                message.append(String.format(" (%.1f%%)", result.getAccuracy()));
+                tvAccuracy.setText(String.format("%.1f%%", result.getAccuracy()));
+            } else {
+                tvAccuracy.setVisibility(View.GONE);
             }
-            message.append("\n\n");
+            cardScore.setVisibility(View.VISIBLE);
         } else {
-            message.append(String.format("Questions Completed: %d\n\n",
-                    result.getItemsCompleted()));
+            // If no score data, show items completed
+            tvScore.setText(String.valueOf(result.getItemsCompleted()));
+            tvAccuracy.setText("items completed");
+            cardScore.setVisibility(View.VISIBLE);
         }
 
+        // Populate ability and classification
         if (result.getFinalTheta() != null) {
-            message.append(String.format("Ability Level: %.2f\n", result.getFinalTheta()));
+            tvAbility.setText(String.format("%.2f", result.getFinalTheta()));
 
-            // Classify ability
             String classification = classifyAbility(result.getFinalTheta());
-            message.append(String.format("Classification: %s\n\n", classification));
-            message.append(getFeedbackForClassification(classification));
+            tvClassification.setText(classification);
+
+            String feedback = getFeedbackForClassification(classification);
+            tvFeedback.setText(feedback);
+
+            layoutAbility.setVisibility(View.VISIBLE);
+        } else {
+            layoutAbility.setVisibility(View.GONE);
         }
 
+        // Show precision if available
         if (result.getSem() != null) {
-            message.append(String.format("\n\nPrecision: %.2f (lower is better)", result.getSem()));
+            tvPrecision.setText(String.format("Precision: %.2f (lower is better)", result.getSem()));
+            tvPrecision.setVisibility(View.VISIBLE);
+        } else {
+            tvPrecision.setVisibility(View.GONE);
         }
 
-        new AlertDialog.Builder(this)
-                .setTitle("Assessment Complete!")
-                .setMessage(message.toString())
-                .setPositiveButton("Continue", (dialog, which) -> {
-                    dialog.dismiss();
-                    finish();
-                })
-                .setCancelable(false)
-                .show();
+        // Continue button
+        btnContinue.setOnClickListener(v -> {
+            dialog.dismiss();
+            finish();
+        });
+
+        dialog.show();
     }
 
     private String classifyAbility(double theta) {

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/background_rounded_white"
+    android:padding="0dp">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/color_midnight_green"
+        android:paddingTop="24dp"
+        android:paddingBottom="20dp"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Word Information"
+            android:textColor="@color/color_sunglow"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <TextView
+            android:id="@+id/tvDialogWord"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Example"
+            android:textColor="@color/white"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"/>
+
+    </LinearLayout>
+
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- Phonetic Section -->
+        <LinearLayout
+            android:id="@+id/layoutPhonetic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@drawable/background_rounded_border"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pronunciation"
+                android:textColor="@color/gray_dark"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp"/>
+
+            <TextView
+                android:id="@+id/tvDialogPhonetic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/ɪɡˈzæmpəl/"
+                android:textColor="@color/color_jade1"
+                android:textSize="18sp"
+                android:textStyle="italic"
+                android:fontFamily="serif"/>
+
+        </LinearLayout>
+
+        <!-- Definition Section -->
+        <LinearLayout
+            android:id="@+id/layoutDefinition"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="20dp"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Definition"
+                android:textColor="@color/gray_dark"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tvDialogDefinition"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="A thing characteristic of its kind or illustrating a general rule."
+                android:textColor="@color/text_primary"
+                android:textSize="15sp"
+                android:lineSpacingExtra="4dp"/>
+
+        </LinearLayout>
+
+        <!-- Close Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDialogClose"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:text="Close"
+            android:textColor="@color/color_midnight_green"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/color_old_lace"
+            app:cornerRadius="12dp"
+            app:strokeColor="@color/color_midnight_green"
+            app:strokeWidth="1dp"
+            android:fontFamily="sans-serif-medium"/>
+
+    </LinearLayout>
+
+</LinearLayout>
