@@ -1,0 +1,20 @@
+# Ignore environment variables
+.env
+
+# Ignore logs
+*.log
+logs/
+
+# Ignore IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Ignore temporary files
+tmp/
+temp/
+*.tmp
+
+# Ignore uploaded files (if any)
+uploads/
