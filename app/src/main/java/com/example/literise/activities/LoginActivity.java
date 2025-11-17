@@ -69,8 +69,17 @@ public class LoginActivity extends AppCompatActivity {
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
-                    // 🎯 Launch Adaptive Assessment (personalized questions)
-                    Intent intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
+                    // 🎯 Check if user has taken assessment
+                    // If ability_score is 0 or near 0, they haven't taken the assessment yet
+                    Intent intent;
+                    if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+                        // First time - go to adaptive assessment
+                        intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
+                    } else {
+                        // Already completed assessment - go to dashboard
+                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    }
+
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();

@@ -509,6 +509,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Continue button
         btnContinue.setOnClickListener(v -> {
             dialog.dismiss();
+            // Navigate to Dashboard after assessment completion
+            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, DashboardActivity.class);
+            startActivity(intent);
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
 
