@@ -1,6 +1,7 @@
 package com.example.literise.api;
 
 
+import com.example.literise.models.PreAssessmentResponse;
 import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
@@ -22,7 +23,7 @@ public interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST("get_preassessment_items.php")
-    Call<List<Question>> getPreAssessmentItems();
+    Call<PreAssessmentResponse> getPreAssessmentItems();
 
     @Headers("Content-Type: application/json")
     @POST("submit_responses.php")

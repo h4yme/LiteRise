@@ -14,6 +14,7 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.PreAssessmentResponse;
 import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.SubmitRequest; // ✅ new wrapper class
@@ -71,20 +72,24 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void loadQuestions() {
         ApiService apiService = ApiClient.getClient().create(ApiService.class);
-        apiService.getPreAssessmentItems().enqueue(new Callback<List<Question>>() {
+        apiService.getPreAssessmentItems().enqueue(new Callback<PreAssessmentResponse>() {
             @Override
-            public void onResponse(Call<List<Question>> call, Response<List<Question>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    questionList = response.body();
-                    showQuestion();
+            public void onResponse(Call<PreAssessmentResponse> call, Response<PreAssessmentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    questionList = response.body().getItems();
+                    if (questionList != null && !questionList.isEmpty()) {
+                        showQuestion();
+                    } else {
+                        Toast.makeText(PreAssessmentActivity.this, "No questions available", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
                     Toast.makeText(PreAssessmentActivity.this, "Failed to load questions", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<List<Question>> call, Throwable t) {
-                Toast.makeText(PreAssessmentActivity.this, "Connection error", Toast.LENGTH_SHORT).show();
+            public void onFailure(Call<PreAssessmentResponse> call, Throwable t) {
+                Toast.makeText(PreAssessmentActivity.this, "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

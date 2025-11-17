@@ -53,13 +53,32 @@ $sessionID = $data['session_id'] ?? null;
 $studentID = $data['student_id'] ?? $data['StudentID'] ?? null;
 $responses = $data['responses'] ?? $data['Responses'] ?? [];
 
-// Validate required fields
-if (!$sessionID) {
-    sendError("session_id is required", 400);
-}
-
+// Validate student_id
 if (!$studentID) {
     sendError("student_id is required", 400);
+}
+
+// Auto-create session if not provided (for Android app compatibility)
+$autoCreatedSession = false;
+if (!$sessionID) {
+    error_log("Auto-creating PreAssessment session for student $studentID");
+    try {
+        $stmt = $conn->prepare("EXEC SP_CreateTestSession @StudentID = :studentID, @Type = :type");
+        $stmt->bindValue(':studentID', $studentID, PDO::PARAM_INT);
+        $stmt->bindValue(':type', 'PreAssessment', PDO::PARAM_STR);
+        $stmt->execute();
+
+        $session = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($session) {
+            $sessionID = $session['SessionID'];
+            $autoCreatedSession = true;
+            error_log("Created session $sessionID for student $studentID");
+        } else {
+            sendError("Failed to create session", 500);
+        }
+    } catch (Exception $e) {
+        sendError("Failed to create session", 500, $e->getMessage());
+    }
 }
 
 if (empty($responses) || !is_array($responses)) {
@@ -100,9 +119,12 @@ try {
     // Insert each response
     foreach ($responses as $response) {
         $itemID = $response['ItemID'] ?? null;
-        $studentResponse = $response['Response'] ?? '';
-        $isCorrect = $response['IsCorrect'] ?? 0;
-        $timeSpent = $response['TimeSpent'] ?? 0;
+        // Handle both Android format (SelectedOption) and original format (Response)
+        $studentResponse = $response['Response'] ?? $response['SelectedOption'] ?? '';
+        // Handle both Android format (Correct) and original format (IsCorrect)
+        $isCorrect = $response['IsCorrect'] ?? $response['Correct'] ?? 0;
+        // Handle both Android format (TimeTakenSec) and original format (TimeSpent)
+        $timeSpent = $response['TimeSpent'] ?? $response['TimeTakenSec'] ?? 0;
 
         if (!$itemID) continue;
 
