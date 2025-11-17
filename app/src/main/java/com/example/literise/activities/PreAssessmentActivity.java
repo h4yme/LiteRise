@@ -63,6 +63,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
     private boolean isRecording = false;
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1;
     private int pronunciationScore = 0;
+    private String lastPartialResult = null; // Store partial result as fallback
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -323,6 +324,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
         }
 
         isRecording = true;
+        lastPartialResult = null; // Clear previous partial result
         tvMicStatus.setText("Listening...");
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
@@ -388,6 +390,14 @@ public class PreAssessmentActivity extends AppCompatActivity {
             isRecording = false;
             cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
 
+            // Check if we have a partial result to use as fallback
+            if (error == SpeechRecognizer.ERROR_NO_MATCH && lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
+                android.util.Log.d("SpeechRecognition", "ERROR_NO_MATCH but using partial result: " + lastPartialResult);
+                tvMicStatus.setText("Processing: " + lastPartialResult);
+                validatePronunciation(lastPartialResult.trim(), 0.8f); // Use 0.8 confidence for partial results
+                return;
+            }
+
             String message = "Recognition error";
             boolean shouldRetry = false;
 
@@ -452,6 +462,11 @@ public class PreAssessmentActivity extends AppCompatActivity {
                 android.util.Log.d("SpeechRecognition", "Confidence: " + confidence);
                 // Send to API for validation
                 validatePronunciation(recognizedText, confidence);
+            } else if (lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
+                // Fallback to partial result if final result is empty
+                android.util.Log.d("SpeechRecognition", "Empty results but using partial: " + lastPartialResult);
+                tvMicStatus.setText("Processing: " + lastPartialResult);
+                validatePronunciation(lastPartialResult.trim(), 0.8f);
             } else {
                 tvMicStatus.setText("No clear speech - try again");
                 Toast.makeText(PreAssessmentActivity.this,
@@ -463,8 +478,10 @@ public class PreAssessmentActivity extends AppCompatActivity {
         @Override
         public void onPartialResults(Bundle partialResults) {
             ArrayList<String> matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            if (matches != null && !matches.isEmpty()) {
+            if (matches != null && !matches.isEmpty() && matches.get(0) != null && !matches.get(0).trim().isEmpty()) {
+                lastPartialResult = matches.get(0); // Store for fallback
                 tvMicStatus.setText("Heard: " + matches.get(0));
+                android.util.Log.d("SpeechRecognition", "Partial result: " + matches.get(0));
             }
         }
 
