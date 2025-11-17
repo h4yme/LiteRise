@@ -47,6 +47,12 @@ public class Question {
     @SerializedName("AudioURL")
     private String audioURL;
 
+    @SerializedName("Phonetic")
+    private String phonetic;
+
+    @SerializedName("Definition")
+    private String definition;
+
     @SerializedName("Difficulty")
     private float difficulty;
 
@@ -87,6 +93,8 @@ public class Question {
     public List<String> getScrambledWords() { return scrambledWords; }
     public String getImageURL() { return imageURL; }
     public String getAudioURL() { return audioURL; }
+    public String getPhonetic() { return phonetic; }
+    public String getDefinition() { return definition; }
     public float getDifficulty() { return difficulty; }
     public float getDiscrimination() { return discrimination; }
 
@@ -105,6 +113,8 @@ public class Question {
     public void setScrambledWords(List<String> scrambledWords) { this.scrambledWords = scrambledWords; }
     public void setImageURL(String imageURL) { this.imageURL = imageURL; }
     public void setAudioURL(String audioURL) { this.audioURL = audioURL; }
+    public void setPhonetic(String phonetic) { this.phonetic = phonetic; }
+    public void setDefinition(String definition) { this.definition = definition; }
     public void setDifficulty(float difficulty) { this.difficulty = difficulty; }
     public void setDiscrimination(float discrimination) { this.discrimination = discrimination; }
 }

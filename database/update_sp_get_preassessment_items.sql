@@ -1,7 +1,7 @@
 USE [LiteRiseDB]
 GO
 
--- Update SP_GetPreAssessmentItems to include CorrectAnswer field
+-- Update SP_GetPreAssessmentItems to include CorrectAnswer, Phonetic, and Definition fields
 ALTER PROCEDURE [dbo].[SP_GetPreAssessmentItems]
 AS
 BEGIN
@@ -19,11 +19,13 @@ BEGIN
         DiscriminationParam,
         GuessingParam,
         ImageURL,           -- ⭐ ADDED: For future image support
-        AudioURL            -- ⭐ ADDED: For pronunciation audio
+        AudioURL,           -- ⭐ ADDED: For pronunciation audio
+        Phonetic,           -- ⭐ ADDED: Phonetic breakdown/IPA for pronunciation
+        Definition          -- ⭐ ADDED: Word definition for pronunciation items
     FROM Items
     WHERE IsActive = 1
     ORDER BY DifficultyParam; -- Start easy, then harder
 END
 GO
 
-PRINT 'SP_GetPreAssessmentItems updated successfully - now includes CorrectAnswer, ImageURL, and AudioURL';
+PRINT 'SP_GetPreAssessmentItems updated successfully - now includes CorrectAnswer, ImageURL, AudioURL, Phonetic, and Definition';

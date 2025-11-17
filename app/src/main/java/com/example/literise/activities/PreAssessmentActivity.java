@@ -201,9 +201,45 @@ public class PreAssessmentActivity extends AppCompatActivity {
         tvPronunciationWord.setText(q.getItemText() != null ? q.getItemText() : "");
         tvPronunciationGuide.setText(q.getPassageText() != null ? "/" + q.getPassageText() + "/" : "");
 
+        // Make the word clickable to show definition
+        if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
+            tvPronunciationWord.setClickable(true);
+            tvPronunciationWord.setOnClickListener(v -> showDefinitionDialog(q));
+
+            // Add visual feedback that word is clickable
+            tvPronunciationWord.setPaintFlags(tvPronunciationWord.getPaintFlags() | android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+        } else {
+            tvPronunciationWord.setClickable(false);
+            tvPronunciationWord.setOnClickListener(null);
+            tvPronunciationWord.setPaintFlags(tvPronunciationWord.getPaintFlags() & ~android.graphics.Paint.UNDERLINE_TEXT_FLAG);
+        }
+
         // Reset mic status
         tvMicStatus.setText("Tap to record");
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+    }
+
+    private void showDefinitionDialog(Question q) {
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(q.getItemText());
+
+        StringBuilder message = new StringBuilder();
+
+        // Add phonetic if available
+        if (q.getPhonetic() != null && !q.getPhonetic().isEmpty()) {
+            message.append("Pronunciation: ").append(q.getPhonetic()).append("\n\n");
+        }
+
+        // Add definition
+        if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
+            message.append("Definition:\n").append(q.getDefinition());
+        }
+
+        builder.setMessage(message.toString());
+        builder.setPositiveButton("Close", (dialog, which) -> dialog.dismiss());
+
+        android.app.AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     private void handleMultipleChoiceQuestion(Question q) {

@@ -184,13 +184,19 @@ try {
             }
         }
 
+        // Use Phonetic field for pronunciation items (displayed as PassageText)
+        $passageText = '';
+        if ($itemType === 'Pronunciation' && !empty($item['Phonetic'])) {
+            $passageText = $item['Phonetic'];
+        }
+
         return [
             'ItemID' => (int)$item['ItemID'],
             'ItemText' => $item['ItemText'] ?? '',
             'QuestionText' => $itemType === 'Syntax'
                 ? 'Arrange the words to form a correct sentence:'
                 : ($item['ItemText'] ?? ''),
-            'PassageText' => '', // Not used in current schema
+            'PassageText' => $passageText, // Phonetic guide for pronunciation
             'ItemType' => $itemType,
             'DifficultyLevel' => $item['DifficultyLevel'] ?? '',
             'Difficulty' => (float)($item['DifficultyParam'] ?? 0), // Alias
@@ -207,7 +213,9 @@ try {
             'CorrectAnswer' => $item['CorrectAnswer'] ?? '',
             'CorrectOption' => $correctOption,
             'ImageURL' => $item['ImageURL'] ?? null,
-            'AudioURL' => $item['AudioURL'] ?? null
+            'AudioURL' => $item['AudioURL'] ?? null,
+            'Phonetic' => $item['Phonetic'] ?? null,
+            'Definition' => $item['Definition'] ?? null
         ];
     }, $items);
 
