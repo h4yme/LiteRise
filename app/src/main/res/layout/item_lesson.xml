@@ -55,7 +55,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/color_jade1"
-                android:fontFamily="sans-serif-medium"
+                android:fontFamily="@font/poppins"
                 android:visibility="gone"/>
         </FrameLayout>
 
@@ -70,7 +70,7 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
-            android:fontFamily="sans-serif-medium"/>
+            android:fontFamily="@font/poppins"/>
 
         <!-- Lock Icon -->
         <ImageView
