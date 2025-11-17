@@ -25,6 +25,7 @@
 require_once __DIR__ . '/src/db.php';
 require_once __DIR__ . '/src/auth.php';
 require_once __DIR__ . '/irt.php';
+require_once __DIR__ . '/src/item_formatter.php';
 
 // Require authentication
 $authUser = requireAuth();
@@ -197,95 +198,9 @@ try {
         sendError("Failed to select next item", 500);
     }
 
-    // Get the full item data
+    // Get the full item data and format it using shared formatter
     $selectedItem = $selectedIRTItem['raw'];
-    $itemType = $selectedItem['ItemType'] ?? '';
-
-    // Format item similar to get_preassessment_items.php
-    $answerChoices = [];
-    if (!empty($selectedItem['AnswerChoices'])) {
-        $decoded = json_decode($selectedItem['AnswerChoices'], true);
-        $answerChoices = $decoded ?? [];
-    }
-
-    $optionA = '';
-    $optionB = '';
-    $optionC = '';
-    $optionD = '';
-    $correctOption = '';
-    $scrambledWords = [];
-
-    if ($itemType === 'Syntax') {
-        // Handle Syntax items (same logic as get_preassessment_items.php)
-        $scrambledWords = array_map('trim', explode(' / ', $selectedItem['ItemText']));
-
-        if (empty($answerChoices) && !empty($selectedItem['CorrectAnswer'])) {
-            require_once 'get_preassessment_items.php'; // For generateIncorrectSentences
-
-            $correctSentence = $selectedItem['CorrectAnswer'];
-            $incorrectOptions = generateIncorrectSentences($scrambledWords, $correctSentence);
-            $allOptions = array_merge([$correctSentence], $incorrectOptions);
-            shuffle($allOptions);
-
-            $optionA = $allOptions[0] ?? '';
-            $optionB = $allOptions[1] ?? '';
-            $optionC = $allOptions[2] ?? '';
-            $optionD = $allOptions[3] ?? '';
-
-            if ($correctSentence === $optionA) $correctOption = 'A';
-            elseif ($correctSentence === $optionB) $correctOption = 'B';
-            elseif ($correctSentence === $optionC) $correctOption = 'C';
-            elseif ($correctSentence === $optionD) $correctOption = 'D';
-        }
-    } else {
-        // Handle other item types
-        $optionA = $answerChoices[0] ?? '';
-        $optionB = $answerChoices[1] ?? '';
-        $optionC = $answerChoices[2] ?? '';
-        $optionD = $answerChoices[3] ?? '';
-
-        if (!empty($selectedItem['CorrectAnswer'])) {
-            $correctAnswer = trim($selectedItem['CorrectAnswer']);
-            if ($correctAnswer === $optionA) $correctOption = 'A';
-            elseif ($correctAnswer === $optionB) $correctOption = 'B';
-            elseif ($correctAnswer === $optionC) $correctOption = 'C';
-            elseif ($correctAnswer === $optionD) $correctOption = 'D';
-        }
-    }
-
-    // Use Phonetic field for pronunciation items
-    $passageText = '';
-    if ($itemType === 'Pronunciation' && !empty($selectedItem['Phonetic'])) {
-        $passageText = $selectedItem['Phonetic'];
-    }
-
-    $formattedItem = [
-        'ItemID' => (int)$selectedItem['ItemID'],
-        'ItemText' => $selectedItem['ItemText'] ?? '',
-        'QuestionText' => $itemType === 'Syntax'
-            ? 'Arrange the words to form a correct sentence:'
-            : ($selectedItem['ItemText'] ?? ''),
-        'PassageText' => $passageText,
-        'ItemType' => $itemType,
-        'DifficultyLevel' => $selectedItem['DifficultyLevel'] ?? '',
-        'Difficulty' => (float)($selectedItem['DifficultyParam'] ?? 0),
-        'DifficultyParam' => (float)($selectedItem['DifficultyParam'] ?? 0),
-        'Discrimination' => (float)($selectedItem['DiscriminationParam'] ?? 1.0),
-        'DiscriminationParam' => (float)($selectedItem['DiscriminationParam'] ?? 1.0),
-        'GuessingParam' => (float)($selectedItem['GuessingParam'] ?? 0.25),
-        'AnswerChoices' => $answerChoices,
-        'ScrambledWords' => $scrambledWords,
-        'OptionA' => $optionA,
-        'OptionB' => $optionB,
-        'OptionC' => $optionC,
-        'OptionD' => $optionD,
-        'CorrectAnswer' => $selectedItem['CorrectAnswer'] ?? '',
-        'CorrectOption' => $correctOption,
-        'ImageURL' => $selectedItem['ImageURL'] ?? null,
-        'AudioURL' => $selectedItem['AudioURL'] ?? null,
-        'Phonetic' => $selectedItem['Phonetic'] ?? null,
-        'Definition' => $selectedItem['Definition'] ?? null
-    ];
+    $formattedItem = formatItemForApp($selectedItem);
 
     $response = [
         'success' => true,
