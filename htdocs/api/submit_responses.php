@@ -195,12 +195,15 @@ try {
     ]);
 
     // Update student's current ability
+    error_log("Updating student $studentID ability from $initialTheta to $finalTheta");
     $stmt = $conn->prepare(
         "UPDATE Students
          SET CurrentAbility = ?
          WHERE StudentID = ?"
     );
-    $stmt->execute([$finalTheta, $studentID]);
+    $updateResult = $stmt->execute([$finalTheta, $studentID]);
+    $rowsAffected = $stmt->rowCount();
+    error_log("Ability update executed: " . ($updateResult ? 'SUCCESS' : 'FAILED') . ", rows affected: $rowsAffected");
 
     // Update theta for all responses
     $stmt = $conn->prepare(
