@@ -389,35 +389,44 @@ public class PreAssessmentActivity extends AppCompatActivity {
             cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
 
             String message = "Recognition error";
+            boolean shouldRetry = false;
+
             switch (error) {
                 case SpeechRecognizer.ERROR_AUDIO:
-                    message = "Audio error";
+                    message = "Audio error - check microphone";
                     break;
                 case SpeechRecognizer.ERROR_CLIENT:
                     message = "Client error";
                     break;
                 case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
-                    message = "Insufficient permissions";
+                    message = "Microphone permission required";
                     break;
                 case SpeechRecognizer.ERROR_NETWORK:
-                    message = "Network error";
+                    message = "Network error - retrying offline...";
+                    shouldRetry = true;
                     break;
                 case SpeechRecognizer.ERROR_NO_MATCH:
-                    message = "No match found. Please try again.";
+                    // Don't show error for NO_MATCH - partial results might have captured speech
+                    message = "Couldn't understand - speak clearly and try again";
                     break;
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
-                    message = "Recognizer busy";
+                    message = "Recognizer busy - please wait";
+                    shouldRetry = true;
                     break;
                 case SpeechRecognizer.ERROR_SERVER:
                     message = "Server error";
                     break;
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                    message = "Speech timeout. Please try again.";
+                    message = "No speech detected - tap mic and speak";
                     break;
             }
 
             tvMicStatus.setText(message);
-            Toast.makeText(PreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+
+            // Only show toast for serious errors, not NO_MATCH
+            if (error != SpeechRecognizer.ERROR_NO_MATCH) {
+                Toast.makeText(PreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
         }
 
         @Override
@@ -428,16 +437,26 @@ public class PreAssessmentActivity extends AppCompatActivity {
             ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             float[] confidenceScores = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
 
+            // Log for debugging
+            android.util.Log.d("SpeechRecognition", "onResults called");
+            android.util.Log.d("SpeechRecognition", "Matches: " + (matches != null ? matches.size() : "null"));
             if (matches != null && !matches.isEmpty()) {
-                String recognizedText = matches.get(0);
+                android.util.Log.d("SpeechRecognition", "First match: " + matches.get(0));
+            }
+
+            if (matches != null && !matches.isEmpty() && matches.get(0) != null && !matches.get(0).trim().isEmpty()) {
+                String recognizedText = matches.get(0).trim();
                 float confidence = (confidenceScores != null && confidenceScores.length > 0)
                         ? confidenceScores[0] : 0.0f;
 
+                android.util.Log.d("SpeechRecognition", "Confidence: " + confidence);
                 // Send to API for validation
                 validatePronunciation(recognizedText, confidence);
             } else {
-                tvMicStatus.setText("No speech detected");
-                Toast.makeText(PreAssessmentActivity.this, "No speech detected", Toast.LENGTH_SHORT).show();
+                tvMicStatus.setText("No clear speech - try again");
+                Toast.makeText(PreAssessmentActivity.this,
+                        "Couldn't hear you clearly. Tap the microphone and speak louder.",
+                        Toast.LENGTH_LONG).show();
             }
         }
 
