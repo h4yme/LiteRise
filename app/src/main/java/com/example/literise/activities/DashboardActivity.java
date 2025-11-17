@@ -49,18 +49,19 @@ public class DashboardActivity extends AppCompatActivity {
         btnRetakeAssessment.setOnClickListener(v -> retakeAssessment());
         ivSettings.setOnClickListener(v -> openSettings());
 
-        // Module click listeners (placeholder for now)
-        cardReadingModule.setOnClickListener(v -> {
-            // TODO: Navigate to Reading Comprehension module
-        });
+        // Module click listeners - Launch lesson activities
+        cardReadingModule.setOnClickListener(v -> startLesson("reading"));
 
-        cardVocabModule.setOnClickListener(v -> {
-            // TODO: Navigate to Vocabulary Building module
-        });
+        cardVocabModule.setOnClickListener(v -> startLesson("vocabulary"));
 
-        cardGrammarModule.setOnClickListener(v -> {
-            // TODO: Navigate to Grammar Practice module
-        });
+        cardGrammarModule.setOnClickListener(v -> startLesson("grammar"));
+    }
+
+    private void startLesson(String lessonType) {
+        Intent intent = new Intent(this, LessonActivity.class);
+        intent.putExtra("lesson_type", lessonType);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     private void loadUserData() {
