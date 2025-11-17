@@ -993,7 +993,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(v -> {
 
             dialog.dismiss();
+            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, DashboardActivity.class);
 
+            startActivity(intent);
+
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
 
         });

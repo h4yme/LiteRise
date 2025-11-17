@@ -103,4 +103,10 @@ public class SessionManager {
         return prefs.getInt(KEY_XP, 0);
 
     }
+
+    public String getFullName() {
+
+        return prefs.getString(KEY_FULLNAME, null);
+
+    }
 }
