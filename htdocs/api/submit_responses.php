@@ -69,6 +69,10 @@ if (!$sessionID) {
         $stmt->execute();
 
         $session = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Close cursor to prevent "other threads running in session" error
+        $stmt->closeCursor();
+
         if ($session) {
             $sessionID = $session['SessionID'];
             $autoCreatedSession = true;
@@ -91,8 +95,10 @@ if ($authUser['studentID'] != $studentID) {
 }
 
 try {
-    // Start transaction
-    $conn->beginTransaction();
+    // Start transaction (only if not already in one)
+    if (!$conn->inTransaction()) {
+        $conn->beginTransaction();
+    }
 
     // Verify session belongs to student
     $stmt = $conn->prepare("SELECT StudentID, InitialTheta, SessionType FROM TestSessions WHERE SessionID = ?");
