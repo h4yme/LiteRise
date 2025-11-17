@@ -2,6 +2,8 @@ package com.example.literise.api;
 
 
 import com.example.literise.models.PreAssessmentResponse;
+import com.example.literise.models.PronunciationRequest;
+import com.example.literise.models.PronunciationResponse;
 import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
@@ -29,7 +31,9 @@ public interface ApiService {
     @POST("submit_responses.php")
     Call<Void> submitResponses(@Body SubmitRequest request);
 
-
+    @Headers("Content-Type: application/json")
+    @POST("check_pronunciation.php")
+    Call<PronunciationResponse> checkPronunciation(@Body PronunciationRequest request);
 
     // ⚙️ Update student ability (calls SP_UpdateStudentAbility)
     @Headers("Content-Type: application/json")

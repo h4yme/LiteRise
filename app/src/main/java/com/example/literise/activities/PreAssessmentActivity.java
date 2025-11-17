@@ -1,7 +1,13 @@
 package com.example.literise.activities;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -9,14 +15,19 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.PreAssessmentResponse;
+import com.example.literise.models.PronunciationRequest;
+import com.example.literise.models.PronunciationResponse;
 import com.example.literise.models.Question;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.SubmitRequest;
@@ -24,6 +35,7 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -45,6 +57,12 @@ public class PreAssessmentActivity extends AppCompatActivity {
     private int currentIndex = 0;
     private SessionManager session;
     private String selectedAnswer = null;
+
+    // Speech recognition
+    private SpeechRecognizer speechRecognizer;
+    private boolean isRecording = false;
+    private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1;
+    private int pronunciationScore = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -243,25 +261,232 @@ public class PreAssessmentActivity extends AppCompatActivity {
     }
 
     private void recordPronunciation() {
-        // TODO: Implement pronunciation recording
-        // For now, just mark as recorded and enable continue
-        tvMicStatus.setText("Recorded ✓");
-        btnContinue.setEnabled(true);
-
-        // Create a placeholder response for pronunciation
-        Question q = questionList.get(currentIndex);
-        ResponseModel response = new ResponseModel();
-        response.setItemId(q.getItemId());
-        response.setSelectedOption("RECORDED"); // Placeholder
-        response.setCorrect(true); // For now, assume correct
-
-        if (currentIndex < responses.size()) {
-            responses.set(currentIndex, response);
-        } else {
-            responses.add(response);
+        // Check for audio permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSION_REQUEST_RECORD_AUDIO);
+            return;
         }
 
-        Toast.makeText(this, "Pronunciation recorded", Toast.LENGTH_SHORT).show();
+        if (isRecording) {
+            stopRecording();
+            return;
+        }
+
+        startRecording();
+    }
+
+    private void startRecording() {
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            Toast.makeText(this, "Speech recognition not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        isRecording = true;
+        tvMicStatus.setText("Listening...");
+        cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
+
+        // Initialize speech recognizer if not already done
+        if (speechRecognizer == null) {
+            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+            speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
+        }
+
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+
+        speechRecognizer.startListening(intent);
+    }
+
+    private void stopRecording() {
+        isRecording = false;
+        if (speechRecognizer != null) {
+            speechRecognizer.stopListening();
+        }
+        tvMicStatus.setText("Tap to record");
+        cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+    }
+
+    private class PronunciationRecognitionListener implements RecognitionListener {
+        @Override
+        public void onReadyForSpeech(Bundle params) {
+            tvMicStatus.setText("Speak now...");
+        }
+
+        @Override
+        public void onBeginningOfSpeech() {
+            tvMicStatus.setText("Listening...");
+        }
+
+        @Override
+        public void onRmsChanged(float rmsdB) {
+            // Could animate the mic icon based on volume
+        }
+
+        @Override
+        public void onBufferReceived(byte[] buffer) {}
+
+        @Override
+        public void onEndOfSpeech() {
+            tvMicStatus.setText("Processing...");
+            isRecording = false;
+        }
+
+        @Override
+        public void onError(int error) {
+            isRecording = false;
+            cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+
+            String message = "Recognition error";
+            switch (error) {
+                case SpeechRecognizer.ERROR_AUDIO:
+                    message = "Audio error";
+                    break;
+                case SpeechRecognizer.ERROR_CLIENT:
+                    message = "Client error";
+                    break;
+                case SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS:
+                    message = "Insufficient permissions";
+                    break;
+                case SpeechRecognizer.ERROR_NETWORK:
+                    message = "Network error";
+                    break;
+                case SpeechRecognizer.ERROR_NO_MATCH:
+                    message = "No match found. Please try again.";
+                    break;
+                case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
+                    message = "Recognizer busy";
+                    break;
+                case SpeechRecognizer.ERROR_SERVER:
+                    message = "Server error";
+                    break;
+                case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
+                    message = "Speech timeout. Please try again.";
+                    break;
+            }
+
+            tvMicStatus.setText(message);
+            Toast.makeText(PreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onResults(Bundle results) {
+            isRecording = false;
+            cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
+
+            ArrayList<String> matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+            float[] confidenceScores = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
+
+            if (matches != null && !matches.isEmpty()) {
+                String recognizedText = matches.get(0);
+                float confidence = (confidenceScores != null && confidenceScores.length > 0)
+                        ? confidenceScores[0] : 0.0f;
+
+                // Send to API for validation
+                validatePronunciation(recognizedText, confidence);
+            } else {
+                tvMicStatus.setText("No speech detected");
+                Toast.makeText(PreAssessmentActivity.this, "No speech detected", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        @Override
+        public void onPartialResults(Bundle partialResults) {}
+
+        @Override
+        public void onEvent(int eventType, Bundle params) {}
+    }
+
+    private void validatePronunciation(String recognizedText, float confidence) {
+        Question q = questionList.get(currentIndex);
+        String expectedWord = q.getItemText();
+
+        tvMicStatus.setText("Validating...");
+
+        PronunciationRequest request = new PronunciationRequest(
+                q.getItemId(),
+                expectedWord,
+                recognizedText,
+                confidence
+        );
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.checkPronunciation(request).enqueue(new Callback<PronunciationResponse>() {
+            @Override
+            public void onResponse(Call<PronunciationResponse> call, Response<PronunciationResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    PronunciationResponse result = response.body();
+                    pronunciationScore = result.getScore();
+
+                    // Update UI with feedback
+                    String statusText = String.format(Locale.getDefault(),
+                            "Score: %d%% - %s",
+                            result.getScore(),
+                            result.getFeedback());
+                    tvMicStatus.setText(statusText);
+
+                    // Create response for this item
+                    ResponseModel responseModel = new ResponseModel();
+                    responseModel.setItemId(q.getItemId());
+                    responseModel.setSelectedOption(recognizedText);
+                    responseModel.setCorrect(result.isCorrect());
+
+                    if (currentIndex < responses.size()) {
+                        responses.set(currentIndex, responseModel);
+                    } else {
+                        responses.add(responseModel);
+                    }
+
+                    // Enable continue button
+                    btnContinue.setEnabled(true);
+
+                    Toast.makeText(PreAssessmentActivity.this,
+                            result.getFeedback(),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    tvMicStatus.setText("Validation failed");
+                    Toast.makeText(PreAssessmentActivity.this,
+                            "Failed to validate pronunciation",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PronunciationResponse> call, Throwable t) {
+                tvMicStatus.setText("Connection error");
+                Toast.makeText(PreAssessmentActivity.this,
+                        "Connection error: " + t.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_REQUEST_RECORD_AUDIO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                startRecording();
+            } else {
+                Toast.makeText(this, "Audio permission required for pronunciation test",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
+        }
     }
 
     private void disableOptions() {

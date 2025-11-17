@@ -5,7 +5,10 @@
     <!-- ✅ Internet permission required for all API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <!-- Optional: if you’ll use local storage or cached images -->
+    <!-- ✅ Audio recording permission for pronunciation assessment -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- Optional: if you'll use local storage or cached images -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
