@@ -361,7 +361,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void finishAssessment(NextItemResponse result) {
         // Save final ability to session
-        session.saveAbility((float) result.getFinalTheta());
+        if (result.getFinalTheta() != null) {
+            session.saveAbility(result.getFinalTheta().floatValue());
+        }
 
         // Show final results
         showFinalResultsDialog(result);
