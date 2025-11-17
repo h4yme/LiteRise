@@ -113,17 +113,6 @@ try {
 
     $availableItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    if (empty($availableItems)) {
-        sendResponse([
-            'success' => true,
-            'session_id' => $sessionID,
-            'assessment_complete' => true,
-            'message' => 'No more items available',
-            'final_theta' => $currentTheta
-        ], 200);
-        exit;
-    }
-
     // Fetch all responses for this session to get actual completion count
     $stmt = $conn->prepare(
         "SELECT
@@ -144,6 +133,64 @@ try {
 
     error_log("get_next_item: sessionID=$sessionID, itemsCompleted=$itemsCompleted (from DB), itemsAnswered from request=" . count($itemsAnswered));
     error_log("get_next_item: Found " . count($responses) . " responses in database for session $sessionID");
+
+    // If no more items available, complete the assessment with current stats
+    if (empty($availableItems)) {
+        // Calculate final stats
+        $correctCount = 0;
+        if (!empty($responses)) {
+            foreach ($responses as $r) {
+                if ($r['IsCorrect']) {
+                    $correctCount++;
+                }
+            }
+        }
+        $accuracy = $itemsCompleted > 0 ? ($correctCount / $itemsCompleted) * 100 : 0;
+
+        error_log("Assessment completion (no more items): items=$itemsCompleted, correct=$correctCount, accuracy=$accuracy%, theta=$currentTheta");
+
+        // Update TestSessions
+        $stmt = $conn->prepare(
+            "UPDATE TestSessions
+             SET TotalQuestions = ?,
+                 CorrectAnswers = ?,
+                 AccuracyPercentage = ?,
+                 FinalTheta = ?,
+                 IsCompleted = 1,
+                 EndTime = GETDATE()
+             WHERE SessionID = ?"
+        );
+        $stmt->execute([
+            $itemsCompleted,
+            $correctCount,
+            $accuracy,
+            $currentTheta,
+            $sessionID
+        ]);
+
+        // Update student's current ability
+        $studentID = $session['StudentID'];
+        error_log("Updating student $studentID ability to $currentTheta (no more items available)");
+        $stmt = $conn->prepare(
+            "UPDATE Students
+             SET CurrentAbility = ?
+             WHERE StudentID = ?"
+        );
+        $stmt->execute([$currentTheta, $studentID]);
+
+        sendResponse([
+            'success' => true,
+            'session_id' => $sessionID,
+            'assessment_complete' => true,
+            'message' => 'No more items available',
+            'items_completed' => $itemsCompleted,
+            'total_items' => $itemsCompleted,
+            'correct_answers' => $correctCount,
+            'accuracy' => round($accuracy, 2),
+            'final_theta' => $currentTheta
+        ], 200);
+        exit;
+    }
 
     if ($itemsCompleted >= $minItems && !empty($responses)) {
         // Calculate current SEM if we have enough items
