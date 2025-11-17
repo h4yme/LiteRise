@@ -180,14 +180,20 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         String itemType = currentQuestion.getItemType() != null ? currentQuestion.getItemType() : "";
 
         // Update header with progress
-        tvTitle.setText("Adaptive Assessment");
-        tvProgress.setText("Question " + response.getItemsCompleted() +
-                          " • ~" + response.getItemsRemaining() + " remaining");
+        tvTitle.setText("Placement Test");
+        int questionsAnswered = response.getItemsCompleted() + 1; // +1 for current question
+        tvProgress.setText("Question " + questionsAnswered +
+                          " of ~" + (questionsAnswered + response.getItemsRemaining()));
         tvItemTypeBadge.setText(itemType);
+
+        // Update progress bar (approximate progress)
+        int totalEstimated = questionsAnswered + response.getItemsRemaining();
+        progressBar.setProgress((int) (((float) questionsAnswered / totalEstimated) * 100));
 
         // Reset state
         selectedAnswer = null;
         btnContinue.setEnabled(false);
+        clearSelections();
         resetButtonStates();
 
         // Hide all sections by default
@@ -207,16 +213,18 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         } else {
             handleMultipleChoiceQuestion(currentQuestion);
         }
+
+        enableOptions();
     }
 
     private void handleSyntaxQuestion(Question q) {
-        tvQuestion.setText(q.getQuestionText() != null ? q.getQuestionText() :
-                "Arrange the words to form a correct sentence:");
+        tvQuestion.setText("Arrange these words to form a correct sentence:");
 
         // Show scrambled words if available
         if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
-            containerScrambledWords.setVisibility(View.VISIBLE);
-            // Display scrambled words (implementation depends on your layout)
+            String scrambledText = String.join(" | ", q.getScrambledWords());
+            tvPassageText.setText(scrambledText);
+            cardPassage.setVisibility(View.VISIBLE);
         }
 
         // Show answer options
@@ -300,14 +308,36 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         btnOptionD.setBackgroundColor(defaultColor);
     }
 
+    private void clearSelections() {
+        btnOptionA.setSelected(false);
+        btnOptionB.setSelected(false);
+        btnOptionC.setSelected(false);
+        btnOptionD.setSelected(false);
+    }
+
+    private void enableOptions() {
+        btnOptionA.setEnabled(true);
+        btnOptionB.setEnabled(true);
+        btnOptionC.setEnabled(true);
+        btnOptionD.setEnabled(true);
+    }
+
+    private void disableOptions() {
+        btnOptionA.setEnabled(false);
+        btnOptionB.setEnabled(false);
+        btnOptionC.setEnabled(false);
+        btnOptionD.setEnabled(false);
+    }
+
     private void submitCurrentAnswer() {
         if (selectedAnswer == null || currentQuestion == null) {
             Toast.makeText(this, "Please select an answer", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Disable continue button during submission
+        // Disable continue button and options during submission
         btnContinue.setEnabled(false);
+        disableOptions();
         progressBar.setVisibility(View.VISIBLE);
 
         // Calculate time spent
