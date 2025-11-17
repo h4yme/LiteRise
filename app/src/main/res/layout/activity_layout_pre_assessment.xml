@@ -262,22 +262,22 @@
                     android:layout_marginTop="16dp"
                     android:rowCount="4">
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnOptionA"
                         style="@style/OptionButtonStyleNew"
                         android:text="a) Lorem ipsum dolor sit amet"/>
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnOptionB"
                         style="@style/OptionButtonStyleNew"
                         android:text="b) Lorem ipsum dolor sit amet"/>
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnOptionC"
                         style="@style/OptionButtonStyleNew"
                         android:text="c) Lorem ipsum dolor sit amet"/>
 
-                    <Button
+                    <androidx.appcompat.widget.AppCompatButton
                         android:id="@+id/btnOptionD"
                         style="@style/OptionButtonStyleNew"
                         android:text="d) Lorem ipsum dolor sit amet"/>
