@@ -56,14 +56,31 @@ try {
 
     // Check if student exists
     if (!$student) {
+        error_log("LOGIN FAILED: Student not found for email: $email");
         sendError("Invalid email or password", 401);
     }
 
     // Verify password
     $hashedPassword = $student['Password'];
 
-    if (!verifyPassword($password, $hashedPassword)) {
-        sendError("Invalid email or password", 401);
+    // DEBUG logging
+    error_log("LOGIN ATTEMPT: Email=$email, HashFromDB=" . substr($hashedPassword, 0, 20) . "...");
+    $verifyResult = verifyPassword($password, $hashedPassword);
+    error_log("PASSWORD VERIFY: Result=" . ($verifyResult ? 'TRUE' : 'FALSE'));
+
+    if (!$verifyResult) {
+        error_log("LOGIN FAILED: Password verification failed for email: $email");
+
+        // In debug mode, show more info
+        $debugInfo = null;
+        if (($_ENV['DEBUG_MODE'] ?? 'false') === 'true') {
+            $debugInfo = [
+                'hash_start' => substr($hashedPassword, 0, 20),
+                'hash_length' => strlen($hashedPassword),
+                'password_length' => strlen($password)
+            ];
+        }
+        sendError("Invalid email or password", 401, $debugInfo);
     }
 
     // Remove password from response
