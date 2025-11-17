@@ -160,6 +160,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
         // Hide all sections by default
         cardPassage.setVisibility(View.GONE);
         cardPronunciation.setVisibility(View.GONE);
+        cardQuestion.setVisibility(View.VISIBLE);  // Show question card by default
         gridOptions.setVisibility(View.VISIBLE);
         containerScrambledWords.setVisibility(View.GONE);
 
@@ -200,8 +201,9 @@ public class PreAssessmentActivity extends AppCompatActivity {
         tvPronunciationWord.setText(q.getItemText() != null ? q.getItemText() : "");
         tvPronunciationGuide.setText(q.getPassageText() != null ? "/" + q.getPassageText() + "/" : "");
 
-        // Auto-enable continue for pronunciation (after recording)
-        // For now, we'll treat mic tap as completion
+        // Reset mic status
+        tvMicStatus.setText("Tap to record");
+        cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
     }
 
     private void handleMultipleChoiceQuestion(Question q) {
