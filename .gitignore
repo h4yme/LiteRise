@@ -1,3 +1,4 @@
+# ==================== Android ====================
 *.iml
 .gradle
 /local.properties
@@ -13,3 +14,62 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.apk
+*.ap_
+*.aab
+/app/build/
+/app/release/
+
+# ==================== PHP Backend ====================
+/htdocs/api/.env
+/htdocs/api/vendor/
+/htdocs/api/*.log
+/htdocs/api/composer.lock
+
+# ==================== ASP.NET ====================
+/web-dashboard/**/bin/
+/web-dashboard/**/obj/
+/web-dashboard/**/.vs/
+/web-dashboard/**/*.user
+/web-dashboard/**/*.suo
+/web-dashboard/**/.vscode/
+/web-dashboard/**/appsettings.Development.json
+
+# ==================== Database ====================
+*.bak
+*.log
+*.ldf
+*.mdf
+
+# ==================== General ====================
+.DS_Store
+*.swp
+*.swo
+*~
+.env
+.env.local
+.env.*.local
+
+# ==================== IDE ====================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==================== OS ====================
+Thumbs.db
+Desktop.ini
+.directory
+
+# ==================== Logs ====================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ==================== Sensitive ====================
+*.key
+*.pem
+*.crt
+credentials.json
+secrets.json
