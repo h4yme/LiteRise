@@ -19,9 +19,18 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent;
 
             if (session.isLoggedIn()) {
-                // 🎯 Launch Adaptive Assessment (personalized questions)
-                intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
+                // Check if user has taken assessment
+                float ability = session.getAbility();
+
+                if (ability == 0.0f || Math.abs(ability) < 0.01f) {
+                    // No assessment taken yet - go to assessment
+                    intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
+                } else {
+                    // Assessment already taken - go to dashboard
+                    intent = new Intent(SplashActivity.this, DashboardActivity.class);
+                }
             } else {
+                // Not logged in - go to login
                 intent = new Intent(SplashActivity.this, LoginActivity.class);
             }
 
