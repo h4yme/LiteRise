@@ -24,8 +24,13 @@ public class AuthInterceptor implements Interceptor {
     public Response intercept(Chain chain) throws IOException {
         Request originalRequest = chain.request();
 
-        // Get token from SharedPreferences
-        SharedPreferences prefs = context.getSharedPreferences("LiteRisePrefs", Context.MODE_PRIVATE);
+        // If context is null, proceed without auth
+        if (context == null) {
+            return chain.proceed(originalRequest);
+        }
+
+        // Get token from SharedPreferences (use same key as SessionManager)
+        SharedPreferences prefs = context.getSharedPreferences("LiteRiseSession", Context.MODE_PRIVATE);
         String token = prefs.getString("token", null);
 
         // If token exists, add to Authorization header

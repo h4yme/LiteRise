@@ -48,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
         student.setEmail(email);
         student.setPassword(password);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         apiService.login(student).enqueue(new Callback<Students>() {
             @Override
             public void onResponse(Call<Students> call, Response<Students> response) {

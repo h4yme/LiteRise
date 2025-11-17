@@ -71,7 +71,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
     }
 
     private void loadQuestions() {
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         apiService.getPreAssessmentItems().enqueue(new Callback<PreAssessmentResponse>() {
             @Override
             public void onResponse(Call<PreAssessmentResponse> call, Response<PreAssessmentResponse> response) {
@@ -156,7 +156,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
         int studentId = session.getStudentId();
         SubmitRequest submitRequest = new SubmitRequest(studentId, responses);
 
-        ApiService apiService = ApiClient.getClient().create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         apiService.submitResponses(submitRequest).enqueue(new Callback<Void>() {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
