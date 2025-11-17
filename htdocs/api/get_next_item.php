@@ -165,12 +165,52 @@ try {
     }
 
     if ($shouldStop || $itemsCompleted >= $maxItems) {
+        // Update TestSessions with final results
+        $correctCount = 0;
+        foreach ($responses as $r) {
+            if ($r['IsCorrect']) {
+                $correctCount++;
+            }
+        }
+        $accuracy = $itemsCompleted > 0 ? ($correctCount / $itemsCompleted) * 100 : 0;
+
+        $stmt = $conn->prepare(
+            "UPDATE TestSessions
+             SET TotalQuestions = ?,
+                 CorrectAnswers = ?,
+                 AccuracyPercentage = ?,
+                 FinalTheta = ?,
+                 IsCompleted = 1,
+                 EndTime = GETDATE()
+             WHERE SessionID = ?"
+        );
+        $stmt->execute([
+            $itemsCompleted,
+            $correctCount,
+            $accuracy,
+            $currentTheta,
+            $sessionID
+        ]);
+
+        // Update student's current ability in Students table
+        $studentID = $session['StudentID'];
+        error_log("Updating student $studentID ability to $currentTheta (adaptive assessment complete)");
+        $stmt = $conn->prepare(
+            "UPDATE Students
+             SET CurrentAbility = ?
+             WHERE StudentID = ?"
+        );
+        $stmt->execute([$currentTheta, $studentID]);
+
         sendResponse([
             'success' => true,
             'session_id' => $sessionID,
             'assessment_complete' => true,
             'message' => 'Assessment complete - sufficient precision achieved',
             'items_completed' => $itemsCompleted,
+            'total_items' => $itemsCompleted,
+            'correct_answers' => $correctCount,
+            'accuracy' => round($accuracy, 2),
             'final_theta' => $currentTheta,
             'sem' => $sem ?? null
         ], 200);

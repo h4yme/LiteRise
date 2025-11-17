@@ -37,6 +37,15 @@ public class NextItemResponse {
     @SerializedName("sem")
     private Double sem;
 
+    @SerializedName("total_items")
+    private Integer totalItems;
+
+    @SerializedName("correct_answers")
+    private Integer correctAnswers;
+
+    @SerializedName("accuracy")
+    private Double accuracy;
+
     public NextItemResponse() {}
 
     // Getters and Setters
@@ -126,5 +135,29 @@ public class NextItemResponse {
 
     public void setSem(Double sem) {
         this.sem = sem;
+    }
+
+    public Integer getTotalItems() {
+        return totalItems;
+    }
+
+    public void setTotalItems(Integer totalItems) {
+        this.totalItems = totalItems;
+    }
+
+    public Integer getCorrectAnswers() {
+        return correctAnswers;
+    }
+
+    public void setCorrectAnswers(Integer correctAnswers) {
+        this.correctAnswers = correctAnswers;
+    }
+
+    public Double getAccuracy() {
+        return accuracy;
+    }
+
+    public void setAccuracy(Double accuracy) {
+        this.accuracy = accuracy;
     }
 }

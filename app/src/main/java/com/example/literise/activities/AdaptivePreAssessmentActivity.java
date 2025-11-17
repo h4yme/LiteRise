@@ -182,14 +182,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // Update header with progress
         tvTitle.setText("Placement Test");
-        int questionsAnswered = response.getItemsCompleted() + 1; // +1 for current question
-        tvProgress.setText("Question " + questionsAnswered +
-                          " of ~" + (questionsAnswered + response.getItemsRemaining()));
+        int questionsAnswered = itemsAnswered.size() + 1; // Already answered + current question
+        int estimatedRemaining = response.getItemsRemaining();
+        int estimatedTotal = questionsAnswered + estimatedRemaining;
+
+        tvProgress.setText(String.format("Question %d of ~%d", questionsAnswered, estimatedTotal));
         tvItemTypeBadge.setText(itemType);
 
         // Update progress bar (approximate progress)
-        int totalEstimated = questionsAnswered + response.getItemsRemaining();
-        progressBar.setProgress((int) (((float) questionsAnswered / totalEstimated) * 100));
+        progressBar.setProgress((int) (((float) questionsAnswered / estimatedTotal) * 100));
 
         // Reset state
         selectedAnswer = null;
@@ -412,8 +413,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void showFinalResultsDialog(NextItemResponse result) {
         StringBuilder message = new StringBuilder();
-        message.append(String.format("Questions Completed: %d\n\n",
-                result.getItemsCompleted()));
+
+        // Show score if available
+        if (result.getCorrectAnswers() != null && result.getTotalItems() != null) {
+            message.append(String.format("Score: %d/%d",
+                    result.getCorrectAnswers(),
+                    result.getTotalItems()));
+
+            if (result.getAccuracy() != null) {
+                message.append(String.format(" (%.1f%%)", result.getAccuracy()));
+            }
+            message.append("\n\n");
+        } else {
+            message.append(String.format("Questions Completed: %d\n\n",
+                    result.getItemsCompleted()));
+        }
 
         if (result.getFinalTheta() != null) {
             message.append(String.format("Ability Level: %.2f\n", result.getFinalTheta()));
