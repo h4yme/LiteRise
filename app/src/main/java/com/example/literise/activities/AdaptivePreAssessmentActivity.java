@@ -28,6 +28,7 @@ import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.GetNextItemRequest;
+import com.example.literise.utils.CustomToast;
 import com.example.literise.models.NextItemResponse;
 import com.example.literise.models.PronunciationRequest;
 import com.example.literise.models.PronunciationResponse;
@@ -376,7 +377,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000; // seconds
 
         // Determine if answer is correct
-        int isCorrect;
+        final int isCorrect;
         if ("Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())) {
             // For pronunciation, use score >= 70% as correct
             isCorrect = (pronunciationScore >= 70) ? 1 : 0;
@@ -408,15 +409,17 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     // Add to answered items
                     itemsAnswered.add(currentQuestion.getItemId());
 
-                    // Show feedback
-                    Toast.makeText(AdaptivePreAssessmentActivity.this,
-                            result.getFeedback(), Toast.LENGTH_SHORT).show();
+                    // Show quick beautiful feedback
+                    if (isCorrect == 1) {
+                        CustomToast.showSuccess(AdaptivePreAssessmentActivity.this, "✓ Correct!");
+                    } else {
+                        CustomToast.showError(AdaptivePreAssessmentActivity.this, "✗ Incorrect");
+                    }
 
-                    // Load next question
+                    // Load next question immediately (don't wait for toast)
                     loadNextAdaptiveQuestion();
                 } else {
-                    Toast.makeText(AdaptivePreAssessmentActivity.this,
-                            "Failed to submit answer", Toast.LENGTH_SHORT).show();
+                    CustomToast.showError(AdaptivePreAssessmentActivity.this, "Failed to submit answer");
                     btnContinue.setEnabled(true);
                 }
             }
@@ -424,8 +427,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<SingleResponseResult> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(AdaptivePreAssessmentActivity.this,
-                        "Connection error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                CustomToast.showError(AdaptivePreAssessmentActivity.this, "Connection error");
                 btnContinue.setEnabled(true);
             }
         });
