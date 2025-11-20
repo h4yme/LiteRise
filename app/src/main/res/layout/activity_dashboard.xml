@@ -1,451 +1,226 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
-
     android:layout_height="match_parent"
-
     android:background="@color/gray_light"
-
     android:fillViewport="true">
 
-
-
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-
         android:orientation="vertical"
-
         android:padding="20dp">
 
-
-
         <!-- Header Section -->
-
         <LinearLayout
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:orientation="horizontal"
-
             android:gravity="center_vertical"
-
             android:layout_marginBottom="16dp">
 
-
-
             <TextView
-
                 android:layout_width="0dp"
-
                 android:layout_height="wrap_content"
-
                 android:layout_weight="1"
-
                 android:text="Home"
-
                 android:textSize="24sp"
-
                 android:textStyle="bold"
-
                 android:textColor="@color/text_primary"
-
-                android:fontFamily="@font/poppins_medium"/>
-
-
+                android:fontFamily="sans-serif-medium"/>
 
             <!-- Header Badges -->
-
             <LinearLayout
-
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal">
 
-
-
                 <!-- XP Badge -->
-
                 <LinearLayout
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:orientation="horizontal"
-
                     android:background="@drawable/background_badge"
-
                     android:paddingStart="10dp"
-
                     android:paddingEnd="10dp"
-
                     android:paddingTop="6dp"
-
                     android:paddingBottom="6dp"
-
                     android:gravity="center"
-
                     android:layout_marginEnd="8dp">
 
-
-
                     <ImageView
-
                         android:layout_width="16dp"
-
                         android:layout_height="16dp"
-
                         android:src="@drawable/ic_star"
-
                         app:tint="@color/color_sunglow"
-
                         android:layout_marginEnd="4dp"/>
 
-
-
                     <TextView
-
                         android:id="@+id/tvHeaderXP"
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
                         android:text="2500 XP"
-
                         android:textSize="12sp"
-
                         android:textStyle="bold"
-                        android:fontFamily="@font/poppins_medium"
                         android:textColor="@color/text_primary"/>
-
                 </LinearLayout>
 
-
-
                 <!-- Trophy Icon -->
-
                 <ImageView
-
                     android:id="@+id/ivTrophy"
-
                     android:layout_width="36dp"
-
                     android:layout_height="36dp"
-
                     android:src="@drawable/ic_trophy"
-
                     android:padding="6dp"
-
                     android:background="@drawable/background_badge"
-
                     app:tint="@color/color_sunglow"
-
                     android:layout_marginEnd="8dp"/>
 
-
-
                 <!-- Settings Icon -->
-
                 <ImageView
-
                     android:id="@+id/ivSettings"
-
                     android:layout_width="36dp"
-
                     android:layout_height="36dp"
-
                     android:src="@drawable/ic_settings"
-
                     android:padding="6dp"
-
                     android:background="@drawable/background_badge"
-
                     app:tint="@color/gray_dark"/>
-
             </LinearLayout>
-
         </LinearLayout>
-
-
 
         <!-- Streak and Badges Row -->
-
         <LinearLayout
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:orientation="horizontal"
-
             android:layout_marginBottom="20dp">
 
-
-
             <!-- Streak Badge -->
-
             <LinearLayout
-
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal"
-
                 android:background="@drawable/background_badge_accent"
-
                 android:paddingStart="10dp"
-
                 android:paddingEnd="10dp"
-
                 android:paddingTop="6dp"
-
                 android:paddingBottom="6dp"
-
                 android:gravity="center"
-
                 android:layout_marginEnd="8dp">
 
-
-
                 <TextView
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="🔥"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textSize="12sp"
-
+                    android:textSize="14sp"
                     android:layout_marginEnd="4dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvStreak"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="10-Day Streak"
-                    android:fontFamily="@font/poppins_regular"
-                    android:textSize="9sp"
-
+                    android:textSize="11sp"
                     android:textColor="@color/white"/>
-
             </LinearLayout>
-
-
 
             <!-- Badges Badge -->
-
             <LinearLayout
-
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal"
-
                 android:background="@drawable/background_badge"
-
                 android:paddingStart="10dp"
-
                 android:paddingEnd="10dp"
-
                 android:paddingTop="6dp"
-
                 android:paddingBottom="6dp"
-
                 android:gravity="center">
 
-
-
                 <TextView
-
                     android:id="@+id/tvBadges"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="7 Badges"
-                    android:fontFamily="@font/poppins_regular"
                     android:textSize="11sp"
-
                     android:textColor="@color/gray_dark"/>
-
             </LinearLayout>
-
         </LinearLayout>
 
-
-
         <!-- Welcome Card -->
-
         <androidx.cardview.widget.CardView
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:layout_marginBottom="24dp"
-
             app:cardCornerRadius="16dp"
-
             app:cardElevation="2dp"
-
             app:cardBackgroundColor="@color/white">
 
-
-
             <LinearLayout
-
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="vertical"
-
                 android:padding="24dp">
 
-
-
                 <TextView
-
                     android:id="@+id/tvWelcome"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Welcome back,\nPatricia!"
-
                     android:textSize="28sp"
-
                     android:textStyle="bold"
-
                     android:textColor="@color/text_primary"
-
-                    android:fontFamily="@font/poppins_medium"
-
+                    android:fontFamily="sans-serif-medium"
                     android:lineSpacingExtra="4dp"
-
                     android:layout_marginBottom="12dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvWelcomeMessage"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Keep up the great work! You're making excellent progress on your literacy journey."
-
-                    android:textSize="12sp"
-
+                    android:textSize="14sp"
                     android:textColor="@color/gray_dark"
-
                     android:lineSpacingExtra="4dp"
-                    android:fontFamily="@font/poppins_regular"
                     android:layout_marginBottom="20dp"/>
 
-
-
                 <com.google.android.material.button.MaterialButton
-
                     android:id="@+id/btnContinueLesson"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="48dp"
-
                     android:text="Continue last lesson"
-
                     android:textSize="14sp"
-
                     android:textStyle="bold"
-
                     app:cornerRadius="24dp"
-
                     app:backgroundTint="@color/color_info_bg"
-
                     android:textColor="@color/white"
-
                     android:paddingStart="24dp"
-
                     android:paddingEnd="24dp"
-
-                    android:fontFamily="@font/poppins_medium"/>
-
+                    android:fontFamily="sans-serif-medium"/>
             </LinearLayout>
-
         </androidx.cardview.widget.CardView>
 
-
-
         <!-- Lesson List Section -->
-
         <TextView
-
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-
             android:text="Lesson List"
-
             android:textSize="20sp"
-
             android:textStyle="bold"
-
             android:textColor="@color/text_primary"
-
-            android:fontFamily="@font/poppins_medium"
-
+            android:fontFamily="sans-serif-medium"
             android:layout_marginBottom="16dp"/>
 
-
-
         <!-- Lesson Items Container -->
-
         <LinearLayout
-
             android:id="@+id/lessonListContainer"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:orientation="vertical">
-
-
 
             <!-- Lesson items will be added programmatically -->
 
-
-
         </LinearLayout>
 
-
-
     </LinearLayout>
-
 </ScrollView>

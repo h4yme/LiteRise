@@ -56,44 +56,30 @@ public class LoginActivity extends AppCompatActivity {
                     Students s = response.body();
 
                     SessionManager sessionManager = new SessionManager(LoginActivity.this);
-
                     sessionManager.saveStudent(s.getStudent_id(), s.getFullname(), s.getEmail());
 
-
-
                     // Save token if available
-
                     if (s.getToken() != null && !s.getToken().isEmpty()) {
-
                         sessionManager.saveToken(s.getToken());
-
                     }
 
-
-
                     // Save ability and XP if available
-
                     sessionManager.saveAbility(s.getAbility_score());
-
                     sessionManager.saveXP(s.getXp());
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
+                    // 🎯 Check if user has taken assessment
+                    // If ability_score is 0 or near 0, they haven't taken the assessment yet
                     Intent intent;
-
                     if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
-
                         // First time - go to adaptive assessment
-
                         intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
-
                     } else {
-
                         // Already completed assessment - go to dashboard
-
                         intent = new Intent(LoginActivity.this, DashboardActivity.class);
-
                     }
+
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();

@@ -1,399 +1,200 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
-
     android:layout_height="wrap_content"
-
     android:orientation="vertical"
-
     android:background="@drawable/background_rounded_white"
-
     android:padding="0dp">
 
-
-
     <!-- Header with Icon -->
-
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-
         android:orientation="vertical"
-
         android:background="@color/color_jade1"
-
         android:paddingTop="32dp"
-
         android:paddingBottom="24dp"
-
         android:paddingStart="24dp"
-
         android:paddingEnd="24dp"
-
         android:gravity="center">
 
-
-
         <!-- Success Icon -->
-
         <ImageView
-
             android:layout_width="64dp"
-
             android:layout_height="64dp"
-
             android:src="@android:drawable/ic_dialog_info"
-
-            app:tint="@color/white"
-
+            android:tint="@color/white"
             android:layout_marginBottom="12dp"/>
 
-
-
         <TextView
-
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
-
             android:text="Assessment Complete!"
-
             android:textColor="@color/white"
-
             android:textSize="24sp"
-
             android:textStyle="bold"
-
             android:fontFamily="sans-serif-medium"/>
-
-
 
     </LinearLayout>
 
-
-
     <!-- Content Section -->
-
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-
         android:orientation="vertical"
-
         android:padding="24dp">
 
-
-
         <!-- Score Display -->
-
         <androidx.cardview.widget.CardView
-
             android:id="@+id/cardScore"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             app:cardCornerRadius="12dp"
-
             app:cardElevation="0dp"
-
             app:cardBackgroundColor="@color/color_old_lace"
-
             android:layout_marginBottom="16dp">
 
-
-
             <LinearLayout
-
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="vertical"
-
                 android:padding="20dp"
-
                 android:gravity="center">
 
-
-
                 <TextView
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Your Score"
-
                     android:textColor="@color/gray_dark"
-
                     android:textSize="14sp"
-
                     android:layout_marginBottom="8dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvDialogScore"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="11/14"
-
                     android:textColor="@color/color_jade1"
-
                     android:textSize="36sp"
-
                     android:textStyle="bold"
-
                     android:fontFamily="sans-serif-medium"
-
                     android:layout_marginBottom="4dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvDialogAccuracy"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="78.6%"
-
                     android:textColor="@color/color_jade2"
-
                     android:textSize="18sp"
-
                     android:textStyle="bold"/>
 
-
-
             </LinearLayout>
-
-
 
         </androidx.cardview.widget.CardView>
 
-
-
         <!-- Ability Level -->
-
         <LinearLayout
-
             android:id="@+id/layoutAbility"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:orientation="horizontal"
-
             android:padding="16dp"
-
             android:background="@drawable/background_rounded_border"
-
             android:layout_marginBottom="12dp">
 
-
-
             <LinearLayout
-
                 android:layout_width="0dp"
-
                 android:layout_height="wrap_content"
-
                 android:layout_weight="1"
-
                 android:orientation="vertical">
 
-
-
                 <TextView
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Ability Level"
-
                     android:textColor="@color/gray_dark"
-
                     android:textSize="13sp"
-
                     android:layout_marginBottom="4dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvDialogAbility"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="1.25"
-
                     android:textColor="@color/text_primary"
-
                     android:textSize="20sp"
-
                     android:textStyle="bold"
-
                     android:fontFamily="sans-serif-medium"/>
 
-
-
             </LinearLayout>
-
-
 
             <LinearLayout
-
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="vertical"
-
                 android:gravity="end">
 
-
-
                 <TextView
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Classification"
-
                     android:textColor="@color/gray_dark"
-
                     android:textSize="13sp"
-
                     android:layout_marginBottom="4dp"/>
 
-
-
                 <TextView
-
                     android:id="@+id/tvDialogClassification"
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:text="Intermediate"
-
                     android:textColor="@color/color_jade1"
-
                     android:textSize="16sp"
-
                     android:textStyle="bold"
-
                     android:fontFamily="sans-serif-medium"/>
 
-
-
             </LinearLayout>
-
-
 
         </LinearLayout>
 
-
-
         <!-- Feedback Message -->
-
         <TextView
-
             android:id="@+id/tvDialogFeedback"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:text="Great job! You're making excellent progress."
-
             android:textColor="@color/text_secondary"
-
             android:textSize="14sp"
-
             android:lineSpacingExtra="4dp"
-
             android:layout_marginBottom="16dp"
-
             android:gravity="center"/>
 
-
-
         <!-- Precision Info (Optional) -->
-
         <TextView
-
             android:id="@+id/tvDialogPrecision"
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:text="Precision: 0.25"
-
             android:textColor="@color/gray_medium"
-
             android:textSize="12sp"
-
             android:gravity="center"
-
             android:layout_marginBottom="16dp"
-
             android:visibility="gone"/>
 
-
-
         <!-- Continue Button -->
-
         <com.google.android.material.button.MaterialButton
-
             android:id="@+id/btnDialogContinue"
-
             android:layout_width="match_parent"
-
             android:layout_height="56dp"
-
             android:text="Continue"
-
             android:textColor="@color/white"
-
             android:textSize="16sp"
-
             android:textStyle="bold"
-
             app:backgroundTint="@color/color_jade1"
-
             app:cornerRadius="12dp"
-
             android:fontFamily="sans-serif-medium"/>
 
-
-
     </LinearLayout>
-
-
 
 </LinearLayout>

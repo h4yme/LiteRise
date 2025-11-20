@@ -10,9 +10,7 @@ public class SessionManager {
     private static final String KEY_FULLNAME = "fullname";
     private static final String KEY_EMAIL = "email";
     private static final String KEY_TOKEN = "token";
-
     private static final String KEY_ABILITY = "current_ability";
-
     private static final String KEY_XP = "total_xp";
 
     private SharedPreferences prefs;
@@ -32,11 +30,42 @@ public class SessionManager {
         editor.apply();
     }
 
+    public void saveToken(String token) {
+        editor.putString(KEY_TOKEN, token);
+        editor.apply();
+    }
+
+    public String getToken() {
+        return prefs.getString(KEY_TOKEN, null);
+    }
+
+    public void saveAbility(float ability) {
+        editor.putFloat(KEY_ABILITY, ability);
+        editor.apply();
+    }
+
+    public float getAbility() {
+        return prefs.getFloat(KEY_ABILITY, 0.0f);
+    }
+
+    public void saveXP(int xp) {
+        editor.putInt(KEY_XP, xp);
+        editor.apply();
+    }
+
+    public int getXP() {
+        return prefs.getInt(KEY_XP, 0);
+    }
+
     public int getStudentId() {
         return prefs.getInt(KEY_STUDENT_ID, 0);
     }
 
     public String getFullname() {
+        return prefs.getString(KEY_FULLNAME, null);
+    }
+
+    public String getFullName() {
         return prefs.getString(KEY_FULLNAME, null);
     }
 
@@ -51,62 +80,5 @@ public class SessionManager {
 
     public boolean isLoggedIn() {
         return getStudentId() != 0;
-    }
-    public void saveToken(String token) {
-
-        editor.putString(KEY_TOKEN, token);
-
-        editor.apply();
-
-    }
-
-
-
-    public String getToken() {
-
-        return prefs.getString(KEY_TOKEN, null);
-
-    }
-
-
-
-    public void saveAbility(float ability) {
-
-        editor.putFloat(KEY_ABILITY, ability);
-
-        editor.apply();
-
-    }
-
-
-
-    public float getAbility() {
-
-        return prefs.getFloat(KEY_ABILITY, 0.0f);
-
-    }
-
-
-
-    public void saveXP(int xp) {
-
-        editor.putInt(KEY_XP, xp);
-
-        editor.apply();
-
-    }
-
-
-
-    public int getXP() {
-
-        return prefs.getInt(KEY_XP, 0);
-
-    }
-
-    public String getFullName() {
-
-        return prefs.getString(KEY_FULLNAME, null);
-
     }
 }
