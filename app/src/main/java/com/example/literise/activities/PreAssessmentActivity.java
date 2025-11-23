@@ -629,55 +629,43 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
     private void startRecording() {
-
         if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-
             Toast.makeText(this, "Speech recognition not available", Toast.LENGTH_SHORT).show();
-
             return;
-
         }
-
-
 
         isRecording = true;
         lastPartialResult = null;
-
         tvMicStatus.setText("Listening...");
-
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
-
-
-        // Initialize speech recognizer if not already done
-
-        if (speechRecognizer == null) {
-
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-
-            speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
-
+        // Always destroy and recreate to avoid stale state issues
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
+            speechRecognizer = null;
         }
-
-
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-        // Use WEB_SEARCH model - better for single words and short phrases
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        // Use explicit English - more reliable than device locale
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
+        intent.putExtra(RecognizerIntent.EXTRA_ONLY_RETURN_LANGUAGE_PREFERENCE, true);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
-        // Longer silence timeout - wait for user to finish speaking
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1500);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1200);
-        // Very short minimum - single words can be as quick as 100-200ms
+        // Longer silence timeout for single words
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1500);
+        // Very short minimum for single words
         intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 100);
-        // Online recognition is better for single words
+        // Online recognition - requires internet but more accurate
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
+        android.util.Log.d("SpeechRecognition", "Starting speech recognition...");
         speechRecognizer.startListening(intent);
-
     }
 
 
