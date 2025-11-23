@@ -23,7 +23,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -61,7 +60,7 @@ public class SentenceScrambleActivity extends AppCompatActivity {
     // Views
     private TextView tvTitle, tvProgress, tvTimer, tvStreakCount, tvScore;
     private TextView tvInstruction;
-    private LinearLayout wordBankContainer, answerContainer;
+    private ViewGroup wordBankContainer, answerContainer;
     private ProgressBar progressBar, timerProgress;
     private MaterialButton btnCheck, btnSkip, btnHint;
     private CardView cardStreak;
