@@ -415,7 +415,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
 
-            handlePronunciationQuestion(currentQuestion);
+            // Check if pronunciation item is MCQ (has options) or speak-type
+
+            if (currentQuestion.hasOptions() || currentQuestion.isMCQ()) {
+
+                // MCQ pronunciation question (e.g., "Which word has the same vowel sound...")
+
+                handleMultipleChoiceQuestion(currentQuestion);
+
+            } else {
+
+                // Speak-type pronunciation (student speaks the word)
+
+                handlePronunciationQuestion(currentQuestion);
+
+            }
 
         } else if ("Spelling".equalsIgnoreCase(itemType) || "Grammar".equalsIgnoreCase(itemType)) {
 
@@ -736,15 +750,23 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         final int isCorrect;
 
-        if ("Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())) {
+        // Check if this is a speak-type pronunciation item
 
-            // For pronunciation, use score >= 70% as correct
+        boolean isSpeakPronunciation = "Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())
+
+                && !currentQuestion.hasOptions() && !currentQuestion.isMCQ();
+
+
+
+        if (isSpeakPronunciation) {
+
+            // For speak-type pronunciation, use score >= 70% as correct
 
             isCorrect = (pronunciationScore >= 70) ? 1 : 0;
 
         } else {
 
-            // For multiple choice, compare to correct option
+            // For multiple choice (including MCQ pronunciation), compare to correct option
 
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
 

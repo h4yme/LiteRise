@@ -102,6 +102,12 @@ public class Question {
     @SerializedName("Discrimination")
     private float discrimination;
 
+    @SerializedName("IsMCQ")
+    private boolean isMCQ;
+
+    @SerializedName("PronunciationSubtype")
+    private String pronunciationSubtype;
+
     // ✅ Empty constructor (required for Retrofit / GSON)
     public Question() {}
 
@@ -186,4 +192,34 @@ public class Question {
     public void setPhonetic(String phonetic) { this.phonetic = phonetic; }
 
     public void setDefinition(String definition) { this.definition = definition; }
+
+    public boolean isMCQ() { return isMCQ; }
+
+    public void setMCQ(boolean MCQ) { isMCQ = MCQ; }
+
+
+
+    public String getPronunciationSubtype() { return pronunciationSubtype; }
+
+    public void setPronunciationSubtype(String pronunciationSubtype) { this.pronunciationSubtype = pronunciationSubtype; }
+
+
+
+    // Helper method to check if this is a speak-type pronunciation item
+
+    public boolean isSpeakPronunciation() {
+
+        return "Pronunciation".equalsIgnoreCase(itemType) && "Speak".equalsIgnoreCase(pronunciationSubtype);
+
+    }
+
+
+
+    // Helper method to check if this item has MCQ options
+
+    public boolean hasOptions() {
+
+        return isMCQ || (optionA != null && !optionA.isEmpty());
+
+    }
 }
