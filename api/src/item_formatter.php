@@ -298,6 +298,16 @@ function formatItemForApp($item) {
 
  
 
+  $isMCQ = !empty($answerChoices) || !empty($optionA);
+
+    $pronunciationSubtype = ($itemType === 'Pronunciation')
+
+        ? ($isMCQ ? 'MCQ' : 'Speak')
+
+        : null;
+
+ 
+
     return [
 
         'ItemID' => (int)$item['ItemID'],
@@ -313,6 +323,10 @@ function formatItemForApp($item) {
         'PassageText' => $passageText, // Phonetic guide for pronunciation
 
         'ItemType' => $itemType,
+
+        'PronunciationSubtype' => $pronunciationSubtype, // 'MCQ' or 'Speak' for pronunciation items
+
+        'IsMCQ' => $isMCQ, // Helper flag: true if item has MCQ options
 
         'DifficultyLevel' => $item['DifficultyLevel'] ?? '',
 
