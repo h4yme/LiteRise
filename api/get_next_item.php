@@ -559,11 +559,7 @@ try {
 
     $irt = new ItemResponseTheory();
 
- 
 
-   $irt = new ItemResponseTheory();
-
- 
 
     // Count items answered by type (from previous responses in this session)
 
@@ -589,9 +585,13 @@ try {
 
     foreach ($typeResults as $tr) {
 
-        if (isset($typeCounts[$tr['ItemType']])) {
+        // Case-insensitive matching for item types
 
-            $typeCounts[$tr['ItemType']] = (int)$tr['cnt'];
+        $itemType = ucfirst(strtolower(trim($tr['ItemType'])));
+
+        if (isset($typeCounts[$itemType])) {
+
+            $typeCounts[$itemType] = (int)$tr['cnt'];
 
         }
 
@@ -621,9 +621,15 @@ try {
 
     if (!empty($prioritizedTypes)) {
 
-        $typeFilteredItems = array_filter($availableItems, function($item) use ($prioritizedTypes) {
+        // Create lowercase version of prioritized types for case-insensitive matching
 
-            return in_array($item['ItemType'], $prioritizedTypes);
+        $prioritizedTypesLower = array_map('strtolower', $prioritizedTypes);
+
+        $typeFilteredItems = array_filter($availableItems, function($item) use ($prioritizedTypesLower) {
+
+            $itemTypeLower = strtolower(trim($item['ItemType'] ?? ''));
+
+            return in_array($itemTypeLower, $prioritizedTypesLower);
 
         });
 

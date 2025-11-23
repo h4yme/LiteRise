@@ -361,23 +361,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         tvTitle.setText("Placement Test");
 
-        int questionsAnswered = itemsAnswered.size() + 1; // Already answered + current question
+        int currentQuestionNumber = itemsAnswered.size() + 1; // Current question number (1-indexed)
 
-        int estimatedRemaining = response.getItemsRemaining();
-
-        int estimatedTotal = questionsAnswered + estimatedRemaining;
+        int totalQuestions = 20; // Fixed total of 20 questions for pre-assessment
 
 
 
-        tvProgress.setText(String.format("Question %d of ~%d", questionsAnswered, estimatedTotal));
+        tvProgress.setText(String.format("Question %d of %d", currentQuestionNumber, totalQuestions));
 
         tvItemTypeBadge.setText(itemType);
 
 
 
-        // Update progress bar (approximate progress)
+        // Update progress bar
 
-        progressBar.setProgress((int) (((float) questionsAnswered / estimatedTotal) * 100));
+        progressBar.setProgress((int) (((float) currentQuestionNumber / totalQuestions) * 100));
 
 
 
@@ -478,11 +476,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void handlePronunciationQuestion(Question q) {
 
-        // Show pronunciation card
+        // Show pronunciation card, hide MCQ options
 
         cardPronunciation.setVisibility(View.VISIBLE);
 
         cardQuestion.setVisibility(View.GONE);
+
+        gridOptions.setVisibility(View.GONE); // Hide MCQ buttons for speak-type pronunciation
 
 
 

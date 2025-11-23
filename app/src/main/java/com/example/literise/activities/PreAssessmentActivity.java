@@ -384,11 +384,13 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private void handlePronunciationQuestion(Question q) {
 
-        // Show pronunciation card
+        // Show pronunciation card, hide MCQ options
 
         cardPronunciation.setVisibility(View.VISIBLE);
 
         cardQuestion.setVisibility(View.GONE);
+
+        gridOptions.setVisibility(View.GONE); // Hide MCQ buttons for speak-type pronunciation
 
 
 
