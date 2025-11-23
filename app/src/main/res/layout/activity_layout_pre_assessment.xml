@@ -394,50 +394,6 @@
 
                 </LinearLayout>
 
-                <!-- Type Fallback Section (shown when speech fails) -->
-                <LinearLayout
-                    android:id="@+id/layoutTypeFallback"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Can't use microphone? Type it instead:"
-                        android:textColor="@color/text_secondary"
-                        android:textSize="12sp"/>
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etTypedPronunciation"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Type the word here"
-                            android:inputType="text"
-                            android:imeOptions="actionDone"
-                            android:textSize="16sp"/>
-
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnSubmitTyped"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Submit"
-                        android:layout_marginTop="8dp"
-                        app:cornerRadius="8dp"/>
-
-                </LinearLayout>
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
