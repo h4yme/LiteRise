@@ -125,7 +125,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
     private int pronunciationScore = 0;
     private String lastPartialResult = null;
     private int recognitionRetryCount = 0;
-    private static final int MAX_RECOGNITION_RETRIES = 1;
+    private static final int MAX_RECOGNITION_RETRIES = 2; // Increased retries
 
 
     @Override
@@ -702,26 +702,31 @@ public class PreAssessmentActivity extends AppCompatActivity {
         }
 
         isRecording = true;
-        tvMicStatus.setText("Listening...");
+        tvMicStatus.setText("Retrying... (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
-        if (speechRecognizer == null) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-            speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
+        // Destroy and recreate speech recognizer to clear any state issues
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
         }
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2500); // Slightly longer on retry
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2000);
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 300);
-        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10); // More results on retry
+        // Longer timeouts on retry
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 200); // Even shorter minimum
+        // Try offline on second retry as fallback
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, recognitionRetryCount >= 2);
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
+        android.util.Log.d("SpeechRecognition", "Retry attempt " + recognitionRetryCount + ", offline=" + (recognitionRetryCount >= 2));
         speechRecognizer.startListening(intent);
     }
 
