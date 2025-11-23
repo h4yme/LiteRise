@@ -132,7 +132,7 @@ function generateIncorrectSentences($words, $correctSentence) {
 
 function formatItemForApp($item) {
 
-    $itemType = $item['ItemType'] ?? '';
+    $itemType = ucfirst(strtolower(trim($item['ItemType'] ?? '')));
 
  
 

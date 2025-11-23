@@ -565,33 +565,69 @@ try {
 
  
 
+   
+
     // Count items answered by type (from previous responses in this session)
+
+ 
 
     $typeCounts = ['Spelling' => 0, 'Grammar' => 0, 'Pronunciation' => 0, 'Syntax' => 0];
 
+ 
+
     $stmtTypes = $conn->prepare(
+
+ 
 
         "SELECT i.ItemType, COUNT(*) as cnt
 
+ 
+
          FROM Responses r
+
+ 
 
          JOIN Items i ON r.ItemID = i.ItemID
 
+ 
+
          WHERE r.SessionID = ?
+
+ 
 
          GROUP BY i.ItemType"
 
+ 
+
     );
+
+ 
 
     $stmtTypes->execute([$sessionID]);
 
+ 
+
     $typeResults = $stmtTypes->fetchAll(PDO::FETCH_ASSOC);
+
+ 
 
     foreach ($typeResults as $tr) {
 
-        if (isset($typeCounts[$tr['ItemType']])) {
+ 
 
-            $typeCounts[$tr['ItemType']] = (int)$tr['cnt'];
+        // Case-insensitive matching for item types
+
+ 
+
+        $itemType = ucfirst(strtolower(trim($tr['ItemType'])));
+
+ 
+
+        if (isset($typeCounts[$itemType])) {
+
+ 
+
+            $typeCounts[$itemType] = (int)$tr['cnt'];
 
         }
 
@@ -621,9 +657,23 @@ try {
 
     if (!empty($prioritizedTypes)) {
 
-        $typeFilteredItems = array_filter($availableItems, function($item) use ($prioritizedTypes) {
+         // Create lowercase version of prioritized types for case-insensitive matching
 
-            return in_array($item['ItemType'], $prioritizedTypes);
+ 
+
+        $prioritizedTypesLower = array_map('strtolower', $prioritizedTypes);
+
+ 
+
+        $typeFilteredItems = array_filter($availableItems, function($item) use ($prioritizedTypesLower) {
+
+ 
+
+            $itemTypeLower = strtolower(trim($item['ItemType'] ?? ''));
+
+ 
+
+            return in_array($itemTypeLower, $prioritizedTypesLower);
 
         });
 
