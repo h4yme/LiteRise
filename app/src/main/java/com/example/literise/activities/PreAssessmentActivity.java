@@ -662,28 +662,19 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
+        // Use WEB_SEARCH model - better for single words and short phrases
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_WEB_SEARCH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
-
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 500); // 0.5 seconds minimum
-
-        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true); // Use offline recognition if available
-
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
+        // Longer silence timeout - wait for user to finish speaking
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1500);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1200);
+        // Very short minimum - single words can be as quick as 100-200ms
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 100);
+        // Online recognition is better for single words
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-
-
 
         speechRecognizer.startListening(intent);
 
