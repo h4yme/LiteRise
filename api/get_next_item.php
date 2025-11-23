@@ -73,12 +73,17 @@ $itemsAnswered = $data['items_answered'] ?? [];
  
 
 // Configuration
-
 $maxItems = 20; // Maximum items in assessment
+$targetSEM = 0.25; // Target precision (stop when SEM is this low)
+$minItems = 20; // Minimum items - require all 20 items for pre-assessment
 
-$targetSEM = 0.3; // Target precision (stop when SEM is this low)
-
-$minItems = 10; // Minimum items before considering stopping
+// Item type distribution for variety (ensures mix of all types)
+$targetDistribution = [
+    'Spelling' => 5,
+    'Grammar' => 5,
+    'Pronunciation' => 5,
+    'Syntax' => 5
+];
 
  
 
@@ -541,10 +546,44 @@ try {
  
 
     // Use IRT to select the next best item
-
     $irt = new ItemResponseTheory();
 
- 
+    // Count items answered by type (from previous responses in this session)
+    $typeCounts = ['Spelling' => 0, 'Grammar' => 0, 'Pronunciation' => 0, 'Syntax' => 0];
+    $stmtTypes = $conn->prepare(
+        "SELECT i.ItemType, COUNT(*) as cnt
+         FROM Responses r
+         JOIN Items i ON r.ItemID = i.ItemID
+         WHERE r.SessionID = ?
+         GROUP BY i.ItemType"
+    );
+    $stmtTypes->execute([$sessionID]);
+    $typeResults = $stmtTypes->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($typeResults as $tr) {
+        if (isset($typeCounts[$tr['ItemType']])) {
+            $typeCounts[$tr['ItemType']] = (int)$tr['cnt'];
+        }
+    }
+
+    // Determine which item types need more items (prioritize underrepresented types)
+    $prioritizedTypes = [];
+    foreach ($targetDistribution as $type => $target) {
+        if ($typeCounts[$type] < $target) {
+            $prioritizedTypes[] = $type;
+        }
+    }
+
+    // Filter available items by prioritized types if any need more items
+    $filteredItems = $availableItems;
+    if (!empty($prioritizedTypes)) {
+        $typeFilteredItems = array_filter($availableItems, function($item) use ($prioritizedTypes) {
+            return in_array($item['ItemType'], $prioritizedTypes);
+        });
+        // Only use filtered if we have items available
+        if (!empty($typeFilteredItems)) {
+            $filteredItems = array_values($typeFilteredItems);
+        }
+    }
 
     // Prepare items for IRT selection
     $irtItems = array_map(function($item) {
@@ -555,12 +594,9 @@ try {
             'c' => (float)($item['GuessingParam'] ?? 0.25),
             'raw' => $item // Keep full item data
         ];
-    }, $availableItems);
-
- 
+    }, $filteredItems);
 
     // Select best item using Maximum Information
-
     $selectedIRTItem = $irt->selectNextItem($currentTheta, $irtItems);
 
  

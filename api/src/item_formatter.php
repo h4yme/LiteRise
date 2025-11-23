@@ -148,6 +148,14 @@ function formatItemForApp($item) {
         $passageText = $item['Phonetic'];
     }
 
+    // Determine if pronunciation item is MCQ or speak-type
+    // MCQ: has answer choices (questions about pronunciation)
+    // Speak: no answer choices (student speaks the word)
+    $isMCQ = !empty($answerChoices) || !empty($optionA);
+    $pronunciationSubtype = ($itemType === 'Pronunciation')
+        ? ($isMCQ ? 'MCQ' : 'Speak')
+        : null;
+
     return [
         'ItemID' => (int)$item['ItemID'],
         'ItemText' => $item['ItemText'] ?? '',
@@ -156,6 +164,8 @@ function formatItemForApp($item) {
             : ($item['ItemText'] ?? ''),
         'PassageText' => $passageText, // Phonetic guide for pronunciation
         'ItemType' => $itemType,
+        'PronunciationSubtype' => $pronunciationSubtype, // 'MCQ' or 'Speak' for pronunciation items
+        'IsMCQ' => $isMCQ, // Helper flag: true if item has MCQ options
         'DifficultyLevel' => $item['DifficultyLevel'] ?? '',
         'Difficulty' => (float)($item['DifficultyParam'] ?? 0), // Alias
         'DifficultyParam' => (float)($item['DifficultyParam'] ?? 0),
