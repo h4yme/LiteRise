@@ -105,6 +105,11 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     private View gridOptions, containerScrambledWords;
 
+    // Type fallback for pronunciation
+    private View layoutTypeFallback;
+    private com.google.android.material.textfield.TextInputEditText etTypedPronunciation;
+    private MaterialButton btnSubmitTyped;
+
 
 
     private List<Question> questionList = new ArrayList<>();
@@ -216,6 +221,14 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
         cardMicButton.setOnClickListener(v -> recordPronunciation());
 
+        // Type fallback views
+        layoutTypeFallback = findViewById(R.id.layoutTypeFallback);
+        etTypedPronunciation = findViewById(R.id.etTypedPronunciation);
+        btnSubmitTyped = findViewById(R.id.btnSubmitTyped);
+
+        if (btnSubmitTyped != null) {
+            btnSubmitTyped.setOnClickListener(v -> submitTypedPronunciation());
+        }
     }
 
 
@@ -394,6 +407,9 @@ public class PreAssessmentActivity extends AppCompatActivity {
         cardQuestion.setVisibility(View.GONE);
 
         gridOptions.setVisibility(View.GONE); // Hide MCQ buttons for speak-type pronunciation
+
+        hideTypeFallback(); // Reset type fallback for new question
+        tvMicStatus.setText("Tap to record"); // Reset mic status
 
 
 
@@ -845,7 +861,7 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_NO_MATCH:
 
-                    // Auto-retry once before showing error
+                    // Auto-retry before showing error
                     if (recognitionRetryCount < MAX_RECOGNITION_RETRIES) {
                         recognitionRetryCount++;
                         android.util.Log.d("SpeechRecognition", "ERROR_NO_MATCH - auto-retrying (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
@@ -857,7 +873,9 @@ public class PreAssessmentActivity extends AppCompatActivity {
                         }, 300);
                         return;
                     }
-                    message = "Couldn't understand - speak clearly and try again";
+                    // All retries exhausted - show type fallback
+                    message = "Speech not recognized - try typing instead";
+                    showTypeFallback();
 
                     break;
 
@@ -1098,6 +1116,42 @@ public class PreAssessmentActivity extends AppCompatActivity {
 
     }
 
+    // Show type fallback when speech recognition fails
+    private void showTypeFallback() {
+        if (layoutTypeFallback != null) {
+            layoutTypeFallback.setVisibility(View.VISIBLE);
+            if (etTypedPronunciation != null) {
+                etTypedPronunciation.setText("");
+                etTypedPronunciation.requestFocus();
+            }
+        }
+    }
+
+    // Hide type fallback (called when new question loads)
+    private void hideTypeFallback() {
+        if (layoutTypeFallback != null) {
+            layoutTypeFallback.setVisibility(View.GONE);
+            if (etTypedPronunciation != null) {
+                etTypedPronunciation.setText("");
+            }
+        }
+    }
+
+    // Submit typed pronunciation as fallback
+    private void submitTypedPronunciation() {
+        if (etTypedPronunciation == null || currentIndex >= questionList.size()) return;
+
+        String typedText = etTypedPronunciation.getText().toString().trim();
+        if (typedText.isEmpty()) {
+            Toast.makeText(this, "Please type the word", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validate typed pronunciation (with lower confidence since it's typed)
+        tvMicStatus.setText("Validating typed answer...");
+        validatePronunciation(typedText, 0.5f); // Lower confidence for typed answers
+        hideTypeFallback();
+    }
 
 
     @Override
