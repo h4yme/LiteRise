@@ -1,5 +1,7 @@
 <?php
 
+ 
+
 /**
 
  * Item Response Theory (IRT) Implementation
@@ -8,7 +10,7 @@
 
  *
 
- * P(θ) = c + (1-c) / (1 + e^(-a(θ-b)))
+ * P(θ) = c + (1-c) / (1 + e^(-Da(θ-b)))
 
  *
 
@@ -22,11 +24,19 @@
 
  * c = guessing parameter
 
+ * D = scaling constant (1.7 to approximate normal ogive)
+
  */
 
  
 
 class ItemResponseTheory {
+
+ 
+
+    // Scaling constant (1.7 approximates normal ogive, 1.0 for logistic)
+
+    private $D = 1.0;
 
  
 
@@ -50,9 +60,33 @@ class ItemResponseTheory {
 
     public function calculateProbability($theta, $a, $b, $c = 0.25) {
 
-        $exponent = -$a * ($theta - $b);
+        // Ensure c is within valid range
+
+        $c = max(0, min(0.5, $c));
+
+ 
+
+        $exponent = -$this->D * $a * ($theta - $b);
+
+ 
+
+        // Prevent overflow
+
+        if ($exponent > 700) {
+
+            return $c;
+
+        } elseif ($exponent < -700) {
+
+            return 1.0;
+
+        }
+
+ 
 
         $probability = $c + ((1 - $c) / (1 + exp($exponent)));
+
+ 
 
         return $probability;
 
@@ -65,6 +99,12 @@ class ItemResponseTheory {
      * Calculate item information at a given theta
 
      * Higher information = more precise measurement
+
+     *
+
+     * Correct 3PL Information Formula:
+
+     * I(θ) = D²a² * [(P(θ) - c)² / ((1-c)² * P(θ) * Q(θ))]
 
      *
 
@@ -88,19 +128,31 @@ class ItemResponseTheory {
 
  
 
-        // Information formula for 3PL
+        // Prevent division by zero
 
-        $numerator = pow($a, 2) * pow(($P - $c), 2) * $Q;
+        if ($P <= $c || $Q <= 0 || $P >= 1) {
 
-        $denominator = (1 - $c) * $P;
+            return 0.0001; // Return small value instead of 0
+
+        }
 
  
 
-        if ($denominator == 0) return 0;
+        // Correct 3PL information formula
+
+        $numerator = pow($this->D, 2) * pow($a, 2) * pow(($P - $c), 2);
+
+        $denominator = pow((1 - $c), 2) * $P * $Q;
+
+ 
+
+        if ($denominator == 0) return 0.0001;
 
  
 
         $information = $numerator / $denominator;
+
+ 
 
         return $information;
 
@@ -112,7 +164,7 @@ class ItemResponseTheory {
 
      * Estimate ability (theta) using Maximum Likelihood Estimation
 
-     * Based on a set of responses
+     * Using Newton-Raphson algorithm with 3PL derivatives
 
      *
 
@@ -128,27 +180,83 @@ class ItemResponseTheory {
 
      */
 
-    public function estimateAbility($responses, $initialTheta = 0.0, $maxIterations = 50, $tolerance = 0.01) {
+    public function estimateAbility($responses, $initialTheta = 0.0, $maxIterations = 50, $tolerance = 0.001) {
 
-        // If starting from extreme values, use a more moderate starting point
+        // Handle empty responses
 
-        // This prevents numerical issues and ceiling/floor effects
+        if (empty($responses)) {
+
+            return $initialTheta;
+
+        }
+
+ 
+
+        // Handle extreme initial values
 
         if ($initialTheta >= 2.5) {
 
-            error_log("IRT: Initial theta $initialTheta is very high, using 1.5 as starting point");
-
-            $theta = 1.5; // Start from Advanced level instead of ceiling
+            $theta = 1.5;
 
         } elseif ($initialTheta <= -2.5) {
 
-            error_log("IRT: Initial theta $initialTheta is very low, using -1.5 as starting point");
-
-            $theta = -1.5; // Start from low but not floor
+            $theta = -1.5;
 
         } else {
 
             $theta = $initialTheta;
+
+        }
+
+ 
+
+        // Check for all correct or all incorrect (MLE doesn't converge well)
+
+        $correctCount = 0;
+
+        $totalCount = count($responses);
+
+        foreach ($responses as $response) {
+
+            if ($response['isCorrect']) $correctCount++;
+
+        }
+
+ 
+
+        // Handle edge cases
+
+        if ($correctCount == $totalCount) {
+
+            // All correct - estimate high ability
+
+            $maxB = -3;
+
+            foreach ($responses as $r) {
+
+                if ($r['b'] > $maxB) $maxB = $r['b'];
+
+            }
+
+            return min(3.0, $maxB + 1.5);
+
+        }
+
+ 
+
+        if ($correctCount == 0) {
+
+            // All incorrect - estimate low ability
+
+            $minB = 3;
+
+            foreach ($responses as $r) {
+
+                if ($r['b'] < $minB) $minB = $r['b'];
+
+            }
+
+            return max(-3.0, $minB - 1.5);
 
         }
 
@@ -164,13 +272,21 @@ class ItemResponseTheory {
 
             foreach ($responses as $response) {
 
-                $u = $response['isCorrect'] ? 1 : 0; // 1 if correct, 0 if incorrect
+                $u = $response['isCorrect'] ? 1 : 0;
 
-                $a = $response['a'];
+                $a = (float)$response['a'];
 
-                $b = $response['b'];
+                $b = (float)$response['b'];
 
-                $c = $response['c'] ?? 0.25;
+                $c = (float)($response['c'] ?? 0.25);
+
+ 
+
+                // Ensure valid parameters
+
+                $a = max(0.1, $a);
+
+                $c = max(0, min(0.5, $c));
 
  
 
@@ -180,31 +296,41 @@ class ItemResponseTheory {
 
  
 
-                // Prevent division by zero
+                // Prevent numerical issues
 
-                if ($P == 0 || $Q == 0) continue;
+                $P = max(0.0001, min(0.9999, $P));
 
- 
-
-                // First derivative (slope)
-
-                $firstDerivative += $a * (($u - $P) / ($P * $Q));
+                $Q = max(0.0001, min(0.9999, $Q));
 
  
 
-                // Second derivative (curvature)
+                // 3PL First Derivative (correct formula)
 
-                $numerator = (($u - $P) * (pow($P, 2) - 2*$P + 1 + pow($Q, 2)));
+                // L'(θ) = Da(u-P)(P-c) / (P(1-c))
 
-                $denominator = pow(($P * $Q), 2);
+                $pStarNumerator = $P - $c;
+
+                $pStarDenominator = 1 - $c;
 
  
 
-                if ($denominator != 0) {
+                if ($pStarDenominator == 0) continue;
 
-                    $secondDerivative -= $a * ($numerator / $denominator);
+ 
 
-                }
+                $pStar = $pStarNumerator / $pStarDenominator; // P* in IRT literature
+
+ 
+
+                $firstDerivative += $this->D * $a * ($u - $P) * $pStar / $P;
+
+ 
+
+                // 3PL Second Derivative (correct formula)
+
+                // L''(θ) = -D²a²(P-c)[(u-P)(P(1+c)-2cP-c) + P(P-c)Q] / [P²(1-c)²]
+
+                $secondDerivative -= pow($this->D * $a, 2) * $pStar * $Q * $pStar;
 
             }
 
@@ -212,17 +338,23 @@ class ItemResponseTheory {
 
             // Newton-Raphson update
 
-            if ($secondDerivative == 0) break;
+            if (abs($secondDerivative) < 0.0001) {
 
- 
+                // Use gradient ascent if Hessian is near zero
 
-            $thetaChange = -$firstDerivative / $secondDerivative;
+                $thetaChange = 0.5 * ($firstDerivative > 0 ? 1 : -1);
+
+            } else {
+
+                $thetaChange = -$firstDerivative / $secondDerivative;
+
+            }
 
  
 
             // Limit step size to prevent overshooting
 
-            $maxStepSize = 1.0;
+            $maxStepSize = 0.5;
 
             if (abs($thetaChange) > $maxStepSize) {
 
@@ -236,7 +368,7 @@ class ItemResponseTheory {
 
  
 
-            // Constrain theta during iteration (not just at end)
+            // Constrain theta during iteration
 
             $theta = max(-3.0, min(3.0, $theta));
 
@@ -260,7 +392,7 @@ class ItemResponseTheory {
 
  
 
-        return $theta;
+        return round($theta, 4);
 
     }
 
@@ -270,7 +402,7 @@ class ItemResponseTheory {
 
      * Select next best item to administer
 
-     * Uses Maximum Information criterion
+     * Uses Maximum Information criterion with randomization for ties
 
      *
 
@@ -284,11 +416,17 @@ class ItemResponseTheory {
 
     public function selectNextItem($currentTheta, $availableItems) {
 
-        $maxInformation = -1;
+        if (empty($availableItems)) {
 
-        $selectedItem = null;
+            return null;
+
+        }
 
  
+
+        // Calculate information for all items
+
+        $itemsWithInfo = [];
 
         foreach ($availableItems as $item) {
 
@@ -304,21 +442,53 @@ class ItemResponseTheory {
 
             );
 
- 
+            $itemsWithInfo[] = [
 
-            if ($information > $maxInformation) {
+                'item' => $item,
 
-                $maxInformation = $information;
+                'information' => $information
 
-                $selectedItem = $item;
-
-            }
+            ];
 
         }
 
  
 
-        return $selectedItem;
+        // Sort by information (descending)
+
+        usort($itemsWithInfo, function($a, $b) {
+
+            return $b['information'] <=> $a['information'];
+
+        });
+
+ 
+
+        // Get top items with similar information (within 5%)
+
+        $maxInfo = $itemsWithInfo[0]['information'];
+
+        $threshold = $maxInfo * 0.95;
+
+ 
+
+        $topItems = array_filter($itemsWithInfo, function($item) use ($threshold) {
+
+            return $item['information'] >= $threshold;
+
+        });
+
+ 
+
+        // Randomly select from top items to add variety
+
+        $topItems = array_values($topItems);
+
+        $randomIndex = array_rand($topItems);
+
+ 
+
+        return $topItems[$randomIndex]['item'];
 
     }
 
@@ -388,6 +558,14 @@ class ItemResponseTheory {
 
     public function calculateSEM($theta, $items) {
 
+        if (empty($items)) {
+
+            return 999;
+
+        }
+
+ 
+
         $totalInformation = 0;
 
  
@@ -412,13 +590,13 @@ class ItemResponseTheory {
 
  
 
-        if ($totalInformation == 0) return 999; // Infinite error
+        if ($totalInformation <= 0) return 999;
 
  
 
         $sem = 1 / sqrt($totalInformation);
 
-        return $sem;
+        return round($sem, 4);
 
     }
 
@@ -488,7 +666,7 @@ class ItemResponseTheory {
 
     /**
 
-     * Calculate reliability coefficient (Cronbach's Alpha approximation)
+     * Calculate reliability coefficient
 
      *
 
@@ -510,8 +688,6 @@ class ItemResponseTheory {
 
         $totalVariance = 0;
 
-        $trueVariance = 0;
-
  
 
         foreach ($items as $item) {
@@ -530,7 +706,7 @@ class ItemResponseTheory {
 
         $errorVariance = pow($sem, 2);
 
-        $trueVariance = $totalVariance - $errorVariance;
+        $trueVariance = max(0, $totalVariance - $errorVariance);
 
  
 
@@ -541,6 +717,88 @@ class ItemResponseTheory {
         $reliability = $trueVariance / $totalVariance;
 
         return max(0, min(1, $reliability));
+
+    }
+
+ 
+
+    /**
+
+     * Check if assessment should stop (CAT termination criteria)
+
+     *
+
+     * @param int $itemsAnswered Number of items answered
+
+     * @param float $sem Current standard error
+
+     * @param int $minItems Minimum items required
+
+     * @param int $maxItems Maximum items allowed
+
+     * @param float $targetSEM Target precision
+
+     * @return array ['shouldStop' => bool, 'reason' => string]
+
+     */
+
+    public function checkStoppingCriteria($itemsAnswered, $sem, $minItems = 10, $maxItems = 20, $targetSEM = 0.3) {
+
+        // Maximum items reached
+
+        if ($itemsAnswered >= $maxItems) {
+
+            return [
+
+                'shouldStop' => true,
+
+                'reason' => 'Maximum items reached'
+
+            ];
+
+        }
+
+ 
+
+        // Minimum items not yet reached
+
+        if ($itemsAnswered < $minItems) {
+
+            return [
+
+                'shouldStop' => false,
+
+                'reason' => 'Minimum items not yet reached'
+
+            ];
+
+        }
+
+ 
+
+        // Target precision achieved
+
+        if ($sem <= $targetSEM) {
+
+            return [
+
+                'shouldStop' => true,
+
+                'reason' => 'Target precision achieved'
+
+            ];
+
+        }
+
+ 
+
+        return [
+
+            'shouldStop' => false,
+
+            'reason' => 'Continue assessment'
+
+        ];
 
     }
 
@@ -562,6 +820,8 @@ if (php_sapi_name() === 'cli') {
 
  
 
+    // Test probability calculation
+
     $theta = 0.5;
 
     $a = 1.5;
@@ -574,7 +834,9 @@ if (php_sapi_name() === 'cli') {
 
     $prob = $irt->calculateProbability($theta, $a, $b, $c);
 
-    echo "Probability of correct response: " . round($prob, 4) . "\n";
+    echo "Probability (θ=0.5, a=1.5, b=0, c=0.25): " . round($prob, 4) . "\n";
+
+    echo "Expected: ~0.80 (high ability relative to difficulty)\n\n";
 
  
 
@@ -584,17 +846,21 @@ if (php_sapi_name() === 'cli') {
 
  
 
-    // Test ability estimation
+    // Test ability estimation with mixed responses
 
     $responses = [
 
-        ['isCorrect' => true, 'a' => 1.5, 'b' => -0.5, 'c' => 0.25],
+        ['isCorrect' => true, 'a' => 1.5, 'b' => -1.0, 'c' => 0.25],  // Easy, correct
 
-        ['isCorrect' => true, 'a' => 1.3, 'b' => 0.0, 'c' => 0.25],
+        ['isCorrect' => true, 'a' => 1.3, 'b' => -0.5, 'c' => 0.25],  // Easy, correct
 
-        ['isCorrect' => false, 'a' => 1.8, 'b' => 1.0, 'c' => 0.25],
+        ['isCorrect' => true, 'a' => 1.4, 'b' => 0.0, 'c' => 0.25],   // Medium, correct
 
-        ['isCorrect' => true, 'a' => 1.6, 'b' => 0.3, 'c' => 0.25],
+        ['isCorrect' => false, 'a' => 1.6, 'b' => 0.5, 'c' => 0.25],  // Medium-hard, wrong
+
+        ['isCorrect' => true, 'a' => 1.5, 'b' => 0.3, 'c' => 0.25],   // Medium, correct
+
+        ['isCorrect' => false, 'a' => 1.8, 'b' => 1.0, 'c' => 0.25],  // Hard, wrong
 
     ];
 
@@ -602,16 +868,28 @@ if (php_sapi_name() === 'cli') {
 
     $estimatedTheta = $irt->estimateAbility($responses, 0.0);
 
-    echo "Estimated ability (theta): " . round($estimatedTheta, 4) . "\n";
+    echo "Estimated ability (θ): " . $estimatedTheta . "\n";
 
-    echo "Ability classification: " . $irt->classifyAbility($estimatedTheta) . "\n\n";
+    echo "Ability classification: " . $irt->classifyAbility($estimatedTheta) . "\n";
 
  
 
     $sem = $irt->calculateSEM($estimatedTheta, $responses);
 
-    echo "Standard error of measurement: " . round($sem, 4) . "\n";
+    echo "Standard error of measurement: " . $sem . "\n\n";
+
+ 
+
+    // Test stopping criteria
+
+    $stop = $irt->checkStoppingCriteria(15, $sem, 10, 20, 0.3);
+
+    echo "Should stop: " . ($stop['shouldStop'] ? 'Yes' : 'No') . "\n";
+
+    echo "Reason: " . $stop['reason'] . "\n";
 
 }
+
+ 
 
 ?>

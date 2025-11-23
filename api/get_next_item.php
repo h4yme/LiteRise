@@ -548,17 +548,17 @@ try {
 
     // Prepare items for IRT selection
 
-    $irtItems = array_map(function($item) {
+     $irtItems = array_map(function($item) {
 
         return [
 
             'itemID' => $item['ItemID'],
 
-            'a' => (float)$item['DiscriminationParam'],
+            'a' => (float)($item['DiscriminationParam'] ?? 1.0),
 
-            'b' => (float)$item['DifficultyParam'],
+            'b' => (float)($item['DifficultyParam'] ?? 0.0),
 
-            'c' => (float)$item['GuessingParam'],
+            'c' => (float)($item['GuessingParam'] ?? 0.25),
 
             'raw' => $item // Keep full item data
 
