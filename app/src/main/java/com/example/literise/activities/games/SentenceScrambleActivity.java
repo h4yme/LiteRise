@@ -35,6 +35,8 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.SaveGameResultRequest;
+import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.models.ScrambleSentence;
 import com.example.literise.models.ScrambleSentenceResponse;
 import com.example.literise.utils.CustomToast;
@@ -92,6 +94,8 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
     // Session
     private SessionManager session;
+    private Integer lessonId;
+    private Integer sessionId;
 
     // Constants
     private static final int POINTS_PER_CORRECT = 100;
@@ -107,6 +111,15 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         startTime = System.currentTimeMillis();
+
+        // Get lesson and session info from intent
+        Intent intent = getIntent();
+        if (intent != null) {
+            lessonId = intent.hasExtra("lesson_id") ? intent.getIntExtra("lesson_id", -1) : null;
+            sessionId = intent.hasExtra("session_id") ? intent.getIntExtra("session_id", -1) : null;
+            if (lessonId != null && lessonId == -1) lessonId = null;
+            if (sessionId != null && sessionId == -1) sessionId = null;
+        }
 
         initializeViews();
         setupListeners();
@@ -183,7 +196,16 @@ public class SentenceScrambleActivity extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.getScrambleSentences(TOTAL_SENTENCES).enqueue(new Callback<ScrambleSentenceResponse>() {
+
+        // Use lesson-specific content if lessonId is available
+        Call<ScrambleSentenceResponse> call;
+        if (lessonId != null) {
+            call = apiService.getScrambleSentences(TOTAL_SENTENCES, lessonId);
+        } else {
+            call = apiService.getScrambleSentences(TOTAL_SENTENCES);
+        }
+
+        call.enqueue(new Callback<ScrambleSentenceResponse>() {
             @Override
             public void onResponse(Call<ScrambleSentenceResponse> call, Response<ScrambleSentenceResponse> response) {
                 progressBar.setVisibility(View.GONE);
@@ -634,7 +656,59 @@ public class SentenceScrambleActivity extends AppCompatActivity {
         long totalTime = System.currentTimeMillis() - startTime;
         float accuracy = totalAttempts > 0 ? ((float) correctAnswers / totalAttempts) * 100 : 0;
 
+        // Save game results to database
+        saveGameResults(accuracy, totalTime);
+
         showResultDialog(accuracy, totalTime);
+    }
+
+    private void saveGameResults(float accuracy, long totalTime) {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) {
+            return; // Can't save without student ID
+        }
+
+        int timeInSeconds = (int) (totalTime / 1000);
+
+        // Build the request
+        SaveGameResultRequest request = new SaveGameResultRequest.Builder(studentId, "SentenceScramble", score)
+                .sessionId(sessionId)
+                .lessonId(lessonId)
+                .accuracyPercentage(accuracy)
+                .timeCompleted(timeInSeconds)
+                .xpEarned(score)
+                .streakAchieved(maxStreak)
+                .build();
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.saveGameResult(request).enqueue(new Callback<SaveGameResultResponse>() {
+            @Override
+            public void onResponse(Call<SaveGameResultResponse> call, Response<SaveGameResultResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    SaveGameResultResponse.StudentStats stats = response.body().getStudent();
+                    if (stats != null) {
+                        // Update local session with new XP
+                        session.updateTotalXP(stats.getTotalXP());
+                    }
+
+                    // Check for badge unlocks
+                    if (response.body().getBadgesUnlocked() != null &&
+                        !response.body().getBadgesUnlocked().isEmpty()) {
+                        for (SaveGameResultResponse.Badge badge : response.body().getBadgesUnlocked()) {
+                            CustomToast.showSuccess(SentenceScrambleActivity.this,
+                                "Badge Unlocked: " + badge.getBadgeName());
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SaveGameResultResponse> call, Throwable t) {
+                // Silent fail - game results will be saved next time
+                // Log for debugging
+                android.util.Log.e("SentenceScramble", "Failed to save game result: " + t.getMessage());
+            }
+        });
     }
 
     private void showResultDialog(float accuracy, long totalTime) {

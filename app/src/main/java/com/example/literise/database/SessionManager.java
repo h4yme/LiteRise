@@ -104,6 +104,14 @@ public class SessionManager {
 
     }
 
+    /**
+     * Update total XP (alias for saveXP for clarity)
+     * @param totalXP New total XP value
+     */
+    public void updateTotalXP(int totalXP) {
+        saveXP(totalXP);
+    }
+
     public String getFullName() {
 
         return prefs.getString(KEY_FULLNAME, null);

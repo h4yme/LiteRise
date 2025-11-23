@@ -4,10 +4,12 @@
  * GET/POST /api/get_scramble_sentences.php
  *
  * Returns sentences for the Sentence Scramble game
+ * Now pulls from LessonGameContent table (lesson-based) instead of Items table
  *
  * Request Parameters:
+ * - lesson_id: The lesson to get content for (required for lesson-based content)
  * - count: Number of sentences to return (default 10)
- * - grade_level: Filter by grade level (optional)
+ * - grade_level: Filter by grade level (optional, for fallback)
  * - difficulty: Filter by difficulty (optional: easy, medium, hard)
  *
  * Response:
@@ -23,7 +25,8 @@
  *       "GradeLevel": 4
  *     }
  *   ],
- *   "total": 10
+ *   "total": 10,
+ *   "lesson_id": 1
  * }
  */
 
@@ -35,6 +38,7 @@ $authUser = requireAuth();
 
 // Get parameters
 $data = getJsonInput();
+$lessonID = $data['lesson_id'] ?? $_GET['lesson_id'] ?? null;
 $count = $data['count'] ?? $_GET['count'] ?? 10;
 $gradeLevel = $data['grade_level'] ?? $_GET['grade_level'] ?? null;
 $difficulty = $data['difficulty'] ?? $_GET['difficulty'] ?? null;
@@ -43,80 +47,92 @@ $difficulty = $data['difficulty'] ?? $_GET['difficulty'] ?? null;
 $count = min(max((int)$count, 1), 20); // Between 1 and 20
 
 try {
-    // First, try to get sentences from the database (Items table with Syntax type)
-    $query = "SELECT TOP (?)
-                ItemID as SentenceID,
-                CorrectAnswer as CorrectSentence,
-                AnswerChoices as ScrambledWordsJSON,
-                DifficultyParam as Difficulty,
-                ItemType as Category,
-                GradeLevel
-              FROM Items
-              WHERE ItemType = 'Syntax'
-                AND IsActive = 1";
-
-    $params = [$count];
-
-    if ($gradeLevel !== null) {
-        $query .= " AND GradeLevel = ?";
-        $params[] = (int)$gradeLevel;
-    }
-
-    // Map difficulty string to range
-    if ($difficulty !== null) {
-        switch (strtolower($difficulty)) {
-            case 'easy':
-                $query .= " AND DifficultyParam < 0.8";
-                break;
-            case 'medium':
-                $query .= " AND DifficultyParam >= 0.8 AND DifficultyParam < 1.2";
-                break;
-            case 'hard':
-                $query .= " AND DifficultyParam >= 1.2";
-                break;
-        }
-    }
-
-    $query .= " ORDER BY NEWID()"; // Random order
-
-    $stmt = $conn->prepare($query);
-    $stmt->execute($params);
-    $dbSentences = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     $sentences = [];
 
-    if (!empty($dbSentences)) {
-        foreach ($dbSentences as $row) {
-            $sentence = [
-                'SentenceID' => (int)$row['SentenceID'],
-                'CorrectSentence' => $row['CorrectSentence'],
-                'Difficulty' => (float)$row['Difficulty'],
-                'Category' => $row['Category'],
-                'GradeLevel' => (int)$row['GradeLevel']
-            ];
+    // If lesson_id is provided, get content from LessonGameContent table
+    if ($lessonID !== null) {
+        $query = "SELECT TOP (?)
+                    ContentID as SentenceID,
+                    ContentText as CorrectSentence,
+                    ContentData as ScrambledWordsJSON,
+                    Difficulty,
+                    Category,
+                    l.GradeLevel
+                  FROM LessonGameContent lgc
+                  INNER JOIN Lessons l ON lgc.LessonID = l.LessonID
+                  WHERE lgc.LessonID = ?
+                    AND lgc.GameType = 'SentenceScramble'
+                    AND lgc.IsActive = 1";
 
-            // Try to parse scrambled words from JSON, or generate them
-            $scrambledWords = null;
-            if (!empty($row['ScrambledWordsJSON'])) {
-                $decoded = json_decode($row['ScrambledWordsJSON'], true);
-                if (is_array($decoded)) {
-                    $scrambledWords = $decoded;
+        $params = [$count, (int)$lessonID];
+
+        // Map difficulty string to range
+        if ($difficulty !== null) {
+            switch (strtolower($difficulty)) {
+                case 'easy':
+                    $query .= " AND lgc.Difficulty < 0.8";
+                    break;
+                case 'medium':
+                    $query .= " AND lgc.Difficulty >= 0.8 AND lgc.Difficulty < 1.2";
+                    break;
+                case 'hard':
+                    $query .= " AND lgc.Difficulty >= 1.2";
+                    break;
+            }
+        }
+
+        $query .= " ORDER BY NEWID()"; // Random order
+
+        $stmt = $conn->prepare($query);
+        $stmt->execute($params);
+        $dbSentences = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!empty($dbSentences)) {
+            foreach ($dbSentences as $row) {
+                $sentence = [
+                    'SentenceID' => (int)$row['SentenceID'],
+                    'CorrectSentence' => $row['CorrectSentence'],
+                    'Difficulty' => (float)$row['Difficulty'],
+                    'Category' => $row['Category'],
+                    'GradeLevel' => (int)$row['GradeLevel']
+                ];
+
+                // Try to parse scrambled words from JSON, or generate them
+                $scrambledWords = null;
+                if (!empty($row['ScrambledWordsJSON'])) {
+                    $decoded = json_decode($row['ScrambledWordsJSON'], true);
+                    if (is_array($decoded)) {
+                        $scrambledWords = $decoded;
+                    }
                 }
-            }
 
-            // Generate scrambled words if not available
-            if ($scrambledWords === null && !empty($row['CorrectSentence'])) {
-                $scrambledWords = generateScrambledWords($row['CorrectSentence']);
-            }
+                // Generate scrambled words if not available
+                if ($scrambledWords === null && !empty($row['CorrectSentence'])) {
+                    $scrambledWords = generateScrambledWords($row['CorrectSentence']);
+                }
 
-            $sentence['ScrambledWords'] = $scrambledWords;
-            $sentences[] = $sentence;
+                $sentence['ScrambledWords'] = $scrambledWords;
+                $sentences[] = $sentence;
+            }
         }
     }
 
-    // If we don't have enough sentences from DB, add fallback sentences
+    // If we don't have enough sentences from lesson content, add fallback sentences
     if (count($sentences) < $count) {
-        $fallbackSentences = getFallbackSentences($gradeLevel);
+        // Determine grade level for fallback
+        $fallbackGradeLevel = $gradeLevel;
+
+        // If lesson_id provided but no content, get lesson's grade level for fallback
+        if ($lessonID !== null && $fallbackGradeLevel === null) {
+            $stmt = $conn->prepare("SELECT GradeLevel FROM Lessons WHERE LessonID = ?");
+            $stmt->execute([(int)$lessonID]);
+            $lesson = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($lesson) {
+                $fallbackGradeLevel = $lesson['GradeLevel'];
+            }
+        }
+
+        $fallbackSentences = getFallbackSentences($fallbackGradeLevel);
         $needed = $count - count($sentences);
 
         // Shuffle fallback and take what we need
@@ -130,12 +146,14 @@ try {
     }
 
     // Log activity
-    logActivity($authUser['studentID'], 'Game', 'Started Sentence Scramble game');
+    $activityDetail = $lessonID ? "Started Sentence Scramble for Lesson $lessonID" : "Started Sentence Scramble game";
+    logActivity($authUser['studentID'], 'Game', $activityDetail);
 
     sendResponse([
         'success' => true,
         'sentences' => $sentences,
-        'total' => count($sentences)
+        'total' => count($sentences),
+        'lesson_id' => $lessonID ? (int)$lessonID : null
     ]);
 
 } catch (PDOException $e) {
