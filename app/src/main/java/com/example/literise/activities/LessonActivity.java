@@ -82,6 +82,8 @@ public class LessonActivity extends AppCompatActivity {
 
     private String lessonType;
 
+    private int lessonId = -1;  // Lesson ID for game content
+
 
 
     private List<String> availableGames;
@@ -115,6 +117,12 @@ public class LessonActivity extends AppCompatActivity {
             lessonType = "reading";
 
         }
+
+
+
+        // Get lesson ID for game content
+
+        lessonId = getIntent().getIntExtra("lesson_id", -1);
 
 
 
@@ -429,6 +437,14 @@ public class LessonActivity extends AppCompatActivity {
         if (intent != null) {
 
             intent.putExtra("lesson_type", lessonType);
+
+            // Pass lesson_id if available for lesson-specific game content
+
+            if (lessonId > 0) {
+
+                intent.putExtra("lesson_id", lessonId);
+
+            }
 
             startActivityForResult(intent, GAME_REQUEST_CODE);
 
