@@ -1261,8 +1261,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             String message = "Recognition error";
 
-            boolean shouldRetry = false;
-
 
 
             switch (error) {
@@ -1287,25 +1285,19 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_NETWORK:
 
-                    message = "Network error - retrying offline...";
-
-                    shouldRetry = true;
+                    message = "Network error";
 
                     break;
 
                 case SpeechRecognizer.ERROR_NO_MATCH:
 
-                    // Don't show error for NO_MATCH - partial results might have captured speech
-
-                    message = "Couldn't understand - speak clearly and try again";
+                    message = "No match found. Please try again.";
 
                     break;
 
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
 
                     message = "Recognizer busy - please wait";
-
-                    shouldRetry = true;
 
                     break;
 
@@ -1317,7 +1309,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
 
-                    message = "No speech detected - tap mic and speak";
+                    message = "Speech timeout. Please try again.";
 
                     break;
 
@@ -1327,15 +1319,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             tvMicStatus.setText(message);
 
-
-
-            // Only show toast for serious errors, not NO_MATCH
-
-            if (error != SpeechRecognizer.ERROR_NO_MATCH) {
-
-                Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
-
-            }
+            Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
 
         }
 
