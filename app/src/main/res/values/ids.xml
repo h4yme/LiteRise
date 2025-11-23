@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tags for Sentence Scramble game -->
+    <item name="tag_placed" type="id" />
+    <item name="tag_word_index" type="id" />
+</resources>
