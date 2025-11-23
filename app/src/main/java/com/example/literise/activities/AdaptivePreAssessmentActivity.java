@@ -153,6 +153,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private int pronunciationScore = 0;
 
     private String lastPartialResult = null;
+    private int recognitionRetryCount = 0;
+
+    private static final int MAX_RECOGNITION_RETRIES = 2;
 
 
     @Override
@@ -361,15 +364,14 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         tvTitle.setText("Placement Test");
 
-        int questionsAnswered = itemsAnswered.size() + 1; // Already answered + current question
-
-        int estimatedRemaining = response.getItemsRemaining();
-
-        int estimatedTotal = questionsAnswered + estimatedRemaining;
+        int currentQuestionNumber = itemsAnswered.size() + 1; // Current question number (1-indexed)
 
 
 
-        tvProgress.setText(String.format("Question %d of ~%d", questionsAnswered, estimatedTotal));
+        int totalQuestions = 20; // Fixed total of 20 questions for pre-assessment
+
+
+        tvProgress.setText(String.format("Question %d of %d", currentQuestionNumber, totalQuestions));
 
         tvItemTypeBadge.setText(itemType);
 
@@ -377,7 +379,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // Update progress bar (approximate progress)
 
-        progressBar.setProgress((int) (((float) questionsAnswered / estimatedTotal) * 100));
+        progressBar.setProgress((int) (((float) currentQuestionNumber / totalQuestions) * 100));
 
 
 
@@ -483,6 +485,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         cardPronunciation.setVisibility(View.VISIBLE);
 
         cardQuestion.setVisibility(View.GONE);
+
+        gridOptions.setVisibility(View.GONE); // Hide MCQ buttons for speak-type pronunciation
 
 
 
@@ -1126,6 +1130,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         isRecording = true;
         lastPartialResult = null;
+        recognitionRetryCount = 0; // Reset retry counter
         tvMicStatus.setText("Listening...");
 
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
@@ -1148,19 +1153,37 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
+
+
 
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
 
+
+
         intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1000); // 1 second
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 500); // 0.5 seconds minimum
+        // Longer silence timeouts for single words - give user more time
 
-        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true); // Use offline recognition if available
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000); // 2 seconds
+
+
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1500); // 1.5 seconds
+
+
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 300); // 0.3 seconds minimum for short words
+
+
+
+        // Don't prefer offline - online recognition is more accurate
+
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
 
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
 
@@ -1170,7 +1193,75 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     }
 
+// Helper method for retry - doesn't reset the retry counter
 
+    private void startRecordingWithoutReset() {
+
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+
+            return;
+
+        }
+
+
+
+        isRecording = true;
+
+        tvMicStatus.setText("Retrying... (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
+
+        cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
+
+
+
+        // Destroy and recreate speech recognizer to clear any state issues
+
+        if (speechRecognizer != null) {
+
+            speechRecognizer.destroy();
+
+        }
+
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+
+        speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
+
+
+
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
+
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
+
+        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10); // More results on retry
+
+        // Longer timeouts on retry
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
+
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 200); // Even shorter minimum
+
+        // Try offline on second retry as fallback
+
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, recognitionRetryCount >= 2);
+
+        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
+
+
+        android.util.Log.d("SpeechRecognition", "Retry attempt " + recognitionRetryCount + ", offline=" + (recognitionRetryCount >= 2));
+
+
+
+        speechRecognizer.startListening(intent);
+
+    }
 
     private void stopRecording() {
 
@@ -1295,7 +1386,29 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 case SpeechRecognizer.ERROR_NO_MATCH:
 
                     // Don't show error for NO_MATCH - partial results might have captured speech
+                    if (recognitionRetryCount < MAX_RECOGNITION_RETRIES) {
 
+                        recognitionRetryCount++;
+
+                        android.util.Log.d("SpeechRecognition", "ERROR_NO_MATCH - auto-retrying (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
+
+                        tvMicStatus.setText("Retrying...");
+
+                        // Small delay before retry
+
+                        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+
+                            if (speechRecognizer != null) {
+
+                                startRecordingWithoutReset();
+
+                            }
+
+                        }, 300);
+
+                        return;
+
+                    }
                     message = "Couldn't understand - speak clearly and try again";
 
                     break;
