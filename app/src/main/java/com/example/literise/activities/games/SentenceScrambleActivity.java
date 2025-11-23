@@ -738,6 +738,7 @@ public class SentenceScrambleActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void onBackPressed() {
         showExitConfirmation();

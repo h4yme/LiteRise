@@ -33,4 +33,9 @@
     <color name="color_info_bg">#3B82F6</color>
     <color name="color_warning_bg">#F59E0B</color>
     <color name="color_grey">#3D3C3C</color>
+
+    <!-- 🎮 Game Colors -->
+    <color name="color_success">#4CAF50</color>
+    <color name="color_error">#F44336</color>
+
 </resources>
