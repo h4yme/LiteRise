@@ -1,7 +1,15 @@
 -- LiteRise: 100-Item Pool for CAT Assessment
 -- Drop and recreate Items table with proper structure
 
--- Drop existing table
+-- Drop foreign key constraints referencing Items table
+DECLARE @sql NVARCHAR(MAX) = '';
+SELECT @sql += 'ALTER TABLE ' + QUOTENAME(OBJECT_SCHEMA_NAME(parent_object_id)) + '.' + QUOTENAME(OBJECT_NAME(parent_object_id)) + ' DROP CONSTRAINT ' + QUOTENAME(name) + ';'
+FROM sys.foreign_keys
+WHERE referenced_object_id = OBJECT_ID('Items');
+EXEC sp_executesql @sql;
+GO
+
+-- Drop existing Items table
 IF OBJECT_ID('Items', 'U') IS NOT NULL DROP TABLE Items;
 GO
 
