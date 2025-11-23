@@ -639,11 +639,12 @@ public class PreAssessmentActivity extends AppCompatActivity {
         tvMicStatus.setText("Listening...");
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
-        // Initialize speech recognizer if not already done
-        if (speechRecognizer == null) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-            speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
+        // Destroy and recreate speech recognizer each time to avoid stale state
+        if (speechRecognizer != null) {
+            speechRecognizer.destroy();
         }
+        speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
