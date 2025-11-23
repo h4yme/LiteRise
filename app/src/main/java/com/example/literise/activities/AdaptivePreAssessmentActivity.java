@@ -68,14 +68,12 @@ import com.example.literise.models.Question;
 
 import com.example.literise.models.SingleResponseResult;
 
-import com.example.literise.models.SubmitRequest;
-
 import com.example.literise.models.SubmitSingleRequest;
 
-import com.example.literise.models.SubmitResponseResult;
+import com.example.literise.utils.CustomToast;
 
 import com.google.android.material.button.MaterialButton;
-import com.example.literise.utils.CustomToast;
+
 
 
 import java.util.ArrayList;
@@ -153,9 +151,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private int pronunciationScore = 0;
 
     private String lastPartialResult = null;
-    private int recognitionRetryCount = 0;
 
-    private static final int MAX_RECOGNITION_RETRIES = 2;
 
 
     @Override
@@ -176,7 +172,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // Get initial theta from student's current ability
 
-        currentTheta = session.getAbility(); // Assumes SessionManager has getAbility()
+        currentTheta = session.getAbility();
 
 
 
@@ -364,11 +360,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         tvTitle.setText("Placement Test");
 
-        int currentQuestionNumber = itemsAnswered.size() + 1; // Current question number (1-indexed)
+        int currentQuestionNumber = itemsAnswered.size() + 1;
 
+        int totalQuestions = 20;
 
-
-        int totalQuestions = 20; // Fixed total of 20 questions for pre-assessment
 
 
         tvProgress.setText(String.format("Question %d of %d", currentQuestionNumber, totalQuestions));
@@ -377,7 +372,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Update progress bar (approximate progress)
+        // Update progress bar
 
         progressBar.setProgress((int) (((float) currentQuestionNumber / totalQuestions) * 100));
 
@@ -421,7 +416,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             if (currentQuestion.hasOptions() || currentQuestion.isMCQ()) {
 
-                // MCQ pronunciation question (e.g., "Which word has the same vowel sound...")
+                // MCQ pronunciation question
 
                 handleMultipleChoiceQuestion(currentQuestion);
 
@@ -464,7 +459,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             tvPassageText.setText(scrambledText);
 
             cardPassage.setVisibility(View.VISIBLE);
-            // Display scrambled words (implementation depends on your layout)
 
         }
 
@@ -480,13 +474,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void handlePronunciationQuestion(Question q) {
 
-        // Show pronunciation card
+        // Show pronunciation card, hide MCQ options
 
         cardPronunciation.setVisibility(View.VISIBLE);
 
         cardQuestion.setVisibility(View.GONE);
 
-        gridOptions.setVisibility(View.GONE); // Hide MCQ buttons for speak-type pronunciation
+        gridOptions.setVisibility(View.GONE);
+
+        tvMicStatus.setText("Tap to record");
 
 
 
@@ -518,9 +514,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Reset mic status
-
-        tvMicStatus.setText("Tap to record");
+        // Reset mic button color
 
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
 
@@ -534,8 +528,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Create dialog with custom view
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
         builder.setView(dialogView);
@@ -548,8 +540,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Get views from custom layout
-
         TextView tvWord = dialogView.findViewById(R.id.tvDialogWord);
 
         TextView tvPhonetic = dialogView.findViewById(R.id.tvDialogPhonetic);
@@ -560,17 +550,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         View layoutDefinition = dialogView.findViewById(R.id.layoutDefinition);
 
-        com.google.android.material.button.MaterialButton btnClose = dialogView.findViewById(R.id.btnDialogClose);
+        MaterialButton btnClose = dialogView.findViewById(R.id.btnDialogClose);
 
 
-
-        // Set word
 
         tvWord.setText(q.getItemText());
 
 
-
-        // Show phonetic if available
 
         if (q.getPhonetic() != null && !q.getPhonetic().isEmpty()) {
 
@@ -586,8 +572,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Show definition if available
-
         if (q.getDefinition() != null && !q.getDefinition().isEmpty()) {
 
             tvDefinition.setText(q.getDefinition());
@@ -601,8 +585,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         }
 
 
-
-        // Close button
 
         btnClose.setOnClickListener(v -> dialog.dismiss());
 
@@ -652,15 +634,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         clearSelections();
 
-
-
-        // Mark the selected button as selected (triggers the selector drawable)
-
         selectedButton.setSelected(true);
-
-
-
-        // Enable continue button
 
         btnContinue.setEnabled(true);
 
@@ -669,8 +643,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
     private void resetButtonStates() {
-
-        // Reset all buttons to unselected state
 
         btnOptionA.setSelected(false);
 
@@ -685,8 +657,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
     private void clearSelections() {
-
-        // Reset all buttons to unselected state
 
         btnOptionA.setSelected(false);
 
@@ -726,6 +696,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     }
 
+
+
     private void submitCurrentAnswer() {
 
         if (selectedAnswer == null || currentQuestion == null) {
@@ -746,15 +718,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Calculate time spent
-
-        long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000; // seconds
+        long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000;
 
 
 
         final int isCorrect;
-
-        // Check if this is a speak-type pronunciation item
 
         boolean isSpeakPronunciation = "Pronunciation".equalsIgnoreCase(currentQuestion.getItemType())
 
@@ -764,13 +732,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         if (isSpeakPronunciation) {
 
-            // For speak-type pronunciation, use score >= 70% as correct
-
             isCorrect = (pronunciationScore >= 70) ? 1 : 0;
 
         } else {
-
-            // For multiple choice (including MCQ pronunciation), compare to correct option
 
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
 
@@ -812,19 +776,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-                    // Update theta
-
                     currentTheta = result.getNewTheta();
-
-
-
-                    // Add to answered items
 
                     itemsAnswered.add(currentQuestion.getItemId());
 
 
-
-                    // Show quick beautiful feedback
 
                     if (isCorrect == 1) {
 
@@ -837,8 +793,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     }
 
 
-
-                    // Load next question immediately (don't wait for toast)
 
                     loadNextAdaptiveQuestion();
 
@@ -880,10 +834,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         }
 
-
-
-        // Show final results
-
         showFinalResultsDialog(result);
 
     }
@@ -895,8 +845,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.dialog_assessment_complete, null);
 
 
-
-        // Create dialog with custom view
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -912,8 +860,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Get views from custom layout
-
         TextView tvScore = dialogView.findViewById(R.id.tvDialogScore);
 
         TextView tvAccuracy = dialogView.findViewById(R.id.tvDialogAccuracy);
@@ -926,15 +872,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         TextView tvPrecision = dialogView.findViewById(R.id.tvDialogPrecision);
 
-        androidx.cardview.widget.CardView cardScore = dialogView.findViewById(R.id.cardScore);
+        CardView cardScore = dialogView.findViewById(R.id.cardScore);
 
         View layoutAbility = dialogView.findViewById(R.id.layoutAbility);
 
-        com.google.android.material.button.MaterialButton btnContinue = dialogView.findViewById(R.id.btnDialogContinue);
+        MaterialButton btnContinueDialog = dialogView.findViewById(R.id.btnDialogContinue);
 
 
-
-        // Populate score data
 
         if (result.getCorrectAnswers() != null && result.getTotalItems() != null) {
 
@@ -956,8 +900,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         } else {
 
-            // If no score data, show items completed
-
             tvScore.setText(String.valueOf(result.getItemsCompleted()));
 
             tvAccuracy.setText("items completed");
@@ -967,8 +909,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         }
 
 
-
-        // Populate ability and classification
 
         if (result.getFinalTheta() != null) {
 
@@ -998,8 +938,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Show precision if available
-
         if (result.getSem() != null) {
 
             tvPrecision.setText(String.format("Precision: %.2f (lower is better)", result.getSem()));
@@ -1014,16 +952,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Continue button
-
-        btnContinue.setOnClickListener(v -> {
+        btnContinueDialog.setOnClickListener(v -> {
 
             dialog.dismiss();
+
             Intent intent = new Intent(AdaptivePreAssessmentActivity.this, DashboardActivity.class);
 
             startActivity(intent);
 
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
             finish();
 
         });
@@ -1080,7 +1018,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-    // Pronunciation recording methods (same as original PreAssessmentActivity)
+    // Speech Recognition Methods
 
     private void recordPronunciation() {
 
@@ -1129,91 +1067,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
         isRecording = true;
+
         lastPartialResult = null;
-        recognitionRetryCount = 0; // Reset retry counter
+
         tvMicStatus.setText("Listening...");
 
         cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
 
 
 
-        if (speechRecognizer == null) {
-
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-
-            speechRecognizer.setRecognitionListener(new PronunciationRecognitionListener());
-
-        }
-
-
-
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-
-                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
-
-
-
-        intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
-
-
-
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
-
-
-
-        // Longer silence timeouts for single words - give user more time
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 2000); // 2 seconds
-
-
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1500); // 1.5 seconds
-
-
-
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 300); // 0.3 seconds minimum for short words
-
-
-
-        // Don't prefer offline - online recognition is more accurate
-
-        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, false);
-
-        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-
-
-
-        speechRecognizer.startListening(intent);
-
-    }
-
-// Helper method for retry - doesn't reset the retry counter
-
-    private void startRecordingWithoutReset() {
-
-        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
-
-            return;
-
-        }
-
-
-
-        isRecording = true;
-
-        tvMicStatus.setText("Retrying... (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
-
-        cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_warning, null));
-
-
-
-        // Destroy and recreate speech recognizer to clear any state issues
+        // Destroy and recreate speech recognizer each time to avoid stale state
 
         if (speechRecognizer != null) {
 
@@ -1231,37 +1094,28 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
-
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, "en-US");
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
 
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
 
-        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10); // More results on retry
+        intent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
 
-        // Longer timeouts on retry
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS, 3000);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 1000);
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS, 2500);
+        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 500);
 
-        intent.putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 200); // Even shorter minimum
-
-        // Try offline on second retry as fallback
-
-        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, recognitionRetryCount >= 2);
+        intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
 
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-
-
-
-        android.util.Log.d("SpeechRecognition", "Retry attempt " + recognitionRetryCount + ", offline=" + (recognitionRetryCount >= 2));
-
 
 
         speechRecognizer.startListening(intent);
 
     }
+
+
 
     private void stopRecording() {
 
@@ -1334,7 +1188,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             isRecording = false;
 
             cardMicButton.setCardBackgroundColor(getResources().getColor(R.color.color_jade1, null));
-// Check if we have a partial result to use as fallback
+
+
+
+            // Check if we have a partial result to use as fallback
 
             if (error == SpeechRecognizer.ERROR_NO_MATCH && lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
 
@@ -1342,16 +1199,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 tvMicStatus.setText("Processing: " + lastPartialResult);
 
-                validatePronunciation(lastPartialResult.trim(), 0.8f); // Use 0.8 confidence for partial results
+                validatePronunciation(lastPartialResult.trim(), 0.8f);
 
                 return;
 
             }
 
 
-            String message = "Recognition error";
 
-            boolean shouldRetry = false;
+            String message = "Recognition error";
 
 
 
@@ -1377,47 +1233,19 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_NETWORK:
 
-                    message = "Network error - retrying offline...";
-
-                    shouldRetry = true;
+                    message = "Network error";
 
                     break;
 
                 case SpeechRecognizer.ERROR_NO_MATCH:
 
-                    // Don't show error for NO_MATCH - partial results might have captured speech
-                    if (recognitionRetryCount < MAX_RECOGNITION_RETRIES) {
-
-                        recognitionRetryCount++;
-
-                        android.util.Log.d("SpeechRecognition", "ERROR_NO_MATCH - auto-retrying (" + recognitionRetryCount + "/" + MAX_RECOGNITION_RETRIES + ")");
-
-                        tvMicStatus.setText("Retrying...");
-
-                        // Small delay before retry
-
-                        new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-
-                            if (speechRecognizer != null) {
-
-                                startRecordingWithoutReset();
-
-                            }
-
-                        }, 300);
-
-                        return;
-
-                    }
-                    message = "Couldn't understand - speak clearly and try again";
+                    message = "No match found. Please try again.";
 
                     break;
 
                 case SpeechRecognizer.ERROR_RECOGNIZER_BUSY:
 
                     message = "Recognizer busy - please wait";
-
-                    shouldRetry = true;
 
                     break;
 
@@ -1429,7 +1257,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                 case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
 
-                    message = "No speech detected - tap mic and speak";
+                    message = "Speech timeout. Please try again.";
 
                     break;
 
@@ -1439,15 +1267,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             tvMicStatus.setText(message);
 
-
-
-            // Only show toast for serious errors, not NO_MATCH
-
-            if (error != SpeechRecognizer.ERROR_NO_MATCH) {
-
-                Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
-
-            }
+            Toast.makeText(AdaptivePreAssessmentActivity.this, message, Toast.LENGTH_SHORT).show();
 
         }
 
@@ -1468,8 +1288,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             float[] confidenceScores = results.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES);
 
 
-
-            // Log for debugging
 
             android.util.Log.d("SpeechRecognition", "onResults called");
 
@@ -1496,15 +1314,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 android.util.Log.d("SpeechRecognition", "Confidence: " + confidence);
 
                 validatePronunciation(recognizedText, confidence);
-            } else if (lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
 
-                // Fallback to partial result if final result is empty
+            } else if (lastPartialResult != null && !lastPartialResult.trim().isEmpty()) {
 
                 android.util.Log.d("SpeechRecognition", "Empty results but using partial: " + lastPartialResult);
 
                 tvMicStatus.setText("Processing: " + lastPartialResult);
 
                 validatePronunciation(lastPartialResult.trim(), 0.8f);
+
             } else {
 
                 tvMicStatus.setText("No clear speech - try again");
@@ -1529,7 +1347,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             if (matches != null && !matches.isEmpty() && matches.get(0) != null && !matches.get(0).trim().isEmpty()) {
 
-                lastPartialResult = matches.get(0); // Store for fallback
+                lastPartialResult = matches.get(0);
 
                 tvMicStatus.setText("Heard: " + matches.get(0));
 
@@ -1602,8 +1420,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     tvMicStatus.setText(statusText);
 
 
-
-                    // Enable continue button and set selectedAnswer to the recognized text
 
                     selectedAnswer = recognizedText;
 

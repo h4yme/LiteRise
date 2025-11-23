@@ -28,7 +28,7 @@ public class ApiClient {
 
     // For physical device: http://YOUR_PC_IP/api/ (e.g., http://192.168.1.100/api/)
 
-    private static final String BASE_URL = "http://10.238.213.239/api/";
+    private static final String BASE_URL = "http://10.130.174.137/api/";
 
     private static Retrofit retrofit;
 
