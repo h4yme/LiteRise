@@ -36,8 +36,13 @@ require_once __DIR__ . '/src/auth.php';
 // Require authentication
 $authUser = requireAuth();
 
-// Get parameters
-$data = getJsonInput();
+// Get parameters - support both GET query params and POST JSON body
+$data = [];
+$rawInput = file_get_contents("php://input");
+if (!empty($rawInput)) {
+    $data = json_decode($rawInput, true) ?? [];
+}
+
 $lessonID = $data['lesson_id'] ?? $_GET['lesson_id'] ?? null;
 $count = $data['count'] ?? $_GET['count'] ?? 10;
 $gradeLevel = $data['grade_level'] ?? $_GET['grade_level'] ?? null;
