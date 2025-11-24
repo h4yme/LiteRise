@@ -12,6 +12,7 @@ import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.Students;
+import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 
 import retrofit2.Call;
@@ -81,7 +82,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     Intent intent;
 
-                    if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+                    // DEMO MODE: Skip pre-assessment and go straight to dashboard
+                    if (AppConfig.DEMO_MODE) {
+                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    } else if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
 
                         // First time - go to adaptive assessment
 
