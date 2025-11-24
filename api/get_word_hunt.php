@@ -15,9 +15,9 @@ try {
         $data = json_decode($rawInput, true) ?? [];
     }
 
-    $count = $data['count'] ?? $_GET['count'] ?? 8;
+    $count = (int)($data['count'] ?? $_GET['count'] ?? 8);
     $lessonID = $data['lesson_id'] ?? $_GET['lesson_id'] ?? null;
-    $studentID = $data['student_id'] ?? $_GET['student_id'] ?? null;
+    $studentID = (int)($data['student_id'] ?? $_GET['student_id'] ?? 0);
     $gridSize = 10; // Default grid size
 
     $words = [];
@@ -59,12 +59,12 @@ try {
                 ORDER BY NEWID()";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$count, $gradeLevel]);
+        $stmt->execute([(int)$count, (int)$gradeLevel]);
         $words = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // If not enough words at exact grade, expand to adjacent grades
         if (count($words) < $count) {
-            $remaining = $count - count($words);
+            $remaining = (int)($count - count($words));
             $existingIds = array_column($words, 'word_id');
 
             // Get more words from adjacent grades
@@ -83,7 +83,7 @@ try {
                     ORDER BY ABS(GradeLevel - ?) ASC, NEWID()";
 
             $adjStmt = $conn->prepare($adjacentSql);
-            $adjStmt->execute([$remaining, $gradeLevel, $gradeLevel]);
+            $adjStmt->execute([(int)$remaining, (int)$gradeLevel, (int)$gradeLevel]);
             $additionalWords = $adjStmt->fetchAll(PDO::FETCH_ASSOC);
 
             $words = array_merge($words, $additionalWords);
