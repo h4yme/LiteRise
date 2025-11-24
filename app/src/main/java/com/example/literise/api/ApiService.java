@@ -28,7 +28,7 @@ import com.example.literise.models.SubmitResponseResult;
 
 import com.example.literise.models.SubmitSingleRequest;
 
-
+import com.example.literise.models.WordHuntResponse;
 
 import java.util.List;
 
@@ -93,5 +93,19 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("save_game_results.php")
     Call<SaveGameResultResponse> saveGameResult(@Body SaveGameResultRequest request);
+
+
+    @Headers("Content-Type: application/json")
+    @POST("get_word_hunt.php")
+    Call<WordHuntResponse> getWordHuntWords(@Query("count") int count);
+
+
+    @Headers("Content-Type: application/json")
+    @POST("get_word_hunt.php")
+    Call<WordHuntResponse> getWordHuntWords(
+            @Query("count") int count,
+            @Query("lesson_id") int lessonId
+
+    );
 
 }

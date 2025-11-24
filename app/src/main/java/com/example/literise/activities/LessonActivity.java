@@ -36,7 +36,7 @@ import com.example.literise.utils.CustomToast;
 
 import com.google.android.material.button.MaterialButton;
 
-
+import com.example.literise.activities.games.WordHuntActivity;
 
 import java.util.ArrayList;
 
@@ -340,7 +340,7 @@ public class LessonActivity extends AppCompatActivity {
 
                 tvGameTitle.setText("Word Hunt");
 
-                tvGameDescription.setText("Find hidden words in the letter grid");
+                tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
 
                 tvGameReward.setText("⭐ Earn up to 450 XP");
 
@@ -348,9 +348,9 @@ public class LessonActivity extends AppCompatActivity {
 
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_sunglow, null));
 
-                btnStartGame.setEnabled(false);
+                btnStartGame.setEnabled(true);
 
-                btnStartGame.setText("Coming Soon");
+                btnStartGame.setText("Start Game");
 
                 break;
 
@@ -416,9 +416,15 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-            case "timed_trail":
-
             case "word_hunt":
+
+                intent = new Intent(this, WordHuntActivity.class);
+
+                break;
+
+
+
+            case "timed_trail":
 
             case "shadow_read":
 

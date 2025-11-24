@@ -8,4 +8,10 @@
 
     <item name="tag_word_index" type="id" />
 
+    <!-- Tags for Word Hunt game -->
+
+    <item name="tag_row" type="id" />
+
+    <item name="tag_col" type="id" />
+
 </resources>
