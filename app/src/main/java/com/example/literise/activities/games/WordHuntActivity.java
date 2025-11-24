@@ -775,7 +775,10 @@ public class WordHuntActivity extends AppCompatActivity {
 
     private void saveGameResults(float accuracy, long totalTime) {
         int studentId = session.getStudentId();
-        if (studentId <= 0) return;
+        if (studentId <= 0) {
+            android.util.Log.e("WordHunt", "Cannot save - invalid studentId: " + studentId);
+            return;
+        }
 
         int timeInSeconds = (int) (totalTime / 1000);
 
@@ -788,21 +791,43 @@ public class WordHuntActivity extends AppCompatActivity {
                 .streakAchieved(wordsFound)
                 .build();
 
+        android.util.Log.d("WordHunt", "Saving game result - studentId: " + studentId +
+                ", lessonId: " + lessonId + ", sessionId: " + sessionId +
+                ", score: " + score + ", accuracy: " + accuracy);
+
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         apiService.saveGameResult(request).enqueue(new Callback<SaveGameResultResponse>() {
             @Override
             public void onResponse(Call<SaveGameResultResponse> call, Response<SaveGameResultResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    SaveGameResultResponse.StudentStats stats = response.body().getStudent();
-                    if (stats != null) {
-                        session.updateTotalXP(stats.getTotalXP());
+                if (response.isSuccessful() && response.body() != null) {
+                    android.util.Log.d("WordHunt", "Save response - success: " + response.body().isSuccess() +
+                            ", message: " + response.body().getMessage() +
+                            ", gameResultId: " + response.body().getGameResultId());
+
+                    if (response.body().isSuccess()) {
+                        SaveGameResultResponse.StudentStats stats = response.body().getStudent();
+                        if (stats != null) {
+                            android.util.Log.d("WordHunt", "Updated stats - TotalXP: " + stats.getTotalXP() +
+                                    ", CurrentStreak: " + stats.getCurrentStreak());
+                            session.updateTotalXP(stats.getTotalXP());
+                        }
                     }
+                } else {
+                    String errorMsg = "Unknown error";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMsg = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        errorMsg = "HTTP " + response.code();
+                    }
+                    android.util.Log.e("WordHunt", "Save failed - HTTP " + response.code() + ": " + errorMsg);
                 }
             }
 
             @Override
             public void onFailure(Call<SaveGameResultResponse> call, Throwable t) {
-                android.util.Log.e("WordHunt", "Failed to save game result: " + t.getMessage());
+                android.util.Log.e("WordHunt", "Failed to save game result: " + t.getMessage(), t);
             }
         });
     }
