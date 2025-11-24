@@ -114,7 +114,7 @@ public class LessonProgressResponse {
         @SerializedName("last_played")
         private String lastPlayed;
 
-        // Per-game completion status (GameType -> stats)
+        // Per-game completion status (GameType -> stats) - MUST be inside LessonProgress
         @SerializedName("games_completed")
         private Map<String, GameStats> gamesCompleted;
 
