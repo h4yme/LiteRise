@@ -6,6 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import java.util.Map;
+
 
 
 /**
@@ -182,6 +184,8 @@ public class LessonProgressResponse {
 
         private String lastAttempt;
 
+
+
         // Detailed stats for completed lessons
 
         @SerializedName("total_xp_earned")
@@ -223,6 +227,16 @@ public class LessonProgressResponse {
         @SerializedName("last_played")
 
         private String lastPlayed;
+
+
+
+        // Per-game completion status (GameType -> stats) - MUST be inside LessonProgress
+
+        @SerializedName("games_completed")
+
+        private Map<String, GameStats> gamesCompleted;
+
+
 
         public int getLessonId() {
 
@@ -309,6 +323,9 @@ public class LessonProgressResponse {
             return completionStatus == null || "NotStarted".equals(completionStatus);
 
         }
+
+
+
         public int getTotalXpEarned() {
 
             return totalXpEarned;
@@ -386,6 +403,121 @@ public class LessonProgressResponse {
             return String.format("%d:%02d", minutes, seconds);
 
         }
+
+
+
+        public Map<String, GameStats> getGamesCompleted() {
+
+            return gamesCompleted;
+
+        }
+
+
+
+        public boolean isGameCompleted(String gameType) {
+
+            return gamesCompleted != null && gamesCompleted.containsKey(gameType);
+
+        }
+
+
+
+        public GameStats getGameStats(String gameType) {
+
+            if (gamesCompleted == null) return null;
+
+            return gamesCompleted.get(gameType);
+
+        }
+
+    }
+
+
+
+    // Stats for each completed game
+
+    public static class GameStats {
+
+        @SerializedName("best_score")
+
+        private int bestScore;
+
+
+
+        @SerializedName("xp_earned")
+
+        private int xpEarned;
+
+
+
+        @SerializedName("accuracy")
+
+        private float accuracy;
+
+
+
+        @SerializedName("best_time")
+
+        private int bestTime;
+
+
+
+        @SerializedName("date_played")
+
+        private String datePlayed;
+
+
+
+        public int getBestScore() {
+
+            return bestScore;
+
+        }
+
+
+
+        public int getXpEarned() {
+
+            return xpEarned;
+
+        }
+
+
+
+        public float getAccuracy() {
+
+            return accuracy;
+
+        }
+
+
+
+        public int getBestTime() {
+
+            return bestTime;
+
+        }
+
+
+
+        public String getDatePlayed() {
+
+            return datePlayed;
+
+        }
+
+
+
+        public String getFormattedTime() {
+
+            int minutes = bestTime / 60;
+
+            int seconds = bestTime % 60;
+
+            return String.format("%d:%02d", minutes, seconds);
+
+        }
+
     }
 
 }
