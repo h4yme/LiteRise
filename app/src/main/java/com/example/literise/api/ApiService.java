@@ -29,7 +29,7 @@ import com.example.literise.models.SubmitResponseResult;
 import com.example.literise.models.SubmitSingleRequest;
 
 import com.example.literise.models.WordHuntResponse;
-
+import com.example.literise.models.LessonProgressResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -37,7 +37,7 @@ import java.util.Map;
 
 
 import retrofit2.Call;
-
+import retrofit2.http.GET;
 import retrofit2.http.Body;
 
 import retrofit2.http.Headers;
@@ -97,15 +97,34 @@ public interface ApiService {
 
     @Headers("Content-Type: application/json")
     @POST("get_word_hunt.php")
-    Call<WordHuntResponse> getWordHuntWords(@Query("count") int count);
+    Call<WordHuntResponse> getWordHuntWords(
+            @Query("count") int count,
+            @Query("student_id") int studentId
 
+    );
 
     @Headers("Content-Type: application/json")
     @POST("get_word_hunt.php")
     Call<WordHuntResponse> getWordHuntWords(
+
             @Query("count") int count,
+
+            @Query("lesson_id") int lessonId,
+
+            @Query("student_id") int studentId);
+
+
+    @GET("get_lesson_progress.php")
+
+    Call<LessonProgressResponse> getLessonProgress(@Query("student_id") int studentId);
+
+    @GET("get_lesson_progress.php")
+
+    Call<LessonProgressResponse> getLessonProgress(
+
+            @Query("student_id") int studentId,
+
             @Query("lesson_id") int lessonId
 
     );
-
 }

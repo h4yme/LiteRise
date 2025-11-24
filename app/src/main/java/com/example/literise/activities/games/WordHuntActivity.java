@@ -316,17 +316,37 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
+        int studentId = session.getStudentId();
+
+
+
+        if (studentId <= 0) {
+
+            loadingProgress.setVisibility(View.GONE);
+
+            showErrorAndExit("No student ID found. Please log in again.");
+
+            return;
+
+        }
+
+
+
         Call<WordHuntResponse> call;
 
         if (lessonId != null) {
 
-            call = apiService.getWordHuntWords(8, lessonId);
+            call = apiService.getWordHuntWords(8, lessonId, studentId);
 
         } else {
 
-            call = apiService.getWordHuntWords(8);
+            call = apiService.getWordHuntWords(8, studentId);
 
         }
+
+
+
+        android.util.Log.d("WordHunt", "Loading words for studentId: " + studentId + ", lessonId: " + lessonId);
 
 
 
@@ -340,33 +360,69 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                if (response.isSuccessful() && response.body() != null) {
 
-                    words = response.body().getWords();
+                    android.util.Log.d("WordHunt", "API Response: success=" + response.body().isSuccess() +
 
-                    if (response.body().getGridSize() > 0) {
+                            ", grade=" + response.body().getStudentGrade() +
 
-                        gridSize = response.body().getGridSize();
+                            ", words=" + (response.body().getWords() != null ? response.body().getWords().size() : 0));
 
-                    }
 
-                    if (words != null && !words.isEmpty()) {
 
-                        startGame();
+                    if (response.body().isSuccess()) {
+
+                        words = response.body().getWords();
+
+                        if (response.body().getGridSize() > 0) {
+
+                            gridSize = response.body().getGridSize();
+
+                        }
+
+                        if (words != null && !words.isEmpty()) {
+
+                            // Log words for verification
+
+                            for (WordHuntWord word : words) {
+
+                                android.util.Log.d("WordHunt", "Word: " + word.getWord() + ", Grade: " + word.getGradeLevel());
+
+                            }
+
+                            startGame();
+
+                        } else {
+
+                            showErrorAndExit("No words found for your grade level. Please contact administrator.");
+
+                        }
 
                     } else {
 
-                        loadFallbackWords();
-
-                        startGame();
+                        showErrorAndExit("API Error: " + response.body().getMessage());
 
                     }
 
                 } else {
 
-                    loadFallbackWords();
+                    String errorMsg = "Failed to load words";
 
-                    startGame();
+                    try {
+
+                        if (response.errorBody() != null) {
+
+                            errorMsg = response.errorBody().string();
+
+                        }
+
+                    } catch (Exception e) {
+
+                        errorMsg = "HTTP " + response.code();
+
+                    }
+
+                    showErrorAndExit("Server Error: " + errorMsg);
 
                 }
 
@@ -380,9 +436,9 @@ public class WordHuntActivity extends AppCompatActivity {
 
                 loadingProgress.setVisibility(View.GONE);
 
-                loadFallbackWords();
+                android.util.Log.e("WordHunt", "API call failed", t);
 
-                startGame();
+                showErrorAndExit("Network Error: " + t.getMessage());
 
             }
 
@@ -392,25 +448,21 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
-    private void loadFallbackWords() {
+    private void showErrorAndExit(String message) {
 
-        words = new ArrayList<>();
+        android.util.Log.e("WordHunt", message);
 
-        words.add(new WordHuntWord(1, "READ", "To look at and understand written words", 0.5f));
+        new AlertDialog.Builder(this)
 
-        words.add(new WordHuntWord(2, "BOOK", "A written work that tells a story or gives information", 0.4f));
+                .setTitle("Error Loading Game")
 
-        words.add(new WordHuntWord(3, "WORD", "A unit of language that has meaning", 0.4f));
+                .setMessage(message)
 
-        words.add(new WordHuntWord(4, "LEARN", "To gain knowledge or skill", 0.6f));
+                .setPositiveButton("OK", (dialog, which) -> finish())
 
-        words.add(new WordHuntWord(5, "WRITE", "To form letters or words on paper", 0.5f));
+                .setCancelable(false)
 
-        words.add(new WordHuntWord(6, "STORY", "An account of events, real or imaginary", 0.6f));
-
-        words.add(new WordHuntWord(7, "SPELL", "To name or write the letters of a word", 0.7f));
-
-        words.add(new WordHuntWord(8, "THINK", "To use your mind to consider something", 0.6f));
+                .show();
 
     }
 
@@ -1224,29 +1276,67 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
-                // Pulse animation on first letter
+                // Verify position is valid
+
+                if (row >= gridSize || col >= gridSize) {
+
+                    android.util.Log.e("WordHunt", "Invalid hint position for word: " + word.getWord());
+
+                    continue;
+
+                }
+
+
+
+                // Pulse animation on first letter using ValueAnimator
 
                 TextView cell = gridCells[row][col];
 
-                ObjectAnimator colorAnim = ObjectAnimator.ofObject(
+                int colorFrom = ContextCompat.getColor(this, R.color.gray_light);
 
-                        cell, "backgroundColor",
+                int colorTo = ContextCompat.getColor(this, R.color.color_sunglow);
 
-                        new ArgbEvaluator(),
 
-                        ContextCompat.getColor(this, R.color.white),
 
-                        ContextCompat.getColor(this, R.color.color_sunglow),
+                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
 
-                        ContextCompat.getColor(this, R.color.white)
+                colorAnimation.setDuration(400);
 
-                );
+                colorAnimation.setRepeatCount(5);
 
-                colorAnim.setDuration(1500);
+                colorAnimation.setRepeatMode(ValueAnimator.REVERSE);
 
-                colorAnim.setRepeatCount(2);
+                colorAnimation.addUpdateListener(animator -> {
 
-                colorAnim.start();
+                    cell.setBackgroundColor((int) animator.getAnimatedValue());
+
+                });
+
+                colorAnimation.addListener(new android.animation.AnimatorListenerAdapter() {
+
+                    @Override
+
+                    public void onAnimationEnd(android.animation.Animator animation) {
+
+                        // Restore the original background drawable after animation
+
+                        String key = row + "," + col;
+
+                        if (highlightedCells.contains(key)) {
+
+                            cell.setBackgroundResource(R.drawable.grid_cell_found);
+
+                        } else {
+
+                            cell.setBackgroundResource(R.drawable.grid_cell_background);
+
+                        }
+
+                    }
+
+                });
+
+                colorAnimation.start();
 
 
 
@@ -1258,13 +1348,23 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
-                CustomToast.showInfo(this, "Look for: " + word.getWord().charAt(0) + "...");
+                // Log for debugging
+
+                android.util.Log.d("WordHunt", "Hint for word: " + word.getWord() + " at [" + row + "," + col + "] = " + grid[row][col]);
+
+
+
+                CustomToast.showInfo(this, "Look for: " + word.getWord().charAt(0) + "... at highlighted cell");
 
                 return;
 
             }
 
         }
+
+
+
+        CustomToast.showInfo(this, "No more hints available!");
 
     }
 
@@ -1454,7 +1554,13 @@ public class WordHuntActivity extends AppCompatActivity {
 
         int studentId = session.getStudentId();
 
-        if (studentId <= 0) return;
+        if (studentId <= 0) {
+
+            android.util.Log.e("WordHunt", "Cannot save - invalid studentId: " + studentId);
+
+            return;
+
+        }
 
 
 
@@ -1480,6 +1586,14 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
+        android.util.Log.d("WordHunt", "Saving game result - studentId: " + studentId +
+
+                ", lessonId: " + lessonId + ", sessionId: " + sessionId +
+
+                ", score: " + score + ", accuracy: " + accuracy);
+
+
+
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
 
         apiService.saveGameResult(request).enqueue(new Callback<SaveGameResultResponse>() {
@@ -1488,15 +1602,51 @@ public class WordHuntActivity extends AppCompatActivity {
 
             public void onResponse(Call<SaveGameResultResponse> call, Response<SaveGameResultResponse> response) {
 
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                if (response.isSuccessful() && response.body() != null) {
 
-                    SaveGameResultResponse.StudentStats stats = response.body().getStudent();
+                    android.util.Log.d("WordHunt", "Save response - success: " + response.body().isSuccess() +
 
-                    if (stats != null) {
+                            ", message: " + response.body().getMessage() +
 
-                        session.updateTotalXP(stats.getTotalXP());
+                            ", gameResultId: " + response.body().getGameResultId());
+
+
+
+                    if (response.body().isSuccess()) {
+
+                        SaveGameResultResponse.StudentStats stats = response.body().getStudent();
+
+                        if (stats != null) {
+
+                            android.util.Log.d("WordHunt", "Updated stats - TotalXP: " + stats.getTotalXP() +
+
+                                    ", CurrentStreak: " + stats.getCurrentStreak());
+
+                            session.updateTotalXP(stats.getTotalXP());
+
+                        }
 
                     }
+
+                } else {
+
+                    String errorMsg = "Unknown error";
+
+                    try {
+
+                        if (response.errorBody() != null) {
+
+                            errorMsg = response.errorBody().string();
+
+                        }
+
+                    } catch (Exception e) {
+
+                        errorMsg = "HTTP " + response.code();
+
+                    }
+
+                    android.util.Log.e("WordHunt", "Save failed - HTTP " + response.code() + ": " + errorMsg);
 
                 }
 
@@ -1508,7 +1658,7 @@ public class WordHuntActivity extends AppCompatActivity {
 
             public void onFailure(Call<SaveGameResultResponse> call, Throwable t) {
 
-                android.util.Log.e("WordHunt", "Failed to save game result: " + t.getMessage());
+                android.util.Log.e("WordHunt", "Failed to save game result: " + t.getMessage(), t);
 
             }
 

@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import android.os.Bundle;
 
+import android.view.View;
+
 import android.widget.ImageView;
 
 import android.widget.ProgressBar;
@@ -28,25 +30,37 @@ import com.example.literise.R;
 
 import com.example.literise.activities.games.SentenceScrambleActivity;
 
+import com.example.literise.activities.games.WordHuntActivity;
+
+import com.example.literise.api.ApiClient;
+
+import com.example.literise.api.ApiService;
+
 import com.example.literise.database.SessionManager;
 
 import com.example.literise.models.GameSession;
+
+import com.example.literise.models.LessonProgressResponse;
 
 import com.example.literise.utils.CustomToast;
 
 import com.google.android.material.button.MaterialButton;
 
-import com.example.literise.activities.games.WordHuntActivity;
+
 
 import java.util.ArrayList;
 
 import java.util.Arrays;
 
-import java.util.Collections;
-
 import java.util.List;
 
-import java.util.Random;
+
+
+import retrofit2.Call;
+
+import retrofit2.Callback;
+
+import retrofit2.Response;
 
 
 
@@ -68,7 +82,9 @@ public class LessonActivity extends AppCompatActivity {
 
     private ImageView ivBack, ivGameIcon;
 
-    private ProgressBar progressBar;
+    private ImageView ivPrevGame, ivNextGame;
+
+    private ProgressBar progressBar, loadingProgress;
 
     private MaterialButton btnStartGame;
 
@@ -82,11 +98,13 @@ public class LessonActivity extends AppCompatActivity {
 
     private String lessonType;
 
-    private int lessonId = -1;  // Lesson ID for game content
+    private int lessonId = -1;
 
 
 
     private List<String> availableGames;
+
+    private int currentGameIndex = 0;
 
     private String currentGame;
 
@@ -95,6 +113,12 @@ public class LessonActivity extends AppCompatActivity {
     private float totalAccuracy = 0;
 
     private int gamesPlayed = 0;
+
+    private int gamesPlayedAtStart = 0;
+
+    private boolean isLessonCompleted = false;
+
+    private LessonProgressResponse.LessonProgress savedProgress = null;
 
 
 
@@ -120,8 +144,6 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-        // Get lesson ID for game content
-
         lessonId = getIntent().getIntExtra("lesson_id", -1);
 
 
@@ -132,7 +154,7 @@ public class LessonActivity extends AppCompatActivity {
 
         setupListeners();
 
-        selectNextGame();
+        loadSavedProgress();
 
     }
 
@@ -166,6 +188,20 @@ public class LessonActivity extends AppCompatActivity {
 
         cardNextGame = findViewById(R.id.cardNextGame);
 
+
+
+        // Navigation arrows for game selection
+
+        ivPrevGame = findViewById(R.id.ivPrevGame);
+
+        ivNextGame = findViewById(R.id.ivNextGame);
+
+
+
+        // Try to find loading progress if it exists
+
+        loadingProgress = findViewById(R.id.loadingProgress);
+
     }
 
 
@@ -182,23 +218,21 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-        // Set lesson title
-
         String title = getLessonTitle(lessonType);
 
         tvLessonTitle.setText(title);
 
 
 
-        // Initialize available games pool (randomized)
+        // Available games list
 
         availableGames = new ArrayList<>(Arrays.asList(
 
                 "sentence_scramble",
 
-                "timed_trail",
-
                 "word_hunt",
+
+                "timed_trail",
 
                 "shadow_read",
 
@@ -206,11 +240,211 @@ public class LessonActivity extends AppCompatActivity {
 
         ));
 
-        Collections.shuffle(availableGames);
+    }
 
 
+
+    private void loadSavedProgress() {
+
+        int studentId = session.getStudentId();
+
+        if (studentId <= 0 || lessonId <= 0) {
+
+            updateProgressDisplay();
+
+            showCurrentGame();
+
+            return;
+
+        }
+
+
+
+        if (loadingProgress != null) {
+
+            loadingProgress.setVisibility(View.VISIBLE);
+
+        }
+
+        btnStartGame.setEnabled(false);
+
+
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+
+        apiService.getLessonProgress(studentId, lessonId).enqueue(new Callback<LessonProgressResponse>() {
+
+            @Override
+
+            public void onResponse(Call<LessonProgressResponse> call, Response<LessonProgressResponse> response) {
+
+                if (loadingProgress != null) {
+
+                    loadingProgress.setVisibility(View.GONE);
+
+                }
+
+
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+
+                    List<LessonProgressResponse.LessonProgress> lessons = response.body().getLessons();
+
+                    if (lessons != null && !lessons.isEmpty()) {
+
+                        savedProgress = lessons.get(0);
+
+
+
+                        gamesPlayed = savedProgress.getGamesPlayed();
+
+                        gamesPlayedAtStart = gamesPlayed;
+
+                        gameSession.setGamesCompleted(gamesPlayed);
+
+                        isLessonCompleted = savedProgress.isCompleted();
+
+
+
+                        android.util.Log.d("LessonActivity", "Loaded progress: " + gamesPlayed +
+
+                                " games, completed=" + isLessonCompleted + " for lesson " + lessonId);
+
+
+
+                        if (isLessonCompleted) {
+
+                            showCompletedLessonSummary();
+
+                            return;
+
+                        }
+
+                    }
+
+                }
+
+
+
+                updateProgressDisplay();
+
+                showCurrentGame();
+
+            }
+
+
+
+            @Override
+
+            public void onFailure(Call<LessonProgressResponse> call, Throwable t) {
+
+                if (loadingProgress != null) {
+
+                    loadingProgress.setVisibility(View.GONE);
+
+                }
+
+                android.util.Log.e("LessonActivity", "Failed to load progress: " + t.getMessage());
+
+
+
+                updateProgressDisplay();
+
+                showCurrentGame();
+
+            }
+
+        });
+
+    }
+
+
+
+    private void showCompletedLessonSummary() {
 
         updateProgressDisplay();
+
+
+
+        // Hide navigation arrows
+
+        if (ivPrevGame != null) ivPrevGame.setVisibility(View.INVISIBLE);
+
+        if (ivNextGame != null) ivNextGame.setVisibility(View.INVISIBLE);
+
+
+
+        btnStartGame.setEnabled(false);
+
+        btnStartGame.setText("Lesson Completed");
+
+
+
+        if (savedProgress != null) {
+
+            String message = String.format(
+
+                    "🎉 You've already completed this lesson!\n\n" +
+
+                            "📊 Your Performance:\n" +
+
+                            "• Games Played: %d\n" +
+
+                            "• Total XP Earned: %d\n" +
+
+                            "• Best Score: %d\n" +
+
+                            "• Average Accuracy: %.1f%%\n" +
+
+                            "• Total Time: %s\n\n" +
+
+                            "Great job! Try another lesson to keep learning.",
+
+                    savedProgress.getGamesPlayed(),
+
+                    savedProgress.getTotalXpEarned(),
+
+                    savedProgress.getBestScore(),
+
+                    savedProgress.getAverageAccuracy(),
+
+                    savedProgress.getFormattedTotalTime()
+
+            );
+
+
+
+            new AlertDialog.Builder(this)
+
+                    .setTitle("✅ Lesson Complete")
+
+                    .setMessage(message)
+
+                    .setPositiveButton("Back to Dashboard", (dialog, which) -> finish())
+
+                    .setCancelable(true)
+
+                    .show();
+
+        }
+
+
+
+        tvGameTitle.setText("Lesson Completed!");
+
+        tvGameDescription.setText(String.format(
+
+                "XP: %d • Accuracy: %.1f%% • Time: %s",
+
+                savedProgress != null ? savedProgress.getTotalXpEarned() : 0,
+
+                savedProgress != null ? savedProgress.getAverageAccuracy() : 0,
+
+                savedProgress != null ? savedProgress.getFormattedTotalTime() : "0:00"
+
+        ));
+
+        tvGameReward.setText("Try another lesson to continue learning!");
 
     }
 
@@ -232,6 +466,18 @@ public class LessonActivity extends AppCompatActivity {
 
                 return "Grammar Practice";
 
+            case "comprehension":
+
+                return "Reading Comprehension";
+
+            case "fluency":
+
+                return "Fluency Practice";
+
+            case "review":
+
+                return "Review & Practice";
+
             default:
 
                 return "Literacy Practice";
@@ -246,7 +492,7 @@ public class LessonActivity extends AppCompatActivity {
 
         ivBack.setOnClickListener(v -> {
 
-            if (gamesPlayed > 0) {
+            if (gamesPlayed > gamesPlayedAtStart) {
 
                 showExitConfirmation();
 
@@ -262,11 +508,59 @@ public class LessonActivity extends AppCompatActivity {
 
         btnStartGame.setOnClickListener(v -> launchGame());
 
+
+
+        // Navigation arrow listeners
+
+        if (ivPrevGame != null) {
+
+            ivPrevGame.setOnClickListener(v -> showPreviousGame());
+
+        }
+
+        if (ivNextGame != null) {
+
+            ivNextGame.setOnClickListener(v -> showNextGame());
+
+        }
+
     }
 
 
 
-    private void selectNextGame() {
+    private void showPreviousGame() {
+
+        currentGameIndex--;
+
+        if (currentGameIndex < 0) {
+
+            currentGameIndex = availableGames.size() - 1;
+
+        }
+
+        showCurrentGame();
+
+    }
+
+
+
+    private void showNextGame() {
+
+        currentGameIndex++;
+
+        if (currentGameIndex >= availableGames.size()) {
+
+            currentGameIndex = 0;
+
+        }
+
+        showCurrentGame();
+
+    }
+
+
+
+    private void showCurrentGame() {
 
         if (gamesPlayed >= TOTAL_GAMES_REQUIRED) {
 
@@ -278,21 +572,47 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-        // Select random game from available pool
-
-        Random random = new Random();
-
-        currentGame = availableGames.get(random.nextInt(availableGames.size()));
-
-
+        currentGame = availableGames.get(currentGameIndex);
 
         displayGameInfo(currentGame);
+
+        updateArrowsVisibility();
+
+    }
+
+
+
+    private void updateArrowsVisibility() {
+
+        // Show arrows if there are multiple games
+
+        if (ivPrevGame != null && ivNextGame != null) {
+
+            if (availableGames.size() > 1 && !isLessonCompleted) {
+
+                ivPrevGame.setVisibility(View.VISIBLE);
+
+                ivNextGame.setVisibility(View.VISIBLE);
+
+            } else {
+
+                ivPrevGame.setVisibility(View.INVISIBLE);
+
+                ivNextGame.setVisibility(View.INVISIBLE);
+
+            }
+
+        }
 
     }
 
 
 
     private void displayGameInfo(String gameType) {
+
+        btnStartGame.setEnabled(true);
+
+
 
         switch (gameType) {
 
@@ -308,7 +628,23 @@ public class LessonActivity extends AppCompatActivity {
 
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_jade1, null));
 
-                btnStartGame.setEnabled(true);
+                btnStartGame.setText("Start Game");
+
+                break;
+
+
+
+            case "word_hunt":
+
+                tvGameTitle.setText("Word Hunt");
+
+                tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
+
+                tvGameReward.setText("⭐ Earn up to 450 XP");
+
+                ivGameIcon.setImageResource(R.drawable.ic_lightbulb);
+
+                ivGameIcon.setColorFilter(getResources().getColor(R.color.color_sunglow, null));
 
                 btnStartGame.setText("Start Game");
 
@@ -331,26 +667,6 @@ public class LessonActivity extends AppCompatActivity {
                 btnStartGame.setEnabled(false);
 
                 btnStartGame.setText("Coming Soon");
-
-                break;
-
-
-
-            case "word_hunt":
-
-                tvGameTitle.setText("Word Hunt");
-
-                tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
-
-                tvGameReward.setText("⭐ Earn up to 450 XP");
-
-                ivGameIcon.setImageResource(R.drawable.ic_lightbulb);
-
-                ivGameIcon.setColorFilter(getResources().getColor(R.color.color_sunglow, null));
-
-                btnStartGame.setEnabled(true);
-
-                btnStartGame.setText("Start Game");
 
                 break;
 
@@ -430,8 +746,6 @@ public class LessonActivity extends AppCompatActivity {
 
             case "minimal_pairs":
 
-                // These games are coming soon
-
                 CustomToast.showInfo(this, "This game is coming soon!");
 
                 return;
@@ -453,8 +767,6 @@ public class LessonActivity extends AppCompatActivity {
             intent.putExtra("lesson_type", lessonType);
 
 
-
-            // Pass lesson_id if available for lesson-specific game content
 
             if (lessonId > 0) {
 
@@ -484,15 +796,11 @@ public class LessonActivity extends AppCompatActivity {
 
         if (requestCode == GAME_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
 
-            // Get game results
-
             int xpEarned = data.getIntExtra("xp_earned", 0);
 
             float accuracy = data.getIntExtra("accuracy", 0);
 
 
-
-            // Update totals
 
             totalXPEarned += xpEarned;
 
@@ -502,29 +810,29 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-            // Update game session
-
             gameSession.incrementGamesCompleted();
 
             gameSession.setTotalXpEarned(totalXPEarned);
 
 
 
-            // Show quick feedback
-
             CustomToast.showSuccess(this, String.format("Great job! +%d XP", xpEarned));
 
 
-
-            // Update display
 
             updateProgressDisplay();
 
 
 
-            // Select next game
+            // Check if lesson is complete
 
-            selectNextGame();
+            if (gamesPlayed >= TOTAL_GAMES_REQUIRED) {
+
+                completeLessonAndStartPostAssessment();
+
+            }
+
+            // Otherwise stay on current game selection (user can choose next game)
 
         }
 
@@ -538,7 +846,11 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-        int progress = gameSession.getProgress();
+        int progress = (int) (((float) gamesPlayed / TOTAL_GAMES_REQUIRED) * 100);
+
+        gameSession.setGamesCompleted(gamesPlayed);
+
+
 
         tvProgressPercentage.setText(progress + "%");
 
@@ -550,7 +862,11 @@ public class LessonActivity extends AppCompatActivity {
 
 
 
-        float avgAccuracy = gamesPlayed > 0 ? (totalAccuracy / gamesPlayed) : 0;
+        float avgAccuracy = (gamesPlayed - gamesPlayedAtStart) > 0
+
+                ? (totalAccuracy / (gamesPlayed - gamesPlayedAtStart))
+
+                : 0;
 
         tvAverageAccuracy.setText(String.format("%.0f%%", avgAccuracy));
 
@@ -560,23 +876,43 @@ public class LessonActivity extends AppCompatActivity {
 
     private void completeLessonAndStartPostAssessment() {
 
-        // Mark lesson as complete
-
         gameSession.setCompleted(true);
 
 
 
-        float finalAccuracy = gamesPlayed > 0 ? (totalAccuracy / gamesPlayed) : 0;
+        // Hide navigation arrows
+
+        if (ivPrevGame != null) ivPrevGame.setVisibility(View.INVISIBLE);
+
+        if (ivNextGame != null) ivNextGame.setVisibility(View.INVISIBLE);
+
+
+
+        float finalAccuracy = (gamesPlayed - gamesPlayedAtStart) > 0
+
+                ? (totalAccuracy / (gamesPlayed - gamesPlayedAtStart))
+
+                : 0;
 
         gameSession.setAccuracyPercentage(finalAccuracy);
 
 
 
-        // For now, just show completion message
+        new AlertDialog.Builder(this)
 
-        CustomToast.showSuccess(this, "Lesson Complete! Post-assessment coming soon.");
+                .setTitle("🎉 Lesson Complete!")
 
-        finish();
+                .setMessage("Congratulations! You've completed all " + TOTAL_GAMES_REQUIRED + " games.\n\n" +
+
+                        "XP Earned: " + totalXPEarned + "\n" +
+
+                        "Average Accuracy: " + String.format("%.0f%%", finalAccuracy))
+
+                .setPositiveButton("Continue", (dialog, which) -> finish())
+
+                .setCancelable(false)
+
+                .show();
 
     }
 
@@ -584,11 +920,17 @@ public class LessonActivity extends AppCompatActivity {
 
     private void showExitConfirmation() {
 
+        int gamesCompletedThisSession = gamesPlayed - gamesPlayedAtStart;
+
         new AlertDialog.Builder(this)
 
                 .setTitle("Exit Lesson?")
 
-                .setMessage("You've completed " + gamesPlayed + " out of " + TOTAL_GAMES_REQUIRED + " games. Your progress will be saved.")
+                .setMessage("You've completed " + gamesCompletedThisSession + " game(s) this session.\n" +
+
+                        "Total progress: " + gamesPlayed + "/" + TOTAL_GAMES_REQUIRED + " games.\n\n" +
+
+                        "Your progress is saved automatically.")
 
                 .setPositiveButton("Exit", (dialog, which) -> finish())
 
@@ -606,7 +948,7 @@ public class LessonActivity extends AppCompatActivity {
 
     public void onBackPressed() {
 
-        if (gamesPlayed > 0) {
+        if (gamesPlayed > gamesPlayedAtStart) {
 
             showExitConfirmation();
 

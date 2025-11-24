@@ -47,6 +47,21 @@ public class WordHuntResponse {
     private int lessonId;
 
 
+    @SerializedName("student_grade")
+
+    private int studentGrade;
+
+
+
+    @SerializedName("student_id")
+
+    private int studentId;
+
+
+
+    @SerializedName("words_count")
+
+    private int wordsCount;
 
     public WordHuntResponse() {}
 
@@ -127,6 +142,52 @@ public class WordHuntResponse {
     public void setLessonId(int lessonId) {
 
         this.lessonId = lessonId;
+
+    }
+
+    public int getStudentGrade() {
+
+        return studentGrade;
+
+    }
+
+
+
+    public void setStudentGrade(int studentGrade) {
+
+        this.studentGrade = studentGrade;
+
+    }
+
+
+
+    public int getStudentId() {
+
+        return studentId;
+
+    }
+
+
+
+    public void setStudentId(int studentId) {
+
+        this.studentId = studentId;
+
+    }
+
+
+
+    public int getWordsCount() {
+
+        return wordsCount;
+
+    }
+
+
+
+    public void setWordsCount(int wordsCount) {
+
+        this.wordsCount = wordsCount;
 
     }
 

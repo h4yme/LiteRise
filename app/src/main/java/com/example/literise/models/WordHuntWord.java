@@ -50,7 +50,9 @@ public class WordHuntWord {
 
     private String category;
 
+    @SerializedName("grade_level")
 
+    private int gradeLevel;
 
     // Transient fields for game state
 
@@ -293,6 +295,20 @@ public class WordHuntWord {
         this.endCol = endCol;
 
         this.horizontal = horizontal;
+
+    }
+
+    public int getGradeLevel() {
+
+        return gradeLevel;
+
+    }
+
+
+
+    public void setGradeLevel(int gradeLevel) {
+
+        this.gradeLevel = gradeLevel;
 
     }
 
