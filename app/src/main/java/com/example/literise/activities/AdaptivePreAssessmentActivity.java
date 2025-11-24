@@ -399,7 +399,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         mockResult.setAssessmentComplete(true);
         mockResult.setCorrectAnswers(demoCorrectAnswers);
         mockResult.setTotalItems(demoQuestions.size());
-        mockResult.setAccuracy(accuracy);
+        mockResult.setAccuracy((double) accuracy);
         mockResult.setFinalTheta(finalTheta);
         mockResult.setItemsCompleted(demoQuestions.size());
 
