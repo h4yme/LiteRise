@@ -227,7 +227,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             // Clickable
 
-            itemView.setOnClickListener(v -> startLesson(lastLessonType));
+            itemView.setOnClickListener(v -> startLesson(lastLessonType, 1));
 
 
 
@@ -243,7 +243,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             // Make clickable
 
-            itemView.setOnClickListener(v -> startLesson("vocabulary"));
+            itemView.setOnClickListener(v -> startLesson("vocabulary", 2));
 
 
 
@@ -277,17 +277,19 @@ public class DashboardActivity extends AppCompatActivity {
 
         // Continue the last accessed lesson (Lesson 1)
 
-        startLesson(lastLessonType);
+        startLesson(lastLessonType, 1);
 
     }
 
 
 
-    private void startLesson(String lessonType) {
+    private void startLesson(String lessonType, int lessonId) {
 
         Intent intent = new Intent(this, LessonActivity.class);
 
         intent.putExtra("lesson_type", lessonType);
+
+        intent.putExtra("lesson_id", lessonId);
 
         startActivity(intent);
 
