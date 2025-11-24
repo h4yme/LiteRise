@@ -3,8 +3,6 @@ package com.example.literise.activities.games;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.content.ClipData;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioManager;
@@ -14,7 +12,6 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.DragEvent;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +19,6 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -43,11 +39,8 @@ import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 import com.example.literise.utils.DemoDataProvider;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipGroup;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -343,7 +336,7 @@ public class SentenceScrambleActivity extends AppCompatActivity {
         // Setup drag
         wordView.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                ClipData data = ClipData.newPlainText("word", word);
+                android.content.ClipData data = android.content.ClipData.newPlainText("word", word);
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
                 v.startDragAndDrop(data, shadowBuilder, v, 0);
                 return true;
@@ -575,7 +568,7 @@ public class SentenceScrambleActivity extends AppCompatActivity {
             for (int i = 0; i < wordBankContainer.getChildCount(); i++) {
                 View child = wordBankContainer.getChildAt(i);
                 if (nextWord.equalsIgnoreCase((String) child.getTag()) &&
-                    child.getVisibility() == View.VISIBLE) {
+                        child.getVisibility() == View.VISIBLE) {
 
                     // Highlight with animation
                     CardView card = child.findViewById(R.id.cardWord);
@@ -711,10 +704,10 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
                     // Check for badge unlocks
                     if (response.body().getBadgesUnlocked() != null &&
-                        !response.body().getBadgesUnlocked().isEmpty()) {
+                            !response.body().getBadgesUnlocked().isEmpty()) {
                         for (SaveGameResultResponse.Badge badge : response.body().getBadgesUnlocked()) {
                             CustomToast.showSuccess(SentenceScrambleActivity.this,
-                                "Badge Unlocked: " + badge.getBadgeName());
+                                    "Badge Unlocked: " + badge.getBadgeName());
                         }
                     }
                 }
