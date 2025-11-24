@@ -4,7 +4,7 @@
  * GET /api/get_lesson_progress.php?student_id=X
  * GET /api/get_lesson_progress.php?student_id=X&lesson_id=Y
  *
- * Returns lesson progress for a student
+ * Returns lesson progress for a student with detailed stats for completed lessons
  */
 
 require_once __DIR__ . '/src/db.php';
@@ -32,86 +32,116 @@ try {
     $lessons = [];
 
     if ($lessonID !== null) {
-        // Get progress for specific lesson
+        // Get detailed progress for specific lesson
         $sql = "SELECT
                     sp.LessonID,
                     sp.CompletionStatus,
                     sp.Score,
                     sp.LastAttemptDate,
                     l.LessonTitle,
-                    l.LessonType,
-                    (SELECT COUNT(*) FROM GameResults gr WHERE gr.StudentID = ? AND gr.LessonID = sp.LessonID) as GamesPlayed
+                    l.LessonType
                 FROM StudentProgress sp
                 LEFT JOIN Lessons l ON sp.LessonID = l.LessonID
                 WHERE sp.StudentID = ? AND sp.LessonID = ?";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$studentID, $studentID, $lessonID]);
+        $stmt->execute([$studentID, $lessonID]);
         $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 
+        // Get detailed game stats for this lesson
+        $statsSql = "SELECT
+                        COUNT(*) as games_played,
+                        ISNULL(SUM(XPEarned), 0) as total_xp_earned,
+                        ISNULL(AVG(AccuracyPercentage), 0) as average_accuracy,
+                        ISNULL(SUM(TimeCompleted), 0) as total_time_seconds,
+                        ISNULL(AVG(TimeCompleted), 0) as average_time_seconds,
+                        MAX(Score) as best_score,
+                        MIN(DatePlayed) as first_played,
+                        MAX(DatePlayed) as last_played
+                    FROM GameResults
+                    WHERE StudentID = ? AND LessonID = ?";
+
+        $statsStmt = $conn->prepare($statsSql);
+        $statsStmt->execute([$studentID, $lessonID]);
+        $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
+
+        $gamesPlayed = (int)($stats['games_played'] ?? 0);
+        $totalGamesRequired = 5;
+        $progressPercent = min(100, (int)(($gamesPlayed / $totalGamesRequired) * 100));
+
+        // Determine completion status
+        $completionStatus = 'NotStarted';
         if ($progress) {
-            $lessons[] = [
-                'lesson_id' => (int)$progress['LessonID'],
-                'lesson_title' => $progress['LessonTitle'] ?? 'Lesson ' . $progress['LessonID'],
-                'lesson_type' => $progress['LessonType'] ?? 'reading',
-                'completion_status' => $progress['CompletionStatus'],
-                'score' => (float)($progress['Score'] ?? 0),
-                'games_played' => (int)($progress['GamesPlayed'] ?? 0),
-                'last_attempt' => $progress['LastAttemptDate']
-            ];
-        } else {
-            // No progress yet for this lesson
-            $lessons[] = [
-                'lesson_id' => $lessonID,
-                'lesson_title' => 'Lesson ' . $lessonID,
-                'lesson_type' => 'reading',
-                'completion_status' => 'NotStarted',
-                'score' => 0,
-                'games_played' => 0,
-                'last_attempt' => null
-            ];
+            $completionStatus = $progress['CompletionStatus'];
+        } elseif ($gamesPlayed > 0) {
+            $completionStatus = $gamesPlayed >= 5 ? 'Completed' : 'InProgress';
         }
+
+        $lessons[] = [
+            'lesson_id' => $lessonID,
+            'lesson_title' => $progress['LessonTitle'] ?? 'Lesson ' . $lessonID,
+            'lesson_type' => $progress['LessonType'] ?? 'reading',
+            'completion_status' => $completionStatus,
+            'score' => (float)($progress['Score'] ?? $stats['average_accuracy'] ?? 0),
+            'games_played' => $gamesPlayed,
+            'progress_percent' => $progressPercent,
+            'last_attempt' => $progress['LastAttemptDate'] ?? $stats['last_played'],
+            // Detailed stats
+            'total_xp_earned' => (int)($stats['total_xp_earned'] ?? 0),
+            'average_accuracy' => round((float)($stats['average_accuracy'] ?? 0), 1),
+            'total_time_seconds' => (int)($stats['total_time_seconds'] ?? 0),
+            'average_time_seconds' => (int)($stats['average_time_seconds'] ?? 0),
+            'best_score' => (int)($stats['best_score'] ?? 0),
+            'first_played' => $stats['first_played'],
+            'last_played' => $stats['last_played']
+        ];
     } else {
         // Get progress for all lessons (1-6)
         for ($i = 1; $i <= 6; $i++) {
-            $sql = "SELECT
-                        sp.CompletionStatus,
-                        sp.Score,
-                        sp.LastAttemptDate,
-                        (SELECT COUNT(*) FROM GameResults gr WHERE gr.StudentID = ? AND gr.LessonID = ?) as GamesPlayed
-                    FROM StudentProgress sp
-                    WHERE sp.StudentID = ? AND sp.LessonID = ?";
+            // Get game stats
+            $statsSql = "SELECT
+                            COUNT(*) as games_played,
+                            ISNULL(SUM(XPEarned), 0) as total_xp_earned,
+                            ISNULL(AVG(AccuracyPercentage), 0) as average_accuracy
+                        FROM GameResults
+                        WHERE StudentID = ? AND LessonID = ?";
+
+            $statsStmt = $conn->prepare($statsSql);
+            $statsStmt->execute([$studentID, $i]);
+            $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
+
+            // Get student progress record
+            $sql = "SELECT CompletionStatus, Score, LastAttemptDate
+                    FROM StudentProgress
+                    WHERE StudentID = ? AND LessonID = ?";
 
             $stmt = $conn->prepare($sql);
-            $stmt->execute([$studentID, $i, $studentID, $i]);
+            $stmt->execute([$studentID, $i]);
             $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($progress) {
-                $gamesPlayed = (int)($progress['GamesPlayed'] ?? 0);
-                $totalGamesRequired = 5;
-                $progressPercent = min(100, (int)(($gamesPlayed / $totalGamesRequired) * 100));
+            $gamesPlayed = (int)($stats['games_played'] ?? 0);
+            $totalGamesRequired = 5;
+            $progressPercent = min(100, (int)(($gamesPlayed / $totalGamesRequired) * 100));
 
-                $lessons[] = [
-                    'lesson_id' => $i,
-                    'lesson_title' => 'Lesson ' . $i,
-                    'completion_status' => $progress['CompletionStatus'],
-                    'score' => (float)($progress['Score'] ?? 0),
-                    'games_played' => $gamesPlayed,
-                    'progress_percent' => $progressPercent,
-                    'last_attempt' => $progress['LastAttemptDate']
-                ];
-            } else {
-                // No progress yet
-                $lessons[] = [
-                    'lesson_id' => $i,
-                    'lesson_title' => 'Lesson ' . $i,
-                    'completion_status' => 'NotStarted',
-                    'score' => 0,
-                    'games_played' => 0,
-                    'progress_percent' => 0,
-                    'last_attempt' => null
-                ];
+            // Determine completion status
+            $completionStatus = 'NotStarted';
+            if ($progress) {
+                $completionStatus = $progress['CompletionStatus'];
+            } elseif ($gamesPlayed > 0) {
+                $completionStatus = $gamesPlayed >= 5 ? 'Completed' : 'InProgress';
             }
+
+            $lessons[] = [
+                'lesson_id' => $i,
+                'lesson_title' => 'Lesson ' . $i,
+                'completion_status' => $completionStatus,
+                'score' => (float)($progress['Score'] ?? $stats['average_accuracy'] ?? 0),
+                'games_played' => $gamesPlayed,
+                'progress_percent' => $progressPercent,
+                'total_xp_earned' => (int)($stats['total_xp_earned'] ?? 0),
+                'average_accuracy' => round((float)($stats['average_accuracy'] ?? 0), 1),
+                'last_attempt' => $progress['LastAttemptDate'] ?? null
+            ];
         }
     }
 

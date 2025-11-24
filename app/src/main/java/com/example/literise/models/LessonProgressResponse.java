@@ -91,6 +91,28 @@ public class LessonProgressResponse {
         @SerializedName("last_attempt")
         private String lastAttempt;
 
+        // Detailed stats for completed lessons
+        @SerializedName("total_xp_earned")
+        private int totalXpEarned;
+
+        @SerializedName("average_accuracy")
+        private float averageAccuracy;
+
+        @SerializedName("total_time_seconds")
+        private int totalTimeSeconds;
+
+        @SerializedName("average_time_seconds")
+        private int averageTimeSeconds;
+
+        @SerializedName("best_score")
+        private int bestScore;
+
+        @SerializedName("first_played")
+        private String firstPlayed;
+
+        @SerializedName("last_played")
+        private String lastPlayed;
+
         public int getLessonId() {
             return lessonId;
         }
@@ -133,6 +155,46 @@ public class LessonProgressResponse {
 
         public boolean isNotStarted() {
             return completionStatus == null || "NotStarted".equals(completionStatus);
+        }
+
+        public int getTotalXpEarned() {
+            return totalXpEarned;
+        }
+
+        public float getAverageAccuracy() {
+            return averageAccuracy;
+        }
+
+        public int getTotalTimeSeconds() {
+            return totalTimeSeconds;
+        }
+
+        public int getAverageTimeSeconds() {
+            return averageTimeSeconds;
+        }
+
+        public int getBestScore() {
+            return bestScore;
+        }
+
+        public String getFirstPlayed() {
+            return firstPlayed;
+        }
+
+        public String getLastPlayed() {
+            return lastPlayed;
+        }
+
+        public String getFormattedTotalTime() {
+            int minutes = totalTimeSeconds / 60;
+            int seconds = totalTimeSeconds % 60;
+            return String.format("%d:%02d", minutes, seconds);
+        }
+
+        public String getFormattedAverageTime() {
+            int minutes = averageTimeSeconds / 60;
+            int seconds = averageTimeSeconds % 60;
+            return String.format("%d:%02d", minutes, seconds);
         }
     }
 }

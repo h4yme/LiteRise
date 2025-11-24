@@ -56,7 +56,9 @@ public class LessonActivity extends AppCompatActivity {
     private int totalXPEarned = 0;
     private float totalAccuracy = 0;
     private int gamesPlayed = 0;
-    private int gamesPlayedAtStart = 0; // Track how many games were already played
+    private int gamesPlayedAtStart = 0;
+    private boolean isLessonCompleted = false;
+    private LessonProgressResponse.LessonProgress savedProgress = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +118,6 @@ public class LessonActivity extends AppCompatActivity {
     private void loadSavedProgress() {
         int studentId = session.getStudentId();
         if (studentId <= 0 || lessonId <= 0) {
-            // No saved progress to load
             updateProgressDisplay();
             selectNextGame();
             return;
@@ -138,14 +139,21 @@ public class LessonActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     List<LessonProgressResponse.LessonProgress> lessons = response.body().getLessons();
                     if (lessons != null && !lessons.isEmpty()) {
-                        LessonProgressResponse.LessonProgress progress = lessons.get(0);
+                        savedProgress = lessons.get(0);
 
-                        // Load saved progress
-                        gamesPlayed = progress.getGamesPlayed();
+                        gamesPlayed = savedProgress.getGamesPlayed();
                         gamesPlayedAtStart = gamesPlayed;
                         gameSession.setGamesCompleted(gamesPlayed);
+                        isLessonCompleted = savedProgress.isCompleted();
 
-                        android.util.Log.d("LessonActivity", "Loaded progress: " + gamesPlayed + " games played for lesson " + lessonId);
+                        android.util.Log.d("LessonActivity", "Loaded progress: " + gamesPlayed +
+                                " games, completed=" + isLessonCompleted + " for lesson " + lessonId);
+
+                        // If lesson is completed, show summary instead of allowing replay
+                        if (isLessonCompleted) {
+                            showCompletedLessonSummary();
+                            return;
+                        }
                     }
                 }
 
@@ -164,6 +172,56 @@ public class LessonActivity extends AppCompatActivity {
                 selectNextGame();
             }
         });
+    }
+
+    private void showCompletedLessonSummary() {
+        // Update UI to show completed state
+        updateProgressDisplay();
+
+        // Hide game selection, show summary
+        if (cardNextGame != null) {
+            cardNextGame.setVisibility(View.GONE);
+        }
+
+        // Update button to show review option
+        btnStartGame.setEnabled(false);
+        btnStartGame.setText("Lesson Completed");
+
+        // Show detailed stats dialog
+        if (savedProgress != null) {
+            String message = String.format(
+                    "🎉 You've already completed this lesson!\n\n" +
+                    "📊 Your Performance:\n" +
+                    "• Games Played: %d\n" +
+                    "• Total XP Earned: %d\n" +
+                    "• Best Score: %d\n" +
+                    "• Average Accuracy: %.1f%%\n" +
+                    "• Total Time: %s\n\n" +
+                    "Great job! Try another lesson to keep learning.",
+                    savedProgress.getGamesPlayed(),
+                    savedProgress.getTotalXpEarned(),
+                    savedProgress.getBestScore(),
+                    savedProgress.getAverageAccuracy(),
+                    savedProgress.getFormattedTotalTime()
+            );
+
+            new AlertDialog.Builder(this)
+                    .setTitle("✅ Lesson Complete")
+                    .setMessage(message)
+                    .setPositiveButton("Back to Dashboard", (dialog, which) -> finish())
+                    .setCancelable(true)
+                    .show();
+        }
+
+        // Update the game info area to show stats summary
+        tvGameTitle.setText("Lesson Completed!");
+        tvGameDescription.setText(String.format(
+                "XP: %d • Accuracy: %.1f%% • Time: %s",
+                savedProgress != null ? savedProgress.getTotalXpEarned() : 0,
+                savedProgress != null ? savedProgress.getAverageAccuracy() : 0,
+                savedProgress != null ? savedProgress.getFormattedTotalTime() : "0:00"
+        ));
+        tvGameReward.setText("Try another lesson to continue learning!");
     }
 
     private String getLessonTitle(String type) {
