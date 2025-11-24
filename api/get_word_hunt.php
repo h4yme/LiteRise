@@ -20,6 +20,10 @@ try {
     $studentID = (int)($data['student_id'] ?? $_GET['student_id'] ?? 0);
     $gridSize = 10; // Default grid size
 
+    // Validate count to prevent SQL injection (already cast to int, but extra safety)
+    if ($count < 1) $count = 8;
+    if ($count > 20) $count = 20;
+
     $words = [];
     $gradeLevel = null;
 
@@ -44,8 +48,9 @@ try {
     }
 
     // Get words from VocabularyWords table filtered by EXACT grade level
+    // Note: Using direct value for TOP since it's already validated as int
     try {
-        $sql = "SELECT TOP (?)
+        $sql = "SELECT TOP $count
                     WordID as word_id,
                     Word as word,
                     Definition as definition,
@@ -59,16 +64,16 @@ try {
                 ORDER BY NEWID()";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute([(int)$count, (int)$gradeLevel]);
+        $stmt->execute([$gradeLevel]);
         $words = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         // If not enough words at exact grade, expand to adjacent grades
         if (count($words) < $count) {
-            $remaining = (int)($count - count($words));
+            $remaining = $count - count($words);
             $existingIds = array_column($words, 'word_id');
 
             // Get more words from adjacent grades
-            $adjacentSql = "SELECT TOP (?)
+            $adjacentSql = "SELECT TOP $remaining
                         WordID as word_id,
                         Word as word,
                         Definition as definition,
@@ -83,7 +88,7 @@ try {
                     ORDER BY ABS(GradeLevel - ?) ASC, NEWID()";
 
             $adjStmt = $conn->prepare($adjacentSql);
-            $adjStmt->execute([(int)$remaining, (int)$gradeLevel, (int)$gradeLevel]);
+            $adjStmt->execute([$gradeLevel, $gradeLevel]);
             $additionalWords = $adjStmt->fetchAll(PDO::FETCH_ASSOC);
 
             $words = array_merge($words, $additionalWords);
