@@ -48,9 +48,17 @@ try {
         $stmt->execute([$studentID, $lessonID]);
         $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // Get detailed game stats for this lesson
+        // Count UNIQUE game types played (not total plays)
+        $uniqueGamesSql = "SELECT COUNT(DISTINCT GameType) as unique_games_played
+                          FROM GameResults
+                          WHERE StudentID = ? AND LessonID = ?";
+        $uniqueStmt = $conn->prepare($uniqueGamesSql);
+        $uniqueStmt->execute([$studentID, $lessonID]);
+        $uniqueGames = $uniqueStmt->fetch(PDO::FETCH_ASSOC);
+        $gamesPlayed = (int)($uniqueGames['unique_games_played'] ?? 0);
+
+        // Get overall stats for this lesson
         $statsSql = "SELECT
-                        COUNT(*) as games_played,
                         ISNULL(SUM(XPEarned), 0) as total_xp_earned,
                         ISNULL(AVG(AccuracyPercentage), 0) as average_accuracy,
                         ISNULL(SUM(TimeCompleted), 0) as total_time_seconds,
@@ -65,7 +73,33 @@ try {
         $statsStmt->execute([$studentID, $lessonID]);
         $stats = $statsStmt->fetch(PDO::FETCH_ASSOC);
 
-        $gamesPlayed = (int)($stats['games_played'] ?? 0);
+        // Get per-game stats (best attempt for each game type)
+        $perGameSql = "SELECT
+                        GameType,
+                        MAX(Score) as best_score,
+                        MAX(XPEarned) as xp_earned,
+                        MAX(AccuracyPercentage) as accuracy,
+                        MIN(TimeCompleted) as best_time,
+                        MAX(DatePlayed) as date_played
+                      FROM GameResults
+                      WHERE StudentID = ? AND LessonID = ?
+                      GROUP BY GameType";
+        $perGameStmt = $conn->prepare($perGameSql);
+        $perGameStmt->execute([$studentID, $lessonID]);
+        $perGameResults = $perGameStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Build games_completed map
+        $gamesCompleted = [];
+        foreach ($perGameResults as $game) {
+            $gamesCompleted[$game['GameType']] = [
+                'best_score' => (int)$game['best_score'],
+                'xp_earned' => (int)$game['xp_earned'],
+                'accuracy' => round((float)$game['accuracy'], 1),
+                'best_time' => (int)$game['best_time'],
+                'date_played' => $game['date_played']
+            ];
+        }
+
         $totalGamesRequired = 5;
         $progressPercent = min(100, (int)(($gamesPlayed / $totalGamesRequired) * 100));
 
@@ -93,14 +127,24 @@ try {
             'average_time_seconds' => (int)($stats['average_time_seconds'] ?? 0),
             'best_score' => (int)($stats['best_score'] ?? 0),
             'first_played' => $stats['first_played'],
-            'last_played' => $stats['last_played']
+            'last_played' => $stats['last_played'],
+            // Per-game completion status
+            'games_completed' => $gamesCompleted
         ];
     } else {
         // Get progress for all lessons (1-6)
         for ($i = 1; $i <= 6; $i++) {
-            // Get game stats
+            // Count UNIQUE game types played (not total plays)
+            $uniqueGamesSql = "SELECT COUNT(DISTINCT GameType) as unique_games_played
+                              FROM GameResults
+                              WHERE StudentID = ? AND LessonID = ?";
+            $uniqueStmt = $conn->prepare($uniqueGamesSql);
+            $uniqueStmt->execute([$studentID, $i]);
+            $uniqueGames = $uniqueStmt->fetch(PDO::FETCH_ASSOC);
+            $gamesPlayed = (int)($uniqueGames['unique_games_played'] ?? 0);
+
+            // Get overall stats
             $statsSql = "SELECT
-                            COUNT(*) as games_played,
                             ISNULL(SUM(XPEarned), 0) as total_xp_earned,
                             ISNULL(AVG(AccuracyPercentage), 0) as average_accuracy
                         FROM GameResults
@@ -119,7 +163,6 @@ try {
             $stmt->execute([$studentID, $i]);
             $progress = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            $gamesPlayed = (int)($stats['games_played'] ?? 0);
             $totalGamesRequired = 5;
             $progressPercent = min(100, (int)(($gamesPlayed / $totalGamesRequired) * 100));
 

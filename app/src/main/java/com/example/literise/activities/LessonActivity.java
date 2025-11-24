@@ -303,56 +303,124 @@ public class LessonActivity extends AppCompatActivity {
         }
     }
 
+    private String getDbGameType(String gameType) {
+        // Convert Android game type to database GameType
+        switch (gameType) {
+            case "sentence_scramble": return "SentenceScramble";
+            case "word_hunt": return "WordHunt";
+            case "timed_trail": return "TimedTrail";
+            case "shadow_read": return "ShadowRead";
+            case "minimal_pairs": return "MinimalPairs";
+            default: return gameType;
+        }
+    }
+
+    private boolean isGameCompleted(String gameType) {
+        if (savedProgress == null) return false;
+        String dbGameType = getDbGameType(gameType);
+        return savedProgress.isGameCompleted(dbGameType);
+    }
+
+    private LessonProgressResponse.GameStats getGameStats(String gameType) {
+        if (savedProgress == null) return null;
+        String dbGameType = getDbGameType(gameType);
+        return savedProgress.getGameStats(dbGameType);
+    }
+
     private void displayGameInfo(String gameType) {
         btnStartGame.setEnabled(true);
+
+        // Check if this game is already completed
+        boolean gameCompleted = isGameCompleted(gameType);
+        LessonProgressResponse.GameStats stats = getGameStats(gameType);
 
         switch (gameType) {
             case "sentence_scramble":
                 tvGameTitle.setText("Sentence Scramble");
-                tvGameDescription.setText("Drag words into the correct order to form sentences");
-                tvGameReward.setText("⭐ Earn up to 500 XP");
+                if (gameCompleted && stats != null) {
+                    tvGameDescription.setText(String.format("✅ Completed! Accuracy: %.0f%% • Time: %s",
+                            stats.getAccuracy(), stats.getFormattedTime()));
+                    tvGameReward.setText(String.format("🏆 Earned %d XP", stats.getXpEarned()));
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Completed");
+                } else {
+                    tvGameDescription.setText("Drag words into the correct order to form sentences");
+                    tvGameReward.setText("⭐ Earn up to 500 XP");
+                    btnStartGame.setText("Start Game");
+                }
                 ivGameIcon.setImageResource(R.drawable.ic_edit);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_jade1, null));
-                btnStartGame.setText("Start Game");
                 break;
 
             case "word_hunt":
                 tvGameTitle.setText("Word Hunt");
-                tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
-                tvGameReward.setText("⭐ Earn up to 450 XP");
+                if (gameCompleted && stats != null) {
+                    tvGameDescription.setText(String.format("✅ Completed! Accuracy: %.0f%% • Time: %s",
+                            stats.getAccuracy(), stats.getFormattedTime()));
+                    tvGameReward.setText(String.format("🏆 Earned %d XP", stats.getXpEarned()));
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Completed");
+                } else {
+                    tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
+                    tvGameReward.setText("⭐ Earn up to 450 XP");
+                    btnStartGame.setText("Start Game");
+                }
                 ivGameIcon.setImageResource(R.drawable.ic_lightbulb);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_sunglow, null));
-                btnStartGame.setText("Start Game");
                 break;
 
             case "timed_trail":
                 tvGameTitle.setText("Timed Trail");
-                tvGameDescription.setText("Race through comprehension and pronunciation challenges");
-                tvGameReward.setText("⭐ Earn up to 600 XP");
+                if (gameCompleted && stats != null) {
+                    tvGameDescription.setText(String.format("✅ Completed! Accuracy: %.0f%% • Time: %s",
+                            stats.getAccuracy(), stats.getFormattedTime()));
+                    tvGameReward.setText(String.format("🏆 Earned %d XP", stats.getXpEarned()));
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Completed");
+                } else {
+                    tvGameDescription.setText("Race through comprehension and pronunciation challenges");
+                    tvGameReward.setText("⭐ Earn up to 600 XP");
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Coming Soon");
+                }
                 ivGameIcon.setImageResource(R.drawable.ic_timer);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_warning, null));
-                btnStartGame.setEnabled(false);
-                btnStartGame.setText("Coming Soon");
                 break;
 
             case "shadow_read":
                 tvGameTitle.setText("Shadow Read");
-                tvGameDescription.setText("Read along with karaoke-style guided text");
-                tvGameReward.setText("⭐ Earn up to 550 XP");
+                if (gameCompleted && stats != null) {
+                    tvGameDescription.setText(String.format("✅ Completed! Accuracy: %.0f%% • Time: %s",
+                            stats.getAccuracy(), stats.getFormattedTime()));
+                    tvGameReward.setText(String.format("🏆 Earned %d XP", stats.getXpEarned()));
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Completed");
+                } else {
+                    tvGameDescription.setText("Read along with karaoke-style guided text");
+                    tvGameReward.setText("⭐ Earn up to 550 XP");
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Coming Soon");
+                }
                 ivGameIcon.setImageResource(R.drawable.ic_book_reading);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_jade1, null));
-                btnStartGame.setEnabled(false);
-                btnStartGame.setText("Coming Soon");
                 break;
 
             case "minimal_pairs":
                 tvGameTitle.setText("Minimal Pairs");
-                tvGameDescription.setText("Practice distinguishing similar-sounding words");
-                tvGameReward.setText("⭐ Earn up to 500 XP");
+                if (gameCompleted && stats != null) {
+                    tvGameDescription.setText(String.format("✅ Completed! Accuracy: %.0f%% • Time: %s",
+                            stats.getAccuracy(), stats.getFormattedTime()));
+                    tvGameReward.setText(String.format("🏆 Earned %d XP", stats.getXpEarned()));
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Completed");
+                } else {
+                    tvGameDescription.setText("Practice distinguishing similar-sounding words");
+                    tvGameReward.setText("⭐ Earn up to 500 XP");
+                    btnStartGame.setEnabled(false);
+                    btnStartGame.setText("Coming Soon");
+                }
                 ivGameIcon.setImageResource(R.drawable.ic_mic);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_info_bg, null));
-                btnStartGame.setEnabled(false);
-                btnStartGame.setText("Coming Soon");
                 break;
         }
     }
@@ -409,14 +477,53 @@ public class LessonActivity extends AppCompatActivity {
 
             CustomToast.showSuccess(this, String.format("Great job! +%d XP", xpEarned));
 
-            updateProgressDisplay();
-
-            // Check if lesson is complete
-            if (gamesPlayed >= TOTAL_GAMES_REQUIRED) {
-                completeLessonAndStartPostAssessment();
-            }
-            // Otherwise stay on current game selection (user can choose next game)
+            // Reload progress from server to get updated games_completed
+            reloadProgressAfterGame();
         }
+    }
+
+    private void reloadProgressAfterGame() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0 || lessonId <= 0) {
+            updateProgressDisplay();
+            showCurrentGame();
+            return;
+        }
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.getLessonProgress(studentId, lessonId).enqueue(new Callback<LessonProgressResponse>() {
+            @Override
+            public void onResponse(Call<LessonProgressResponse> call, Response<LessonProgressResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    List<LessonProgressResponse.LessonProgress> lessons = response.body().getLessons();
+                    if (lessons != null && !lessons.isEmpty()) {
+                        savedProgress = lessons.get(0);
+                        gamesPlayed = savedProgress.getGamesPlayed();
+                        isLessonCompleted = savedProgress.isCompleted();
+
+                        android.util.Log.d("LessonActivity", "Reloaded progress: " + gamesPlayed +
+                                " unique games played, completed=" + isLessonCompleted);
+                    }
+                }
+
+                updateProgressDisplay();
+
+                // Check if lesson is complete
+                if (gamesPlayed >= TOTAL_GAMES_REQUIRED || isLessonCompleted) {
+                    completeLessonAndStartPostAssessment();
+                } else {
+                    // Refresh current game display (will now show as completed/locked)
+                    showCurrentGame();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LessonProgressResponse> call, Throwable t) {
+                android.util.Log.e("LessonActivity", "Failed to reload progress: " + t.getMessage());
+                updateProgressDisplay();
+                showCurrentGame();
+            }
+        });
     }
 
     private void updateProgressDisplay() {
