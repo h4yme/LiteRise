@@ -11,6 +11,7 @@ import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.models.ScrambleSentenceResponse;
 import com.example.literise.models.SingleResponseResult;
+import com.example.literise.models.TimedTrailResponse;
 import com.example.literise.models.WordHuntResponse;
 import com.example.literise.models.Students;
 import com.example.literise.models.SubmitRequest;
@@ -111,6 +112,30 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("get_word_hunt.php")
     Call<WordHuntResponse> getWordHuntWords(
+            @Query("count") int count,
+            @Query("lesson_id") int lessonId
+    );
+
+    // Timed Trail Game Endpoints
+
+    /**
+     * Get reading passages for Timed Trail game
+     * @param count Number of questions to return
+     * @return TimedTrailResponse with list of passages and questions
+     */
+    @Headers("Content-Type: application/json")
+    @POST("get_timed_trail.php")
+    Call<TimedTrailResponse> getTimedTrailQuestions(@Query("count") int count);
+
+    /**
+     * Get reading passages for Timed Trail for a specific lesson
+     * @param count Number of questions to return
+     * @param lessonId The lesson to get content for
+     * @return TimedTrailResponse with list of passages and questions
+     */
+    @Headers("Content-Type: application/json")
+    @POST("get_timed_trail.php")
+    Call<TimedTrailResponse> getTimedTrailQuestions(
             @Query("count") int count,
             @Query("lesson_id") int lessonId
     );
