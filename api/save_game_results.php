@@ -4,7 +4,7 @@
 
  * LiteRise Save Game Result API
 
- * POST /api/save_game_result.php
+ * POST /api/save_game_results.php
 
  *
 
@@ -16,9 +16,9 @@
 
  * {
 
- *   "session_id": 123,
+ *   "session_id": 123,        // Optional - test session ID
 
- *   "student_id": 1,
+ *   "student_id": 1,          // Required
 
  *   "game_type": "SentenceScramble",
 
@@ -26,11 +26,13 @@
 
  *   "accuracy_percentage": 85.0,
 
- *   "time_completed": 120,
+ *   "time_completed": 120,    // seconds
 
  *   "xp_earned": 100,
 
- *   "streak_achieved": 7
+ *   "streak_achieved": 7,
+
+ *   "lesson_id": 1            // Optional - lesson this game was played for
 
  * }
 
@@ -96,11 +98,13 @@ $xpEarned = $data['xp_earned'] ?? 0;
 
 $streakAchieved = $data['streak_achieved'] ?? 0;
 
+$lessonID = $data['lesson_id'] ?? null;
+
  
 
-// Validate required fields
+// Validate required fields (session_id is now optional)
 
-validateRequired($data, ['session_id', 'student_id', 'game_type', 'score']);
+validateRequired($data, ['student_id', 'game_type', 'score']);
 
  
 
@@ -116,7 +120,7 @@ if ($authUser['studentID'] != $studentID) {
 
 // Validate game type
 
-$validGameTypes = ['SentenceScramble', 'TimedTrail'];
+$validGameTypes = ['SentenceScramble', 'TimedTrail', 'WordHunt', 'ShadowRead', 'MinimalPairs'];
 
 if (!in_array($gameType, $validGameTypes)) {
 
@@ -134,35 +138,39 @@ try {
 
  
 
-    // Verify session exists and belongs to student
+    // If session_id provided, verify it exists and belongs to student
 
-    $stmt = $conn->prepare(
+    if ($sessionID !== null) {
 
-        "SELECT StudentID, SessionType FROM TestSessions WHERE SessionID = ?"
+        $stmt = $conn->prepare(
 
-    );
+            "SELECT StudentID, SessionType FROM TestSessions WHERE SessionID = ?"
 
-    $stmt->execute([$sessionID]);
+        );
 
-    $session = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt->execute([$sessionID]);
 
- 
-
-    if (!$session) {
-
-        $conn->rollBack();
-
-        sendError("Session not found", 404);
-
-    }
+        $session = $stmt->fetch(PDO::FETCH_ASSOC);
 
  
 
-    if ($session['StudentID'] != $studentID) {
+        if (!$session) {
 
-        $conn->rollBack();
+            $conn->rollBack();
 
-        sendError("Session does not belong to this student", 403);
+            sendError("Session not found", 404);
+
+        }
+
+ 
+
+        if ($session['StudentID'] != $studentID) {
+
+            $conn->rollBack();
+
+            sendError("Session does not belong to this student", 403);
+
+        }
 
     }
 
@@ -188,7 +196,9 @@ try {
 
          @XPEarned = ?,
 
-         @StreakAchieved = ?"
+         @StreakAchieved = ?,
+
+         @LessonID = ?"
 
     );
 
@@ -208,7 +218,9 @@ try {
 
         $xpEarned,
 
-        $streakAchieved
+        $streakAchieved,
+
+        $lessonID
 
     ]);
 
@@ -222,13 +234,13 @@ try {
 
          FROM GameResults
 
-         WHERE StudentID = ? AND SessionID = ?
+         WHERE StudentID = ?
 
          ORDER BY DatePlayed DESC"
 
     );
 
-    $stmt->execute([$studentID, $sessionID]);
+    $stmt->execute([$studentID]);
 
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -254,29 +266,45 @@ try {
 
  
 
-    // Check for badge unlocks
+    // Check for badge unlocks (if stored procedure exists)
 
-    $stmt = $conn->prepare("EXEC SP_CheckBadgeUnlock @StudentID = ?");
+    $unlockedBadges = [];
 
-    $stmt->execute([$studentID]);
+    try {
 
-    $unlockedBadges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $conn->prepare("EXEC SP_CheckBadgeUnlock @StudentID = ?");
+
+        $stmt->execute([$studentID]);
+
+        $unlockedBadges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    } catch (PDOException $e) {
+
+        // Badge check failed - not critical, continue
+
+        error_log("Badge check failed: " . $e->getMessage());
+
+    }
 
  
 
-    // Mark session as completed
+    // Mark session as completed if session_id was provided
 
-    $stmt = $conn->prepare(
+    if ($sessionID !== null) {
 
-        "UPDATE TestSessions
+        $stmt = $conn->prepare(
 
-         SET IsCompleted = 1, EndTime = GETDATE()
+            "UPDATE TestSessions
 
-         WHERE SessionID = ?"
+             SET IsCompleted = 1, EndTime = GETDATE()
 
-    );
+             WHERE SessionID = ?"
 
-    $stmt->execute([$sessionID]);
+        );
+
+        $stmt->execute([$sessionID]);
+
+    }
 
  
 
@@ -288,13 +316,15 @@ try {
 
     // Log activity
 
+    $lessonInfo = $lessonID ? " (Lesson: $lessonID)" : "";
+
     logActivity(
 
         $studentID,
 
         'GameComplete',
 
-        "Completed $gameType - Score: $score, Accuracy: $accuracyPercentage%, XP: +$xpEarned"
+        "Completed $gameType$lessonInfo - Score: $score, Accuracy: $accuracyPercentage%, XP: +$xpEarned"
 
     );
 
@@ -310,11 +340,11 @@ try {
 
         'student' => [
 
-            'TotalXP' => (int)$studentStats['TotalXP'],
+            'TotalXP' => (int)($studentStats['TotalXP'] ?? 0),
 
-            'CurrentStreak' => (int)$studentStats['CurrentStreak'],
+            'CurrentStreak' => (int)($studentStats['CurrentStreak'] ?? 0),
 
-            'LongestStreak' => (int)$studentStats['LongestStreak']
+            'LongestStreak' => (int)($studentStats['LongestStreak'] ?? 0)
 
         ],
 
