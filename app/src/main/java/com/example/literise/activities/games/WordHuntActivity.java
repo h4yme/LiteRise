@@ -218,17 +218,22 @@ public class WordHuntActivity extends AppCompatActivity {
         grid = new char[gridSize][gridSize];
         gridCells = new TextView[gridSize][gridSize];
 
-        // Fill with random letters first
+        // Track which cells are used by words (not random)
+        boolean[][] usedCells = new boolean[gridSize][gridSize];
+
+        // Place words in grid FIRST (before filling with random)
+        for (WordHuntWord word : words) {
+            placeWordInGrid(word, usedCells);
+        }
+
+        // Fill remaining cells with random letters
         Random random = new Random();
         for (int i = 0; i < gridSize; i++) {
             for (int j = 0; j < gridSize; j++) {
-                grid[i][j] = (char) ('A' + random.nextInt(26));
+                if (!usedCells[i][j]) {
+                    grid[i][j] = (char) ('A' + random.nextInt(26));
+                }
             }
-        }
-
-        // Place words in grid
-        for (WordHuntWord word : words) {
-            placeWordInGrid(word);
         }
 
         // Create grid UI
@@ -257,10 +262,10 @@ public class WordHuntActivity extends AppCompatActivity {
         setupGridTouchListener();
     }
 
-    private void placeWordInGrid(WordHuntWord word) {
+    private void placeWordInGrid(WordHuntWord word, boolean[][] usedCells) {
         String wordStr = word.getWord().toUpperCase();
         Random random = new Random();
-        int maxAttempts = 100;
+        int maxAttempts = 200;
         int attempts = 0;
 
         while (attempts < maxAttempts) {
@@ -268,23 +273,33 @@ public class WordHuntActivity extends AppCompatActivity {
             int row, col;
 
             if (horizontal) {
+                if (gridSize - wordStr.length() + 1 <= 0) {
+                    attempts++;
+                    continue;
+                }
                 row = random.nextInt(gridSize);
                 col = random.nextInt(gridSize - wordStr.length() + 1);
 
-                if (canPlaceWord(wordStr, row, col, 0, 1)) {
+                if (canPlaceWord(wordStr, row, col, 0, 1, usedCells)) {
                     for (int i = 0; i < wordStr.length(); i++) {
                         grid[row][col + i] = wordStr.charAt(i);
+                        usedCells[row][col + i] = true;
                     }
                     word.setPosition(row, col, row, col + wordStr.length() - 1, true);
                     return;
                 }
             } else {
+                if (gridSize - wordStr.length() + 1 <= 0) {
+                    attempts++;
+                    continue;
+                }
                 row = random.nextInt(gridSize - wordStr.length() + 1);
                 col = random.nextInt(gridSize);
 
-                if (canPlaceWord(wordStr, row, col, 1, 0)) {
+                if (canPlaceWord(wordStr, row, col, 1, 0, usedCells)) {
                     for (int i = 0; i < wordStr.length(); i++) {
                         grid[row + i][col] = wordStr.charAt(i);
+                        usedCells[row + i][col] = true;
                     }
                     word.setPosition(row, col, row + wordStr.length() - 1, col, false);
                     return;
@@ -293,37 +308,42 @@ public class WordHuntActivity extends AppCompatActivity {
             attempts++;
         }
 
-        // Force placement if can't find spot
-        int row = random.nextInt(Math.max(1, gridSize - wordStr.length()));
-        int col = random.nextInt(Math.max(1, gridSize - wordStr.length()));
-        for (int i = 0; i < wordStr.length() && col + i < gridSize; i++) {
-            grid[row][col + i] = wordStr.charAt(i);
+        // Force placement horizontally if can't find spot
+        for (int row = 0; row < gridSize; row++) {
+            for (int col = 0; col <= gridSize - wordStr.length(); col++) {
+                boolean canPlace = true;
+                for (int i = 0; i < wordStr.length(); i++) {
+                    if (usedCells[row][col + i]) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+                if (canPlace) {
+                    for (int i = 0; i < wordStr.length(); i++) {
+                        grid[row][col + i] = wordStr.charAt(i);
+                        usedCells[row][col + i] = true;
+                    }
+                    word.setPosition(row, col, row, col + wordStr.length() - 1, true);
+                    return;
+                }
+            }
         }
-        word.setPosition(row, col, row, Math.min(col + wordStr.length() - 1, gridSize - 1), true);
+
+        // If still can't place, log error (word won't be findable)
+        android.util.Log.e("WordHunt", "Could not place word: " + wordStr);
     }
 
-    private boolean canPlaceWord(String word, int startRow, int startCol, int rowDir, int colDir) {
+    private boolean canPlaceWord(String word, int startRow, int startCol, int rowDir, int colDir, boolean[][] usedCells) {
         for (int i = 0; i < word.length(); i++) {
             int r = startRow + i * rowDir;
             int c = startCol + i * colDir;
 
-            if (r >= gridSize || c >= gridSize) return false;
+            if (r >= gridSize || c >= gridSize || r < 0 || c < 0) return false;
 
-            char existing = grid[r][c];
-            char needed = word.charAt(i);
-
-            // Check if cell is empty (random letter) or matches needed letter
-            if (existing != needed && !Character.isLowerCase(existing)) {
-                // Check if it's already used by another word
-                boolean usedByOther = false;
-                for (WordHuntWord w : words) {
-                    if (w.getStartRow() >= 0) {
-                        // Word already placed - basic overlap check
-                        usedByOther = true;
-                        break;
-                    }
-                }
-                if (usedByOther && existing != needed) {
+            // Check if cell is already used by another word
+            if (usedCells[r][c]) {
+                // Allow if the existing letter matches what we need
+                if (grid[r][c] != word.charAt(i)) {
                     return false;
                 }
             }
@@ -591,27 +611,51 @@ public class WordHuntActivity extends AppCompatActivity {
                 int row = word.getStartRow();
                 int col = word.getStartCol();
 
-                // Pulse animation on first letter
+                // Verify position is valid
+                if (row >= gridSize || col >= gridSize) {
+                    android.util.Log.e("WordHunt", "Invalid hint position for word: " + word.getWord());
+                    continue;
+                }
+
+                // Pulse animation on first letter using ValueAnimator
                 TextView cell = gridCells[row][col];
-                ObjectAnimator colorAnim = ObjectAnimator.ofObject(
-                        cell, "backgroundColor",
-                        new ArgbEvaluator(),
-                        ContextCompat.getColor(this, R.color.white),
-                        ContextCompat.getColor(this, R.color.color_sunglow),
-                        ContextCompat.getColor(this, R.color.white)
-                );
-                colorAnim.setDuration(1500);
-                colorAnim.setRepeatCount(2);
-                colorAnim.start();
+                int colorFrom = ContextCompat.getColor(this, R.color.background_card);
+                int colorTo = ContextCompat.getColor(this, R.color.color_sunglow);
+
+                ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+                colorAnimation.setDuration(400);
+                colorAnimation.setRepeatCount(5);
+                colorAnimation.setRepeatMode(ValueAnimator.REVERSE);
+                colorAnimation.addUpdateListener(animator -> {
+                    cell.setBackgroundColor((int) animator.getAnimatedValue());
+                });
+                colorAnimation.addListener(new android.animation.AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(android.animation.Animator animation) {
+                        // Restore the original background drawable after animation
+                        String key = row + "," + col;
+                        if (highlightedCells.contains(key)) {
+                            cell.setBackgroundResource(R.drawable.grid_cell_found);
+                        } else {
+                            cell.setBackgroundResource(R.drawable.grid_cell_background);
+                        }
+                    }
+                });
+                colorAnimation.start();
 
                 hintsUsed++;
                 score = Math.max(0, score - HINT_PENALTY);
                 updateScore();
 
-                CustomToast.showInfo(this, "Look for: " + word.getWord().charAt(0) + "...");
+                // Log for debugging
+                android.util.Log.d("WordHunt", "Hint for word: " + word.getWord() + " at [" + row + "," + col + "] = " + grid[row][col]);
+
+                CustomToast.showInfo(this, "Look for: " + word.getWord().charAt(0) + "... at highlighted cell");
                 return;
             }
         }
+
+        CustomToast.showInfo(this, "No more hints available!");
     }
 
     private void shuffleGrid() {
