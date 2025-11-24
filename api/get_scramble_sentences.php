@@ -133,32 +133,11 @@ try {
         }
     }
 
-    // If we don't have enough sentences from lesson content, add fallback sentences
-    if (count($sentences) < $count) {
-        // Determine grade level for fallback
-        $fallbackGradeLevel = $gradeLevel;
-
-        // If lesson_id provided but no content, get lesson's grade level for fallback
-        if ($lessonID !== null && $fallbackGradeLevel === null) {
-            $stmt = $conn->prepare("SELECT GradeLevel FROM Lessons WHERE LessonID = ?");
-            $stmt->execute([(int)$lessonID]);
-            $lesson = $stmt->fetch(PDO::FETCH_ASSOC);
-            if ($lesson) {
-                $fallbackGradeLevel = $lesson['GradeLevel'];
-            }
-        }
-
-        $fallbackSentences = getFallbackSentences($fallbackGradeLevel);
-        $needed = $count - count($sentences);
-
-        // Shuffle fallback and take what we need
-        shuffle($fallbackSentences);
-        $fallbackToAdd = array_slice($fallbackSentences, 0, $needed);
-
-        foreach ($fallbackToAdd as $fb) {
-            $fb['ScrambledWords'] = generateScrambledWords($fb['CorrectSentence']);
-            $sentences[] = $fb;
-        }
+    // Fallback disabled for testing
+    // If we don't have enough sentences from lesson content, return error
+    if (count($sentences) < 1) {
+        sendError("No sentences found for this lesson. LessonGameContent table may not exist or has no data.", 404);
+        return;
     }
 
     // Log activity
