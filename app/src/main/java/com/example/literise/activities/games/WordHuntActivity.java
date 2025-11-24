@@ -158,59 +158,78 @@ public class WordHuntActivity extends AppCompatActivity {
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         int studentId = session.getStudentId();
 
-        Call<WordHuntResponse> call;
-        if (lessonId != null && studentId > 0) {
-            call = apiService.getWordHuntWords(8, lessonId, studentId);
-        } else if (studentId > 0) {
-            call = apiService.getWordHuntWords(8, studentId);
-        } else {
-            // Fallback if no student ID (shouldn't happen in normal use)
-            loadFallbackWords();
-            startGame();
+        if (studentId <= 0) {
+            loadingProgress.setVisibility(View.GONE);
+            showErrorAndExit("No student ID found. Please log in again.");
             return;
         }
+
+        Call<WordHuntResponse> call;
+        if (lessonId != null) {
+            call = apiService.getWordHuntWords(8, lessonId, studentId);
+        } else {
+            call = apiService.getWordHuntWords(8, studentId);
+        }
+
+        android.util.Log.d("WordHunt", "Loading words for studentId: " + studentId + ", lessonId: " + lessonId);
 
         call.enqueue(new Callback<WordHuntResponse>() {
             @Override
             public void onResponse(Call<WordHuntResponse> call, Response<WordHuntResponse> response) {
                 loadingProgress.setVisibility(View.GONE);
 
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    words = response.body().getWords();
-                    if (response.body().getGridSize() > 0) {
-                        gridSize = response.body().getGridSize();
-                    }
-                    if (words != null && !words.isEmpty()) {
-                        startGame();
+                if (response.isSuccessful() && response.body() != null) {
+                    android.util.Log.d("WordHunt", "API Response: success=" + response.body().isSuccess() +
+                            ", grade=" + response.body().getStudentGrade() +
+                            ", words=" + (response.body().getWords() != null ? response.body().getWords().size() : 0));
+
+                    if (response.body().isSuccess()) {
+                        words = response.body().getWords();
+                        if (response.body().getGridSize() > 0) {
+                            gridSize = response.body().getGridSize();
+                        }
+                        if (words != null && !words.isEmpty()) {
+                            // Log words for verification
+                            for (WordHuntWord word : words) {
+                                android.util.Log.d("WordHunt", "Word: " + word.getWord() + ", Grade: " + word.getGradeLevel());
+                            }
+                            startGame();
+                        } else {
+                            showErrorAndExit("No words found for your grade level. Please contact administrator.");
+                        }
                     } else {
-                        loadFallbackWords();
-                        startGame();
+                        showErrorAndExit("API Error: " + response.body().getMessage());
                     }
                 } else {
-                    loadFallbackWords();
-                    startGame();
+                    String errorMsg = "Failed to load words";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMsg = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        errorMsg = "HTTP " + response.code();
+                    }
+                    showErrorAndExit("Server Error: " + errorMsg);
                 }
             }
 
             @Override
             public void onFailure(Call<WordHuntResponse> call, Throwable t) {
                 loadingProgress.setVisibility(View.GONE);
-                loadFallbackWords();
-                startGame();
+                android.util.Log.e("WordHunt", "API call failed", t);
+                showErrorAndExit("Network Error: " + t.getMessage());
             }
         });
     }
 
-    private void loadFallbackWords() {
-        words = new ArrayList<>();
-        words.add(new WordHuntWord(1, "READ", "To look at and understand written words", 0.5f));
-        words.add(new WordHuntWord(2, "BOOK", "A written work that tells a story or gives information", 0.4f));
-        words.add(new WordHuntWord(3, "WORD", "A unit of language that has meaning", 0.4f));
-        words.add(new WordHuntWord(4, "LEARN", "To gain knowledge or skill", 0.6f));
-        words.add(new WordHuntWord(5, "WRITE", "To form letters or words on paper", 0.5f));
-        words.add(new WordHuntWord(6, "STORY", "An account of events, real or imaginary", 0.6f));
-        words.add(new WordHuntWord(7, "SPELL", "To name or write the letters of a word", 0.7f));
-        words.add(new WordHuntWord(8, "THINK", "To use your mind to consider something", 0.6f));
+    private void showErrorAndExit(String message) {
+        android.util.Log.e("WordHunt", message);
+        new AlertDialog.Builder(this)
+                .setTitle("Error Loading Game")
+                .setMessage(message)
+                .setPositiveButton("OK", (dialog, which) -> finish())
+                .setCancelable(false)
+                .show();
     }
 
     private void startGame() {
