@@ -41,29 +41,24 @@ public class SplashActivity extends AppCompatActivity {
 
             if (session.isLoggedIn()) {
 
-                // DEMO MODE: Skip pre-assessment and go straight to dashboard
-                if (AppConfig.DEMO_MODE) {
-                    intent = new Intent(SplashActivity.this, DashboardActivity.class);
+                // 🎯 Launch Adaptive Assessment (personalized questions)
+
+                float ability = session.getAbility();
+
+
+
+                if (ability == 0.0f || Math.abs(ability) < 0.01f) {
+
+                    // No assessment taken yet - go to assessment
+
+                    intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
+
                 } else {
-                    // 🎯 Launch Adaptive Assessment (personalized questions)
 
-                    float ability = session.getAbility();
+                    // Assessment already taken - go to dashboard
 
+                    intent = new Intent(SplashActivity.this, DashboardActivity.class);
 
-
-                    if (ability == 0.0f || Math.abs(ability) < 0.01f) {
-
-                        // No assessment taken yet - go to assessment
-
-                        intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
-
-                    } else {
-
-                        // Assessment already taken - go to dashboard
-
-                        intent = new Intent(SplashActivity.this, DashboardActivity.class);
-
-                    }
                 }
 
             } else {

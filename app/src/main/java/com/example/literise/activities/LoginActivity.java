@@ -82,10 +82,7 @@ public class LoginActivity extends AppCompatActivity {
 
                     Intent intent;
 
-                    // DEMO MODE: Skip pre-assessment and go straight to dashboard
-                    if (AppConfig.DEMO_MODE) {
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
-                    } else if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+                    if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
 
                         // First time - go to adaptive assessment
 

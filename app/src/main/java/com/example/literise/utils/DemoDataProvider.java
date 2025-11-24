@@ -251,4 +251,159 @@ public class DemoDataProvider {
             return String.format("%d:%02d", minutes, seconds);
         }
     }
+
+    // ==================== ASSESSMENT QUESTIONS DATA ====================
+
+    public static List<com.example.literise.models.Question> getAssessmentQuestions() {
+        List<com.example.literise.models.Question> questions = new ArrayList<>();
+
+        // Grammar Questions
+        com.example.literise.models.Question q1 = new com.example.literise.models.Question();
+        q1.setItemId(2001);
+        q1.setItemType("Grammar");
+        q1.setQuestionText("Choose the correct verb form: She ___ to school every day.");
+        q1.setOptionA("go");
+        q1.setOptionB("goes");
+        q1.setOptionC("going");
+        q1.setOptionD("gone");
+        q1.setCorrectOption("B");
+        q1.setDifficulty(0.5f);
+        q1.setDiscrimination(1.0f);
+        q1.setMCQ(true);
+        questions.add(q1);
+
+        com.example.literise.models.Question q2 = new com.example.literise.models.Question();
+        q2.setItemId(2002);
+        q2.setItemType("Grammar");
+        q2.setQuestionText("Which sentence is correct?");
+        q2.setOptionA("He don't like vegetables");
+        q2.setOptionB("He doesn't likes vegetables");
+        q2.setOptionC("He doesn't like vegetables");
+        q2.setOptionD("He not like vegetables");
+        q2.setCorrectOption("C");
+        q2.setDifficulty(0.6f);
+        q2.setDiscrimination(1.0f);
+        q2.setMCQ(true);
+        questions.add(q2);
+
+        // Spelling Questions
+        com.example.literise.models.Question q3 = new com.example.literise.models.Question();
+        q3.setItemId(2003);
+        q3.setItemType("Spelling");
+        q3.setQuestionText("Choose the correctly spelled word:");
+        q3.setOptionA("recieve");
+        q3.setOptionB("receive");
+        q3.setOptionC("recive");
+        q3.setOptionD("receeve");
+        q3.setCorrectOption("B");
+        q3.setDifficulty(0.7f);
+        q3.setDiscrimination(1.0f);
+        q3.setMCQ(true);
+        questions.add(q3);
+
+        com.example.literise.models.Question q4 = new com.example.literise.models.Question();
+        q4.setItemId(2004);
+        q4.setItemType("Spelling");
+        q4.setQuestionText("Which word is spelled correctly?");
+        q4.setOptionA("occassion");
+        q4.setOptionB("occasion");
+        q4.setOptionC("ocasion");
+        q4.setOptionD("ocassion");
+        q4.setCorrectOption("B");
+        q4.setDifficulty(0.8f);
+        q4.setDiscrimination(1.0f);
+        q4.setMCQ(true);
+        questions.add(q4);
+
+        // Syntax Questions
+        com.example.literise.models.Question q5 = new com.example.literise.models.Question();
+        q5.setItemId(2005);
+        q5.setItemType("Syntax");
+        q5.setQuestionText("Arrange these words to form a correct sentence:");
+        q5.setScrambledWords(Arrays.asList("dog", "the", "quickly", "ran"));
+        q5.setOptionA("The dog ran quickly");
+        q5.setOptionB("Quickly the dog ran");
+        q5.setOptionC("Ran the dog quickly");
+        q5.setOptionD("The quickly dog ran");
+        q5.setCorrectOption("A");
+        q5.setDifficulty(0.6f);
+        q5.setDiscrimination(1.0f);
+        q5.setMCQ(true);
+        questions.add(q5);
+
+        com.example.literise.models.Question q6 = new com.example.literise.models.Question();
+        q6.setItemId(2006);
+        q6.setItemType("Syntax");
+        q6.setQuestionText("Arrange these words to form a correct sentence:");
+        q6.setScrambledWords(Arrays.asList("reading", "enjoys", "books", "she"));
+        q6.setOptionA("She enjoys reading books");
+        q6.setOptionB("Books reading she enjoys");
+        q6.setOptionC("Reading she enjoys books");
+        q6.setOptionD("Enjoys she reading books");
+        q6.setCorrectOption("A");
+        q6.setDifficulty(0.7f);
+        q6.setDiscrimination(1.0f);
+        q6.setMCQ(true);
+        questions.add(q6);
+
+        // More Grammar Questions
+        com.example.literise.models.Question q7 = new com.example.literise.models.Question();
+        q7.setItemId(2007);
+        q7.setItemType("Grammar");
+        q7.setQuestionText("Complete the sentence: They ___ playing basketball yesterday.");
+        q7.setOptionA("is");
+        q7.setOptionB("are");
+        q7.setOptionC("was");
+        q7.setOptionD("were");
+        q7.setCorrectOption("D");
+        q7.setDifficulty(0.6f);
+        q7.setDiscrimination(1.0f);
+        q7.setMCQ(true);
+        questions.add(q7);
+
+        com.example.literise.models.Question q8 = new com.example.literise.models.Question();
+        q8.setItemId(2008);
+        q8.setItemType("Grammar");
+        q8.setQuestionText("Choose the correct sentence:");
+        q8.setOptionA("I has finished my homework");
+        q8.setOptionB("I have finished my homework");
+        q8.setOptionC("I finished have my homework");
+        q8.setOptionD("I have finish my homework");
+        q8.setCorrectOption("B");
+        q8.setDifficulty(0.7f);
+        q8.setDiscrimination(1.0f);
+        q8.setMCQ(true);
+        questions.add(q8);
+
+        // Advanced Questions
+        com.example.literise.models.Question q9 = new com.example.literise.models.Question();
+        q9.setItemId(2009);
+        q9.setItemType("Grammar");
+        q9.setQuestionText("Identify the sentence with correct punctuation:");
+        q9.setOptionA("Where are you going");
+        q9.setOptionB("Where are you going.");
+        q9.setOptionC("Where are you going?");
+        q9.setOptionD("Where are you going,");
+        q9.setCorrectOption("C");
+        q9.setDifficulty(0.9f);
+        q9.setDiscrimination(1.0f);
+        q9.setMCQ(true);
+        questions.add(q9);
+
+        com.example.literise.models.Question q10 = new com.example.literise.models.Question();
+        q10.setItemId(2010);
+        q10.setItemType("Spelling");
+        q10.setQuestionText("Choose the correctly spelled word:");
+        q10.setOptionA("definately");
+        q10.setOptionB("definitly");
+        q10.setOptionC("definitely");
+        q10.setOptionD("definetely");
+        q10.setCorrectOption("C");
+        q10.setDifficulty(1.0f);
+        q10.setDiscrimination(1.0f);
+        q10.setMCQ(true);
+        questions.add(q10);
+
+        return questions;
+    }
 }
