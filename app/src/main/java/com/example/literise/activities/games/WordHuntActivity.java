@@ -619,7 +619,7 @@ public class WordHuntActivity extends AppCompatActivity {
 
                 // Pulse animation on first letter using ValueAnimator
                 TextView cell = gridCells[row][col];
-                int colorFrom = ContextCompat.getColor(this, R.color.background_card);
+                int colorFrom = ContextCompat.getColor(this, R.color.gray_light);
                 int colorTo = ContextCompat.getColor(this, R.color.color_sunglow);
 
                 ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
