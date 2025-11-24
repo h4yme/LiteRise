@@ -1,6 +1,7 @@
 package com.example.literise.api;
 
 import com.example.literise.models.GetNextItemRequest;
+import com.example.literise.models.LessonProgressResponse;
 import com.example.literise.models.NextItemResponse;
 import com.example.literise.models.PreAssessmentResponse;
 import com.example.literise.models.PronunciationRequest;
@@ -23,6 +24,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -143,6 +145,28 @@ public interface ApiService {
     @POST("get_timed_trail.php")
     Call<TimedTrailResponse> getTimedTrailQuestions(
             @Query("count") int count,
+            @Query("lesson_id") int lessonId
+    );
+
+    // Lesson Progress Endpoints
+
+    /**
+     * Get lesson progress for all lessons
+     * @param studentId Student ID
+     * @return LessonProgressResponse with progress for all lessons
+     */
+    @GET("get_lesson_progress.php")
+    Call<LessonProgressResponse> getLessonProgress(@Query("student_id") int studentId);
+
+    /**
+     * Get lesson progress for a specific lesson
+     * @param studentId Student ID
+     * @param lessonId Lesson ID
+     * @return LessonProgressResponse with progress for the lesson
+     */
+    @GET("get_lesson_progress.php")
+    Call<LessonProgressResponse> getLessonProgress(
+            @Query("student_id") int studentId,
             @Query("lesson_id") int lessonId
     );
 }
