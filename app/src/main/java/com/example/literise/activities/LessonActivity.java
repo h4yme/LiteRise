@@ -26,6 +26,8 @@ import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
 
+import com.example.literise.activities.games.SentenceScrambleActivity;
+
 import com.example.literise.database.SessionManager;
 
 import com.example.literise.models.GameSession;
@@ -80,6 +82,8 @@ public class LessonActivity extends AppCompatActivity {
 
     private String lessonType;
 
+    private int lessonId = -1;  // Lesson ID for game content
+
 
 
     private List<String> availableGames;
@@ -113,6 +117,12 @@ public class LessonActivity extends AppCompatActivity {
             lessonType = "reading";
 
         }
+
+
+
+        // Get lesson ID for game content
+
+        lessonId = getIntent().getIntExtra("lesson_id", -1);
 
 
 
@@ -298,9 +308,9 @@ public class LessonActivity extends AppCompatActivity {
 
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_jade1, null));
 
-                btnStartGame.setEnabled(false);
+                btnStartGame.setEnabled(true);
 
-                btnStartGame.setText("Coming Soon");
+                btnStartGame.setText("Start Game");
 
                 break;
 
@@ -392,9 +402,67 @@ public class LessonActivity extends AppCompatActivity {
 
     private void launchGame() {
 
-        // All games are "Coming Soon" for now
+        Intent intent = null;
 
-        CustomToast.showInfo(this, "This game is coming soon!");
+
+
+        switch (currentGame) {
+
+            case "sentence_scramble":
+
+                intent = new Intent(this, SentenceScrambleActivity.class);
+
+                break;
+
+
+
+            case "timed_trail":
+
+            case "word_hunt":
+
+            case "shadow_read":
+
+            case "minimal_pairs":
+
+                // These games are coming soon
+
+                CustomToast.showInfo(this, "This game is coming soon!");
+
+                return;
+
+
+
+            default:
+
+                CustomToast.showInfo(this, "Unknown game type");
+
+                return;
+
+        }
+
+
+
+        if (intent != null) {
+
+            intent.putExtra("lesson_type", lessonType);
+
+
+
+            // Pass lesson_id if available for lesson-specific game content
+
+            if (lessonId > 0) {
+
+                intent.putExtra("lesson_id", lessonId);
+
+            }
+
+
+
+            startActivityForResult(intent, GAME_REQUEST_CODE);
+
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+        }
 
     }
 
@@ -525,6 +593,8 @@ public class LessonActivity extends AppCompatActivity {
     }
 
 
+
+    @SuppressWarnings("deprecation")
 
     @Override
 

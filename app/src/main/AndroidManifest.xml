@@ -136,6 +136,18 @@
             android:exported="false"
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- 🎮 Game Activities -->
+
+        <activity
+
+            android:name=".activities.games.SentenceScrambleActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+
+            android:screenOrientation="portrait" />
     </application>
 
 
