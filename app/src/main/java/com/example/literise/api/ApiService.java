@@ -11,6 +11,7 @@ import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.models.ScrambleSentenceResponse;
 import com.example.literise.models.SingleResponseResult;
+import com.example.literise.models.WordHuntResponse;
 import com.example.literise.models.Students;
 import com.example.literise.models.SubmitRequest;
 import com.example.literise.models.SubmitResponseResult;
@@ -89,4 +90,28 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("save_game_results.php")
     Call<SaveGameResultResponse> saveGameResult(@Body SaveGameResultRequest request);
+
+    // Word Hunt Game Endpoints
+
+    /**
+     * Get words for Word Hunt game
+     * @param count Number of words to return
+     * @return WordHuntResponse with list of words
+     */
+    @Headers("Content-Type: application/json")
+    @POST("get_word_hunt.php")
+    Call<WordHuntResponse> getWordHuntWords(@Query("count") int count);
+
+    /**
+     * Get words for Word Hunt game for a specific lesson
+     * @param count Number of words to return
+     * @param lessonId The lesson to get content for
+     * @return WordHuntResponse with list of words
+     */
+    @Headers("Content-Type: application/json")
+    @POST("get_word_hunt.php")
+    Call<WordHuntResponse> getWordHuntWords(
+            @Query("count") int count,
+            @Query("lesson_id") int lessonId
+    );
 }

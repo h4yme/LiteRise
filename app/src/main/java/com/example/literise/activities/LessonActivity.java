@@ -13,6 +13,7 @@ import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
 import com.example.literise.activities.games.SentenceScrambleActivity;
+import com.example.literise.activities.games.WordHuntActivity;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.GameSession;
 import com.example.literise.utils.CustomToast;
@@ -169,12 +170,12 @@ public class LessonActivity extends AppCompatActivity {
 
             case "word_hunt":
                 tvGameTitle.setText("Word Hunt");
-                tvGameDescription.setText("Find hidden words in the letter grid");
+                tvGameDescription.setText("Find hidden vocabulary words in the letter grid");
                 tvGameReward.setText("⭐ Earn up to 450 XP");
                 ivGameIcon.setImageResource(R.drawable.ic_lightbulb);
                 ivGameIcon.setColorFilter(getResources().getColor(R.color.color_sunglow, null));
-                btnStartGame.setEnabled(false);
-                btnStartGame.setText("Coming Soon");
+                btnStartGame.setEnabled(true);
+                btnStartGame.setText("Start Game");
                 break;
 
             case "shadow_read":
@@ -207,8 +208,11 @@ public class LessonActivity extends AppCompatActivity {
                 intent = new Intent(this, SentenceScrambleActivity.class);
                 break;
 
-            case "timed_trail":
             case "word_hunt":
+                intent = new Intent(this, WordHuntActivity.class);
+                break;
+
+            case "timed_trail":
             case "shadow_read":
             case "minimal_pairs":
                 // These games are coming soon
