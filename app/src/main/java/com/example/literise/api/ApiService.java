@@ -97,23 +97,29 @@ public interface ApiService {
     /**
      * Get words for Word Hunt game
      * @param count Number of words to return
-     * @return WordHuntResponse with list of words
-     */
-    @Headers("Content-Type: application/json")
-    @POST("get_word_hunt.php")
-    Call<WordHuntResponse> getWordHuntWords(@Query("count") int count);
-
-    /**
-     * Get words for Word Hunt game for a specific lesson
-     * @param count Number of words to return
-     * @param lessonId The lesson to get content for
+     * @param studentId Student ID to get grade-appropriate words
      * @return WordHuntResponse with list of words
      */
     @Headers("Content-Type: application/json")
     @POST("get_word_hunt.php")
     Call<WordHuntResponse> getWordHuntWords(
             @Query("count") int count,
-            @Query("lesson_id") int lessonId
+            @Query("student_id") int studentId
+    );
+
+    /**
+     * Get words for Word Hunt game for a specific lesson
+     * @param count Number of words to return
+     * @param lessonId The lesson to get content for
+     * @param studentId Student ID to get grade-appropriate words
+     * @return WordHuntResponse with list of words
+     */
+    @Headers("Content-Type: application/json")
+    @POST("get_word_hunt.php")
+    Call<WordHuntResponse> getWordHuntWords(
+            @Query("count") int count,
+            @Query("lesson_id") int lessonId,
+            @Query("student_id") int studentId
     );
 
     // Timed Trail Game Endpoints

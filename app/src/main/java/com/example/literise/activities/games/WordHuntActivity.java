@@ -156,12 +156,18 @@ public class WordHuntActivity extends AppCompatActivity {
         loadingProgress.setVisibility(View.VISIBLE);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        int studentId = session.getStudentId();
 
         Call<WordHuntResponse> call;
-        if (lessonId != null) {
-            call = apiService.getWordHuntWords(8, lessonId);
+        if (lessonId != null && studentId > 0) {
+            call = apiService.getWordHuntWords(8, lessonId, studentId);
+        } else if (studentId > 0) {
+            call = apiService.getWordHuntWords(8, studentId);
         } else {
-            call = apiService.getWordHuntWords(8);
+            // Fallback if no student ID (shouldn't happen in normal use)
+            loadFallbackWords();
+            startGame();
+            return;
         }
 
         call.enqueue(new Callback<WordHuntResponse>() {
