@@ -54,71 +54,82 @@ $count = min(max((int)$count, 1), 20); // Between 1 and 20
 try {
     $sentences = [];
 
-    // If lesson_id is provided, get content from LessonGameContent table
+    // If lesson_id is provided, try to get content from LessonGameContent table
     if ($lessonID !== null) {
-        $query = "SELECT TOP (?)
-                    ContentID as SentenceID,
-                    ContentText as CorrectSentence,
-                    ContentData as ScrambledWordsJSON,
-                    Difficulty,
-                    Category,
-                    l.GradeLevel
-                  FROM LessonGameContent lgc
-                  INNER JOIN Lessons l ON lgc.LessonID = l.LessonID
-                  WHERE lgc.LessonID = ?
-                    AND lgc.GameType = 'SentenceScramble'
-                    AND lgc.IsActive = 1";
+        try {
+            // Check if LessonGameContent table exists before querying
+            $checkTable = $conn->query("SELECT TOP 1 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'LessonGameContent'");
+            $tableExists = $checkTable->fetch() !== false;
 
-        $params = [$count, (int)$lessonID];
+            if ($tableExists) {
+                $query = "SELECT TOP $count
+                            ContentID as SentenceID,
+                            ContentText as CorrectSentence,
+                            ContentData as ScrambledWordsJSON,
+                            Difficulty,
+                            Category,
+                            l.GradeLevel
+                          FROM LessonGameContent lgc
+                          INNER JOIN Lessons l ON lgc.LessonID = l.LessonID
+                          WHERE lgc.LessonID = ?
+                            AND lgc.GameType = 'SentenceScramble'
+                            AND lgc.IsActive = 1";
 
-        // Map difficulty string to range
-        if ($difficulty !== null) {
-            switch (strtolower($difficulty)) {
-                case 'easy':
-                    $query .= " AND lgc.Difficulty < 0.8";
-                    break;
-                case 'medium':
-                    $query .= " AND lgc.Difficulty >= 0.8 AND lgc.Difficulty < 1.2";
-                    break;
-                case 'hard':
-                    $query .= " AND lgc.Difficulty >= 1.2";
-                    break;
-            }
-        }
+                $params = [(int)$lessonID];
 
-        $query .= " ORDER BY NEWID()"; // Random order
-
-        $stmt = $conn->prepare($query);
-        $stmt->execute($params);
-        $dbSentences = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        if (!empty($dbSentences)) {
-            foreach ($dbSentences as $row) {
-                $sentence = [
-                    'SentenceID' => (int)$row['SentenceID'],
-                    'CorrectSentence' => $row['CorrectSentence'],
-                    'Difficulty' => (float)$row['Difficulty'],
-                    'Category' => $row['Category'],
-                    'GradeLevel' => (int)$row['GradeLevel']
-                ];
-
-                // Try to parse scrambled words from JSON, or generate them
-                $scrambledWords = null;
-                if (!empty($row['ScrambledWordsJSON'])) {
-                    $decoded = json_decode($row['ScrambledWordsJSON'], true);
-                    if (is_array($decoded)) {
-                        $scrambledWords = $decoded;
+                // Map difficulty string to range
+                if ($difficulty !== null) {
+                    switch (strtolower($difficulty)) {
+                        case 'easy':
+                            $query .= " AND lgc.Difficulty < 0.8";
+                            break;
+                        case 'medium':
+                            $query .= " AND lgc.Difficulty >= 0.8 AND lgc.Difficulty < 1.2";
+                            break;
+                        case 'hard':
+                            $query .= " AND lgc.Difficulty >= 1.2";
+                            break;
                     }
                 }
 
-                // Generate scrambled words if not available
-                if ($scrambledWords === null && !empty($row['CorrectSentence'])) {
-                    $scrambledWords = generateScrambledWords($row['CorrectSentence']);
-                }
+                $query .= " ORDER BY NEWID()"; // Random order
 
-                $sentence['ScrambledWords'] = $scrambledWords;
-                $sentences[] = $sentence;
+                $stmt = $conn->prepare($query);
+                $stmt->execute($params);
+                $dbSentences = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                if (!empty($dbSentences)) {
+                    foreach ($dbSentences as $row) {
+                        $sentence = [
+                            'SentenceID' => (int)$row['SentenceID'],
+                            'CorrectSentence' => $row['CorrectSentence'],
+                            'Difficulty' => (float)$row['Difficulty'],
+                            'Category' => $row['Category'],
+                            'GradeLevel' => (int)$row['GradeLevel']
+                        ];
+
+                        // Try to parse scrambled words from JSON, or generate them
+                        $scrambledWords = null;
+                        if (!empty($row['ScrambledWordsJSON'])) {
+                            $decoded = json_decode($row['ScrambledWordsJSON'], true);
+                            if (is_array($decoded)) {
+                                $scrambledWords = $decoded;
+                            }
+                        }
+
+                        // Generate scrambled words if not available
+                        if ($scrambledWords === null && !empty($row['CorrectSentence'])) {
+                            $scrambledWords = generateScrambledWords($row['CorrectSentence']);
+                        }
+
+                        $sentence['ScrambledWords'] = $scrambledWords;
+                        $sentences[] = $sentence;
+                    }
+                }
             }
+        } catch (PDOException $e) {
+            // Table doesn't exist or query failed - will fall back to hardcoded sentences
+            error_log("LessonGameContent query failed (using fallback): " . $e->getMessage());
         }
     }
 
