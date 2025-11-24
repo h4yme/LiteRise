@@ -16,6 +16,9 @@ public class WordHuntWord {
     @SerializedName("definition")
     private String definition;
 
+    @SerializedName("hint")
+    private String hint;
+
     @SerializedName("example_sentence")
     private String exampleSentence;
 
@@ -92,6 +95,14 @@ public class WordHuntWord {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 
     public int getGradeLevel() {
