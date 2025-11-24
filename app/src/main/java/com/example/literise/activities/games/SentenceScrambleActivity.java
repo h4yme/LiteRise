@@ -39,7 +39,9 @@ import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.models.ScrambleSentence;
 import com.example.literise.models.ScrambleSentenceResponse;
+import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
+import com.example.literise.utils.DemoDataProvider;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -193,6 +195,13 @@ public class SentenceScrambleActivity extends AppCompatActivity {
     }
 
     private void loadSentences() {
+        // DEMO MODE: Use hardcoded sentences directly (no API)
+        if (AppConfig.DEMO_MODE) {
+            loadFallbackSentences();
+            startGame();
+            return;
+        }
+
         progressBar.setVisibility(View.VISIBLE);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
@@ -669,6 +678,15 @@ public class SentenceScrambleActivity extends AppCompatActivity {
         }
 
         int timeInSeconds = (int) (totalTime / 1000);
+
+        // DEMO MODE: Save locally instead of API
+        if (AppConfig.DEMO_MODE) {
+            int effectiveLessonId = lessonId != null ? lessonId : 1;
+            DemoDataProvider.saveGameCompleted(this, effectiveLessonId, "SentenceScramble", score, accuracy, timeInSeconds);
+            session.updateTotalXP(DemoDataProvider.getTotalXP(this));
+            android.util.Log.d("SentenceScramble", "Demo mode: Saved game locally - XP: " + score);
+            return;
+        }
 
         // Build the request
         SaveGameResultRequest request = new SaveGameResultRequest.Builder(studentId, "SentenceScramble", score)

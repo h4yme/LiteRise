@@ -36,7 +36,9 @@ import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.models.WordHuntResponse;
 import com.example.literise.models.WordHuntWord;
+import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
+import com.example.literise.utils.DemoDataProvider;
 import com.google.android.flexbox.FlexboxLayout;
 import com.google.android.material.button.MaterialButton;
 
@@ -153,6 +155,13 @@ public class WordHuntActivity extends AppCompatActivity {
     }
 
     private void loadWords() {
+        // DEMO MODE: Use hardcoded words directly (no API)
+        if (AppConfig.DEMO_MODE) {
+            loadDemoWords();
+            startGame();
+            return;
+        }
+
         loadingProgress.setVisibility(View.VISIBLE);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
@@ -230,6 +239,20 @@ public class WordHuntActivity extends AppCompatActivity {
                 .setPositiveButton("OK", (dialog, which) -> finish())
                 .setCancelable(false)
                 .show();
+    }
+
+    private void loadDemoWords() {
+        words = new ArrayList<>();
+        List<DemoDataProvider.WordItem> demoWords = DemoDataProvider.getWords(8);
+        for (DemoDataProvider.WordItem item : demoWords) {
+            WordHuntWord word = new WordHuntWord();
+            word.setWord(item.word);
+            word.setDefinition(item.definition);
+            word.setHint(item.hint);
+            word.setGradeLevel(item.gradeLevel);
+            words.add(word);
+        }
+        android.util.Log.d("WordHunt", "Demo mode: Loaded " + words.size() + " words");
     }
 
     private void startGame() {
@@ -781,6 +804,15 @@ public class WordHuntActivity extends AppCompatActivity {
         }
 
         int timeInSeconds = (int) (totalTime / 1000);
+
+        // DEMO MODE: Save locally instead of API
+        if (AppConfig.DEMO_MODE) {
+            int effectiveLessonId = lessonId != null ? lessonId : 1;
+            DemoDataProvider.saveGameCompleted(this, effectiveLessonId, "WordHunt", score, accuracy, timeInSeconds);
+            session.updateTotalXP(DemoDataProvider.getTotalXP(this));
+            android.util.Log.d("WordHunt", "Demo mode: Saved game locally - XP: " + score);
+            return;
+        }
 
         SaveGameResultRequest request = new SaveGameResultRequest.Builder(studentId, "WordHunt", score)
                 .sessionId(sessionId)
