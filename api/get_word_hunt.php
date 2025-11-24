@@ -4,17 +4,7 @@
  * Returns vocabulary words for the Word Hunt game
  */
 
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
-header("Content-Type: application/json; charset=UTF-8");
-
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-require_once 'db_config.php';
+require_once __DIR__ . '/src/db.php';
 
 try {
     // Get parameters from query string or JSON body
@@ -28,71 +18,37 @@ try {
     $lessonID = $data['lesson_id'] ?? $_GET['lesson_id'] ?? null;
     $gridSize = 10; // Default grid size
 
-    $conn = getDBConnection();
     $words = [];
 
-    if ($lessonID) {
-        // Get words from LessonGameContent for specific lesson
+    // Try to get words from VocabularyWords table
+    try {
         $sql = "SELECT TOP (?)
-                    ContentID as word_id,
-                    ContentText as word,
-                    ContentData as definition,
+                    WordID as word_id,
+                    Word as word,
+                    Definition as definition,
+                    ExampleSentence as example_sentence,
                     Difficulty as difficulty,
                     Category as category
-                FROM LessonGameContent
-                WHERE LessonID = ?
-                  AND GameType = 'WordHunt'
-                  AND IsActive = 1
+                FROM VocabularyWords
+                WHERE IsActive = 1
                 ORDER BY NEWID()";
 
         $stmt = $conn->prepare($sql);
-        $stmt->execute([$count, $lessonID]);
+        $stmt->execute([$count]);
         $words = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Exception $e) {
+        // Table might not exist, use fallback
+        error_log("VocabularyWords query failed: " . $e->getMessage());
     }
 
-    // If no lesson-specific content, get general vocabulary
-    if (empty($words)) {
-        // Check if VocabularyWords table exists
-        $tableCheck = $conn->query("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'VocabularyWords'");
-        $tableExists = $tableCheck->fetchColumn() > 0;
-
-        if ($tableExists) {
-            $sql = "SELECT TOP (?)
-                        WordID as word_id,
-                        Word as word,
-                        Definition as definition,
-                        ExampleSentence as example_sentence,
-                        Difficulty as difficulty,
-                        Category as category
-                    FROM VocabularyWords
-                    WHERE IsActive = 1
-                    ORDER BY NEWID()";
-
-            $stmt = $conn->prepare($sql);
-            $stmt->execute([$count]);
-            $words = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        }
-    }
-
-    // If still no words, use fallback
+    // If no words from database, use fallback
     if (empty($words)) {
         $words = getFallbackWords($count);
     }
 
-    // Process words - parse definition from ContentData if needed
+    // Process words
     foreach ($words as &$word) {
-        // If definition looks like JSON, parse it
-        if (isset($word['definition']) && $word['definition'] && $word['definition'][0] === '{') {
-            $jsonData = json_decode($word['definition'], true);
-            if ($jsonData && isset($jsonData['definition'])) {
-                $word['definition'] = $jsonData['definition'];
-                if (isset($jsonData['example'])) {
-                    $word['example_sentence'] = $jsonData['example'];
-                }
-            }
-        }
-
-        // Ensure word is uppercase and reasonable length for grid
+        // Ensure word is uppercase
         $word['word'] = strtoupper(trim($word['word']));
 
         // Adjust grid size if needed for longer words
@@ -102,7 +58,7 @@ try {
         }
     }
 
-    echo json_encode([
+    sendResponse([
         'success' => true,
         'words' => $words,
         'grid_size' => $gridSize,
@@ -110,17 +66,11 @@ try {
     ]);
 
 } catch (PDOException $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Database error: ' . $e->getMessage()
-    ]);
+    error_log("Word Hunt DB error: " . $e->getMessage());
+    sendError("Database error", 500);
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Error: ' . $e->getMessage()
-    ]);
+    error_log("Word Hunt error: " . $e->getMessage());
+    sendError("Error loading words", 500);
 }
 
 function getFallbackWords($count) {
