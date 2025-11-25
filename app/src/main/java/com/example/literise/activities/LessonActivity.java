@@ -150,7 +150,8 @@ public class LessonActivity extends AppCompatActivity {
                         gamesPlayed = savedProgress.getGamesPlayed();
                         gamesPlayedAtStart = gamesPlayed;
                         gameSession.setGamesCompleted(gamesPlayed);
-                        isLessonCompleted = savedProgress.isCompleted();
+                        // Only mark as completed if status is "Completed" AND all games are done
+                        isLessonCompleted = savedProgress.isCompleted() && gamesPlayed >= TOTAL_GAMES_REQUIRED;
 
                         android.util.Log.d("LessonActivity", "Loaded progress: " + gamesPlayed +
                                 " games, completed=" + isLessonCompleted + " for lesson " + lessonId);
@@ -499,7 +500,8 @@ public class LessonActivity extends AppCompatActivity {
                     if (lessons != null && !lessons.isEmpty()) {
                         savedProgress = lessons.get(0);
                         gamesPlayed = savedProgress.getGamesPlayed();
-                        isLessonCompleted = savedProgress.isCompleted();
+                        // Only mark as completed if status is "Completed" AND all games are done
+                        isLessonCompleted = savedProgress.isCompleted() && gamesPlayed >= TOTAL_GAMES_REQUIRED;
 
                         android.util.Log.d("LessonActivity", "Reloaded progress: " + gamesPlayed +
                                 " unique games played, completed=" + isLessonCompleted);
