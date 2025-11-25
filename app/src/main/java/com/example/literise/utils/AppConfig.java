@@ -7,7 +7,7 @@ public class AppConfig {
 
     // Set to true for offline demo APK (no internet/API required)
     // Set to false for normal online mode with API
-    public static final boolean DEMO_MODE = true;
+    public static final boolean DEMO_MODE = false;
 
     // Demo user info
     public static final int DEMO_STUDENT_ID = 1;
