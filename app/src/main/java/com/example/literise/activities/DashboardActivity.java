@@ -162,7 +162,8 @@ public class DashboardActivity extends AppCompatActivity {
 
         if (progress != null) {
             progressPercent = progress.getProgressPercent();
-            isCompleted = progress.isCompleted();
+            // Lesson is only complete if status is "Completed" AND progress is 100%
+            isCompleted = progress.isCompleted() && progressPercent >= 100;
             hasProgress = progressPercent > 0 || progress.getGamesPlayed() > 0;
         }
 
