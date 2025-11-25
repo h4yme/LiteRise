@@ -12,6 +12,10 @@ import android.content.pm.PackageManager;
 
 import android.os.Bundle;
 
+import android.os.Handler;
+
+import android.os.Looper;
+
 import android.os.SystemClock;
 
 import android.speech.RecognitionListener;
@@ -70,7 +74,11 @@ import com.example.literise.models.SingleResponseResult;
 
 import com.example.literise.models.SubmitSingleRequest;
 
+import com.example.literise.utils.AppConfig;
+
 import com.example.literise.utils.CustomToast;
+
+import com.example.literise.utils.DemoDataProvider;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -137,6 +145,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private SessionManager session;
 
     private String selectedAnswer = null;
+
+
+
+    // Demo mode
+
+    private List<Question> demoQuestions = new ArrayList<>();
+
+    private int demoQuestionIndex = 0;
+
+    private int demoCorrectAnswers = 0;
 
 
 
@@ -258,6 +276,18 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void loadNextAdaptiveQuestion() {
 
+        // DEMO MODE: Use hardcoded questions
+
+        if (AppConfig.DEMO_MODE) {
+
+            loadDemoQuestion();
+
+            return;
+
+        }
+
+
+
         progressBar.setVisibility(View.VISIBLE);
 
 
@@ -341,6 +371,97 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             }
 
         });
+
+    }
+
+
+
+    private void loadDemoQuestion() {
+
+        // Load demo questions on first call
+
+        if (demoQuestions.isEmpty()) {
+
+            demoQuestions = DemoDataProvider.getAssessmentQuestions();
+
+        }
+
+
+
+        // Check if assessment is complete (10 questions)
+
+        if (demoQuestionIndex >= demoQuestions.size()) {
+
+            finishDemoAssessment();
+
+            return;
+
+        }
+
+
+
+        // Get next demo question
+
+        currentQuestion = demoQuestions.get(demoQuestionIndex);
+
+        questionStartTime = SystemClock.elapsedRealtime();
+
+
+
+        // Create a mock NextItemResponse for showQuestion
+
+        NextItemResponse mockResponse = new NextItemResponse();
+
+        mockResponse.setSuccess(true);
+
+        mockResponse.setItem(currentQuestion);
+
+
+
+        showQuestion(mockResponse);
+
+    }
+
+
+
+    private void finishDemoAssessment() {
+
+        // Calculate demo ability based on performance
+
+        float accuracy = (demoQuestions.size() > 0) ? ((float) demoCorrectAnswers / demoQuestions.size()) * 100 : 0;
+
+        double finalTheta = -1.0 + (accuracy / 100.0) * 3.0; // Map 0-100% to -1.0 to 2.0
+
+
+
+        // Save ability to session
+
+        session.saveAbility((float) finalTheta);
+
+
+
+        // Create mock response for results dialog
+
+        NextItemResponse mockResult = new NextItemResponse();
+
+        mockResult.setSuccess(true);
+
+        mockResult.setAssessmentComplete(true);
+
+        mockResult.setCorrectAnswers(demoCorrectAnswers);
+
+        mockResult.setTotalItems(demoQuestions.size());
+
+        mockResult.setAccuracy((double) accuracy);
+
+
+        mockResult.setFinalTheta(finalTheta);
+
+        mockResult.setItemsCompleted(demoQuestions.size());
+
+
+
+        finishAssessment(mockResult);
 
     }
 
@@ -714,10 +835,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         disableOptions();
 
-        progressBar.setVisibility(View.VISIBLE);
-
-
-
         long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000;
 
 
@@ -739,6 +856,22 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
 
         }
+
+
+
+        // DEMO MODE: Handle locally without API
+
+        if (AppConfig.DEMO_MODE) {
+
+            submitDemoAnswer(isCorrect);
+
+            return;
+
+        }
+
+
+
+        progressBar.setVisibility(View.VISIBLE);
 
 
 
@@ -821,6 +954,50 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             }
 
         });
+
+    }
+
+
+
+    private void submitDemoAnswer(int isCorrect) {
+
+        // Track correct answers
+
+        if (isCorrect == 1) {
+
+            demoCorrectAnswers++;
+
+        }
+
+
+
+        // Show feedback
+
+        if (isCorrect == 1) {
+
+            CustomToast.showSuccess(this, "Correct!");
+
+        } else {
+
+            CustomToast.showError(this, "Incorrect");
+
+        }
+
+
+
+        // Move to next question
+
+        demoQuestionIndex++;
+
+
+
+        // Small delay before showing next question
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+            loadNextAdaptiveQuestion();
+
+        }, 800);
 
     }
 
@@ -1109,6 +1286,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true);
 
         intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+
 
 
         speechRecognizer.startListening(intent);

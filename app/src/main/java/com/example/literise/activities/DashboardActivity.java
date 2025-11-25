@@ -326,7 +326,7 @@ public class DashboardActivity extends AppCompatActivity {
 
             progressPercent = progress.getProgressPercent();
 
-            isCompleted = progress.isCompleted();
+            isCompleted = progress.isCompleted() && progressPercent >= 100;
 
             hasProgress = progressPercent > 0 || progress.getGamesPlayed() > 0;
 

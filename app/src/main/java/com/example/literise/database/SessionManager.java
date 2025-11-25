@@ -3,26 +3,81 @@ package com.example.literise.database;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.example.literise.utils.AppConfig;
+
+
+
 public class SessionManager {
 
+
+
     private static final String PREF_NAME = "LiteRiseSession";
+
     private static final String KEY_STUDENT_ID = "student_id";
+
     private static final String KEY_FULLNAME = "fullname";
+
     private static final String KEY_EMAIL = "email";
+
     private static final String KEY_TOKEN = "token";
+
+
 
     private static final String KEY_ABILITY = "current_ability";
 
+
+
     private static final String KEY_XP = "total_xp";
 
+
+
     private SharedPreferences prefs;
+
     private SharedPreferences.Editor editor;
+
     private Context context;
 
+
+
     public SessionManager(Context context) {
+
         this.context = context;
+
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+
         editor = prefs.edit();
+
+
+
+        // Auto-setup demo user if in demo mode
+
+        if (AppConfig.DEMO_MODE && !isLoggedIn()) {
+
+            setupDemoUser();
+
+        }
+
+    }
+
+
+
+    /**
+
+     * Setup demo user for offline mode
+
+     */
+
+    public void setupDemoUser() {
+
+        editor.putInt(KEY_STUDENT_ID, AppConfig.DEMO_STUDENT_ID);
+
+        editor.putString(KEY_FULLNAME, AppConfig.DEMO_STUDENT_NAME);
+
+        editor.putString(KEY_EMAIL, AppConfig.DEMO_EMAIL);
+
+        editor.putString(KEY_TOKEN, "demo_token");
+
+        editor.apply();
     }
 
     public void saveStudent(int studentId, String fullname, String email) {

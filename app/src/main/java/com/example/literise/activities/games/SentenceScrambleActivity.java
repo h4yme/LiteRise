@@ -8,10 +8,6 @@ import android.animation.AnimatorListenerAdapter;
 
 import android.animation.ObjectAnimator;
 
-import android.animation.ValueAnimator;
-
-import android.content.ClipData;
-
 import android.content.Intent;
 
 import android.graphics.Color;
@@ -30,8 +26,6 @@ import android.os.Looper;
 
 import android.view.DragEvent;
 
-import android.view.Gravity;
-
 import android.view.LayoutInflater;
 
 import android.view.MotionEvent;
@@ -45,9 +39,6 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 
 import android.view.animation.AnimationUtils;
-
-import android.widget.FrameLayout;
-
 
 import android.widget.ProgressBar;
 
@@ -73,23 +64,25 @@ import com.example.literise.api.ApiService;
 
 import com.example.literise.database.SessionManager;
 
+import com.example.literise.models.SaveGameResultRequest;
+
+import com.example.literise.models.SaveGameResultResponse;
+
 import com.example.literise.models.ScrambleSentence;
 
 import com.example.literise.models.ScrambleSentenceResponse;
 
+import com.example.literise.utils.AppConfig;
+
 import com.example.literise.utils.CustomToast;
 
+import com.example.literise.utils.DemoDataProvider;
+
 import com.google.android.material.button.MaterialButton;
-
-import com.google.android.material.chip.Chip;
-
-import com.google.android.material.chip.ChipGroup;
 
 
 
 import java.util.ArrayList;
-
-import java.util.Collections;
 
 import java.util.List;
 
@@ -102,9 +95,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 
 import retrofit2.Response;
-import com.example.literise.models.SaveGameResultRequest;
 
-import com.example.literise.models.SaveGameResultResponse;
 
 
 /**
@@ -188,8 +179,11 @@ public class SentenceScrambleActivity extends AppCompatActivity {
     // Session
 
     private SessionManager session;
+
     private Integer lessonId;
+
     private Integer sessionId;
+
 
 
     // Constants
@@ -220,6 +214,10 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
         startTime = System.currentTimeMillis();
 
+
+
+        // Get lesson and session info from intent
+
         Intent intent = getIntent();
 
         if (intent != null) {
@@ -233,6 +231,8 @@ public class SentenceScrambleActivity extends AppCompatActivity {
             if (sessionId != null && sessionId == -1) sessionId = null;
 
         }
+
+
 
         initializeViews();
 
@@ -378,11 +378,29 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
     private void loadSentences() {
 
+        // DEMO MODE: Use hardcoded sentences directly (no API)
+
+        if (AppConfig.DEMO_MODE) {
+
+            loadFallbackSentences();
+
+            startGame();
+
+            return;
+
+        }
+
+
+
         progressBar.setVisibility(View.VISIBLE);
 
 
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+
+
+
+        // Use lesson-specific content if lessonId is available
 
         Call<ScrambleSentenceResponse> call;
 
@@ -656,7 +674,7 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                ClipData data = ClipData.newPlainText("word", word);
+                android.content.ClipData data = android.content.ClipData.newPlainText("word", word);
 
                 View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
 
@@ -1328,6 +1346,24 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
 
 
+        // DEMO MODE: Save locally instead of API
+
+        if (AppConfig.DEMO_MODE) {
+
+            int effectiveLessonId = lessonId != null ? lessonId : 1;
+
+            DemoDataProvider.saveGameCompleted(this, effectiveLessonId, "SentenceScramble", score, accuracy, timeInSeconds);
+
+            session.updateTotalXP(DemoDataProvider.getTotalXP(this));
+
+            android.util.Log.d("SentenceScramble", "Demo mode: Saved game locally - XP: " + score);
+
+            return;
+
+        }
+
+
+
         // Build the request
 
         SaveGameResultRequest request = new SaveGameResultRequest.Builder(studentId, "SentenceScramble", score)
@@ -1599,7 +1635,10 @@ public class SentenceScrambleActivity extends AppCompatActivity {
             }
 
             handler.postDelayed(toneGenerator::release, 200);
-        } catch(Exception e){
+
+        } catch (Exception e) {
+
+            // Ignore sound errors
 
         }
 
@@ -1607,8 +1646,10 @@ public class SentenceScrambleActivity extends AppCompatActivity {
 
 
 
-
     @SuppressWarnings("deprecation")
+
+    @Override
+
     public void onBackPressed() {
 
         showExitConfirmation();

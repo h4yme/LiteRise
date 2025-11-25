@@ -14,7 +14,7 @@ import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
 
-
+import com.example.literise.utils.AppConfig;
 
 public class SplashActivity extends AppCompatActivity {
 
@@ -42,19 +42,35 @@ public class SplashActivity extends AppCompatActivity {
 
                 // 🎯 Launch Adaptive Assessment (personalized questions)
 
+
+
                 float ability = session.getAbility();
+
+
+
+
 
 
 
                 if (ability == 0.0f || Math.abs(ability) < 0.01f) {
 
+
+
                     // No assessment taken yet - go to assessment
+
+
 
                     intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
 
+
+
                 } else {
 
+
+
                     // Assessment already taken - go to dashboard
+
+
 
                     intent = new Intent(SplashActivity.this, DashboardActivity.class);
 

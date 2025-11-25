@@ -26,7 +26,8 @@ public class WordHuntWord {
 
     private String word;
 
-
+    @SerializedName("hint")
+    private String hint;
 
     @SerializedName("definition")
 
@@ -309,6 +310,20 @@ public class WordHuntWord {
     public void setGradeLevel(int gradeLevel) {
 
         this.gradeLevel = gradeLevel;
+
+    }
+
+    public String getHint() {
+
+        return hint;
+
+    }
+
+
+
+    public void setHint(String hint) {
+
+        this.hint = hint;
 
     }
 

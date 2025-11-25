@@ -302,7 +302,7 @@ public class LessonActivity extends AppCompatActivity {
 
                         gameSession.setGamesCompleted(gamesPlayed);
 
-                        isLessonCompleted = savedProgress.isCompleted();
+                        isLessonCompleted = savedProgress.isCompleted() && gamesPlayed >= TOTAL_GAMES_REQUIRED;
 
 
 
@@ -1004,7 +1004,7 @@ public class LessonActivity extends AppCompatActivity {
 
                         gamesPlayed = savedProgress.getGamesPlayed();
 
-                        isLessonCompleted = savedProgress.isCompleted();
+                        isLessonCompleted = savedProgress.isCompleted() && gamesPlayed >= TOTAL_GAMES_REQUIRED;
 
 
 
