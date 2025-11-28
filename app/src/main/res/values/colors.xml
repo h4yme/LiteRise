@@ -38,4 +38,18 @@
     <color name="color_success">#4CAF50</color>
     <color name="color_error">#F44336</color>
 
+    <!-- 🎨 Child-Friendly Redesign Colors -->
+    <color name="primary_blue">#42A5F5</color>
+    <color name="primary_purple">#AB47BC</color>
+    <color name="accent_yellow">#FFEB3B</color>
+    <color name="success_green">#66BB6A</color>
+    <color name="warning_orange">#FFA726</color>
+    <color name="mascot_yellow">#FFD700</color>
+    <color name="background_light">#F5F5F5</color>
+
+    <!-- 🌈 Gradient Colors -->
+    <color name="gradient_start">#42A5F5</color>
+    <color name="gradient_middle">#AB47BC</color>
+    <color name="gradient_end">#66BB6A</color>
+
 </resources>
