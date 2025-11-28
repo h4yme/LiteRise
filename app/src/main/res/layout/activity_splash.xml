@@ -9,11 +9,101 @@
 
     android:gravity="center">
 
+    <!-- Decorative elements - Top Left -->
 
+    <ImageView
 
-    <!-- Sunburst effect (using gradient_splash) -->
+        android:layout_width="40dp"
 
+        android:layout_height="40dp"
 
+        android:src="@drawable/splash_decoration_star"
+
+        android:layout_alignParentTop="true"
+
+        android:layout_alignParentStart="true"
+
+        android:layout_margin="32dp"
+
+        android:alpha="0.6" />
+
+    <!-- Decorative elements - Top Right -->
+
+    <ImageView
+
+        android:layout_width="32dp"
+
+        android:layout_height="32dp"
+
+        android:src="@drawable/splash_decoration_sparkle"
+
+        android:layout_alignParentTop="true"
+
+        android:layout_alignParentEnd="true"
+
+        android:layout_margin="48dp"
+
+        android:alpha="0.5" />
+
+    <!-- Decorative elements - Bottom Left Book -->
+
+    <ImageView
+
+        android:layout_width="56dp"
+
+        android:layout_height="56dp"
+
+        android:src="@drawable/splash_decoration_book"
+
+        android:layout_alignParentBottom="true"
+
+        android:layout_alignParentStart="true"
+
+        android:layout_margin="40dp"
+
+        android:rotation="-15"
+
+        android:alpha="0.7" />
+
+    <!-- Decorative elements - Bottom Right Star -->
+
+    <ImageView
+
+        android:layout_width="36dp"
+
+        android:layout_height="36dp"
+
+        android:src="@drawable/splash_decoration_star"
+
+        android:layout_alignParentBottom="true"
+
+        android:layout_alignParentEnd="true"
+
+        android:layout_margin="56dp"
+
+        android:alpha="0.5" />
+
+    <!-- Decorative sparkle - Middle Right -->
+
+    <ImageView
+
+        android:layout_width="24dp"
+
+        android:layout_height="24dp"
+
+        android:src="@drawable/splash_decoration_sparkle"
+
+        android:layout_alignParentEnd="true"
+
+        android:layout_centerVertical="true"
+
+        android:layout_marginEnd="24dp"
+
+        android:layout_marginTop="-80dp"
+
+        android:alpha="0.4" />
+
+    <!-- Center Content -->
 
     <LinearLayout
 
@@ -27,8 +117,6 @@
 
         android:gravity="center">
 
-
-
         <!-- App Name -->
 
         <TextView
@@ -41,7 +129,7 @@
 
             android:text="LiteRise"
 
-            android:textSize="48sp"
+            android:textSize="52sp"
 
             android:textStyle="bold"
 
@@ -49,17 +137,15 @@
 
             android:fontFamily="@font/poppins_bold"
 
-            android:shadowColor="#40000000"
+            android:shadowColor="#20000000"
 
-            android:shadowDx="2"
+            android:shadowDx="1"
 
-            android:shadowDy="2"
+            android:shadowDy="1"
 
-            android:shadowRadius="4"
+            android:shadowRadius="2"
 
             android:layout_marginBottom="8dp" />
-
-
 
         <!-- Tagline -->
 
@@ -79,12 +165,10 @@
 
             android:fontFamily="@font/poppins_medium"
 
-            android:letterSpacing="0.05" />
+            android:letterSpacing="0.05"
 
-
+            android:alpha="0.8" />
 
     </LinearLayout>
-
-
 
 </RelativeLayout>
