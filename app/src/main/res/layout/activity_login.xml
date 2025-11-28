@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="@drawable/gradient_login"
     android:fitsSystemWindows="true"
     tools:context=".activities.LoginActivity">
 
@@ -21,39 +21,7 @@
         android:paddingTop="40dp"
         android:paddingBottom="24dp">
 
-        <!-- Book Icon with Modern Styling -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="120dp"
 
-            android:layout_height="120dp"
-
-            app:cardCornerRadius="60dp"
-
-            app:cardElevation="8dp"
-
-            android:layout_marginBottom="16dp"
-
-            app:cardBackgroundColor="@color/accent_yellow">
-
-
-
-            <ImageView
-
-                android:id="@+id/ivBookIcon"
-
-                android:layout_width="70dp"
-
-                android:layout_height="70dp"
-
-                android:layout_gravity="center"
-
-                android:src="@drawable/ic_book_reading"
-
-                android:contentDescription="Book Reading Icon"
-
-                app:tint="@color/white" />
-
-        </androidx.cardview.widget.CardView>
 
 
 
@@ -314,7 +282,7 @@
 
             android:layout_height="60dp"
 
-            android:text="Let's Start Learning! 🚀"
+            android:text="Let's Read!"
 
             android:textAllCaps="false"
 
@@ -328,7 +296,7 @@
 
             app:cornerRadius="30dp"
 
-            app:backgroundTint="@color/success_green"
+            app:backgroundTint="@color/warning_orange"
 
             android:elevation="4dp"
             style="@style/Widget.MaterialComponents.Button" />

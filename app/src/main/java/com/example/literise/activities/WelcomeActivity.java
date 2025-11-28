@@ -31,7 +31,7 @@ import com.example.literise.adapters.IntroSlideAdapter;
 import com.example.literise.database.SessionManager;
 
 import com.google.android.material.button.MaterialButton;
-
+import com.example.literise.utils.ZoomOutPageTransformer;
 
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -44,7 +44,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private TextView tvSkip;
 
-    private View indicator1, indicator2, indicator3;
+    private View indicator1, indicator2, indicator3, indicator4, indicator5;
 
     private MediaPlayer soundPlayer;
 
@@ -78,7 +78,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         indicator3 = findViewById(R.id.indicator3);
 
+        indicator4 = findViewById(R.id.indicator4);
 
+        indicator5 = findViewById(R.id.indicator5);
 
         // Set up ViewPager2
 
@@ -86,7 +88,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         viewPager.setAdapter(adapter);
 
+        // Add smooth page transformer for zoom effect
 
+        viewPager.setPageTransformer(new ZoomOutPageTransformer());
 
         // Fade-in animation
 
@@ -116,7 +120,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                 // Update button text on last slide
 
-                if (position == 2) {
+                if (position == 4) {
 
                     btnNext.setText("Let's Start! 🚀");
 
@@ -162,7 +166,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
                         int currentItem = viewPager.getCurrentItem();
 
-                        if (currentItem < 2) {
+                        if (currentItem < 4) {
 
                             // Go to next slide
 
@@ -208,6 +212,12 @@ public class WelcomeActivity extends AppCompatActivity {
 
 
 
+        indicator4.setBackgroundResource(R.drawable.indicator_inactive);
+
+        indicator5.setBackgroundResource(R.drawable.indicator_inactive);
+
+
+
         // Set active indicator
 
         switch (position) {
@@ -230,6 +240,18 @@ public class WelcomeActivity extends AppCompatActivity {
 
                 break;
 
+            case 3:
+
+                indicator4.setBackgroundResource(R.drawable.indicator_active);
+
+                break;
+
+            case 4:
+
+                indicator5.setBackgroundResource(R.drawable.indicator_active);
+
+                break;
+
         }
 
     }
@@ -246,7 +268,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
             }
 
-            soundPlayer = MediaPlayer.create(this, R.raw.button_click);
+            soundPlayer = MediaPlayer.create(this, R.raw.sound_button_click);
 
             soundPlayer.setOnCompletionListener(MediaPlayer::release);
 

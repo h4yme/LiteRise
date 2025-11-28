@@ -28,9 +28,9 @@
 
         android:layout_marginEnd="40dp"
 
-        android:text="Turn study time into playtime with gamified lessons."
+        android:text="Start your adventure today!"
 
-        android:textSize="38sp"
+        android:textSize="48sp"
 
         android:textStyle="bold"
 
@@ -40,7 +40,7 @@
 
         android:gravity="center"
 
-        android:lineSpacingExtra="6dp"
+        android:lineSpacingExtra="8dp"
 
         app:layout_constraintTop_toTopOf="parent"
 
@@ -60,17 +60,17 @@
 
         android:layout_height="0dp"
 
-        android:layout_marginStart="40dp"
+        android:layout_marginStart="60dp"
 
-        android:layout_marginEnd="40dp"
+        android:layout_marginEnd="60dp"
 
         android:layout_marginTop="40dp"
 
         android:layout_marginBottom="60dp"
 
-        android:src="@drawable/mascot_happy"
+        android:src="@drawable/mascot_excited"
 
-        android:contentDescription="Literiser mascot reading book"
+        android:contentDescription="Literiser mascot celebrating"
 
         android:scaleType="fitCenter"
 

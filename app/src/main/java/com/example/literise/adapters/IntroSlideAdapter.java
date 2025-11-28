@@ -8,7 +8,11 @@ import android.view.View;
 
 import android.view.ViewGroup;
 
+import android.view.animation.Animation;
 
+import android.view.animation.AnimationUtils;
+
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -30,7 +34,11 @@ public class IntroSlideAdapter extends RecyclerView.Adapter<IntroSlideAdapter.In
 
             R.layout.intro_slide_2,
 
-            R.layout.intro_slide_3
+            R.layout.intro_slide_3,
+
+            R.layout.intro_slide_4,
+
+            R.layout.intro_slide_5
 
     };
 
@@ -56,7 +64,47 @@ public class IntroSlideAdapter extends RecyclerView.Adapter<IntroSlideAdapter.In
 
     public void onBindViewHolder(@NonNull IntroViewHolder holder, int position) {
 
-        // Slides are static, no binding needed
+        // Add bounce animation to mascot
+
+        ImageView mascot = holder.itemView.findViewById(R.id.ivMascot);
+
+        if (mascot != null) {
+
+            Animation bounceAnim = AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.bounce);
+
+            Animation floatAnim = AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.float_up_down);
+
+            mascot.startAnimation(bounceAnim);
+
+
+
+            // Start floating animation after bounce completes
+
+            bounceAnim.setAnimationListener(new Animation.AnimationListener() {
+
+                @Override
+
+                public void onAnimationStart(Animation animation) {}
+
+
+
+                @Override
+
+                public void onAnimationEnd(Animation animation) {
+
+                    mascot.startAnimation(floatAnim);
+
+                }
+
+
+
+                @Override
+
+                public void onAnimationRepeat(Animation animation) {}
+
+            });
+
+        }
 
     }
 

@@ -28,7 +28,7 @@
 
         android:layout_marginEnd="40dp"
 
-        android:text="Turn study time into playtime with gamified lessons."
+        android:text="Make learning exciting and easy with Literiser!"
 
         android:textSize="38sp"
 
@@ -68,9 +68,9 @@
 
         android:layout_marginBottom="60dp"
 
-        android:src="@drawable/mascot_happy"
+        android:src="@drawable/mascot_thinking"
 
-        android:contentDescription="Literiser mascot reading book"
+        android:contentDescription="Literiser mascot thinking"
 
         android:scaleType="fitCenter"
 
