@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+        <!-- Mascot Image (Celebrating) -->
+        <ImageView
+            android:id="@+id/ivMascotCelebrating"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/ic_trophy"
+            app:tint="@color/white"
+            android:contentDescription="Celebrating mascot"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Assessment Complete!"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:fontFamily="@font/poppins_bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Subtitle -->
+        <TextView
+            android:id="@+id/tvSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Here's your personalized learning path!"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:fontFamily="@font/poppins_regular"
+            android:gravity="center"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Results Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Score Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Results"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:fontFamily="@font/poppins_bold"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Score Display -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:layout_marginBottom="20dp">
+
+                    <TextView
+                        android:id="@+id/tvScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="8/10"
+                        android:textSize="48sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/color_success"
+                        android:fontFamily="@font/poppins_bold" />
+
+                    <TextView
+                        android:id="@+id/tvAccuracy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="80% Correct"
+                        android:textSize="18sp"
+                        android:textColor="@color/gray_dark"
+                        android:fontFamily="@font/poppins_medium"
+                        android:layout_marginStart="16dp" />
+                </LinearLayout>
+
+                <!-- Module Unlock Order -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your Learning Path"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:fontFamily="@font/poppins_bold"
+                    android:layout_marginBottom="12dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="We'll unlock modules in this order, starting with areas where you can improve the most:"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_dark"
+                    android:fontFamily="@font/poppins_regular"
+                    android:lineSpacingExtra="4dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Module List Container -->
+                <LinearLayout
+                    android:id="@+id/moduleListContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <!-- Module items will be added programmatically -->
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Start Learning Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartLearning"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:text="Start Learning! 🚀"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:fontFamily="@font/poppins_bold"
+            app:cornerRadius="32dp"
+            app:backgroundTint="@color/color_success"
+            android:elevation="8dp"
+            app:elevation="8dp"
+            android:stateListAnimator="@null" />
+
+    </LinearLayout>
+</ScrollView>

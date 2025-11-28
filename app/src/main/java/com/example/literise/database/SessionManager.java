@@ -31,6 +31,8 @@ public class SessionManager {
 
     private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
 
+    private static final String KEY_NICKNAME = "nickname";
+
 
     private SharedPreferences prefs;
 
@@ -184,6 +186,20 @@ public class SessionManager {
     public String getFullName() {
 
         return prefs.getString(KEY_FULLNAME, null);
+
+    }
+
+    public void saveNickname(String nickname) {
+
+        editor.putString(KEY_NICKNAME, nickname);
+
+        editor.apply();
+
+    }
+
+    public String getNickname() {
+
+        return prefs.getString(KEY_NICKNAME, null);
 
     }
 }

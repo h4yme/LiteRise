@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="32dp">
+
+        <!-- Mascot Image -->
+        <ImageView
+            android:id="@+id/ivMascot"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/ic_book_reading"
+            android:contentDescription="Friendly mascot"
+            app:tint="@color/white"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="32dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- Card Container -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/ivMascot"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:cardCornerRadius="32dp"
+            app:cardElevation="12dp"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="32dp"
+                android:gravity="center">
+
+                <!-- Heading -->
+                <TextView
+                    android:id="@+id/tvHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="What should we call you?"
+                    android:textSize="28sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary_blue"
+                    android:fontFamily="@font/poppins_bold"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Subtitle -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Choose a fun nickname for your learning journey!"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_dark"
+                    android:fontFamily="@font/poppins_regular"
+                    android:gravity="center"
+                    android:layout_marginBottom="32dp" />
+
+                <!-- Nickname Input -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="28dp"
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#F8FAFC"
+                    app:boxCornerRadiusTopStart="20dp"
+                    app:boxCornerRadiusTopEnd="20dp"
+                    app:boxCornerRadiusBottomStart="20dp"
+                    app:boxCornerRadiusBottomEnd="20dp"
+                    app:boxStrokeWidth="0dp"
+                    app:boxStrokeWidthFocused="2dp"
+                    app:boxStrokeColor="@color/primary_blue"
+                    app:hintEnabled="false">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etNickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="64dp"
+                        android:hint="Enter your nickname"
+                        android:inputType="textCapWords"
+                        android:fontFamily="@font/poppins_regular"
+                        android:textSize="18sp"
+                        android:textColor="@color/color_midnight_green"
+                        android:gravity="center"
+                        android:maxLength="20"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Continue Button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnContinue"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:text="Continue"
+                    android:textAllCaps="false"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/poppins_bold"
+                    app:cornerRadius="32dp"
+                    app:backgroundTint="@color/primary_blue"
+                    android:elevation="8dp"
+                    app:elevation="8dp"
+                    android:stateListAnimator="@null" />
+
+                <!-- Skip Button -->
+                <TextView
+                    android:id="@+id/tvSkipNickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Skip for now"
+                    android:textSize="14sp"
+                    android:textColor="@color/gray_medium"
+                    android:fontFamily="@font/poppins_medium"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    android:layout_marginTop="8dp" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -915,15 +915,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-                    if (isCorrect == 1) {
+                    // Show neutral encouragement (no instant feedback on correctness)
 
-                        CustomToast.showSuccess(AdaptivePreAssessmentActivity.this, "Correct!");
+                    String[] encouragements = {"Great job!", "Keep going!", "Nice work!", "You're doing great!"};
 
-                    } else {
+                    String randomEncouragement = encouragements[new java.util.Random().nextInt(encouragements.length)];
 
-                        CustomToast.showError(AdaptivePreAssessmentActivity.this, "Incorrect");
-
-                    }
+                    CustomToast.showSuccess(AdaptivePreAssessmentActivity.this, randomEncouragement);
 
 
 
@@ -971,17 +969,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        // Show feedback
+        // Show neutral encouragement (no instant feedback on correctness)
 
-        if (isCorrect == 1) {
+        String[] encouragements = {"Great job!", "Keep going!", "Nice work!", "You're doing great!"};
 
-            CustomToast.showSuccess(this, "Correct!");
+        String randomEncouragement = encouragements[new java.util.Random().nextInt(encouragements.length)];
 
-        } else {
-
-            CustomToast.showError(this, "Incorrect");
-
-        }
+        CustomToast.showSuccess(this, randomEncouragement);
 
 
 
@@ -1133,7 +1127,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             dialog.dismiss();
 
-            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, DashboardActivity.class);
+            // Navigate to AssessmentResultsActivity to show module unlock order
+
+            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, AssessmentResultsActivity.class);
+
+            intent.putExtra("correct_answers", result.getCorrectAnswers() != null ? result.getCorrectAnswers() : 0);
+
+            intent.putExtra("total_questions", result.getTotalItems() != null ? result.getTotalItems() : 0);
+
+            intent.putExtra("accuracy", result.getAccuracy() != null ? result.getAccuracy() : 0.0);
 
             startActivity(intent);
 

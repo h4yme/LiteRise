@@ -94,6 +94,14 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Nickname Setup Screen -->
+
+        <activity
+
+            android:name=".activities.NicknameSetupActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
 
         <activity
@@ -111,6 +119,16 @@
         <activity
 
             android:name=".activities.AdaptivePreAssessmentActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Assessment Results Screen -->
+
+        <activity
+
+            android:name=".activities.AssessmentResultsActivity"
 
             android:exported="false"
 

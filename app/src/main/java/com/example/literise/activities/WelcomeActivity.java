@@ -286,14 +286,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private void goToNicknameSetup() {
 
-        // TODO: Create NicknameActivity - for now go to pre-assessment
-
-        Intent intent = new Intent(WelcomeActivity.this, AdaptivePreAssessmentActivity.class);
+        Intent intent = new Intent(WelcomeActivity.this, NicknameSetupActivity.class);
 
         startActivity(intent);
-        // Mark welcome screens as seen
-
-        sessionManager.setHasSeenWelcome(true);
 
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
