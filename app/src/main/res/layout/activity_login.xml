@@ -8,70 +8,37 @@
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!-- Decorative sparkle - Top Left -->
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/splash_decoration_sparkle"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="24dp"
-            android:alpha="0.5" />
-
-        <!-- Decorative star - Top Right -->
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/splash_decoration_star"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="40dp"
-            android:alpha="0.4" />
-
-        <!-- Decorative book - Bottom Left -->
-        <ImageView
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:src="@drawable/splash_decoration_book"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="28dp"
-            android:rotation="12"
-            android:alpha="0.5" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:padding="32dp">
+        android:padding="40dp"
+        android:layout_gravity="center_vertical">
 
         <!-- Login Illustration -->
         <ImageView
             android:id="@+id/ivMascot"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
             android:src="@drawable/login_illustration"
             android:contentDescription="Reading books illustration"
             android:scaleType="fitCenter"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="40dp" />
 
         <!-- Welcome Heading -->
         <TextView
             android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome Back!"
-            android:textSize="28sp"
+            android:text="Welcome Back"
+            android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="#8B7AA8"
+            android:textColor="#1A1A1A"
             android:fontFamily="@font/poppins_bold"
             android:gravity="center"
+            android:letterSpacing="-0.01"
             android:layout_marginBottom="8dp" />
 
         <!-- Subtitle -->
@@ -79,57 +46,61 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign in to continue your learning journey"
-            android:textSize="14sp"
-            android:textColor="#64748B"
+            android:text="Sign in to continue"
+            android:textSize="15sp"
+            android:textColor="#666666"
             android:fontFamily="@font/poppins_regular"
             android:gravity="center"
-            android:lineSpacingExtra="2dp"
-            android:layout_marginBottom="32dp"
-            android:alpha="0.8"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp" />
+            android:layout_marginBottom="48dp" />
 
         <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:boxBackgroundMode="outline"
+            android:layout_marginBottom="20dp"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="#F5F5F5"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp"
-            app:boxStrokeColor="#9B8BB8"
-            app:hintTextColor="#9B8BB8"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:boxStrokeColor="#1A1A1A"
+            app:hintTextColor="#666666"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email Address"
+                android:hint="Email"
                 android:inputType="textEmailAddress"
                 android:fontFamily="@font/poppins_regular"
-                android:textSize="15sp"
-                android:padding="16dp" />
+                android:textSize="16sp"
+                android:textColor="#1A1A1A"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Password Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:boxBackgroundMode="outline"
+            android:layout_marginBottom="32dp"
+            app:boxBackgroundMode="filled"
+            app:boxBackgroundColor="#F5F5F5"
             app:boxCornerRadiusTopStart="12dp"
             app:boxCornerRadiusTopEnd="12dp"
             app:boxCornerRadiusBottomStart="12dp"
             app:boxCornerRadiusBottomEnd="12dp"
-            app:boxStrokeColor="#9B8BB8"
-            app:hintTextColor="#9B8BB8"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:boxStrokeColor="#1A1A1A"
+            app:hintTextColor="#666666"
             app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#9B8BB8"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            app:passwordToggleTint="#666666"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPassword"
@@ -138,39 +109,39 @@
                 android:hint="Password"
                 android:inputType="textPassword"
                 android:fontFamily="@font/poppins_regular"
-                android:textSize="15sp"
-                android:padding="16dp" />
+                android:textSize="16sp"
+                android:textColor="#1A1A1A"
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Login Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="58dp"
             android:text="Sign In"
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:fontFamily="@font/poppins_bold"
-            app:cornerRadius="16dp"
-            app:backgroundTint="#9B8BB8"
-            android:elevation="2dp"
-            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/poppins_semibold"
+            app:cornerRadius="12dp"
+            app:backgroundTint="#1A1A1A"
+            android:elevation="0dp"
+            android:layout_marginBottom="24dp"
             style="@style/Widget.MaterialComponents.Button" />
 
         <!-- Sign Up Link -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New to LiteRise? Sign up here"
-            android:textSize="14sp"
-            android:textColor="#9B8BB8"
-            android:fontFamily="@font/poppins_medium"
-            android:gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:text="Don't have an account? Sign up"
+            android:textSize="15sp"
+            android:textColor="#666666"
+            android:fontFamily="@font/poppins_regular"
+            android:gravity="center" />
 
     </LinearLayout>
 
-    </RelativeLayout>
 </ScrollView>
