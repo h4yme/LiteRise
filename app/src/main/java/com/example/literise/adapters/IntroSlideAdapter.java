@@ -14,7 +14,9 @@ public class IntroSlideAdapter extends RecyclerView.Adapter<IntroSlideAdapter.In
     private final int[] layouts = {
             R.layout.intro_slide_1,
             R.layout.intro_slide_2,
-            R.layout.intro_slide_3
+            R.layout.intro_slide_3,
+            R.layout.intro_slide_4,
+            R.layout.intro_slide_5
     };
 
     @NonNull

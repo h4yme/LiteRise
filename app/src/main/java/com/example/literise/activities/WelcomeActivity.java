@@ -21,7 +21,7 @@ public class WelcomeActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private MaterialButton btnNext;
     private TextView tvSkip;
-    private View indicator1, indicator2, indicator3;
+    private View indicator1, indicator2, indicator3, indicator4, indicator5;
     private MediaPlayer soundPlayer;
     private SessionManager sessionManager;
 
@@ -40,6 +40,8 @@ public class WelcomeActivity extends AppCompatActivity {
         indicator1 = findViewById(R.id.indicator1);
         indicator2 = findViewById(R.id.indicator2);
         indicator3 = findViewById(R.id.indicator3);
+        indicator4 = findViewById(R.id.indicator4);
+        indicator5 = findViewById(R.id.indicator5);
 
         // Set up ViewPager2
         IntroSlideAdapter adapter = new IntroSlideAdapter();
@@ -59,7 +61,7 @@ public class WelcomeActivity extends AppCompatActivity {
                 updateIndicators(position);
 
                 // Update button text on last slide
-                if (position == 2) {
+                if (position == 4) {
                     btnNext.setText("Let's Start! 🚀");
                     tvSkip.setVisibility(View.INVISIBLE);
                 } else {
@@ -82,7 +84,7 @@ public class WelcomeActivity extends AppCompatActivity {
                     v.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
 
                     int currentItem = viewPager.getCurrentItem();
-                    if (currentItem < 2) {
+                    if (currentItem < 4) {
                         // Go to next slide
                         viewPager.setCurrentItem(currentItem + 1, true);
                     } else {
@@ -104,6 +106,8 @@ public class WelcomeActivity extends AppCompatActivity {
         indicator1.setBackgroundResource(R.drawable.indicator_inactive);
         indicator2.setBackgroundResource(R.drawable.indicator_inactive);
         indicator3.setBackgroundResource(R.drawable.indicator_inactive);
+        indicator4.setBackgroundResource(R.drawable.indicator_inactive);
+        indicator5.setBackgroundResource(R.drawable.indicator_inactive);
 
         // Set active indicator
         switch (position) {
@@ -115,6 +119,12 @@ public class WelcomeActivity extends AppCompatActivity {
                 break;
             case 2:
                 indicator3.setBackgroundResource(R.drawable.indicator_active);
+                break;
+            case 3:
+                indicator4.setBackgroundResource(R.drawable.indicator_active);
+                break;
+            case 4:
+                indicator5.setBackgroundResource(R.drawable.indicator_active);
                 break;
         }
     }

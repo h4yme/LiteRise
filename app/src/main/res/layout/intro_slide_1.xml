@@ -3,51 +3,41 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light">
+    android:background="@drawable/gradient_welcome">
 
-    <!-- Mascot Image -->
-    <ImageView
-        android:id="@+id/ivMascot"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginTop="80dp"
-        android:src="@drawable/mascot_happy"
-        android:contentDescription="Happy Mascot"
+    <!-- Title at Top -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60dp"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:text="Welcome to\nLiteRise!"
+        android:textSize="48sp"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:fontFamily="@font/poppins_bold"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- Welcome Title -->
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="Hi! I'm Litey! 👋"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="@color/primary_blue"
-        android:fontFamily="@font/poppins_bold"
-        android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/ivMascot"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Description -->
-    <TextView
-        android:id="@+id/tvDescription"
+    <!-- Large Mascot Image -->
+    <ImageView
+        android:id="@+id/ivMascot"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="0dp"
         android:layout_marginStart="40dp"
         android:layout_marginEnd="40dp"
-        android:text="Welcome to LiteRise! I'll be your reading buddy and help you become an amazing reader!"
-        android:textSize="18sp"
-        android:textColor="@color/gray_dark"
-        android:fontFamily="@font/poppins_regular"
-        android:gravity="center"
-        android:lineSpacingExtra="4dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="60dp"
+        android:src="@drawable/mascot_happy"
+        android:contentDescription="Literiser mascot sitting with book"
+        android:scaleType="fitCenter"
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
