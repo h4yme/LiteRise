@@ -1,19 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:background="@color/white">
+    android:background="@drawable/gradient_splash"
+    android:gravity="center">
 
-    <TextView
-        android:id="@+id/tvAppName"
+    <!-- Sunburst effect (using gradient_splash) -->
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LiteRise"
-        android:textSize="36sp"
-        android:textStyle="bold"
-        android:textColor="#1B3242"
-        android:fontFamily="@font/poppins_semibold" />
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:gravity="center">
 
-</LinearLayout>
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/tvAppName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LiteRise"
+            android:textSize="48sp"
+            android:textStyle="bold"
+            android:textColor="@color/color_midnight_green"
+            android:fontFamily="@font/poppins_bold"
+            android:shadowColor="#40000000"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="4"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/tvTagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read • Learn • Rise!"
+            android:textSize="16sp"
+            android:textColor="@color/color_charcoal"
+            android:fontFamily="@font/poppins_medium"
+            android:letterSpacing="0.05" />
+
+    </LinearLayout>
+
+</RelativeLayout>
