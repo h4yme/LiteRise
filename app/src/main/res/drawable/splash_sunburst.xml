@@ -13,7 +13,7 @@
         </shape>
     </item>
 
-    <!-- Sunburst rays overlay -->
+    <!-- Sunburst rays - Layer 1 -->
     <item>
         <rotate
             android:fromDegrees="0"
@@ -23,8 +23,42 @@
                 <gradient
                     android:angle="0"
                     android:centerColor="#00FFFFFF"
-                    android:endColor="#1AFFFFFF"
-                    android:startColor="#1AFFFFFF"
+                    android:endColor="#4DFFFFFF"
+                    android:startColor="#4DFFFFFF"
+                    android:type="sweep" />
+            </shape>
+        </rotate>
+    </item>
+
+    <!-- Sunburst rays - Layer 2 (rotated) -->
+    <item>
+        <rotate
+            android:fromDegrees="15"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <gradient
+                    android:angle="0"
+                    android:centerColor="#00FFFFFF"
+                    android:endColor="#33FFFFFF"
+                    android:startColor="#33FFFFFF"
+                    android:type="sweep" />
+            </shape>
+        </rotate>
+    </item>
+
+    <!-- Sunburst rays - Layer 3 (rotated more) -->
+    <item>
+        <rotate
+            android:fromDegrees="30"
+            android:pivotX="50%"
+            android:pivotY="50%">
+            <shape android:shape="rectangle">
+                <gradient
+                    android:angle="0"
+                    android:centerColor="#00FFFFFF"
+                    android:endColor="#26FFFFFF"
+                    android:startColor="#26FFFFFF"
                     android:type="sweep" />
             </shape>
         </rotate>
