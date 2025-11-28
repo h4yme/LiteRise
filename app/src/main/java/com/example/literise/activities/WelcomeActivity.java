@@ -124,7 +124,7 @@ public class WelcomeActivity extends AppCompatActivity {
             if (soundPlayer != null) {
                 soundPlayer.release();
             }
-            soundPlayer = MediaPlayer.create(this, R.raw.button_click);
+            soundPlayer = MediaPlayer.create(this, R.raw.sound_button_click);
             soundPlayer.setOnCompletionListener(MediaPlayer::release);
             soundPlayer.start();
         } catch (Exception e) {
