@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/gradient_background"
+    android:background="#F5F0FF"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -14,13 +14,12 @@
         <!-- Mascot Image -->
         <ImageView
             android:id="@+id/ivMascot"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:src="@drawable/ic_book_reading"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:src="@drawable/mascot_happy"
             android:contentDescription="Friendly mascot"
-            app:tint="@color/white"
-            android:layout_marginTop="48dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="24dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

@@ -8,39 +8,27 @@
 
     android:layout_height="match_parent"
 
-    android:background="@drawable/gradient_welcome">
+    android:background="#F5F0FF">
 
 
 
-    <!-- Title at Top -->
+    <!-- Mascot Characters on Grass -->
 
-    <TextView
+    <ImageView
 
-        android:id="@+id/tvTitle"
+        android:id="@+id/ivMascot"
 
-        android:layout_width="0dp"
+        android:layout_width="280dp"
 
-        android:layout_height="wrap_content"
+        android:layout_height="280dp"
 
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="120dp"
 
-        android:layout_marginStart="40dp"
+        android:src="@drawable/mascot_happy"
 
-        android:layout_marginEnd="40dp"
+        android:contentDescription="Happy mascot characters"
 
-        android:text="Welcome to\nLiteRise!"
-
-        android:textSize="48sp"
-
-        android:textStyle="bold"
-
-        android:textColor="@color/white"
-
-        android:fontFamily="@font/poppins_bold"
-
-        android:gravity="center"
-
-        android:lineSpacingExtra="8dp"
+        android:scaleType="fitCenter"
 
         app:layout_constraintTop_toTopOf="parent"
 
@@ -50,33 +38,73 @@
 
 
 
-    <!-- Large Mascot Image -->
+    <!-- Welcome Text -->
 
-    <ImageView
+    <TextView
 
-        android:id="@+id/ivMascot"
+        android:id="@+id/tvWelcome"
 
         android:layout_width="0dp"
 
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="32dp"
 
         android:layout_marginStart="40dp"
 
         android:layout_marginEnd="40dp"
 
-        android:layout_marginTop="40dp"
+        android:text="Hello! Welcome to\nKids Land!"
 
-        android:layout_marginBottom="60dp"
+        android:textSize="28sp"
 
-        android:src="@drawable/mascot_happy"
+        android:textStyle="bold"
 
-        android:contentDescription="Literiser mascot sitting with book"
+        android:textColor="#6B4EFF"
 
-        android:scaleType="fitCenter"
+        android:fontFamily="@font/poppins_bold"
 
-        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        android:gravity="center"
 
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:lineSpacingExtra="4dp"
+
+        app:layout_constraintTop_toBottomOf="@id/ivMascot"
+
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+    <!-- Subtitle -->
+
+    <TextView
+
+        android:id="@+id/tvSubtitle"
+
+        android:layout_width="0dp"
+
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="12dp"
+
+        android:layout_marginStart="40dp"
+
+        android:layout_marginEnd="40dp"
+
+        android:text="Let's learn together with fun games and stories!"
+
+        android:textSize="16sp"
+
+        android:textColor="#6B7280"
+
+        android:fontFamily="@font/poppins_regular"
+
+        android:gravity="center"
+
+        android:lineSpacingExtra="4dp"
+
+        app:layout_constraintTop_toBottomOf="@id/tvWelcome"
 
         app:layout_constraintStart_toStartOf="parent"
 

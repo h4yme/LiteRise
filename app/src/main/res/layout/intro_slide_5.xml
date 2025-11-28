@@ -8,39 +8,27 @@
 
     android:layout_height="match_parent"
 
-    android:background="@drawable/gradient_welcome">
+    android:background="@drawable/gradient_purple">
 
 
 
-    <!-- Title at Top -->
+    <!-- Celebrating Child Character -->
 
-    <TextView
+    <ImageView
 
-        android:id="@+id/tvTitle"
+        android:id="@+id/ivMascot"
 
-        android:layout_width="0dp"
+        android:layout_width="240dp"
 
-        android:layout_height="wrap_content"
+        android:layout_height="240dp"
 
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="100dp"
 
-        android:layout_marginStart="40dp"
+        android:src="@drawable/mascot_excited"
 
-        android:layout_marginEnd="40dp"
+        android:contentDescription="Happy child celebrating"
 
-        android:text="Start your adventure today!"
-
-        android:textSize="48sp"
-
-        android:textStyle="bold"
-
-        android:textColor="@color/white"
-
-        android:fontFamily="@font/poppins_bold"
-
-        android:gravity="center"
-
-        android:lineSpacingExtra="8dp"
+        android:scaleType="fitCenter"
 
         app:layout_constraintTop_toTopOf="parent"
 
@@ -50,33 +38,71 @@
 
 
 
-    <!-- Large Mascot Image -->
+    <!-- Success Title -->
 
-    <ImageView
+    <TextView
 
-        android:id="@+id/ivMascot"
+        android:id="@+id/tvTitle"
 
         android:layout_width="0dp"
 
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
 
-        android:layout_marginStart="60dp"
+        android:layout_marginTop="32dp"
 
-        android:layout_marginEnd="60dp"
+        android:layout_marginStart="40dp"
 
-        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
 
-        android:layout_marginBottom="60dp"
+        android:text="You're All Set!"
 
-        android:src="@drawable/mascot_excited"
+        android:textSize="36sp"
 
-        android:contentDescription="Literiser mascot celebrating"
+        android:textStyle="bold"
 
-        android:scaleType="fitCenter"
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/poppins_bold"
+
+        android:gravity="center"
+
+        app:layout_constraintTop_toBottomOf="@id/ivMascot"
+
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+    <!-- Success Message -->
+
+    <TextView
+
+        android:id="@+id/tvMessage"
+
+        android:layout_width="0dp"
+
+        android:layout_height="wrap_content"
+
+        android:layout_marginTop="16dp"
+
+        android:layout_marginStart="40dp"
+
+        android:layout_marginEnd="40dp"
+
+        android:text="Your account has been created!\nLet's start learning and having fun!"
+
+        android:textSize="18sp"
+
+        android:textColor="@color/white"
+
+        android:fontFamily="@font/poppins_medium"
+
+        android:gravity="center"
+
+        android:lineSpacingExtra="4dp"
 
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
-
-        app:layout_constraintBottom_toBottomOf="parent"
 
         app:layout_constraintStart_toStartOf="parent"
 
