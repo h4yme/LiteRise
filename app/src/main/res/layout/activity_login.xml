@@ -8,34 +8,48 @@
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Decorative sparkle - Top Right -->
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/splash_decoration_sparkle"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="32dp"
+            android:alpha="0.25" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:padding="40dp"
-        android:layout_gravity="center_vertical">
+        android:layout_centerVertical="true">
 
         <!-- Login Illustration -->
         <ImageView
             android:id="@+id/ivMascot"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:src="@drawable/login_illustration"
             android:contentDescription="Reading books illustration"
             android:scaleType="fitCenter"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="40dp" />
+            android:layout_marginBottom="32dp" />
 
         <!-- Welcome Heading -->
         <TextView
             android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome Back"
+            android:text="Welcome Back!"
             android:textSize="32sp"
             android:textStyle="bold"
-            android:textColor="#1A1A1A"
+            android:textColor="#5B4A7A"
             android:fontFamily="@font/poppins_bold"
             android:gravity="center"
             android:letterSpacing="-0.01"
@@ -46,28 +60,28 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign in to continue"
+            android:text="Sign in to continue learning"
             android:textSize="15sp"
-            android:textColor="#666666"
+            android:textColor="#8B7AA8"
             android:fontFamily="@font/poppins_regular"
             android:gravity="center"
-            android:layout_marginBottom="48dp" />
+            android:layout_marginBottom="40dp" />
 
         <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="18dp"
             app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#F5F5F5"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxBackgroundColor="#F8F5FF"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="2dp"
-            app:boxStrokeColor="#1A1A1A"
-            app:hintTextColor="#666666"
+            app:boxStrokeColor="#8B7AA8"
+            app:hintTextColor="#8B7AA8"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -78,7 +92,7 @@
                 android:inputType="textEmailAddress"
                 android:fontFamily="@font/poppins_regular"
                 android:textSize="16sp"
-                android:textColor="#1A1A1A"
+                android:textColor="#2D2D2D"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -87,19 +101,19 @@
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="32dp"
+            android:layout_marginBottom="28dp"
             app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#F5F5F5"
-            app:boxCornerRadiusTopStart="12dp"
-            app:boxCornerRadiusTopEnd="12dp"
-            app:boxCornerRadiusBottomStart="12dp"
-            app:boxCornerRadiusBottomEnd="12dp"
+            app:boxBackgroundColor="#F8F5FF"
+            app:boxCornerRadiusTopStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusBottomEnd="14dp"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="2dp"
-            app:boxStrokeColor="#1A1A1A"
-            app:hintTextColor="#666666"
+            app:boxStrokeColor="#8B7AA8"
+            app:hintTextColor="#8B7AA8"
             app:passwordToggleEnabled="true"
-            app:passwordToggleTint="#666666"
+            app:passwordToggleTint="#8B7AA8"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -110,7 +124,7 @@
                 android:inputType="textPassword"
                 android:fontFamily="@font/poppins_regular"
                 android:textSize="16sp"
-                android:textColor="#1A1A1A"
+                android:textColor="#2D2D2D"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp" />
         </com.google.android.material.textfield.TextInputLayout>
@@ -125,11 +139,11 @@
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"
-            android:fontFamily="@font/poppins_semibold"
-            app:cornerRadius="12dp"
-            app:backgroundTint="#1A1A1A"
+            android:fontFamily="@font/poppins_bold"
+            app:cornerRadius="14dp"
+            app:backgroundTint="#7B6AA0"
             android:elevation="0dp"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="20dp"
             style="@style/Widget.MaterialComponents.Button" />
 
         <!-- Sign Up Link -->
@@ -138,10 +152,12 @@
             android:layout_height="wrap_content"
             android:text="Don't have an account? Sign up"
             android:textSize="15sp"
-            android:textColor="#666666"
-            android:fontFamily="@font/poppins_regular"
+            android:textColor="#8B7AA8"
+            android:fontFamily="@font/poppins_medium"
             android:gravity="center" />
 
     </LinearLayout>
+
+    </RelativeLayout>
 
 </ScrollView>
