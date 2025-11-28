@@ -163,7 +163,7 @@
 
             android:layout_height="wrap_content"
 
-            android:text="Welcome Back! 👋"
+            android:text="Welcome! 👋"
 
             android:textSize="28sp"
 
@@ -333,68 +333,6 @@
             android:elevation="4dp"
             style="@style/Widget.MaterialComponents.Button" />
 
-        <!-- Spacer to push content to bottom -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Divider -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#E5E7EB" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="  OR  "
-                android:textSize="12sp"
-                android:textColor="#9CA3AF"
-                android:fontFamily="@font/poppins_medium" />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"
-                android:background="#E5E7EB" />
-        </LinearLayout>
-
-        <!-- Sign Up Prompt -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New to LiteRise? "
-                android:textSize="13sp"
-                android:textColor="#6B7280"
-                android:fontFamily="@font/poppins_regular" />
-
-            <TextView
-                android:id="@+id/tvSignUp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sign Up Here!"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="@color/color_jade1"
-                android:fontFamily="@font/poppins_bold"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
 
     </LinearLayout>
     </androidx.cardview.widget.CardView>
