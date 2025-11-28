@@ -4,13 +4,49 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@drawable/login_background"
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Decorative sparkle - Top Left -->
+        <ImageView
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/splash_decoration_sparkle"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="24dp"
+            android:alpha="0.5" />
+
+        <!-- Decorative star - Top Right -->
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/splash_decoration_star"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="40dp"
+            android:alpha="0.4" />
+
+        <!-- Decorative book - Bottom Left -->
+        <ImageView
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:src="@drawable/splash_decoration_book"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentStart="true"
+            android:layout_margin="28dp"
+            android:rotation="12"
+            android:alpha="0.5" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         android:padding="32dp">
@@ -18,75 +54,78 @@
         <!-- Mascot Image at Top -->
         <ImageView
             android:id="@+id/ivMascot"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
             android:src="@drawable/mascot_happy"
             android:contentDescription="LiteRise mascot"
             android:scaleType="fitCenter"
-            android:layout_marginTop="40dp"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="32dp" />
 
         <!-- Welcome Heading -->
         <TextView
             android:id="@+id/tvWelcome"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Aloha! Selamat datang di Kids Land!"
-            android:textSize="24sp"
+            android:text="Welcome to LiteRise!"
+            android:textSize="28sp"
             android:textStyle="bold"
-            android:textColor="#6B4BA8"
+            android:textColor="#8B7AA8"
             android:fontFamily="@font/poppins_bold"
             android:gravity="center"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="8dp" />
 
         <!-- Subtitle -->
         <TextView
             android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Aplikasi belajar dengan ekosistem dengan karakter favorit dan 7-14 tahun yang dirancang dengan karakter favorit dan permainan interaktif."
-            android:textSize="13sp"
+            android:text="Start your reading adventure"
+            android:textSize="15sp"
             android:textColor="#64748B"
             android:fontFamily="@font/poppins_regular"
             android:gravity="center"
             android:lineSpacingExtra="2dp"
             android:layout_marginBottom="40dp"
+            android:alpha="0.8"
             android:paddingStart="20dp"
             android:paddingEnd="20dp" />
 
-        <!-- Register Button (Purple) -->
+        <!-- Register Button (Soft Purple) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnRegister"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Daftar Sekarang"
+            android:text="Get Started"
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"
             android:fontFamily="@font/poppins_bold"
-            app:cornerRadius="12dp"
-            app:backgroundTint="#6B4BA8"
-            android:layout_marginBottom="16dp"
+            app:cornerRadius="16dp"
+            app:backgroundTint="#9B8BB8"
+            android:elevation="2dp"
+            android:layout_marginBottom="12dp"
             style="@style/Widget.MaterialComponents.Button" />
 
-        <!-- Login Button (White with border) -->
+        <!-- Login Button (Outlined) -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Sudah punya akun? Masuk"
+            android:text="Already have an account? Sign In"
             android:textAllCaps="false"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:textStyle="bold"
-            android:textColor="#6B4BA8"
+            android:textColor="#9B8BB8"
             android:fontFamily="@font/poppins_bold"
-            app:cornerRadius="12dp"
-            app:strokeColor="#6B4BA8"
+            app:cornerRadius="16dp"
+            app:strokeColor="#9B8BB8"
             app:strokeWidth="2dp"
-            app:backgroundTint="@color/white"
+            app:backgroundTint="#00FFFFFF"
             android:layout_marginBottom="32dp"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
 
     </LinearLayout>
+
+    </RelativeLayout>
 </ScrollView>
