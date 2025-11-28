@@ -17,6 +17,8 @@ public class SessionManager {
 
     private static final String KEY_XP = "total_xp";
 
+    private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
+
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private Context context;
@@ -134,5 +136,20 @@ public class SessionManager {
 
         return prefs.getString(KEY_FULLNAME, null);
 
+    }
+
+    /**
+     * Mark that user has seen the welcome/intro screens
+     */
+    public void setHasSeenWelcome(boolean hasSeen) {
+        editor.putBoolean(KEY_HAS_SEEN_WELCOME, hasSeen);
+        editor.apply();
+    }
+
+    /**
+     * Check if user has already seen the welcome/intro screens
+     */
+    public boolean hasSeenWelcome() {
+        return prefs.getBoolean(KEY_HAS_SEEN_WELCOME, false);
     }
 }

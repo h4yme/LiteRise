@@ -106,9 +106,13 @@ public class LoginActivity extends AppCompatActivity {
 
                     Intent intent;
 
-                    if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+                    // Check if user has seen welcome screens
+                    if (!sessionManager.hasSeenWelcome()) {
+                        // First time user - show welcome/intro screens
+                        intent = new Intent(LoginActivity.this, WelcomeActivity.class);
+                    } else if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
 
-                        // First time - go to adaptive assessment
+                        // Seen welcome but no assessment - go to adaptive assessment
 
                         intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
 
