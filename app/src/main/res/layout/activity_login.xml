@@ -8,38 +8,36 @@
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <!-- Decorative sparkle - Top Right -->
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:src="@drawable/splash_decoration_sparkle"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="32dp"
-            android:alpha="0.25" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
-        android:padding="40dp"
-        android:layout_centerVertical="true">
+        android:padding="32dp">
 
-        <!-- Login Illustration -->
-        <ImageView
-            android:id="@+id/ivMascot"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:src="@drawable/login_illustration"
-            android:contentDescription="Reading books illustration"
-            android:scaleType="fitCenter"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="32dp" />
+        <!-- App Branding -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="LiteRise"
+            android:textSize="36sp"
+            android:textStyle="bold"
+            android:textColor="#5B4A7A"
+            android:fontFamily="@font/poppins_bold"
+            android:letterSpacing="-0.01"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Tagline -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read • Learn • Rise!"
+            android:textSize="13sp"
+            android:textColor="#8B7AA8"
+            android:fontFamily="@font/poppins_medium"
+            android:letterSpacing="0.08"
+            android:layout_marginBottom="48dp" />
 
         <!-- Welcome Heading -->
         <TextView
@@ -47,12 +45,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Welcome Back!"
-            android:textSize="32sp"
+            android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="#5B4A7A"
             android:fontFamily="@font/poppins_bold"
             android:gravity="center"
-            android:letterSpacing="-0.01"
             android:layout_marginBottom="8dp" />
 
         <!-- Subtitle -->
@@ -60,58 +57,78 @@
             android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Sign in to continue learning"
-            android:textSize="15sp"
+            android:text="Log in to continue your reading adventure"
+            android:textSize="14sp"
             android:textColor="#8B7AA8"
             android:fontFamily="@font/poppins_regular"
             android:gravity="center"
-            android:layout_marginBottom="40dp" />
+            android:layout_marginBottom="32dp" />
+
+        <!-- Email Label -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Email Address"
+            android:textSize="13sp"
+            android:textColor="#5B4A7A"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_marginBottom="8dp" />
 
         <!-- Email Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="20dp"
             app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#F8F5FF"
-            app:boxCornerRadiusTopStart="14dp"
-            app:boxCornerRadiusTopEnd="14dp"
-            app:boxCornerRadiusBottomStart="14dp"
-            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="2dp"
             app:boxStrokeColor="#8B7AA8"
-            app:hintTextColor="#8B7AA8"
+            app:hintTextColor="#AAAAAA"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Email"
+                android:hint="yourname@example.com"
                 android:inputType="textEmailAddress"
                 android:fontFamily="@font/poppins_regular"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textColor="#2D2D2D"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp" />
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Password Label -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Password"
+            android:textSize="13sp"
+            android:textColor="#5B4A7A"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_marginBottom="8dp" />
 
         <!-- Password Input -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="28dp"
+            android:layout_marginBottom="16dp"
             app:boxBackgroundMode="filled"
-            app:boxBackgroundColor="#F8F5FF"
-            app:boxCornerRadiusTopStart="14dp"
-            app:boxCornerRadiusTopEnd="14dp"
-            app:boxCornerRadiusBottomStart="14dp"
-            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
             app:boxStrokeWidth="0dp"
             app:boxStrokeWidthFocused="2dp"
             app:boxStrokeColor="#8B7AA8"
-            app:hintTextColor="#8B7AA8"
+            app:hintTextColor="#AAAAAA"
             app:passwordToggleEnabled="true"
             app:passwordToggleTint="#8B7AA8"
             style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
@@ -120,44 +137,67 @@
                 android:id="@+id/etPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Password"
+                android:hint="Enter your password"
                 android:inputType="textPassword"
                 android:fontFamily="@font/poppins_regular"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textColor="#2D2D2D"
-                android:paddingTop="20dp"
-                android:paddingBottom="20dp" />
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
         </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Remember Me & Forgot Password Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="32dp">
+
+            <CheckBox
+                android:id="@+id/cbRememberMe"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remember me"
+                android:textSize="13sp"
+                android:textColor="#5B4A7A"
+                android:fontFamily="@font/poppins_regular"
+                android:buttonTint="#8B7AA8" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/tvForgotPassword"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Forgot Password"
+                android:textSize="13sp"
+                android:textColor="#8B7AA8"
+                android:fontFamily="@font/poppins_medium"
+                android:clickable="true"
+                android:focusable="true" />
+
+        </LinearLayout>
 
         <!-- Login Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
-            android:layout_height="58dp"
-            android:text="Sign In"
+            android:layout_height="56dp"
+            android:text="Let's Read!"
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/white"
             android:fontFamily="@font/poppins_bold"
-            app:cornerRadius="14dp"
-            app:backgroundTint="#7B6AA0"
+            app:cornerRadius="12dp"
+            app:backgroundTint="#FF9D5C"
             android:elevation="0dp"
-            android:layout_marginBottom="20dp"
             style="@style/Widget.MaterialComponents.Button" />
 
-        <!-- Sign Up Link -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Don't have an account? Sign up"
-            android:textSize="15sp"
-            android:textColor="#8B7AA8"
-            android:fontFamily="@font/poppins_medium"
-            android:gravity="center" />
-
     </LinearLayout>
-
-    </RelativeLayout>
 
 </ScrollView>
