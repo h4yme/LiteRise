@@ -28,6 +28,18 @@ public class Students {
     @SerializedName("token")
     private String token;
 
+    @SerializedName("Nickname")
+    private String nickname;
+
+    @SerializedName("CompletedWelcome")
+    private boolean completedWelcome;
+
+    @SerializedName("CompletedTutorial")
+    private boolean completedTutorial;
+
+    @SerializedName("PriorityModule")
+    private String priorityModule;
+
     // Getters and Setters
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
@@ -51,7 +63,18 @@ public class Students {
     public void setPassword(String password) { this.password = password; }
 
     public String getToken() { return token; }
-
     public void setToken(String token) { this.token = token; }
+
+    public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
+
+    public boolean isCompletedWelcome() { return completedWelcome; }
+    public void setCompletedWelcome(boolean completedWelcome) { this.completedWelcome = completedWelcome; }
+
+    public boolean isCompletedTutorial() { return completedTutorial; }
+    public void setCompletedTutorial(boolean completedTutorial) { this.completedTutorial = completedTutorial; }
+
+    public String getPriorityModule() { return priorityModule; }
+    public void setPriorityModule(String priorityModule) { this.priorityModule = priorityModule; }
 }
 
