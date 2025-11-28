@@ -84,7 +84,15 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Welcome/Intro Screens -->
 
+
+
+        <activity
+
+            android:name=".activities.WelcomeActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
 
         <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
 

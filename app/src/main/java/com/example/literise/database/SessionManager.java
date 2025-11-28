@@ -29,6 +29,7 @@ public class SessionManager {
 
     private static final String KEY_XP = "total_xp";
 
+    private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
 
 
     private SharedPreferences prefs;
@@ -95,6 +96,23 @@ public class SessionManager {
         return prefs.getString(KEY_FULLNAME, null);
     }
 
+
+    public void setHasSeenWelcome(boolean hasSeen) {
+
+        editor.putBoolean(KEY_HAS_SEEN_WELCOME, hasSeen);
+
+        editor.apply();
+
+    }
+
+
+
+
+    public boolean hasSeenWelcome() {
+
+        return prefs.getBoolean(KEY_HAS_SEEN_WELCOME, false);
+
+    }
     public String getEmail() {
         return prefs.getString(KEY_EMAIL, null);
     }
