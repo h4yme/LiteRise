@@ -3,6 +3,9 @@ package com.example.literise.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +32,27 @@ public class IntroSlideAdapter extends RecyclerView.Adapter<IntroSlideAdapter.In
 
     @Override
     public void onBindViewHolder(@NonNull IntroViewHolder holder, int position) {
-        // Slides are static, no binding needed
+        // Add bounce animation to mascot
+        ImageView mascot = holder.itemView.findViewById(R.id.ivMascot);
+        if (mascot != null) {
+            Animation bounceAnim = AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.bounce);
+            Animation floatAnim = AnimationUtils.loadAnimation(holder.itemView.getContext(), R.anim.float_up_down);
+            mascot.startAnimation(bounceAnim);
+
+            // Start floating animation after bounce completes
+            bounceAnim.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {}
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    mascot.startAnimation(floatAnim);
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {}
+            });
+        }
     }
 
     @Override

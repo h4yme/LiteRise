@@ -14,6 +14,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.example.literise.R;
 import com.example.literise.adapters.IntroSlideAdapter;
 import com.example.literise.database.SessionManager;
+import com.example.literise.utils.ZoomOutPageTransformer;
 import com.google.android.material.button.MaterialButton;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -46,6 +47,9 @@ public class WelcomeActivity extends AppCompatActivity {
         // Set up ViewPager2
         IntroSlideAdapter adapter = new IntroSlideAdapter();
         viewPager.setAdapter(adapter);
+
+        // Add smooth page transformer for zoom effect
+        viewPager.setPageTransformer(new ZoomOutPageTransformer());
 
         // Fade-in animation
         View rootView = findViewById(android.R.id.content);
