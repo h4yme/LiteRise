@@ -1,8 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <gradient
-        android:angle="180"
-        android:startColor="#FEFBFF"
-        android:endColor="#F9FBFF"
-        android:type="linear" />
-</shape>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+
+    <!-- Light pastel gradient background -->
+
+    <item>
+
+        <shape android:shape="rectangle">
+
+            <gradient
+
+                android:angle="180"
+
+                android:startColor="#FAF5FF"
+
+                android:centerColor="#FFF9F5"
+
+                android:endColor="#F5F9FF"
+
+                android:type="linear" />
+
+        </shape>
+
+    </item>
+
+
+
+    <!-- Subtle overlay for depth -->
+
+    <item>
+
+        <shape android:shape="rectangle">
+
+            <gradient
+
+                android:angle="90"
+
+                android:startColor="#08DDB8FF"
+
+                android:endColor="#08B8DDFF"
+
+                android:type="linear" />
+
+        </shape>
+
+    </item>
+
+
+
+</layer-list>

@@ -1,33 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+
     android:width="400dp"
+
     android:height="400dp"
+
     android:viewportWidth="400"
+
     android:viewportHeight="400">
+
     <!-- Outer gradient circle -->
+
     <path
+
         android:fillColor="#9D4EDD"
+
         android:pathData="M200,200m-190,0a190,190 0,1 1,380 0a190,190 0,1 1,-380 0" />
 
+
+
     <!-- Middle circle with lighter shade -->
+
     <path
+
         android:fillColor="#C77DFF"
+
         android:pathData="M200,200m-160,0a160,160 0,1 1,320 0a160,160 0,1 1,-320 0" />
 
+
+
     <!-- Inner circle -->
+
     <path
+
         android:fillColor="#E0AAFF"
+
         android:pathData="M200,200m-130,0a130,130 0,1 1,260 0a130,260 0,1 1,-260 0" />
 
+
+
     <!-- Decorative ring -->
+
     <path
+
         android:strokeColor="#FFFFFF"
+
         android:strokeWidth="4"
+
         android:fillColor="@android:color/transparent"
+
         android:pathData="M200,200m-145,0a145,145 0,1 1,290 0a145,145 0,1 1,-290 0" />
 
+
+
     <!-- Small decorative stars around the circle -->
+
     <path
+
         android:fillColor="#FFFFFF"
+
         android:pathData="M200,20 L204,32 L216,32 L206,40 L210,52 L200,44 L190,52 L194,40 L184,32 L196,32 Z M380,200 L384,212 L396,212 L386,220 L390,232 L380,224 L370,232 L374,220 L364,212 L376,212 Z M200,380 L204,368 L216,368 L206,360 L210,348 L200,356 L190,348 L194,360 L184,368 L196,368 Z M20,200 L24,212 L36,212 L26,220 L30,232 L20,224 L10,232 L14,220 L4,212 L16,212 Z" />
+
 </vector>

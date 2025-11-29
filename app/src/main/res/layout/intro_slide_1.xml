@@ -12,97 +12,193 @@
 
 
 
+
+
+
+
     <!-- Mascot Characters on Grass -->
+
+
 
     <ImageView
 
+
+
         android:id="@+id/ivMascot"
+
+
 
         android:layout_width="280dp"
 
+
+
         android:layout_height="280dp"
+
+
 
         android:layout_marginTop="120dp"
 
+
+
         android:src="@drawable/mascot_happy"
+
+
 
         android:contentDescription="Happy mascot characters"
 
+
+
         android:scaleType="fitCenter"
+
+
 
         app:layout_constraintTop_toTopOf="parent"
 
+
+
         app:layout_constraintStart_toStartOf="parent"
 
+
+
         app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+
 
 
 
     <!-- Welcome Text -->
 
+
+
     <TextView
+
+
 
         android:id="@+id/tvWelcome"
 
+
+
         android:layout_width="0dp"
+
+
 
         android:layout_height="wrap_content"
 
+
+
         android:layout_marginTop="32dp"
+
+
 
         android:layout_marginStart="40dp"
 
+
+
         android:layout_marginEnd="40dp"
 
-        android:text="Hello! Welcome to\nKids Land!"
+
+
+        android:text="Hello! Welcome to\nLiteRise!"
+
+
 
         android:textSize="28sp"
 
+
+
         android:textStyle="bold"
+
+
 
         android:textColor="#6B4EFF"
 
+
+
         android:fontFamily="@font/poppins_bold"
+
+
 
         android:gravity="center"
 
+
+
         android:lineSpacingExtra="4dp"
+
+
 
         app:layout_constraintTop_toBottomOf="@id/ivMascot"
 
+
+
         app:layout_constraintStart_toStartOf="parent"
+
+
 
         app:layout_constraintEnd_toEndOf="parent" />
 
 
 
+
+
+
+
     <!-- Subtitle -->
+
+
 
     <TextView
 
+
+
         android:id="@+id/tvSubtitle"
+
+
 
         android:layout_width="0dp"
 
+
+
         android:layout_height="wrap_content"
+
+
 
         android:layout_marginTop="12dp"
 
+
+
         android:layout_marginStart="40dp"
+
+
 
         android:layout_marginEnd="40dp"
 
+
+
         android:text="Let's learn together with fun games and stories!"
+
+
 
         android:textSize="16sp"
 
+
+
         android:textColor="#6B7280"
+
+
 
         android:fontFamily="@font/poppins_regular"
 
+
+
         android:gravity="center"
 
+
+
         android:lineSpacingExtra="4dp"
+
+
 
         app:layout_constraintTop_toBottomOf="@id/tvWelcome"
 
