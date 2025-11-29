@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:width="200dp"
+
+    android:height="200dp"
+
+    android:viewportWidth="200"
+
+    android:viewportHeight="200">
+
+    <!-- Ruler body -->
+
+    <path
+
+        android:fillColor="#6FBAFF"
+
+        android:pathData="M30,80 L170,80 L170,120 L30,120 Z" />
+
+    <!-- Measurement marks - long -->
+
+    <path
+
+        android:strokeColor="#FFFFFF"
+
+        android:strokeWidth="3"
+
+        android:pathData="M50,80 L50,100 M90,80 L90,100 M130,80 L130,100" />
+
+    <!-- Measurement marks - short -->
+
+    <path
+
+        android:strokeColor="#FFFFFF"
+
+        android:strokeWidth="2"
+
+        android:pathData="M40,80 L40,90 M60,80 L60,90 M70,80 L70,90 M80,80 L80,90 M100,80 L100,90 M110,80 L110,90 M120,80 L120,90 M140,80 L140,90 M150,80 L150,90 M160,80 L160,90" />
+
+    <!-- Numbers on ruler -->
+
+    <path
+
+        android:fillColor="#FFFFFF"
+
+        android:pathData="M45,105 L47,115 L45,115 M85,105 L87,115 L85,115 M125,105 L127,115 L125,115" />
+
+</vector>

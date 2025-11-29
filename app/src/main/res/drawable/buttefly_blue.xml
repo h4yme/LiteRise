@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:width="128dp"
+
+    android:height="128dp"
+
+    android:viewportWidth="128"
+
+    android:viewportHeight="128">
+
+    <!-- Left upper wing -->
+
+    <path
+
+        android:fillColor="#6FBAFF"
+
+        android:pathData="M45,35 Q30,25 25,40 Q20,55 35,60 Q40,50 45,35 Z" />
+
+    <!-- Left lower wing -->
+
+    <path
+
+        android:fillColor="#9DD1FF"
+
+        android:pathData="M45,60 Q25,65 22,80 Q20,95 40,95 Q45,75 45,60 Z" />
+
+    <!-- Right upper wing -->
+
+    <path
+
+        android:fillColor="#6FBAFF"
+
+        android:pathData="M83,35 Q98,25 103,40 Q108,55 93,60 Q88,50 83,35 Z" />
+
+    <!-- Right lower wing -->
+
+    <path
+
+        android:fillColor="#9DD1FF"
+
+        android:pathData="M83,60 Q103,65 106,80 Q108,95 88,95 Q83,75 83,60 Z" />
+
+    <!-- Body -->
+
+    <path
+
+        android:fillColor="#424242"
+
+        android:pathData="M64,25 Q58,25 58,40 L58,90 Q58,100 64,100 Q70,100 70,90 L70,40 Q70,25 64,25 Z" />
+
+    <!-- Antennae -->
+
+    <path
+
+        android:strokeColor="#424242"
+
+        android:strokeWidth="2"
+
+        android:pathData="M64,25 Q58,15 52,10 M64,25 Q70,15 76,10" />
+
+</vector>

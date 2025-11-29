@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:width="200dp"
+
+    android:height="200dp"
+
+    android:viewportWidth="200"
+
+    android:viewportHeight="200">
+
+
+
+    <!-- Background circle (soft) -->
+
+    <path
+
+        android:fillColor="#F8F3FF"
+
+        android:pathData="M100,20 C144.18,20 180,55.82 180,100 C180,144.18 144.18,180 100,180 C55.82,180 20,144.18 20,100 C20,55.82 55.82,20 100,20 Z" />
+
+
+
+    <!-- Book 1 (bottom, tilted left, soft coral) -->
+
+    <path
+
+        android:fillColor="#FFB8A8"
+
+        android:pathData="M50,120 L90,115 L95,145 L55,150 Z" />
+
+
+
+    <!-- Book 1 spine -->
+
+    <path
+
+        android:fillColor="#FF9B88"
+
+        android:pathData="M50,120 L55,125 L55,150 L50,150 Z" />
+
+
+
+    <!-- Book 1 pages -->
+
+    <path
+
+        android:fillColor="#FFFFFF"
+
+        android:fillAlpha="0.6"
+
+        android:pathData="M57,122 L88,118 L90,140 L59,144 Z" />
+
+
+
+    <!-- Book 2 (middle, straight, soft purple) -->
+
+    <path
+
+        android:fillColor="#C8B8E8"
+
+        android:pathData="M70,100 L130,100 L130,135 L70,135 Z" />
+
+
+
+    <!-- Book 2 spine -->
+
+    <path
+
+        android:fillColor="#B8A8D8"
+
+        android:pathData="M70,100 L75,105 L75,135 L70,135 Z" />
+
+
+
+    <!-- Book 2 pages -->
+
+    <path
+
+        android:fillColor="#FFFFFF"
+
+        android:fillAlpha="0.7"
+
+        android:pathData="M78,105 L125,105 L125,130 L78,130 Z" />
+
+
+
+    <!-- Book 3 (top, tilted right, soft blue) -->
+
+    <path
+
+        android:fillColor="#A8D8E8"
+
+        android:pathData="M110,85 L150,90 L145,120 L105,115 Z" />
+
+
+
+    <!-- Book 3 spine -->
+
+    <path
+
+        android:fillColor="#88C8D8"
+
+        android:pathData="M110,85 L115,90 L110,120 L105,115 Z" />
+
+
+
+    <!-- Book 3 pages -->
+
+    <path
+
+        android:fillColor="#FFFFFF"
+
+        android:fillAlpha="0.6"
+
+        android:pathData="M117,92 L145,96 L142,115 L114,111 Z" />
+
+
+
+    <!-- Open book on top (soft yellow/cream) -->
+
+    <path
+
+        android:fillColor="#FFE8B8"
+
+        android:pathData="M80,70 L100,75 L100,95 L80,90 Z M100,75 L120,70 L120,90 L100,95 Z" />
+
+
+
+    <!-- Book pages detail -->
+
+    <path
+
+        android:strokeColor="#E8D8A8"
+
+        android:strokeWidth="1"
+
+        android:pathData="M85,80 L95,82 M85,85 L95,87" />
+
+    <path
+
+        android:strokeColor="#E8D8A8"
+
+        android:strokeWidth="1"
+
+        android:pathData="M105,82 L115,80 M105,87 L115,85" />
+
+
+
+    <!-- Floating star 1 -->
+
+    <path
+
+        android:fillColor="#FFD89B"
+
+        android:pathData="M140,50 L142,56 L148,57 L143,61 L145,67 L140,63 L135,67 L137,61 L132,57 L138,56 Z" />
+
+
+
+    <!-- Floating star 2 -->
+
+    <path
+
+        android:fillColor="#D8B8FF"
+
+        android:pathData="M60,55 L61.5,59 L65.5,59.5 L62.5,62 L63.5,66 L60,63.5 L56.5,66 L57.5,62 L54.5,59.5 L58.5,59 Z" />
+
+
+
+    <!-- Small sparkle 1 -->
+
+    <path
+
+        android:fillColor="#B8E8FF"
+
+        android:pathData="M155,100 L156,103 L159,103 L157,105 L158,108 L155,106 L152,108 L153,105 L151,103 L154,103 Z" />
+
+
+
+    <!-- Small sparkle 2 -->
+
+    <path
+
+        android:fillColor="#FFB8D8"
+
+        android:pathData="M45,90 L46,93 L49,93 L47,95 L48,98 L45,96 L42,98 L43,95 L41,93 L44,93 Z" />
+
+
+
+</vector>
