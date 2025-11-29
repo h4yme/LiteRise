@@ -31,6 +31,8 @@ public class SessionManager {
 
     private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
 
+    private static final String KEY_NICKNAME = "nickname";
+
 
     private SharedPreferences prefs;
 
@@ -113,6 +115,7 @@ public class SessionManager {
         return prefs.getBoolean(KEY_HAS_SEEN_WELCOME, false);
 
     }
+
     public String getEmail() {
         return prefs.getString(KEY_EMAIL, null);
     }
@@ -125,6 +128,7 @@ public class SessionManager {
     public boolean isLoggedIn() {
         return getStudentId() != 0;
     }
+
     public void saveToken(String token) {
 
         editor.putString(KEY_TOKEN, token);
@@ -176,14 +180,30 @@ public class SessionManager {
         return prefs.getInt(KEY_XP, 0);
 
     }
+
     public void updateTotalXP(int totalXP) {
 
         saveXP(totalXP);
 
     }
+
     public String getFullName() {
 
         return prefs.getString(KEY_FULLNAME, null);
+
+    }
+
+    public void saveNickname(String nickname) {
+
+        editor.putString(KEY_NICKNAME, nickname);
+
+        editor.apply();
+
+    }
+
+    public String getNickname() {
+
+        return prefs.getString(KEY_NICKNAME, null);
 
     }
 }

@@ -145,6 +145,14 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <activity
+
+            android:name=".activities.NicknameSetupActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- 🎮 Game Activities -->
 
         <activity
