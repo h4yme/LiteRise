@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <!-- Pencil body -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M160,20 L180,40 L60,160 L40,140 Z" />
+    <!-- Pencil eraser -->
+    <path
+        android:fillColor="#FF6B9D"
+        android:pathData="M165,15 L185,35 L180,40 L160,20 Z" />
+    <!-- Pencil tip -->
+    <path
+        android:fillColor="#8B6F47"
+        android:pathData="M40,140 L60,160 L50,170 Z" />
+    <!-- Pencil lead -->
+    <path
+        android:fillColor="#424242"
+        android:pathData="M50,150 L60,160 L50,170 Z" />
+    <!-- Pencil shine -->
+    <path
+        android:fillColor="#FFECB3"
+        android:pathData="M150,30 L165,45 L160,50 L145,35 Z" />
+</vector>

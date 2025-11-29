@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Vertical line -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M22,8 L26,8 L26,40 L22,40 Z" />
+    <!-- Horizontal line -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M8,22 L40,22 L40,26 L8,26 Z" />
+    <!-- Center diamond -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M24,18 L28,24 L24,30 L20,24 Z" />
+</vector>

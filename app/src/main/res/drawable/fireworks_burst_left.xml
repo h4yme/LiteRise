@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="512dp"
+    android:height="512dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+    <!-- Central burst -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M256,256m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
+
+    <!-- Burst rays - Yellow -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M256,256 L280,160 L270,256 Z M256,256 L352,232 L256,242 Z M256,256 L280,352 L270,256 Z M256,256 L160,280 L256,270 Z" />
+
+    <!-- Burst rays - Orange -->
+    <path
+        android:fillColor="#FFA500"
+        android:pathData="M256,256 L320,180 L276,246 Z M256,256 L376,256 L266,256 Z M256,256 L320,332 L276,266 Z M256,256 L136,256 L246,256 Z" />
+
+    <!-- Burst rays - Pink -->
+    <path
+        android:fillColor="#FFB5E8"
+        android:pathData="M256,256 L340,200 L280,250 Z M256,256 L392,288 L270,260 Z M256,256 L340,312 L280,262 Z M256,256 L120,224 L242,250 Z" />
+
+    <!-- Sparkle particles -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M200,180m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0 M340,220m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0 M300,340m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0 M180,300m-12,0a12,12 0,1 1,24 0a12,12 0,1 1,-24 0" />
+
+    <!-- Small stars around -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M160,140 L164,150 L174,150 L166,156 L170,166 L160,160 L150,166 L154,156 L146,150 L156,150 Z M360,180 L364,190 L374,190 L366,196 L370,206 L360,200 L350,206 L354,196 L346,190 L356,190 Z M380,320 L384,330 L394,330 L386,336 L390,346 L380,340 L370,346 L374,336 L366,330 L376,330 Z M140,340 L144,350 L154,350 L146,356 L150,366 L140,360 L130,366 L134,356 L126,350 L136,350 Z" />
+</vector>
