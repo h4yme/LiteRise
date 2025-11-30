@@ -272,13 +272,18 @@
         android:id="@+id/overlayDark"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000" />
+        android:background="#CC000000"
+        android:clickable="true"
+        android:focusable="true" />
 
     <!-- Tutorial Content -->
     <RelativeLayout
+        android:id="@+id/tutorialContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="24dp">
+        android:padding="24dp"
+        android:clickable="true"
+        android:focusable="true">
 
         <!-- Leo Mascot (bottom right) -->
         <ImageView

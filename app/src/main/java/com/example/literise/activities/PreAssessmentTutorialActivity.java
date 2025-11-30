@@ -17,6 +17,7 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
 
     private View rootLayout;
     private View overlayDark;
+    private View tutorialContentLayout;
     private TextView tvTutorialTitle;
     private TextView tvTutorialMessage;
     private TextView tvTapToContinue;
@@ -59,6 +60,7 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
         // Initialize views
         rootLayout = findViewById(R.id.rootLayout);
         overlayDark = findViewById(R.id.overlayDark);
+        tutorialContentLayout = findViewById(R.id.tutorialContentLayout);
         tvTutorialTitle = findViewById(R.id.tvTutorialTitle);
         tvTutorialMessage = findViewById(R.id.tvTutorialMessage);
         tvTapToContinue = findViewById(R.id.tvTapToContinue);
@@ -69,11 +71,15 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
         cardMockQuestion = findViewById(R.id.cardMockQuestion);
         btnMockContinue = findViewById(R.id.btnMockContinue);
 
-        // Set click listener on entire layout
-        rootLayout.setOnClickListener(v -> {
+        // Set click listener on multiple elements to ensure tap is detected
+        View.OnClickListener tutorialClickListener = v -> {
             playClickSound();
             nextStep();
-        });
+        };
+
+        rootLayout.setOnClickListener(tutorialClickListener);
+        overlayDark.setOnClickListener(tutorialClickListener);
+        tutorialContentLayout.setOnClickListener(tutorialClickListener);
 
         // Show first step
         updateTutorialStep();
