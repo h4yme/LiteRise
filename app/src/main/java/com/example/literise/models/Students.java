@@ -28,6 +28,8 @@ public class Students {
     @SerializedName("token")
     private String token;
 
+    @SerializedName("Nickname")
+    private String nickname;
     // Getters and Setters
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
@@ -53,5 +55,8 @@ public class Students {
     public String getToken() { return token; }
 
     public void setToken(String token) { this.token = token; }
+
+    public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
 }
 

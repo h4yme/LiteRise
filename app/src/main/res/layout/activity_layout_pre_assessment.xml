@@ -1,22 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
+<FrameLayout
+
+
 
     xmlns:android="http://schemas.android.com/apk/res/android"
 
+
+
     xmlns:app="http://schemas.android.com/apk/res-auto"
+
+
 
     xmlns:tools="http://schemas.android.com/tools"
 
+
+
     android:layout_width="match_parent"
+
+
 
     android:layout_height="match_parent"
 
-    android:background="@color/gray_light"
 
-    android:fillViewport="true"
 
     tools:context=".activities.PreAssessmentActivity">
+
+
+
+    <!-- Background Image -->
+
+
+
+    <ImageView
+
+
+
+        android:layout_width="match_parent"
+
+
+
+        android:layout_height="match_parent"
+
+
+
+        android:src="@drawable/bg_placement"
+
+
+
+        android:scaleType="centerCrop"
+
+
+
+        android:contentDescription="Placement Test Background" />
+
+
+
+    <ScrollView
+
+
+
+        android:layout_width="match_parent"
+
+
+
+        android:layout_height="match_parent"
+
+
+
+        android:fillViewport="true">
 
 
 
@@ -74,23 +126,43 @@
 
                     android:textStyle="bold"
 
-                    android:textColor="@color/text_primary"
+                    android:textColor="@android:color/white"
+
+
 
                     android:fontFamily="sans-serif-medium"/>
 
 
 
+
+
+
+
                 <TextView
+
+
 
                     android:id="@+id/tvProgress"
 
+
+
                     android:layout_width="wrap_content"
+
+
 
                     android:layout_height="wrap_content"
 
-                    android:text="Question 1 of 7"
 
-                    android:textColor="@color/text_secondary"
+
+                    android:text="1/7 Questions"
+
+
+
+                    android:textColor="@android:color/white"
+
+
+
+                    android:alpha="0.9"
 
                     android:textSize="14sp"
 
@@ -196,11 +268,12 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text="Read the passage:"
+                    android:text="Read the following passage aloud:"
 
-                    android:textColor="@color/color_jade1"
 
-                    android:textSize="14sp"
+                    android:textColor="@color/text_primary"
+
+                    android:textSize="15sp"
 
                     android:textStyle="bold"
 
@@ -605,3 +678,4 @@
     </LinearLayout>
 
 </ScrollView>
+</FrameLayout>

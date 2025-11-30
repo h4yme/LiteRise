@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:layout_marginBottom="12dp"
+
+    app:cardCornerRadius="12dp"
+
+    app:cardElevation="4dp"
+
+    app:cardBackgroundColor="@android:color/white">
+
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal"
+
+        android:padding="16dp"
+
+        android:gravity="center_vertical">
+
+
+
+        <!-- Priority Badge -->
+
+        <TextView
+
+            android:id="@+id/tvPriorityBadge"
+
+            android:layout_width="36dp"
+
+            android:layout_height="36dp"
+
+            android:text="1"
+
+            android:textSize="16sp"
+
+            android:textStyle="bold"
+
+            android:textColor="@android:color/white"
+
+            android:background="@drawable/circle_progress_bg"
+
+            android:gravity="center"
+
+            android:layout_marginEnd="12dp" />
+
+
+
+        <!-- Module Info -->
+
+        <LinearLayout
+
+            android:layout_width="0dp"
+
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"
+
+            android:orientation="vertical">
+
+
+
+            <TextView
+
+                android:id="@+id/tvModuleName"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Reading Comprehension"
+
+                android:textSize="16sp"
+
+                android:textStyle="bold"
+
+                android:textColor="#2D3436" />
+
+
+
+            <TextView
+
+                android:id="@+id/tvModuleDescription"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Start here to improve faster"
+
+                android:textSize="13sp"
+
+                android:textColor="#636E72"
+
+                android:layout_marginTop="2dp" />
+
+
+
+        </LinearLayout>
+
+
+
+        <!-- Status Icon -->
+
+        <ImageView
+
+            android:id="@+id/ivModuleIcon"
+
+            android:layout_width="24dp"
+
+            android:layout_height="24dp"
+
+            android:src="@drawable/ic_arrow_right"
+
+            app:tint="#00B894"
+
+            android:contentDescription="Module Icon" />
+
+
+
+    </LinearLayout>
+
+
+
+</androidx.cardview.widget.CardView>

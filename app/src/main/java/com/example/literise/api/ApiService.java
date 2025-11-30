@@ -127,4 +127,12 @@ public interface ApiService {
             @Query("lesson_id") int lessonId
 
     );
+
+    // 📝 Save Nickname
+
+    @Headers("Content-Type: application/json")
+
+    @POST("save_nickname.php")
+
+    Call<ResponseModel> saveNickname(@Body Students student);
 }

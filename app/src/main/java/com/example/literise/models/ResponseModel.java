@@ -18,7 +18,16 @@ public class ResponseModel {
 
     @SerializedName("TimeTakenSec")
     private float timeTakenSec;
+    // Fields for generic API responses (like save_nickname.php)
 
+    @SerializedName("success")
+    private boolean success;
+
+    @SerializedName("message")
+    private String message;
+
+    @SerializedName("nickname")
+    private String nickname;
     // ✅ Empty constructor (required for Retrofit and Gson)
     public ResponseModel() {}
 
@@ -44,4 +53,20 @@ public class ResponseModel {
     public void setSelectedOption(String selectedOption) { this.selectedOption = selectedOption; }
     public void setCorrect(boolean correct) { this.correct = correct; }
     public void setTimeTakenSec(float timeTakenSec) { this.timeTakenSec = timeTakenSec; }
+
+
+    // Getters and Setters for generic API response fields
+
+    public boolean isSuccess() { return success; }
+    public void setSuccess(boolean success) { this.success = success; }
+
+
+
+    public String getMessage() { return message; }
+    public void setMessage(String message) { this.message = message; }
+
+
+
+    public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
 }
