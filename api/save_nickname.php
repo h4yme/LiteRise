@@ -1,22 +1,31 @@
 <?php
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: POST");
-header("Access-Control-Allow-Headers: Content-Type");
+/**
+ * LiteRise Save Nickname API
+ * 
+ * POST /api/save_nickname.php
+ * 
+ * Request Body:
+ * {
+ *   "StudentID": 1,
+ *   "Nickname": "Johnny"
+ * }
+ * 
+ * Response:
+ * {
+ *   "success": true,
+ *   "message": "Nickname saved successfully",
+ *   "nickname": "Johnny"
+ * }
+ */
 
-require_once 'src/db.php';
+require_once __DIR__ . '/src/db.php';
 
 // Get JSON input
-$json = file_get_contents('php://input');
-$data = json_decode($json, true);
+$data = getJsonInput();
 
-// Validate input
+// Validate required fields
 if (!isset($data['StudentID']) || !isset($data['Nickname'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'StudentID and Nickname are required'
-    ]);
-    exit;
+    sendError("StudentID and Nickname are required", 400);
 }
 
 $studentId = (int)$data['StudentID'];
@@ -24,57 +33,31 @@ $nickname = trim($data['Nickname']);
 
 // Validate nickname
 if (empty($nickname)) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Nickname cannot be empty'
-    ]);
-    exit;
+    sendError("Nickname cannot be empty", 400);
 }
 
 if (strlen($nickname) > 20) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Nickname must be 20 characters or less'
-    ]);
-    exit;
+    sendError("Nickname must be 20 characters or less", 400);
 }
 
 try {
-    $db = new Database();
-    $conn = $db->getConnection();
-
     // Update nickname in Students table
-    $sql = "UPDATE Students SET Nickname = ? WHERE StudentID = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("si", $nickname, $studentId);
+    $stmt = $conn->prepare("UPDATE Students SET Nickname = :nickname WHERE StudentID = :studentId");
+    $stmt->bindValue(':nickname', $nickname, PDO::PARAM_STR);
+    $stmt->bindValue(':studentId', $studentId, PDO::PARAM_INT);
+    $stmt->execute();
 
-    if ($stmt->execute()) {
-        if ($stmt->affected_rows > 0) {
-            echo json_encode([
-                'success' => true,
-                'message' => 'Nickname saved successfully',
-                'nickname' => $nickname
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'Student not found or nickname unchanged'
-            ]);
-        }
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Failed to save nickname: ' . $stmt->error
+    if ($stmt->rowCount() > 0) {
+        sendResponse([
+            'message' => 'Nickname saved successfully',
+            'nickname' => $nickname
         ]);
+    } else {
+        sendError("Student not found or nickname unchanged", 404);
     }
 
-    $stmt->close();
-    $conn->close();
-
-} catch (Exception $e) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'Error: ' . $e->getMessage()
-    ]);
+} catch (PDOException $e) {
+    error_log("❌ Save nickname failed: " . $e->getMessage());
+    sendError("Failed to save nickname: " . $e->getMessage(), 500);
 }
 ?>
