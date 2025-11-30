@@ -7,85 +7,87 @@
     android:clickable="true"
     android:focusable="true">
 
-    <!-- Semi-transparent dark overlay background -->
-    <View
+    <!-- Background Image (same as placement test) -->
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#CC000000" />
+        android:src="@drawable/bg_placement"
+        android:scaleType="centerCrop"
+        android:contentDescription="Placement Test Background" />
 
-    <!-- Main content container -->
-    <LinearLayout
+    <!-- Content Container -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="32dp">
+        android:layout_height="match_parent"
+        android:padding="24dp">
 
-        <!-- Leo mascot image -->
-        <ImageView
-            android:id="@+id/ivLeoMascot"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:src="@drawable/leo_placement_test"
-            android:scaleType="fitCenter"
-            android:layout_marginBottom="24dp" />
-
-        <!-- Speech bubble container -->
+        <!-- Speech Bubble (centered in upper portion) -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/cardSpeechBubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="120dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             app:cardBackgroundColor="@android:color/white"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="20dp">
 
-                <!-- Tutorial title -->
-                <TextView
-                    android:id="@+id/tvTutorialTitle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Let's Find Your Level!"
-                    android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:textColor="#2D3436"
-                    android:gravity="center"
-                    android:layout_marginBottom="12dp" />
-
-                <!-- Tutorial message -->
+                <!-- Tutorial Message -->
                 <TextView
                     android:id="@+id/tvTutorialMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="I'm Leo! 🦁 I'll help you take a quick placement test to find the perfect lessons for you. Don't worry - just do your best!"
-                    android:textSize="16sp"
-                    android:textColor="#636E72"
-                    android:gravity="center"
-                    android:lineSpacingExtra="4dp" />
+                    android:text="Hi! I'm Leo! 🦁\n\nI'll guide you through a quick placement test. You'll answer questions by:\n\n• Reading passages\n• Tapping your answer (a, b, c, or d)\n• Using the microphone for some questions\n\nDon't worry - just do your best!"
+                    android:textSize="15sp"
+                    android:textColor="#2D3436"
+                    android:lineSpacingExtra="4dp"
+                    android:gravity="start" />
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Tap to continue hint -->
+        <!-- Small tail for speech bubble (pointing down to Leo) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_below="@id/cardSpeechBubble"
+            android:layout_centerHorizontal="true" />
+
+        <!-- Leo Mascot (bottom center) -->
+        <ImageView
+            android:id="@+id/ivLeoMascot"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="80dp"
+            android:src="@drawable/leo_placement_test"
+            android:scaleType="fitCenter"
+            android:contentDescription="Leo Mascot" />
+
+        <!-- Tap to Continue (bottom) -->
         <TextView
             android:id="@+id/tvTapToContinue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tap anywhere to continue"
-            android:textSize="14sp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="24dp"
+            android:text="Tap to Continue"
+            android:textSize="16sp"
             android:textColor="@android:color/white"
-            android:alpha="0.8"
-            android:layout_marginTop="32dp"
+            android:textStyle="bold"
             android:padding="12dp" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
 </FrameLayout>
