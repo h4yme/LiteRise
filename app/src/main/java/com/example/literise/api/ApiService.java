@@ -53,6 +53,11 @@ public interface ApiService {
     @POST("login.php")
     Call<Students> login(@Body Students student);
 
+    // 📝 Save Nickname
+    @Headers("Content-Type: application/json")
+    @POST("save_nickname.php")
+    Call<ResponseModel> saveNickname(@Body Students student);
+
     @Headers("Content-Type: application/json")
     @POST("get_preassessment_items.php")
     Call<PreAssessmentResponse> getPreAssessmentItems();
