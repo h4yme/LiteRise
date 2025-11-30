@@ -194,67 +194,69 @@
 
 
 
-        <!-- Password Input -->
+        <!-- Password Input Container -->
 
-        <com.google.android.material.textfield.TextInputLayout
+        <RelativeLayout
 
             android:layout_width="match_parent"
 
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
 
-            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_rounded_white"
 
-            app:boxBackgroundMode="filled"
-
-            app:boxBackgroundColor="#FFFFFF"
-
-            app:boxCornerRadiusTopStart="12dp"
-
-            app:boxCornerRadiusTopEnd="12dp"
-
-            app:boxCornerRadiusBottomStart="12dp"
-
-            app:boxCornerRadiusBottomEnd="12dp"
-
-            app:boxStrokeWidth="0dp"
-
-            app:boxStrokeWidthFocused="2dp"
-
-            app:boxStrokeColor="#8B7AA8"
-
-            app:hintTextColor="#AAAAAA"
-
-            app:passwordToggleEnabled="true"
-
-            app:passwordToggleTint="#8B7AA8"
-
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
+            android:layout_marginBottom="16dp">
 
 
 
-            <com.google.android.material.textfield.TextInputEditText
+            <EditText
 
                 android:id="@+id/etPassword"
 
                 android:layout_width="match_parent"
 
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+
+                android:background="@android:color/transparent"
 
                 android:hint="Enter your password"
 
-                android:inputType="textPassword"
+                android:textColorHint="#999999"
 
-                android:fontFamily="@font/poppins_regular"
+                android:textColor="#333333"
 
                 android:textSize="15sp"
 
-                android:textColor="#2D2D2D"
+                android:fontFamily="@font/poppins_regular"
 
-                android:paddingTop="16dp"
+                android:inputType="textPassword"
 
-                android:paddingBottom="16dp" />
+                android:paddingStart="20dp"
 
-        </com.google.android.material.textfield.TextInputLayout>
+                android:paddingEnd="56dp" />
+
+
+
+            <ImageView
+
+                android:id="@+id/ivPasswordToggle"
+
+                android:layout_width="24dp"
+
+                android:layout_height="24dp"
+
+                android:layout_alignParentEnd="true"
+
+                android:layout_centerVertical="true"
+
+                android:layout_marginEnd="16dp"
+
+                android:src="@android:drawable/ic_menu_view"
+
+                android:contentDescription="Toggle password visibility"
+
+                android:tint="#999999" />
+
+        </RelativeLayout>
 
 
 
