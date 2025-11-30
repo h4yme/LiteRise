@@ -15,19 +15,290 @@
         android:scaleType="centerCrop"
         android:contentDescription="Placement Test Background" />
 
-    <!-- Content Container -->
+    <!-- Mock Placement Test UI -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Mock Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Placement Test"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:textColor="@android:color/white" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Question 1 of 7"
+                        android:textColor="@android:color/white"
+                        android:alpha="0.8"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp"/>
+
+                </LinearLayout>
+
+                <!-- Item Type Badge -->
+                <TextView
+                    android:id="@+id/tvMockBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Grammar"
+                    android:textColor="@android:color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/badge_background"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="6dp" />
+
+            </LinearLayout>
+
+            <!-- Progress Bar -->
+            <ProgressBar
+                android:style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:max="100"
+                android:progress="15"
+                android:progressTint="#00B894"
+                android:backgroundTint="#E0E0E0"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- Mock Passage Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMockPassage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:visibility="visible">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Read the passage:"
+                        android:textColor="#00B894"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt..."
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:lineSpacingExtra="4dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mock Pronunciation Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMockPronunciation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="24dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Pronounce this word:"
+                        android:textColor="#636E72"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="education"
+                        android:textColor="#2D3436"
+                        android:textSize="32sp"
+                        android:textStyle="bold" />
+
+                    <!-- Mic Button -->
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/cardMockMicButton"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        app:cardCornerRadius="40dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="#00B894"
+                        android:layout_marginTop="24dp">
+
+                        <ImageView
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_mic"
+                            android:layout_gravity="center"
+                            app:tint="@android:color/white" />
+
+                    </androidx.cardview.widget.CardView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tap to record"
+                        android:textColor="#636E72"
+                        android:textSize="14sp"
+                        android:layout_marginTop="8dp"/>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mock Question Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardMockQuestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="2dp"
+                android:layout_marginBottom="16dp"
+                app:cardBackgroundColor="@android:color/white">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="What is the main idea of the passage?"
+                        android:textColor="#2D3436"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:lineSpacingExtra="4dp"/>
+
+                    <!-- Multiple Choice Options -->
+                    <GridLayout
+                        android:id="@+id/gridMockOptions"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="1"
+                        android:layout_marginTop="16dp"
+                        android:rowCount="4">
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnMockOptionA"
+                            style="@style/OptionButtonStyleNew"
+                            android:text="a) Lorem ipsum dolor sit amet"/>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnMockOptionB"
+                            style="@style/OptionButtonStyleNew"
+                            android:text="b) Lorem ipsum dolor sit amet"/>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnMockOptionC"
+                            style="@style/OptionButtonStyleNew"
+                            android:text="c) Lorem ipsum dolor sit amet"/>
+
+                        <androidx.appcompat.widget.AppCompatButton
+                            android:id="@+id/btnMockOptionD"
+                            style="@style/OptionButtonStyleNew"
+                            android:text="d) Lorem ipsum dolor sit amet"/>
+
+                    </GridLayout>
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Mock Continue Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMockContinue"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Continue"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="28dp"
+                app:backgroundTint="#00B894"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"/>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Tutorial Overlay (semi-transparent with spotlight effect) -->
+    <View
+        android:id="@+id/overlayDark"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000" />
+
+    <!-- Tutorial Content -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="24dp">
 
-        <!-- Speech Bubble (centered in upper portion) -->
+        <!-- Leo Mascot (bottom center) -->
+        <ImageView
+            android:id="@+id/ivLeoMascot"
+            android:layout_width="160dp"
+            android:layout_height="160dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="100dp"
+            android:src="@drawable/leo_placement_test"
+            android:scaleType="fitCenter"
+            android:contentDescription="Leo Mascot" />
+
+        <!-- Speech Bubble (above Leo) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardSpeechBubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="120dp"
+            android:layout_above="@id/ivLeoMascot"
+            android:layout_marginBottom="16dp"
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             app:cardBackgroundColor="@android:color/white"
@@ -40,39 +311,32 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
+                <!-- Tutorial Title -->
+                <TextView
+                    android:id="@+id/tvTutorialTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Welcome to Placement Test!"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D3436"
+                    android:gravity="center"
+                    android:layout_marginBottom="8dp" />
+
                 <!-- Tutorial Message -->
                 <TextView
                     android:id="@+id/tvTutorialMessage"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Hi! I'm Leo! 🦁\n\nI'll guide you through a quick placement test. You'll answer questions by:\n\n• Reading passages\n• Tapping your answer (a, b, c, or d)\n• Using the microphone for some questions\n\nDon't worry - just do your best!"
+                    android:text="Hi! I'm Leo! 🦁\n\nLet me show you how this test works. Tap anywhere to continue!"
                     android:textSize="15sp"
                     android:textColor="#2D3436"
                     android:lineSpacingExtra="4dp"
-                    android:gravity="start" />
+                    android:gravity="center" />
 
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
-
-        <!-- Small tail for speech bubble (pointing down to Leo) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_below="@id/cardSpeechBubble"
-            android:layout_centerHorizontal="true" />
-
-        <!-- Leo Mascot (bottom center) -->
-        <ImageView
-            android:id="@+id/ivLeoMascot"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="80dp"
-            android:src="@drawable/leo_placement_test"
-            android:scaleType="fitCenter"
-            android:contentDescription="Leo Mascot" />
 
         <!-- Tap to Continue (bottom) -->
         <TextView
@@ -87,6 +351,14 @@
             android:textColor="@android:color/white"
             android:textStyle="bold"
             android:padding="12dp" />
+
+        <!-- Highlight Circle/Arrow (animated indicator) -->
+        <ImageView
+            android:id="@+id/ivHighlightArrow"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:visibility="gone"
+            android:contentDescription="Highlight Indicator" />
 
     </RelativeLayout>
 
