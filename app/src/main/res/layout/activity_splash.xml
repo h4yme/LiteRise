@@ -5,9 +5,15 @@
 
     android:layout_height="match_parent"
 
-    android:background="@drawable/bg_gradient_purple"
-
     android:gravity="center">
+
+    <!-- Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_splash_login"
+        android:scaleType="centerCrop"
+        android:contentDescription="Background" />
 
 
 
