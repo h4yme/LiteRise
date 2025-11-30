@@ -36,6 +36,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
     private Button btnMockOptionC;
     private Button btnMockOptionD;
     private CardView cardMockMicButton;
+    private TextView tvMockPassageLabel;
+    private TextView tvMockPassageContent;
 
     private MediaPlayer soundPlayer;
     private int currentStep = 0; // 0 to 5 (6 tutorial steps)
@@ -56,11 +58,11 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
     private final String[] tutorialMessages = {
         "Hi! I'm Leo! 🦁\n\nLet's practice together! I'll guide you every step of the way!",
 
-        "Great! Now, some questions will have a passage to read.\n\nLet me show you! ✨",
+        "Great! Some questions will show a passage or scrambled words.\n\nLet me show you! ✨",
 
-        "Perfect! Now try tapping on the passage card above to practice!\n\nGo ahead, tap it! 👆",
+        "Perfect! Now try tapping on the card with scrambled words!\n\nGo ahead, tap it! 👆",
 
-        "Awesome! 🌟 Now for multiple choice questions, tap any answer you like!\n\nTry tapping option 'b' to practice!",
+        "Awesome! 🌟 Now choose the correct sentence from the options!\n\nTry tapping option 'a' to practice!",
 
         "Fantastic! 🎉 For pronunciation questions, tap the green microphone button!\n\nGive it a try!",
 
@@ -75,10 +77,10 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
         {"Reading passages helps you answer better!", "Take your time to understand!", "You're doing great!"},
 
         // Step 2 - Tap the Passage
-        {"Try tapping the white card with text!", "The passage is waiting for your tap! 👆", "You can do it! Tap the card above!"},
+        {"Try tapping the white card with scrambled words!", "The card with words is waiting for your tap! 👆", "You can do it! Tap the card above!"},
 
         // Step 3 - Choose Answer
-        {"Tap option 'b' to practice!", "Just tap the second option!", "Give it a try - tap option 'b'! 💪"},
+        {"Tap option 'a' to practice!", "Just tap the first option!", "Give it a try - tap 'The cat is black'! 💪"},
 
         // Step 4 - Pronunciation
         {"Tap the green microphone button! 🎤", "The mic button is ready for you!", "Go ahead, tap that green circle!"},
@@ -110,6 +112,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
         btnMockOptionC = findViewById(R.id.btnMockOptionC);
         btnMockOptionD = findViewById(R.id.btnMockOptionD);
         cardMockMicButton = findViewById(R.id.cardMockMicButton);
+        tvMockPassageLabel = findViewById(R.id.tvMockPassageLabel);
+        tvMockPassageContent = findViewById(R.id.tvMockPassageContent);
 
         // Set up interactive click listeners for each step
         setupInteractiveListeners();
@@ -222,6 +226,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
                 cardMockPronunciation.setVisibility(View.GONE);
                 cardMockQuestion.setVisibility(View.VISIBLE);
                 btnMockContinue.setVisibility(View.VISIBLE);
+                tvMockPassageLabel.setText("Read the passage:");
+                tvMockPassageContent.setText("The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet!");
                 highlightView(cardMockPassage);
                 // Auto-advance after 2.5 seconds
                 hintHandler.postDelayed(() -> {
@@ -235,6 +241,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
                 cardMockPronunciation.setVisibility(View.GONE);
                 cardMockQuestion.setVisibility(View.VISIBLE);
                 btnMockContinue.setVisibility(View.VISIBLE);
+                tvMockPassageLabel.setText("Use these words:");
+                tvMockPassageContent.setText("the | is | cat | black");
                 highlightView(cardMockPassage);
                 startProgressiveHints();
                 break;
@@ -244,6 +252,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
                 cardMockPronunciation.setVisibility(View.GONE);
                 cardMockQuestion.setVisibility(View.VISIBLE);
                 btnMockContinue.setVisibility(View.VISIBLE);
+                tvMockPassageLabel.setText("Use these words:");
+                tvMockPassageContent.setText("the | is | cat | black");
                 highlightView(cardMockQuestion);
                 startProgressiveHints();
                 break;
@@ -262,6 +272,8 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
                 cardMockPronunciation.setVisibility(View.GONE);
                 cardMockQuestion.setVisibility(View.VISIBLE);
                 btnMockContinue.setVisibility(View.VISIBLE);
+                tvMockPassageLabel.setText("Use these words:");
+                tvMockPassageContent.setText("the | is | cat | black");
                 highlightView(btnMockContinue);
                 startProgressiveHints();
                 break;
