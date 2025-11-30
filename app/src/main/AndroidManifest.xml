@@ -94,18 +94,6 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-        <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
-
-        <activity
-
-            android:name=".activities.PreAssessmentActivity"
-
-            android:exported="false"
-
-            android:theme="@style/Theme.LiteRise.NoActionBar" />
-
-
-
         <!-- ✅ Adaptive Pre-Assessment Screen (Adaptive Mode - 10-15 questions) -->
 
         <activity
@@ -116,30 +104,10 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-
-
-        <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
-
-        <activity
-
-            android:name=".MainActivity"
-
-            android:exported="false"
-
-            android:theme="@style/Theme.LiteRise.NoActionBar" />
-
-
+        <!-- ✅ Dashboard -->
         <activity
 
             android:name=".activities.DashboardActivity"
-
-            android:exported="false"
-
-            android:theme="@style/Theme.LiteRise.NoActionBar" />
-
-        <activity
-
-            android:name=".activities.LessonActivity"
 
             android:exported="false"
 
