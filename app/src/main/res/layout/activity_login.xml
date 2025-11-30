@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_gradient_purple"
+    android:background="@drawable/gradient_login"
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
 
@@ -144,61 +144,33 @@
 
         <!-- Email Input -->
 
-        <com.google.android.material.textfield.TextInputLayout
+        <EditText
+
+            android:id="@+id/etEmail"
 
             android:layout_width="match_parent"
 
-            android:layout_height="wrap_content"
+            android:layout_height="56dp"
 
-            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_rounded_white"
 
-            app:boxBackgroundMode="filled"
+            android:hint="yourname@example.com"
 
-            app:boxBackgroundColor="#FFFFFF"
+            android:textColorHint="#999999"
 
-            app:boxCornerRadiusTopStart="12dp"
+            android:textColor="#333333"
 
-            app:boxCornerRadiusTopEnd="12dp"
+            android:textSize="15sp"
 
-            app:boxCornerRadiusBottomStart="12dp"
+            android:fontFamily="@font/poppins_regular"
 
-            app:boxCornerRadiusBottomEnd="12dp"
+            android:inputType="textEmailAddress"
 
-            app:boxStrokeWidth="0dp"
+            android:paddingStart="20dp"
 
-            app:boxStrokeWidthFocused="2dp"
+            android:paddingEnd="20dp"
 
-            app:boxStrokeColor="#8B7AA8"
-
-            app:hintTextColor="#AAAAAA"
-
-            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox">
-
-
-
-            <com.google.android.material.textfield.TextInputEditText
-
-                android:id="@+id/etEmail"
-
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-
-                android:hint="yourname@example.com"
-
-                android:inputType="textEmailAddress"
-
-                android:fontFamily="@font/poppins_regular"
-
-                android:textSize="15sp"
-
-                android:textColor="#2D2D2D"
-
-                android:paddingTop="16dp"
-
-                android:paddingBottom="16dp" />
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginBottom="20dp" />
 
 
 
