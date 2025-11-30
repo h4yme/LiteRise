@@ -90,7 +90,7 @@
 
             android:id="@+id/tvWelcome"
 
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
 
             android:layout_height="wrap_content"
 
@@ -104,7 +104,7 @@
 
             android:fontFamily="@font/poppins_bold"
 
-            android:gravity="center"
+            android:gravity="start"
 
             android:layout_marginBottom="8dp" />
 
@@ -130,7 +130,7 @@
 
             android:fontFamily="@font/poppins_regular"
 
-            android:gravity="center"
+            android:gravity="start"
 
             android:layout_marginBottom="32dp" />
 
