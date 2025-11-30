@@ -92,7 +92,7 @@
 
                     android:textStyle="bold"
 
-                    android:textColor="@color/text_primary"
+                    android:textColor="@android:color/white"
 
                     android:fontFamily="sans-serif-medium"/>
 
@@ -106,9 +106,11 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text="Question 1 of 7"
+                    android:text="1/7 Questions"
 
-                    android:textColor="@color/text_secondary"
+                    android:textColor="@android:color/white"
+
+                    android:alpha="0.9"
 
                     android:textSize="14sp"
 
@@ -214,11 +216,11 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text="Read the passage:"
+                    android:text="Read the following passage aloud:"
 
-                    android:textColor="@color/color_jade1"
+                    android:textColor="@color/text_primary"
 
-                    android:textSize="14sp"
+                    android:textSize="15sp"
 
                     android:textStyle="bold"
 
