@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true">
+
+    <!-- Semi-transparent dark overlay background -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000" />
+
+    <!-- Main content container -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="32dp">
+
+        <!-- Leo mascot image -->
+        <ImageView
+            android:id="@+id/ivLeoMascot"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:src="@drawable/leo_placement_test"
+            android:scaleType="fitCenter"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Speech bubble container -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <!-- Tutorial title -->
+                <TextView
+                    android:id="@+id/tvTutorialTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Let's Find Your Level!"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D3436"
+                    android:gravity="center"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Tutorial message -->
+                <TextView
+                    android:id="@+id/tvTutorialMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="I'm Leo! 🦁 I'll help you take a quick placement test to find the perfect lessons for you. Don't worry - just do your best!"
+                    android:textSize="16sp"
+                    android:textColor="#636E72"
+                    android:gravity="center"
+                    android:lineSpacingExtra="4dp" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Tap to continue hint -->
+        <TextView
+            android:id="@+id/tvTapToContinue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tap anywhere to continue"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:alpha="0.8"
+            android:layout_marginTop="32dp"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -153,6 +153,22 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <activity
+
+            android:name=".activities.PreAssessmentTutorialActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+
+            android:name=".activities.AssessmentResultsActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- 🎮 Game Activities -->
 
         <activity

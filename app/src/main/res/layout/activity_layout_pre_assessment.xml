@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
+<FrameLayout
 
     xmlns:android="http://schemas.android.com/apk/res/android"
 
@@ -12,11 +12,29 @@
 
     android:layout_height="match_parent"
 
-    android:background="@color/gray_light"
-
-    android:fillViewport="true"
-
     tools:context=".activities.PreAssessmentActivity">
+
+    <!-- Background Image -->
+
+    <ImageView
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:src="@drawable/bg_placement"
+
+        android:scaleType="centerCrop"
+
+        android:contentDescription="Placement Test Background" />
+
+    <ScrollView
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:fillViewport="true">
 
 
 
@@ -604,4 +622,6 @@
 
     </LinearLayout>
 
-</ScrollView>
+    </ScrollView>
+
+</FrameLayout>

@@ -223,7 +223,7 @@ public class NicknameSetupActivity extends AppCompatActivity {
     }
 
     private void goToPreAssessment() {
-        Intent intent = new Intent(NicknameSetupActivity.this, AdaptivePreAssessmentActivity.class);
+        Intent intent = new Intent(NicknameSetupActivity.this, PreAssessmentTutorialActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();

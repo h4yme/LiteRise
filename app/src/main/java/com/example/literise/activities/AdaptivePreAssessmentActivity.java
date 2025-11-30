@@ -1133,7 +1133,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
             dialog.dismiss();
 
-            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, DashboardActivity.class);
+            Intent intent = new Intent(AdaptivePreAssessmentActivity.this, AssessmentResultsActivity.class);
+
+            // Pass the estimated ability score to results screen
+
+            if (result.getFinalTheta() != null) {
+
+                intent.putExtra("estimated_ability", result.getFinalTheta());
+
+            }
 
             startActivity(intent);
 

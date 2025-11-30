@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_hooray"
+        android:scaleType="centerCrop"
+        android:contentDescription="Hooray Background" />
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:gravity="center">
+
+            <!-- Celebration Title -->
+            <TextView
+                android:id="@+id/tvCelebrationTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hooray!"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginTop="60dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Completion Message -->
+            <TextView
+                android:id="@+id/tvCompletionMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="You've completed the placement test!"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:alpha="0.9"
+                android:gravity="center"
+                android:layout_marginBottom="40dp" />
+
+            <!-- Results Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="24dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="28dp"
+                    android:gravity="center">
+
+                    <!-- Your Level -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Your Level"
+                        android:textSize="16sp"
+                        android:textColor="#636E72"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvStudentLevel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Intermediate"
+                        android:textSize="32sp"
+                        android:textStyle="bold"
+                        android:textColor="#2D3436"
+                        android:layout_marginBottom="24dp" />
+
+                    <!-- Estimated Ability Score -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="24dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ability Score: "
+                            android:textSize="14sp"
+                            android:textColor="#636E72" />
+
+                        <TextView
+                            android:id="@+id/tvAbilityScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0.45"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="#00B894" />
+
+                    </LinearLayout>
+
+                    <!-- Divider -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#E0E0E0"
+                        android:layout_marginBottom="20dp" />
+
+                    <!-- Personalized Message -->
+                    <TextView
+                        android:id="@+id/tvPersonalizedMessage"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Great job! We've created a personalized learning path just for you."
+                        android:textSize="15sp"
+                        android:textColor="#2D3436"
+                        android:gravity="center"
+                        android:lineSpacingExtra="4dp" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Focus Areas Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Focus Areas"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Module Priority Container (will be populated dynamically) -->
+            <LinearLayout
+                android:id="@+id/containerModulePriorities"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginBottom="32dp">
+
+                <!-- Module items will be added programmatically here -->
+
+            </LinearLayout>
+
+            <!-- Continue Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContinueToDashboard"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Start Learning!"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                app:cornerRadius="30dp"
+                app:backgroundTint="#00B894"
+                android:elevation="4dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>
