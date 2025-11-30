@@ -2,10 +2,12 @@ package com.example.literise.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -24,6 +26,8 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     Button btnLogin;
+    ImageView ivPasswordToggle;
+    boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,24 @@ public class LoginActivity extends AppCompatActivity {
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
+
+        // Password visibility toggle
+        ivPasswordToggle.setOnClickListener(v -> {
+            if (isPasswordVisible) {
+                // Hide password
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                ivPasswordToggle.setImageResource(android.R.drawable.ic_menu_view);
+                isPasswordVisible = false;
+            } else {
+                // Show password
+                etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                ivPasswordToggle.setImageResource(android.R.drawable.ic_menu_close_clear_cancel);
+                isPasswordVisible = true;
+            }
+            // Move cursor to end of text
+            etPassword.setSelection(etPassword.getText().length());
+        });
 
         // Fade-in animation on load
 
