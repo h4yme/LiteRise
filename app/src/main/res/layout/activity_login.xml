@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/login_background"
+    android:background="@drawable/bg_gradient_purple"
     android:fillViewport="true"
     tools:context=".activities.LoginActivity">
 
@@ -36,7 +36,7 @@
 
             android:textStyle="bold"
 
-            android:textColor="#5B4A7A"
+            android:textColor="@android:color/white"
 
             android:fontFamily="@font/poppins_bold"
 
@@ -60,7 +60,9 @@
 
             android:textSize="13sp"
 
-            android:textColor="#8B7AA8"
+            android:textColor="@android:color/white"
+
+            android:alpha="0.9"
 
             android:fontFamily="@font/poppins_medium"
 
@@ -80,13 +82,13 @@
 
             android:layout_height="wrap_content"
 
-            android:text="Welcome!"
+            android:text="Welcome Back!"
 
             android:textSize="28sp"
 
             android:textStyle="bold"
 
-            android:textColor="#5B4A7A"
+            android:textColor="@android:color/white"
 
             android:fontFamily="@font/poppins_bold"
 
@@ -110,7 +112,9 @@
 
             android:textSize="14sp"
 
-            android:textColor="#8B7AA8"
+            android:textColor="@android:color/white"
+
+            android:alpha="0.85"
 
             android:fontFamily="@font/poppins_regular"
 
@@ -130,7 +134,7 @@
 
             android:textSize="13sp"
 
-            android:textColor="#5B4A7A"
+            android:textColor="@android:color/white"
 
             android:fontFamily="@font/poppins_medium"
 
@@ -210,7 +214,7 @@
 
             android:textSize="13sp"
 
-            android:textColor="#5B4A7A"
+            android:textColor="@android:color/white"
 
             android:fontFamily="@font/poppins_medium"
 
@@ -310,11 +314,11 @@
 
                 android:textSize="13sp"
 
-                android:textColor="#5B4A7A"
+                android:textColor="@android:color/white"
 
                 android:fontFamily="@font/poppins_regular"
 
-                android:buttonTint="#8B7AA8" />
+                android:buttonTint="@android:color/white" />
 
 
 
@@ -336,11 +340,13 @@
 
                 android:layout_height="wrap_content"
 
-                android:text="Forgot Password"
+                android:text="Forgot Password?"
 
                 android:textSize="13sp"
 
-                android:textColor="#8B7AA8"
+                android:textColor="@android:color/white"
+
+                android:alpha="0.9"
 
                 android:fontFamily="@font/poppins_medium"
 
@@ -384,7 +390,32 @@
 
             style="@style/Widget.MaterialComponents.Button" />
 
+        <!-- Divider OR Text -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="OR"
+            android:textSize="12sp"
+            android:textColor="@android:color/white"
+            android:alpha="0.7"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_gravity="center"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp" />
 
+        <!-- Sign Up Link -->
+        <TextView
+            android:id="@+id/tvSignUp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New to LiteRise? Sign Up Here!"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/poppins_medium"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_marginBottom="24dp" />
 
     </LinearLayout>
 
