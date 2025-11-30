@@ -204,10 +204,19 @@ public class PreAssessmentTutorialActivity extends AppCompatActivity {
         // Update "Tap to Continue" text based on step
         if (currentStep == 0) {
             tvTapToContinue.setText("Tap to Continue");
+            // Enable overlay clicks for welcome step
+            overlayDark.setClickable(true);
+            tutorialContentLayout.setClickable(true);
         } else if (currentStep == 1) {
             tvTapToContinue.setText("Watch and Learn");
+            // Disable overlay clicks to allow mock UI interaction
+            overlayDark.setClickable(false);
+            tutorialContentLayout.setClickable(false);
         } else {
             tvTapToContinue.setText("Try It Yourself!");
+            // Disable overlay clicks to allow mock UI interaction
+            overlayDark.setClickable(false);
+            tutorialContentLayout.setClickable(false);
         }
 
         // Apply step-specific highlights and visibility
