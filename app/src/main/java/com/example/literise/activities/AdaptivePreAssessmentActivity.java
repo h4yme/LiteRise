@@ -574,6 +574,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Show scrambled words if available
 
         if (q.getScrambledWords() != null && !q.getScrambledWords().isEmpty()) {
+            tvPassage.setText("Use these words:");
 
             String scrambledText = String.join(" | ", q.getScrambledWords());
 

@@ -210,13 +210,15 @@
 
                     <TextView
 
+                        android:id="@+id/tvMockPassageLabel"
+
                         android:layout_width="match_parent"
 
                         android:layout_height="wrap_content"
 
-                        android:text="Read the following passage aloud:"
+                        android:text="Read the passage:"
 
-                        android:textColor="@color/text_primary"
+                        android:textColor="#2D3436"
 
                         android:textSize="15sp"
 
@@ -226,13 +228,15 @@
 
                     <TextView
 
+                        android:id="@+id/tvMockPassageContent"
+
                         android:layout_width="match_parent"
 
                         android:layout_height="wrap_content"
 
                         android:layout_marginTop="8dp"
 
-                        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt..."
+                        android:text="Some questions will show a passage or scrambled words here. Read them carefully!"
 
                         android:textColor="#2D3436"
 
@@ -399,7 +403,6 @@
                 app:cardBackgroundColor="@android:color/white">
 
 
-
                 <LinearLayout
 
                     android:layout_width="match_parent"
@@ -411,12 +414,13 @@
                     android:padding="20dp">
 
 
-
                     <TextView
 
                         android:layout_width="match_parent"
 
                         android:layout_height="wrap_content"
+
+                        android:lineSpacingExtra="4dp"
 
                         android:text="What is the main idea of the passage?"
 
@@ -424,10 +428,7 @@
 
                         android:textSize="18sp"
 
-                        android:textStyle="bold"
-
-                        android:lineSpacingExtra="4dp"/>
-
+                        android:textStyle="bold" />
 
 
                     <!-- Multiple Choice Options -->
@@ -440,12 +441,11 @@
 
                         android:layout_height="wrap_content"
 
-                        android:columnCount="1"
-
                         android:layout_marginTop="16dp"
 
-                        android:rowCount="4">
+                        android:columnCount="1"
 
+                        android:rowCount="4">
 
 
                         <androidx.appcompat.widget.AppCompatButton
@@ -454,7 +454,7 @@
 
                             style="@style/OptionButtonStyleNew"
 
-                            android:text="a) Lorem ipsum dolor sit amet"/>
+                            android:text="a) The cat is black"/>
 
 
 
@@ -464,7 +464,7 @@
 
                             style="@style/OptionButtonStyleNew"
 
-                            android:text="b) Lorem ipsum dolor sit amet"/>
+                            android:text="b) The black is cat"/>
 
 
 
@@ -474,7 +474,7 @@
 
                             style="@style/OptionButtonStyleNew"
 
-                            android:text="c) Lorem ipsum dolor sit amet"/>
+                            android:text="c) Is the cat black"/>
 
 
 
@@ -484,16 +484,13 @@
 
                             style="@style/OptionButtonStyleNew"
 
-                            android:text="d) Lorem ipsum dolor sit amet"/>
-
+                            android:text="d) Black cat the is"/>
 
 
                     </GridLayout>
 
 
-
                 </LinearLayout>
-
 
 
             </androidx.cardview.widget.CardView>
@@ -546,7 +543,11 @@
 
         android:layout_height="match_parent"
 
-        android:background="#CC000000" />
+        android:background="#CC000000"
+
+        android:clickable="true"
+
+        android:focusable="true" />
 
 
 
@@ -554,11 +555,17 @@
 
     <RelativeLayout
 
+        android:id="@+id/tutorialContentLayout"
+
         android:layout_width="match_parent"
 
         android:layout_height="match_parent"
 
-        android:padding="24dp">
+        android:padding="24dp"
+
+        android:clickable="true"
+
+        android:focusable="true">
 
 
 
@@ -578,7 +585,7 @@
 
             android:layout_marginBottom="20dp"
 
-            android:layout_marginEnd="5dp"
+            android:layout_marginEnd="-25dp"
 
             android:src="@drawable/leo_placement_test"
 
