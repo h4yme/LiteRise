@@ -160,11 +160,33 @@ public class LoginActivity extends AppCompatActivity {
 
                     sessionManager.saveXP(s.getXp());
 
+
+
+                    // Sync server data with local flags
+
+                    // If server has nickname, user has completed welcome/nickname setup
+
+                    if (s.getNickname() != null && !s.getNickname().isEmpty()) {
+
+                        sessionManager.saveNickname(s.getNickname());
+
+                        sessionManager.setHasSeenWelcome(true);
+
+                    }
+
+                    // If server has ability score, user has completed assessment
+
+                    if (s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f) {
+
+                        sessionManager.setAssessmentCompleted(true);
+
+                    }
+
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
                     Intent intent;
 
-                    // Check if user has seen welcome screens
+                    // Check if user has seen welcome screens (now synced with server)
 
                     if (!sessionManager.hasSeenWelcome()) {
 
@@ -172,9 +194,9 @@ public class LoginActivity extends AppCompatActivity {
 
                         intent = new Intent(LoginActivity.this, WelcomeActivity.class);
 
-                    } else if (sessionManager.hasCompletedAssessment() || s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f) {
+                    } else if (sessionManager.hasCompletedAssessment()) {
 
-                        // Already completed assessment (locally or on server) - go to dashboard
+                        // Already completed assessment - go to dashboard
 
                         intent = new Intent(LoginActivity.this, DashboardActivity.class);
 
