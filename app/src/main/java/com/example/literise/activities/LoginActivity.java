@@ -172,19 +172,17 @@ public class LoginActivity extends AppCompatActivity {
 
                         intent = new Intent(LoginActivity.this, WelcomeActivity.class);
 
-                    } else if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+                    } else if (sessionManager.hasCompletedAssessment() || s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f) {
 
+                        // Already completed assessment (locally or on server) - go to dashboard
 
+                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+
+                    } else {
 
                         // Seen welcome but no assessment - go to adaptive assessment
 
                         intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
-
-                    } else {
-
-                        // Already completed assessment - go to dashboard
-
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
 
                     }
                     startActivity(intent);
