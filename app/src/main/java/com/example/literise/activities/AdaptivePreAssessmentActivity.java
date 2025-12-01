@@ -956,6 +956,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 "Let's Begin!"
         );
 
+        // Slower timing - give kids 5 seconds to read welcome message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
             showTutorialStep(
@@ -965,8 +966,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             );
             highlightView(cardPassage);
 
+            // Slower timing - give kids 6 seconds to read and see highlighted passage
             hintHandler.postDelayed(() -> {
                 tutorialStep = 2;
+                // Hide dark overlay so student can read and choose clearly
+                overlayDark.setVisibility(View.GONE);
                 showTutorialStep(
                         "Step 2: Choose Your Answer",
                         "Now tap one of the options below that shows the correct sentence!",
@@ -979,8 +983,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                         "Choose the answer that makes sense!",
                         "Go ahead, select an option!"
                 });
-            }, 2500);
-        }, 2000);
+            }, 6000);
+        }, 5000);
     }
 
     private void startPronunciationTutorial() {
@@ -990,8 +994,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 "Let's Begin!"
         );
 
+        // Slower timing - give kids 5 seconds to read welcome message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
+            // Hide dark overlay so student can tap microphone clearly
+            overlayDark.setVisibility(View.GONE);
             showTutorialStep(
                     "Step 1: Tap the Microphone",
                     "Tap the green microphone button to record your pronunciation!",
@@ -1003,7 +1010,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     "The microphone is waiting for you!",
                     "Go ahead, tap it!"
             });
-        }, 2000);
+        }, 5000);
     }
 
     private void startGrammarTutorial() {
@@ -1013,6 +1020,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 "Let's Begin!"
         );
 
+        // Slower timing - give kids 5 seconds to read welcome message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
             showTutorialStep(
@@ -1022,8 +1030,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             );
             highlightView(cardQuestion);
 
+            // Slower timing - give kids 6 seconds to read and see highlighted question
             hintHandler.postDelayed(() -> {
                 tutorialStep = 2;
+                // Hide dark overlay so student can read and choose clearly
+                overlayDark.setVisibility(View.GONE);
                 showTutorialStep(
                         "Step 2: Choose Your Answer",
                         "Now tap one of the options below that you think is correct!",
@@ -1034,8 +1045,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                         "Choose the answer you think is right!",
                         "Go ahead, select an option!"
                 });
-            }, 2500);
-        }, 2000);
+            }, 6000);
+        }, 5000);
     }
 
     private void proceedToFinalTutorialStep() {
@@ -1045,6 +1056,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         celebrateInteraction("Excellent!");
 
+        // Slower timing - give kids 3 seconds to see the celebration
         hintHandler.postDelayed(() -> {
             showTutorialStep(
                     "Final Step: Continue",
@@ -1057,7 +1069,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     "The Continue button is ready!",
                     "You're almost done! Tap Continue!"
             });
-        }, 1500);
+        }, 3000);
     }
 
     private void showTutorialStep(String title, String message, String tapText) {
@@ -1079,7 +1091,12 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         if (view == null) return;
 
         view.setAlpha(1.0f);
-        view.setElevation(16f);
+        // IMPORTANT: Set very high elevation to appear above overlay
+        view.setElevation(100f);
+        // Bring view to front to ensure it's above overlay
+        view.bringToFront();
+        view.requestLayout();
+        view.invalidate();
 
         ScaleAnimation pulse = new ScaleAnimation(
                 1.0f, 1.05f,
@@ -1094,15 +1111,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void resetHighlights() {
-        cardPassage.setAlpha(0.6f);
+        // Keep cards at full brightness so students can read clearly
+        cardPassage.setAlpha(1.0f);
+        cardPassage.setElevation(4f);
         cardPassage.clearAnimation();
-        cardPronunciation.setAlpha(0.6f);
+        cardPronunciation.setAlpha(1.0f);
+        cardPronunciation.setElevation(4f);
         cardPronunciation.clearAnimation();
-        cardQuestion.setAlpha(0.6f);
+        cardQuestion.setAlpha(1.0f);
+        cardQuestion.setElevation(4f);
         cardQuestion.clearAnimation();
-        btnContinue.setAlpha(0.6f);
+        btnContinue.setAlpha(1.0f);
+        btnContinue.setElevation(0f);
         btnContinue.clearAnimation();
-        cardMicButton.setAlpha(0.6f);
+        cardMicButton.setAlpha(1.0f);
+        cardMicButton.setElevation(4f);
         cardMicButton.clearAnimation();
     }
 
@@ -1114,11 +1137,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 if (hintLevel < hints.length && isTutorialActive) {
                     tvTutorialMessage.setText(tvTutorialMessage.getText() + "\n\n💡 " + hints[hintLevel]);
                     hintLevel++;
-                    hintHandler.postDelayed(this, 3000);
+                    // Slower hints for kids - 5 seconds between each hint
+                    hintHandler.postDelayed(this, 5000);
                 }
             }
         };
-        hintHandler.postDelayed(hintRunnable, 3000);
+        // First hint appears after 5 seconds
+        hintHandler.postDelayed(hintRunnable, 5000);
     }
 
     private void cancelHints() {
