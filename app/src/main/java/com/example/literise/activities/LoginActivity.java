@@ -164,21 +164,41 @@ public class LoginActivity extends AppCompatActivity {
 
                     // Sync server data with local flags
 
-                    // If server has nickname, user has completed welcome/nickname setup
+                    boolean hasAbilityScore = (s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f);
 
-                    if (s.getNickname() != null && !s.getNickname().isEmpty()) {
+                    boolean hasNickname = (s.getNickname() != null && !s.getNickname().isEmpty());
+
+
+
+                    // Debug logging
+
+                    android.util.Log.d("LoginActivity", "Server data - Nickname: " + s.getNickname() + ", AbilityScore: " + s.getAbility_score());
+
+                    android.util.Log.d("LoginActivity", "Checks - hasNickname: " + hasNickname + ", hasAbilityScore: " + hasAbilityScore);
+
+
+
+                    // If user has ability score, they MUST have completed onboarding
+
+                    // (Can't take assessment without completing welcome/nickname)
+
+                    if (hasAbilityScore) {
+
+                        sessionManager.setHasSeenWelcome(true);
+
+                        sessionManager.setAssessmentCompleted(true);
+
+                    }
+
+
+
+                    // Save nickname if available
+
+                    if (hasNickname) {
 
                         sessionManager.saveNickname(s.getNickname());
 
                         sessionManager.setHasSeenWelcome(true);
-
-                    }
-
-                    // If server has ability score, user has completed assessment
-
-                    if (s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f) {
-
-                        sessionManager.setAssessmentCompleted(true);
 
                     }
 
