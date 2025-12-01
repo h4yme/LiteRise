@@ -21,6 +21,8 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
 
+import java.util.HashSet;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -94,7 +96,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private ImageView ivLeoMascot;
     private CardView cardSpeechBubble;
     private boolean isTutorialActive = false;
-    private boolean isTutorialCompleted = false;
+    private HashSet<String> tutorialShownForTypes = new HashSet<>();
     private int tutorialStep = 0;
     private Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
@@ -339,8 +341,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         enableOptions();
 
-        // Show tutorial for first question only
-        if (itemsAnswered.isEmpty() && demoQuestionIndex == 0 && !isTutorialCompleted) {
+        // Show tutorial for each question type the first time it appears
+        String questionType = currentQuestion.getItemType() != null ? currentQuestion.getItemType() : "General";
+        if (!tutorialShownForTypes.contains(questionType)) {
+            tutorialShownForTypes.add(questionType);
             startTutorialForQuestion(currentQuestion);
         } else {
             hideTutorial();
@@ -926,6 +930,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Show tutorial overlay
         overlayDark.setVisibility(View.VISIBLE);
         tutorialContentLayout.setVisibility(View.VISIBLE);
+        tutorialContentLayout.setClickable(true);
+        tutorialContentLayout.setFocusable(true);
 
         // Fade in animation
         AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
@@ -1169,7 +1175,6 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void completeTutorial() {
-        isTutorialCompleted = true;
         isTutorialActive = false;
         cancelHints();
         resetHighlights();
@@ -1184,6 +1189,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             public void onAnimationEnd(Animation animation) {
                 overlayDark.setVisibility(View.GONE);
                 tutorialContentLayout.setVisibility(View.GONE);
+                // Ensure tutorial doesn't block content
+                tutorialContentLayout.setClickable(false);
+                tutorialContentLayout.setFocusable(false);
             }
 
             @Override
@@ -1196,5 +1204,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         overlayDark.setVisibility(View.GONE);
         tutorialContentLayout.setVisibility(View.GONE);
         isTutorialActive = false;
+        // Ensure tutorial doesn't block content
+        tutorialContentLayout.setClickable(false);
+        tutorialContentLayout.setFocusable(false);
     }
 }
