@@ -36,6 +36,12 @@ import android.widget.TextView;
 
 import android.widget.Toast;
 
+import android.view.animation.AlphaAnimation;
+
+import android.view.animation.Animation;
+
+import android.view.animation.ScaleAnimation;
+
 
 
 import androidx.annotation.NonNull;
@@ -172,6 +178,30 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
+    // Tutorial-related views and variables
+
+    private View overlayDark, tutorialContentLayout;
+
+    private TextView tvTutorialTitle, tvTutorialMessage, tvTapToContinue;
+
+    private ImageView ivLeoMascot;
+
+    private CardView cardSpeechBubble;
+
+    private boolean isTutorialActive = false;
+
+    private boolean isTutorialCompleted = false;
+
+    private int tutorialStep = 0;
+
+    private Handler hintHandler = new Handler(Looper.getMainLooper());
+
+    private Runnable hintRunnable;
+
+    private int hintLevel = 0;
+
+
+
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,19 +286,97 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
 
 
-        btnOptionA.setOnClickListener(v -> selectAnswer("A", btnOptionA));
+        btnOptionA.setOnClickListener(v -> {
 
-        btnOptionB.setOnClickListener(v -> selectAnswer("B", btnOptionB));
+            if (isTutorialActive && tutorialStep == 2) {
 
-        btnOptionC.setOnClickListener(v -> selectAnswer("C", btnOptionC));
+                proceedToFinalTutorialStep();
 
-        btnOptionD.setOnClickListener(v -> selectAnswer("D", btnOptionD));
+            }
 
-        btnContinue.setOnClickListener(v -> submitCurrentAnswer());
+            selectAnswer("A", btnOptionA);
+
+        });
+
+        btnOptionB.setOnClickListener(v -> {
+
+            if (isTutorialActive && tutorialStep == 2) {
+
+                proceedToFinalTutorialStep();
+
+            }
+
+            selectAnswer("B", btnOptionB);
+
+        });
+
+        btnOptionC.setOnClickListener(v -> {
+
+            if (isTutorialActive && tutorialStep == 2) {
+
+                proceedToFinalTutorialStep();
+
+            }
+
+            selectAnswer("C", btnOptionC);
+
+        });
+
+        btnOptionD.setOnClickListener(v -> {
+
+            if (isTutorialActive && tutorialStep == 2) {
+
+                proceedToFinalTutorialStep();
+
+            }
+
+            selectAnswer("D", btnOptionD);
+
+        });
+
+        btnContinue.setOnClickListener(v -> {
+
+            if (isTutorialActive && tutorialStep == 3) {
+
+                completeTutorial();
+
+            }
+
+            submitCurrentAnswer();
+
+        });
 
 
 
-        cardMicButton.setOnClickListener(v -> recordPronunciation());
+        cardMicButton.setOnClickListener(v -> {
+
+            if (isTutorialActive && tutorialStep == 1) {
+
+                proceedToFinalTutorialStep();
+
+            }
+
+            recordPronunciation();
+
+        });
+
+
+
+        // Initialize tutorial views
+
+        overlayDark = findViewById(R.id.overlayDark);
+
+        tutorialContentLayout = findViewById(R.id.tutorialContentLayout);
+
+        tvTutorialTitle = findViewById(R.id.tvTutorialTitle);
+
+        tvTutorialMessage = findViewById(R.id.tvTutorialMessage);
+
+        tvTapToContinue = findViewById(R.id.tvTapToContinue);
+
+        ivLeoMascot = findViewById(R.id.ivLeoMascot);
+
+        cardSpeechBubble = findViewById(R.id.cardSpeechBubble);
 
     }
 
@@ -560,6 +668,20 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         }
 
         enableOptions();
+
+
+
+        // Show tutorial for first question only
+
+        if (itemsAnswered.isEmpty() && demoQuestionIndex == 0 && !isTutorialCompleted) {
+
+            startTutorialForQuestion(currentQuestion);
+
+        } else {
+
+            hideTutorial();
+
+        }
 
     }
 
@@ -1692,6 +1814,526 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             speechRecognizer.destroy();
 
         }
+
+        cancelHints();
+
+    }
+
+
+
+    // ============ Tutorial Methods ============
+
+
+
+    private void startTutorialForQuestion(Question q) {
+
+        isTutorialActive = true;
+
+        tutorialStep = 0;
+
+        hintLevel = 0;
+
+
+
+        String itemType = q.getItemType() != null ? q.getItemType() : "";
+
+
+
+        // Show tutorial overlay
+
+        overlayDark.setVisibility(View.VISIBLE);
+
+        tutorialContentLayout.setVisibility(View.VISIBLE);
+
+
+
+        // Fade in animation
+
+        AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+
+        fadeIn.setDuration(300);
+
+        tutorialContentLayout.startAnimation(fadeIn);
+
+
+
+        // Determine tutorial flow based on question type
+
+        if ("Syntax".equalsIgnoreCase(itemType)) {
+
+            startSyntaxTutorial();
+
+        } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
+
+            // Check if it's speak-type or MCQ
+
+            if (q.hasOptions() || q.isMCQ()) {
+
+                startGrammarTutorial(); // MCQ pronunciation
+
+            } else {
+
+                startPronunciationTutorial(); // Speak type
+
+            }
+
+        } else if ("Spelling".equalsIgnoreCase(itemType) || "Grammar".equalsIgnoreCase(itemType)) {
+
+            startGrammarTutorial();
+
+        } else {
+
+            startGrammarTutorial();
+
+        }
+
+    }
+
+
+
+    private void startSyntaxTutorial() {
+
+        showTutorialStep(
+
+            "Welcome to the Test!",
+
+            "Hi! I'm Leo!\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
+
+            "Let's Begin!"
+
+        );
+
+
+
+        hintHandler.postDelayed(() -> {
+
+            tutorialStep = 1;
+
+            showTutorialStep(
+
+                "Step 1: Read the Words",
+
+                "Look at the scrambled words in the white card above.\n\nThese words need to be arranged correctly!",
+
+                "Got it!"
+
+            );
+
+            highlightView(cardPassage);
+
+
+
+            hintHandler.postDelayed(() -> {
+
+                tutorialStep = 2;
+
+                showTutorialStep(
+
+                    "Step 2: Choose Your Answer",
+
+                    "Now tap one of the options below that shows the correct sentence!",
+
+                    "Try It!"
+
+                );
+
+                resetHighlights();
+
+                highlightView(cardQuestion);
+
+                startProgressiveHints(new String[]{
+
+                    "Tap any option to practice!",
+
+                    "Choose the answer that makes sense!",
+
+                    "Go ahead, select an option!"
+
+                });
+
+            }, 2500);
+
+        }, 2000);
+
+    }
+
+
+
+    private void startPronunciationTutorial() {
+
+        showTutorialStep(
+
+            "Welcome to the Test!",
+
+            "Hi! I'm Leo!\n\nThis is a pronunciation question. You'll speak the word clearly!",
+
+            "Let's Begin!"
+
+        );
+
+
+
+        hintHandler.postDelayed(() -> {
+
+            tutorialStep = 1;
+
+            showTutorialStep(
+
+                "Step 1: Tap the Microphone",
+
+                "Tap the green microphone button to record your pronunciation!",
+
+                "Try It!"
+
+            );
+
+            highlightView(cardMicButton);
+
+            startProgressiveHints(new String[]{
+
+                "Tap the green circle to record!",
+
+                "The microphone is waiting for you!",
+
+                "Go ahead, tap it!"
+
+            });
+
+        }, 2000);
+
+    }
+
+
+
+    private void startGrammarTutorial() {
+
+        showTutorialStep(
+
+            "Welcome to the Test!",
+
+            "Hi! I'm Leo!\n\nRead the question carefully and choose the best answer!",
+
+            "Let's Begin!"
+
+        );
+
+
+
+        hintHandler.postDelayed(() -> {
+
+            tutorialStep = 1;
+
+            showTutorialStep(
+
+                "Step 1: Read the Question",
+
+                "Look at the question in the white card.\n\nTake your time to understand it!",
+
+                "Got it!"
+
+            );
+
+            highlightView(cardQuestion);
+
+
+
+            hintHandler.postDelayed(() -> {
+
+                tutorialStep = 2;
+
+                showTutorialStep(
+
+                    "Step 2: Choose Your Answer",
+
+                    "Now tap one of the options below that you think is correct!",
+
+                    "Try It!"
+
+                );
+
+                startProgressiveHints(new String[]{
+
+                    "Tap any option to practice!",
+
+                    "Choose the answer you think is right!",
+
+                    "Go ahead, select an option!"
+
+                });
+
+            }, 2500);
+
+        }, 2000);
+
+    }
+
+
+
+    private void proceedToFinalTutorialStep() {
+
+        cancelHints();
+
+        resetHighlights();
+
+        tutorialStep = 3;
+
+
+
+        celebrateInteraction("Excellent!");
+
+
+
+        hintHandler.postDelayed(() -> {
+
+            showTutorialStep(
+
+                "Final Step: Continue",
+
+                "Great job! Now tap the Continue button below to move forward!",
+
+                "Almost Done!"
+
+            );
+
+            highlightView(btnContinue);
+
+            startProgressiveHints(new String[]{
+
+                "Tap Continue to proceed!",
+
+                "The Continue button is ready!",
+
+                "You're almost done! Tap Continue!"
+
+            });
+
+        }, 1500);
+
+    }
+
+
+
+    private void showTutorialStep(String title, String message, String tapText) {
+
+        tvTutorialTitle.setText(title);
+
+        tvTutorialMessage.setText(message);
+
+        tvTapToContinue.setText(tapText);
+
+
+
+        ScaleAnimation bounce = new ScaleAnimation(
+
+            0.95f, 1.0f,
+
+            0.95f, 1.0f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f
+
+        );
+
+        bounce.setDuration(300);
+
+        cardSpeechBubble.startAnimation(bounce);
+
+    }
+
+
+
+    private void highlightView(View view) {
+
+        if (view == null) return;
+
+
+
+        view.setAlpha(1.0f);
+
+        view.setElevation(16f);
+
+
+
+        ScaleAnimation pulse = new ScaleAnimation(
+
+            1.0f, 1.05f,
+
+            1.0f, 1.05f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f
+
+        );
+
+        pulse.setDuration(600);
+
+        pulse.setRepeatMode(Animation.REVERSE);
+
+        pulse.setRepeatCount(Animation.INFINITE);
+
+        view.startAnimation(pulse);
+
+    }
+
+
+
+    private void resetHighlights() {
+
+        cardPassage.setAlpha(0.6f);
+
+        cardPassage.clearAnimation();
+
+        cardPronunciation.setAlpha(0.6f);
+
+        cardPronunciation.clearAnimation();
+
+        cardQuestion.setAlpha(0.6f);
+
+        cardQuestion.clearAnimation();
+
+        btnContinue.setAlpha(0.6f);
+
+        btnContinue.clearAnimation();
+
+        cardMicButton.setAlpha(0.6f);
+
+        cardMicButton.clearAnimation();
+
+    }
+
+
+
+    private void startProgressiveHints(String[] hints) {
+
+        hintLevel = 0;
+
+        hintRunnable = new Runnable() {
+
+            @Override
+
+            public void run() {
+
+                if (hintLevel < hints.length && isTutorialActive) {
+
+                    tvTutorialMessage.setText(tvTutorialMessage.getText() + "\n\n💡 " + hints[hintLevel]);
+
+                    hintLevel++;
+
+                    hintHandler.postDelayed(this, 3000);
+
+                }
+
+            }
+
+        };
+
+        hintHandler.postDelayed(hintRunnable, 3000);
+
+    }
+
+
+
+    private void cancelHints() {
+
+        if (hintRunnable != null) {
+
+            hintHandler.removeCallbacks(hintRunnable);
+
+        }
+
+    }
+
+
+
+    private void celebrateInteraction(String message) {
+
+        cancelHints();
+
+        tvTutorialMessage.setText(message);
+
+
+
+        ScaleAnimation celebrate = new ScaleAnimation(
+
+            1.0f, 1.1f,
+
+            1.0f, 1.1f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f,
+
+            Animation.RELATIVE_TO_SELF, 0.5f
+
+        );
+
+        celebrate.setDuration(200);
+
+        celebrate.setRepeatMode(Animation.REVERSE);
+
+        celebrate.setRepeatCount(1);
+
+        tutorialContentLayout.startAnimation(celebrate);
+
+    }
+
+
+
+    private void completeTutorial() {
+
+        isTutorialCompleted = true;
+
+        isTutorialActive = false;
+
+        cancelHints();
+
+        resetHighlights();
+
+
+
+        AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
+
+        fadeOut.setDuration(300);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+
+            public void onAnimationStart(Animation animation) {}
+
+
+
+            @Override
+
+            public void onAnimationEnd(Animation animation) {
+
+                overlayDark.setVisibility(View.GONE);
+
+                tutorialContentLayout.setVisibility(View.GONE);
+
+            }
+
+
+
+            @Override
+
+            public void onAnimationRepeat(Animation animation) {}
+
+        });
+
+        tutorialContentLayout.startAnimation(fadeOut);
+
+    }
+
+
+
+    private void hideTutorial() {
+
+        overlayDark.setVisibility(View.GONE);
+
+        tutorialContentLayout.setVisibility(View.GONE);
+
+        isTutorialActive = false;
 
     }
 
