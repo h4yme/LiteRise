@@ -977,6 +977,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 tutorialStep = 2;
                 // Hide dark overlay so student can read and choose clearly
                 overlayDark.setVisibility(View.GONE);
+                // Allow clicks through tutorial layout to reach options below
+                tutorialContentLayout.setClickable(false);
+                tutorialContentLayout.setFocusable(false);
                 showTutorialStep(
                         "Step 2: Choose Your Answer",
                         "Now tap one of the options below that shows the correct sentence!",
@@ -1005,6 +1008,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             tutorialStep = 1;
             // Hide dark overlay so student can tap microphone clearly
             overlayDark.setVisibility(View.GONE);
+            // Allow clicks through tutorial layout to reach microphone button
+            tutorialContentLayout.setClickable(false);
+            tutorialContentLayout.setFocusable(false);
             showTutorialStep(
                     "Step 1: Tap the Microphone",
                     "Tap the green microphone button to record your pronunciation!",
@@ -1041,6 +1047,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 tutorialStep = 2;
                 // Hide dark overlay so student can read and choose clearly
                 overlayDark.setVisibility(View.GONE);
+                // Allow clicks through tutorial layout to reach options below
+                tutorialContentLayout.setClickable(false);
+                tutorialContentLayout.setFocusable(false);
                 showTutorialStep(
                         "Step 2: Choose Your Answer",
                         "Now tap one of the options below that you think is correct!",
@@ -1064,6 +1073,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // Slower timing - give kids 3 seconds to see the celebration
         hintHandler.postDelayed(() -> {
+            // Make tutorial overlay clickable again for final step (prevent accidental continue)
+            tutorialContentLayout.setClickable(true);
+            tutorialContentLayout.setFocusable(true);
             showTutorialStep(
                     "Final Step: Continue",
                     "Great job! Now tap the Continue button below to move forward!",
