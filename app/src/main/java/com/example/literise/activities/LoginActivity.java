@@ -160,31 +160,137 @@ public class LoginActivity extends AppCompatActivity {
 
                     sessionManager.saveXP(s.getXp());
 
+
+
+
+
+
+
+
+                    // Sync server data with local flags
+
+
+
+                    boolean hasAbilityScore = (s.getAbility_score() != 0.0f && Math.abs(s.getAbility_score()) >= 0.01f);
+
+
+
+                    boolean hasNickname = (s.getNickname() != null && !s.getNickname().isEmpty());
+
+
+
+
+
+
+
+                    // Debug logging
+
+
+
+                    android.util.Log.d("LoginActivity", "Server data - Nickname: " + s.getNickname() + ", AbilityScore: " + s.getAbility_score());
+
+
+
+                    android.util.Log.d("LoginActivity", "Checks - hasNickname: " + hasNickname + ", hasAbilityScore: " + hasAbilityScore);
+
+
+
+
+
+
+
+                    // If user has ability score, they MUST have completed onboarding
+
+
+
+                    // (Can't take assessment without completing welcome/nickname)
+
+
+
+                    if (hasAbilityScore) {
+
+
+
+                        sessionManager.setHasSeenWelcome(true);
+
+
+
+                        sessionManager.setAssessmentCompleted(true);
+
+
+
+                    }
+
+
+
+
+
+
+
+                    // Save nickname if available
+
+
+
+                    if (hasNickname) {
+
+
+
+                        sessionManager.saveNickname(s.getNickname());
+
+
+
+                        sessionManager.setHasSeenWelcome(true);
+
+
+                    }
+
+
+
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
+
+
 
                     Intent intent;
 
-                    // Check if user has seen welcome screens
+
+
+                    // Check if user has seen welcome screens (now synced with server)
+
+
 
                     if (!sessionManager.hasSeenWelcome()) {
 
+
+
                         // First time user - show welcome/intro screens
+
+
 
                         intent = new Intent(LoginActivity.this, WelcomeActivity.class);
 
-                    } else if (s.getAbility_score() == 0.0f || Math.abs(s.getAbility_score()) < 0.01f) {
+
+
+                    } else if (sessionManager.hasCompletedAssessment()) {
+
+
+
+                        // Already completed assessment - go to dashboard
+
+
+
+                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+
+
+
+                    } else {
 
 
 
                         // Seen welcome but no assessment - go to adaptive assessment
 
+
+
                         intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
-
-                    } else {
-
-                        // Already completed assessment - go to dashboard
-
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
 
                     }
                     startActivity(intent);
