@@ -270,14 +270,15 @@
 
                     android:text="Read the following passage aloud:"
 
-
                     android:textColor="@color/text_primary"
 
-                    android:textSize="15sp"
+                    android:textSize="16sp"
 
                     android:textStyle="bold"
 
-                    android:fontFamily="sans-serif-medium"/>
+                    android:fontFamily="sans-serif-medium"
+
+                    android:layout_marginBottom="12dp"/>
 
 
 
@@ -289,15 +290,15 @@
 
                     android:layout_height="wrap_content"
 
-                    android:layout_marginTop="8dp"
-
                     android:text=""
 
                     android:textColor="@color/text_primary"
 
                     android:textSize="15sp"
 
-                    android:lineSpacingExtra="4dp"/>
+                    android:lineSpacingExtra="6dp"
+
+                    android:justificationMode="inter_word"/>
 
             </LinearLayout>
 
@@ -425,7 +426,7 @@
 
                         app:cardElevation="4dp"
 
-                        app:cardBackgroundColor="@color/color_jade1">
+                        app:cardBackgroundColor="#5B9FED">
 
 
 
@@ -581,7 +582,7 @@
 
 
 
-                <!-- Multiple Choice Options Grid -->
+                <!-- Multiple Choice Options Grid (2x2 layout like in design) -->
 
                 <GridLayout
 
@@ -591,11 +592,17 @@
 
                     android:layout_height="wrap_content"
 
-                    android:columnCount="1"
+                    android:columnCount="2"
 
                     android:layout_marginTop="16dp"
 
-                    android:rowCount="4">
+                    android:rowCount="2"
+
+                    android:alignmentMode="alignBounds"
+
+                    android:columnOrderPreserved="false"
+
+                    android:useDefaultMargins="false">
 
 
 
@@ -604,6 +611,14 @@
                         android:id="@+id/btnOptionA"
 
                         style="@style/OptionButtonStyleNew"
+
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_columnWeight="1"
+
+                        android:layout_margin="4dp"
 
                         android:text="a) Lorem ipsum dolor sit amet"/>
 
@@ -615,6 +630,14 @@
 
                         style="@style/OptionButtonStyleNew"
 
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_columnWeight="1"
+
+                        android:layout_margin="4dp"
+
                         android:text="b) Lorem ipsum dolor sit amet"/>
 
 
@@ -625,6 +648,14 @@
 
                         style="@style/OptionButtonStyleNew"
 
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_columnWeight="1"
+
+                        android:layout_margin="4dp"
+
                         android:text="c) Lorem ipsum dolor sit amet"/>
 
 
@@ -634,6 +665,14 @@
                         android:id="@+id/btnOptionD"
 
                         style="@style/OptionButtonStyleNew"
+
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_columnWeight="1"
+
+                        android:layout_margin="4dp"
 
                         android:text="d) Lorem ipsum dolor sit amet"/>
 
