@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -64,6 +65,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private TextView tvItemTypeBadge, tvPronunciationWord, tvPronunciationGuide, tvMicStatus;
     private Button btnOptionA, btnOptionB, btnOptionC, btnOptionD;
     private MaterialButton btnContinue;
+    private MaterialButton btnSkipPronunciation; // TODO: Remove after testing - temporary for pronunciation testing
     private CardView cardPassage, cardPronunciation, cardQuestion, cardMicButton;
     private ImageView ivMic;
     private ProgressBar progressBar;
@@ -103,6 +105,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private Runnable hintRunnable;
     private int hintLevel = 0;
 
+    // Sound effects
+    private MediaPlayer soundClick;
+    private MediaPlayer soundSuccess;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -134,6 +140,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         btnOptionC = findViewById(R.id.btnOptionC);
         btnOptionD = findViewById(R.id.btnOptionD);
         btnContinue = findViewById(R.id.btnContinue);
+        btnSkipPronunciation = findViewById(R.id.btnSkipPronunciation); // TODO: Remove after testing
 
         cardPassage = findViewById(R.id.cardPassage);
         cardPronunciation = findViewById(R.id.cardPronunciation);
@@ -187,6 +194,15 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             recordPronunciation();
         });
 
+        // TODO: Remove skip button functionality after testing - temporary for pronunciation testing
+        btnSkipPronunciation.setOnClickListener(v -> {
+            // Skip pronunciation - set dummy answer and enable continue
+            selectedAnswer = "SKIP";
+            pronunciationScore = 50; // Neutral score for skipped questions
+            btnContinue.setEnabled(true);
+            tvMicStatus.setText("Skipped");
+        });
+
         // Initialize tutorial views
         overlayDark = findViewById(R.id.overlayDark);
         tutorialContentLayout = findViewById(R.id.tutorialContentLayout);
@@ -195,6 +211,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         tvTapToContinue = findViewById(R.id.tvTapToContinue);
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
         cardSpeechBubble = findViewById(R.id.cardSpeechBubble);
+
+        // Initialize sound effects for tutorial
+        soundClick = MediaPlayer.create(this, R.raw.sound_button_click);
+        soundSuccess = MediaPlayer.create(this, R.raw.sound_success);
     }
 
     private void loadNextAdaptiveQuestion() {
@@ -374,6 +394,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         gridOptions.setVisibility(View.GONE);
         tvMicStatus.setText("Tap to record");
 
+        // TODO: Remove after testing - show skip button for pronunciation questions
+        btnSkipPronunciation.setVisibility(View.VISIBLE);
+
         tvPronunciationWord.setText(q.getItemText() != null ? q.getItemText() : "");
         tvPronunciationGuide.setText(q.getPassageText() != null ? "/" + q.getPassageText() + "/" : "");
 
@@ -431,6 +454,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private void handleMultipleChoiceQuestion(Question q) {
         tvQuestion.setText(q.getQuestionText());
         setOptionsVisibility(q);
+
+        // Hide skip button for MCQ questions
+        btnSkipPronunciation.setVisibility(View.GONE);
     }
 
     private void setOptionsVisibility(Question q) {
@@ -498,6 +524,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             isCorrect = (pronunciationScore >= 70) ? 1 : 0;
         } else {
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
+        }
+
+        // During tutorial, skip validation and just proceed to next question
+        if (isTutorialActive) {
+            // Don't show correct/incorrect during tutorial - just practice
+            playSound(soundClick);
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                loadNextAdaptiveQuestion();
+            }, 500);
+            return;
         }
 
         // DEMO MODE: Handle locally without API
@@ -917,6 +953,28 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             speechRecognizer.destroy();
         }
         cancelHints();
+
+        // Release sound resources
+        if (soundClick != null) {
+            soundClick.release();
+        }
+        if (soundSuccess != null) {
+            soundSuccess.release();
+        }
+    }
+
+    private void playSound(MediaPlayer sound) {
+        if (sound != null) {
+            try {
+                if (sound.isPlaying()) {
+                    sound.seekTo(0);
+                } else {
+                    sound.start();
+                }
+            } catch (Exception e) {
+                android.util.Log.e("AdaptiveAssessment", "Error playing sound: " + e.getMessage());
+            }
+        }
     }
 
     // ============ Tutorial Methods ============
@@ -1103,6 +1161,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         resetHighlights();
         tutorialStep = 3;
 
+        // Play success sound when student interacts correctly
+        playSound(soundSuccess);
+
         celebrateInteraction("Excellent!");
 
         // Slower timing - give kids 3 seconds to see the celebration
@@ -1128,6 +1189,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         tvTutorialTitle.setText(title);
         tvTutorialMessage.setText(message);
         tvTapToContinue.setText(tapText);
+
+        // Play subtle click sound when showing new tutorial step
+        playSound(soundClick);
 
         ScaleAnimation bounce = new ScaleAnimation(
                 0.95f, 1.0f,
@@ -1220,6 +1284,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         isTutorialActive = false;
         cancelHints();
         resetHighlights();
+
+        // Play success sound when completing tutorial
+        playSound(soundSuccess);
 
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(300);

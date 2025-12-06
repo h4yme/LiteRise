@@ -466,6 +466,18 @@
 
                         android:layout_marginTop="8dp"/>
 
+                    <!-- TODO: Remove skip button after testing - temporary for pronunciation testing -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSkipPronunciation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="Skip"
+                        android:textSize="12sp"
+                        app:cornerRadius="18dp"
+                        style="@style/Widget.Material3.Button.TextButton"
+                        android:layout_marginTop="8dp"
+                        android:visibility="gone"/>
+
                 </LinearLayout>
 
             </LinearLayout>
