@@ -1073,9 +1073,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // Slower timing - give kids 3 seconds to see the celebration
         hintHandler.postDelayed(() -> {
-            // Make tutorial overlay clickable again for final step (prevent accidental continue)
-            tutorialContentLayout.setClickable(true);
-            tutorialContentLayout.setFocusable(true);
+            // Keep tutorial overlay non-clickable so Continue button can be pressed
+            tutorialContentLayout.setClickable(false);
+            tutorialContentLayout.setFocusable(false);
             showTutorialStep(
                     "Final Step: Continue",
                     "Great job! Now tap the Continue button below to move forward!",
