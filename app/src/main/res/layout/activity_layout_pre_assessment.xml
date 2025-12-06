@@ -736,18 +736,18 @@
         android:focusable="false"
         android:visibility="gone">
 
-        <!-- Speech Bubble (positioned in center-bottom area, above Leo) -->
+        <!-- Speech Bubble (positioned at top to avoid blocking choices) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardSpeechBubble"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_marginStart="32dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="100dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginTop="80dp"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="20dp"
-            app:cardElevation="8dp">
+            app:cardElevation="12dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -782,26 +782,28 @@
 
         </androidx.cardview.widget.CardView>
 
-        <!-- Leo Mascot (bottom center, like in the design) -->
+        <!-- Leo Mascot (bottom-right corner, smaller to avoid blocking) -->
         <ImageView
             android:id="@+id/ivLeoMascot"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="60dp"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
             android:src="@drawable/leo_placement_test"
             android:scaleType="fitCenter"
             android:contentDescription="Leo Mascot" />
 
-        <!-- Tap to Continue (below Leo, at very bottom) -->
+        <!-- Tap to Continue (bottom-left, opposite of Leo) -->
         <TextView
             android:id="@+id/tvTapToContinue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentStart="true"
             android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
             android:text="Tap to Continue"
             android:textSize="16sp"
             android:textColor="@android:color/white"

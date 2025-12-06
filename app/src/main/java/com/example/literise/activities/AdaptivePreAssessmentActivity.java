@@ -97,6 +97,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private CardView cardSpeechBubble;
     private boolean isTutorialActive = false;
     private HashSet<String> tutorialShownForTypes = new HashSet<>();
+    private boolean isFirstTutorial = true; // Track if this is the very first tutorial
     private int tutorialStep = 0;
     private Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
@@ -956,18 +957,29 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void startSyntaxTutorial() {
-        showTutorialStep(
-                "Welcome to the Test!",
-                "Hi! I'm Leo!\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
-                "Let's Begin!"
-        );
+        if (isFirstTutorial) {
+            // First tutorial - introduce Leo
+            showTutorialStep(
+                    "Hi! I'm Leo! 🦁",
+                    "Welcome to the test! I'll help you along the way.\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
+                    "Let's Begin!"
+            );
+            isFirstTutorial = false;
+        } else {
+            // Subsequent tutorials - skip intro, go straight to instructions
+            showTutorialStep(
+                    "Syntax Question",
+                    "Use the scrambled words to form a correct sentence!",
+                    "Got it!"
+            );
+        }
 
-        // Slower timing - give kids 5 seconds to read welcome message
+        // Slower timing - give kids 5 seconds to read message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
             showTutorialStep(
-                    "Step 1: Read the Words",
-                    "Look at the scrambled words in the white card above.\n\nThese words need to be arranged correctly!",
+                    "Read the Words",
+                    "Look at the scrambled words in the card above.\n\nThese words need to be arranged correctly!",
                     "Got it!"
             );
             highlightView(cardPassage);
@@ -981,7 +993,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 tutorialContentLayout.setClickable(false);
                 tutorialContentLayout.setFocusable(false);
                 showTutorialStep(
-                        "Step 2: Choose Your Answer",
+                        "Choose Your Answer",
                         "Now tap one of the options below that shows the correct sentence!",
                         "Try It!"
                 );
@@ -997,13 +1009,24 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void startPronunciationTutorial() {
-        showTutorialStep(
-                "Welcome to the Test!",
-                "Hi! I'm Leo!\n\nThis is a pronunciation question. You'll speak the word clearly!",
-                "Let's Begin!"
-        );
+        if (isFirstTutorial) {
+            // First tutorial - introduce Leo
+            showTutorialStep(
+                    "Hi! I'm Leo! 🦁",
+                    "Welcome to the test! I'll help you along the way.\n\nThis is a pronunciation question. You'll speak the word clearly!",
+                    "Let's Begin!"
+            );
+            isFirstTutorial = false;
+        } else {
+            // Subsequent tutorials - skip intro, go straight to instructions
+            showTutorialStep(
+                    "Pronunciation Question",
+                    "You'll speak the word clearly into the microphone!",
+                    "Got it!"
+            );
+        }
 
-        // Slower timing - give kids 5 seconds to read welcome message
+        // Slower timing - give kids 5 seconds to read message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
             // Hide dark overlay so student can tap microphone clearly
@@ -1012,13 +1035,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             tutorialContentLayout.setClickable(false);
             tutorialContentLayout.setFocusable(false);
             showTutorialStep(
-                    "Step 1: Tap the Microphone",
-                    "Tap the green microphone button to record your pronunciation!",
+                    "Tap the Microphone",
+                    "Tap the blue microphone button to record your pronunciation!",
                     "Try It!"
             );
             highlightView(cardMicButton);
             startProgressiveHints(new String[]{
-                    "Tap the green circle to record!",
+                    "Tap the blue circle to record!",
                     "The microphone is waiting for you!",
                     "Go ahead, tap it!"
             });
@@ -1026,18 +1049,29 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void startGrammarTutorial() {
-        showTutorialStep(
-                "Welcome to the Test!",
-                "Hi! I'm Leo!\n\nRead the question carefully and choose the best answer!",
-                "Let's Begin!"
-        );
+        if (isFirstTutorial) {
+            // First tutorial - introduce Leo
+            showTutorialStep(
+                    "Hi! I'm Leo! 🦁",
+                    "Welcome to the test! I'll help you along the way.\n\nRead the question carefully and choose the best answer!",
+                    "Let's Begin!"
+            );
+            isFirstTutorial = false;
+        } else {
+            // Subsequent tutorials - skip intro, go straight to instructions
+            showTutorialStep(
+                    "Question Time",
+                    "Read the question carefully and choose the best answer!",
+                    "Got it!"
+            );
+        }
 
-        // Slower timing - give kids 5 seconds to read welcome message
+        // Slower timing - give kids 5 seconds to read message
         hintHandler.postDelayed(() -> {
             tutorialStep = 1;
             showTutorialStep(
-                    "Step 1: Read the Question",
-                    "Look at the question in the white card.\n\nTake your time to understand it!",
+                    "Read the Question",
+                    "Look at the question in the card.\n\nTake your time to understand it!",
                     "Got it!"
             );
             highlightView(cardQuestion);
@@ -1051,7 +1085,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 tutorialContentLayout.setClickable(false);
                 tutorialContentLayout.setFocusable(false);
                 showTutorialStep(
-                        "Step 2: Choose Your Answer",
+                        "Choose Your Answer",
                         "Now tap one of the options below that you think is correct!",
                         "Try It!"
                 );
@@ -1109,12 +1143,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         if (view == null) return;
 
         view.setAlpha(1.0f);
-        // IMPORTANT: Set very high elevation to appear above overlay
-        view.setElevation(100f);
-        // Bring view to front to ensure it's above overlay
-        view.bringToFront();
-        view.requestLayout();
-        view.invalidate();
+        // Use moderate elevation without bringToFront to prevent teleporting
+        view.setElevation(16f);
 
         ScaleAnimation pulse = new ScaleAnimation(
                 1.0f, 1.05f,
