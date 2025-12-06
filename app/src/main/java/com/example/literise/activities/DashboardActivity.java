@@ -28,6 +28,8 @@ import com.example.literise.api.ApiClient;
 
 import com.example.literise.api.ApiService;
 
+import com.example.literise.utils.ModulePriorityManager;
+
 import com.example.literise.database.SessionManager;
 
 import com.example.literise.models.LessonProgressResponse;
@@ -56,15 +58,17 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome;
+    private TextView tvHeaderXP, tvStreak, tvWelcome, tvMotivation;
 
-    private ImageView ivSettings, ivTrophy;
+    private ImageView ivLeoMascot;
 
     private com.google.android.material.button.MaterialButton btnContinueLesson;
 
-    private LinearLayout lessonListContainer;
+    private android.widget.GridLayout gridModules;
 
     private SessionManager session;
+
+    private ModulePriorityManager priorityManager;
 
 
 
@@ -82,11 +86,13 @@ public class DashboardActivity extends BaseActivity {
 
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_dashboard);
+        setContentView(R.layout.activity_dashboard_new);
 
 
 
         session = new SessionManager(this);
+
+        priorityManager = new ModulePriorityManager(this);
 
 
 
@@ -94,7 +100,7 @@ public class DashboardActivity extends BaseActivity {
 
         loadUserData();
 
-        loadLessonProgress();
+        displayModules();
 
         setupListeners();
 
@@ -108,17 +114,15 @@ public class DashboardActivity extends BaseActivity {
 
         tvStreak = findViewById(R.id.tvStreak);
 
-        tvBadges = findViewById(R.id.tvBadges);
-
         tvWelcome = findViewById(R.id.tvWelcome);
 
-        ivSettings = findViewById(R.id.ivSettings);
+        tvMotivation = findViewById(R.id.tvMotivation);
 
-        ivTrophy = findViewById(R.id.ivTrophy);
+        ivLeoMascot = findViewById(R.id.ivLeoMascot);
 
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
-        lessonListContainer = findViewById(R.id.lessonListContainer);
+        gridModules = findViewById(R.id.gridModules);
 
     }
 
@@ -126,11 +130,11 @@ public class DashboardActivity extends BaseActivity {
 
     private void setupListeners() {
 
-        ivSettings.setOnClickListener(v -> openSettings());
-
-        ivTrophy.setOnClickListener(v -> openAchievements());
-
         btnContinueLesson.setOnClickListener(v -> continueLesson());
+
+        // Leo mascot - show encouraging message when tapped
+
+        ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
 
     }
 
@@ -138,15 +142,19 @@ public class DashboardActivity extends BaseActivity {
 
     private void loadUserData() {
 
-        String fullName = session.getFullName();
+        String nickname = session.getNickname();
 
         int xp = session.getXP();
 
 
 
-        if (fullName != null && !fullName.isEmpty()) {
+        if (nickname != null && !nickname.isEmpty()) {
 
-            tvWelcome.setText(String.format("Welcome back,\n%s!", fullName));
+            tvWelcome.setText(String.format("Hello, %s", nickname));
+
+        } else {
+
+            tvWelcome.setText("Hello, Student");
 
         }
 
@@ -154,9 +162,183 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d-Day Streak", currentStreak));
+        tvStreak.setText(String.format("%d", currentStreak));
 
-        tvBadges.setText(String.format("%d Badges", 0));
+    }
+
+
+
+    /**
+
+     * Display 6 module cards ordered by priority (weakest to strongest)
+
+     */
+
+    private void displayModules() {
+
+        gridModules.removeAllViews();
+
+
+
+        // Get modules ordered from weakest to strongest
+
+        List<String> orderedModules = priorityManager.getOrderedModules();
+
+
+
+        // Module card background colors (soft gradients matching design)
+
+        int[] moduleColors = {
+
+                0xFFFDBEBD, // Soft pink (priority 1 - weakest)
+
+                0xFFFDD4BC, // Soft peach (priority 2)
+
+                0xFFFFF4CE, // Soft yellow (priority 3)
+
+                0xFFD4F1D4, // Soft green (priority 4)
+
+                0xFFBBDEFB, // Soft blue (priority 5)
+
+                0xFFD4C5F9  // Soft purple (priority 6 - strongest)
+
+        };
+
+
+
+        // Priority badge colors
+
+        int[] badgeColors = {
+
+                0xFFE74C3C, // Red (highest priority)
+
+                0xFFE67E22, // Orange
+
+                0xFFF39C12, // Yellow
+
+                0xFF00B894, // Green
+
+                0xFF0984E3, // Blue
+
+                0xFF6C5CE7  // Purple (lowest priority)
+
+        };
+
+
+
+        for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
+
+            String moduleName = orderedModules.get(i);
+
+            int priority = i + 1;
+
+
+
+            View moduleCard = LayoutInflater.from(this).inflate(
+
+                    R.layout.item_dashboard_module,
+
+                    gridModules,
+
+                    false
+
+            );
+
+
+
+            // Set views
+
+            LinearLayout cardContainer = moduleCard.findViewById(R.id.moduleCardContainer);
+
+            TextView tvPriority = moduleCard.findViewById(R.id.tvPriorityNumber);
+
+            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
+
+            TextView tvProgress = moduleCard.findViewById(R.id.tvModuleProgress);
+
+
+
+            // Set card background color
+
+            cardContainer.setBackgroundColor(moduleColors[i]);
+
+
+
+            // Set priority badge
+
+            tvPriority.setText(String.valueOf(priority));
+
+            tvPriority.setBackgroundTintList(
+
+                    android.content.res.ColorStateList.valueOf(badgeColors[i])
+
+            );
+
+
+
+            // Set module name
+
+            tvModuleName.setText(moduleName);
+
+
+
+            // Set progress (TODO: load from database)
+
+            tvProgress.setText("0/20");
+
+
+
+            // Click listener to open module
+
+            final int moduleIndex = i;
+
+            moduleCard.setOnClickListener(v -> openModule(moduleName, moduleIndex));
+
+
+
+            gridModules.addView(moduleCard);
+
+        }
+
+    }
+
+
+
+    private void showLeoEncouragement() {
+
+        String[] encouragements = {
+
+                "You're doing great! Keep it up! 🌟",
+
+                "Learning is an adventure! Let's go! 🚀",
+
+                "Every step counts! You've got this! 💪",
+
+                "I believe in you! 🦁"
+
+        };
+
+        int randomIndex = (int) (Math.random() * encouragements.length);
+
+        android.widget.Toast.makeText(this, encouragements[randomIndex], android.widget.Toast.LENGTH_SHORT).show();
+
+    }
+
+
+
+    private void openModule(String moduleName, int priority) {
+
+        // TODO: Navigate to ModuleLadderActivity
+
+        android.widget.Toast.makeText(
+
+                this,
+
+                "Opening " + moduleName + " (Priority " + (priority + 1) + ")",
+
+                android.widget.Toast.LENGTH_SHORT
+
+        ).show();
 
     }
 

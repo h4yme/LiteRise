@@ -20,6 +20,8 @@ import android.widget.LinearLayout;
 
 import android.widget.TextView;
 
+import java.util.List;
+
 
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +31,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
+
+import com.example.literise.utils.ModulePriorityManager;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -52,6 +56,8 @@ public class AssessmentResultsActivity extends BaseActivity {
 
     private SessionManager sessionManager;
 
+    private ModulePriorityManager priorityManager;
+
     private MediaPlayer soundPlayer;
 
 
@@ -73,6 +79,8 @@ public class AssessmentResultsActivity extends BaseActivity {
         // Initialize SessionManager
 
         sessionManager = new SessionManager(this);
+
+        priorityManager = new ModulePriorityManager(this);
 
 
 
@@ -216,29 +224,15 @@ public class AssessmentResultsActivity extends BaseActivity {
 
 
 
-        // Define the 6 literacy modules
+        // Get ordered modules from ModulePriorityManager (weakest to strongest)
 
-        String[] moduleNames = {
-
-                "Reading Comprehension",
-
-                "Phonics & Pronunciation",
-
-                "Vocabulary Building",
-
-                "Grammar & Syntax",
-
-                "Reading Fluency",
-
-                "Spelling & Writing"
-
-        };
+        List<String> orderedModules = priorityManager.getOrderedModules();
 
 
 
         String[] moduleDescriptions = {
 
-                "Start here to improve faster",
+                "Start here - needs most practice",
 
                 "Build your foundation",
 
@@ -256,7 +250,7 @@ public class AssessmentResultsActivity extends BaseActivity {
 
         int[] modulePriorityColors = {
 
-                0xFFE74C3C, // Red (highest priority)
+                0xFFE74C3C, // Red (highest priority - weakest area)
 
                 0xFFE67E22, // Orange
 
@@ -266,17 +260,15 @@ public class AssessmentResultsActivity extends BaseActivity {
 
                 0xFF0984E3, // Blue
 
-                0xFF6C5CE7  // Purple (lowest priority)
+                0xFF6C5CE7  // Purple (lowest priority - strongest area)
 
         };
 
 
 
-        // For demo purposes, show all 6 modules in order
+        // Display modules in order of priority (weakest to strongest)
 
-        // In production, this would be based on actual assessment analysis
-
-        for (int i = 0; i < Math.min(6, moduleNames.length); i++) {
+        for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
 
             View moduleView = LayoutInflater.from(this).inflate(R.layout.item_module_priority, containerModulePriorities, false);
 
@@ -290,13 +282,29 @@ public class AssessmentResultsActivity extends BaseActivity {
 
 
 
+            String moduleName = orderedModules.get(i);
+
+
+
             tvPriorityBadge.setText(String.valueOf(i + 1));
 
             tvPriorityBadge.setBackgroundTintList(android.content.res.ColorStateList.valueOf(modulePriorityColors[i]));
 
-            tvModuleName.setText(moduleNames[i]);
+            tvModuleName.setText(moduleName);
 
             tvModuleDescription.setText(moduleDescriptions[i]);
+
+
+
+            // Show performance if available
+
+            ModulePriorityManager.ModulePerformance perf = priorityManager.getModulePerformance(moduleName);
+
+            if (perf != null && perf.getTotalAttempts() > 0) {
+
+                tvModuleDescription.setText(moduleDescriptions[i] + " • " + perf.getPerformanceLevel());
+
+            }
 
 
 
