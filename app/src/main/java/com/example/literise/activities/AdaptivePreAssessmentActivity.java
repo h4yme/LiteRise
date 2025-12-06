@@ -45,6 +45,7 @@ import com.example.literise.models.SubmitSingleRequest;
 import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 import com.example.literise.utils.DemoDataProvider;
+import com.example.literise.utils.ModulePriorityManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -109,13 +110,20 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private MediaPlayer soundClick;
     private MediaPlayer soundSuccess;
 
+    // Module priority tracking
+    private ModulePriorityManager priorityManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_layout_pre_assessment);
 
         session = new SessionManager(this);
+        priorityManager = new ModulePriorityManager(this);
         initializeViews();
+
+        // Clear previous assessment data for fresh start
+        priorityManager.clearPerformance();
 
         // Get initial theta from student's current ability
         currentTheta = session.getAbility();
@@ -296,6 +304,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Calculate demo ability based on performance
         float accuracy = (demoQuestions.size() > 0) ? ((float) demoCorrectAnswers / demoQuestions.size()) * 100 : 0;
         double finalTheta = -1.0 + (accuracy / 100.0) * 3.0; // Map 0-100% to -1.0 to 2.0
+
+        // Calculate module priorities based on performance (weakest to strongest)
+        priorityManager.calculateModulePriorities();
 
         // Save ability to session
         session.saveAbility((float) finalTheta);
@@ -526,6 +537,11 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
         }
 
+        // Track performance for module prioritization (skip during tutorial)
+        if (!isTutorialActive && currentQuestion.getItemType() != null) {
+            priorityManager.recordPerformance(currentQuestion.getItemType(), isCorrect == 1);
+        }
+
         // During tutorial, skip validation and just proceed to next question
         if (isTutorialActive) {
             // Don't show correct/incorrect during tutorial - just practice
@@ -673,6 +689,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         btnContinueDialog.setOnClickListener(v -> {
             dialog.dismiss();
+
+            // Calculate module priorities based on performance (weakest to strongest)
+            priorityManager.calculateModulePriorities();
+
             Intent intent = new Intent(AdaptivePreAssessmentActivity.this, AssessmentResultsActivity.class);
             // Pass the estimated ability score to results screen
             if (result.getFinalTheta() != null) {
