@@ -34,7 +34,7 @@ import com.google.android.material.button.MaterialButton;
 
 
 
-public class AssessmentResultsActivity extends AppCompatActivity {
+public class AssessmentResultsActivity extends BaseActivity {
 
 
 

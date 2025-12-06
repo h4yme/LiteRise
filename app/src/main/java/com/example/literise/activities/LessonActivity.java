@@ -64,7 +64,7 @@ import retrofit2.Response;
 
 
 
-public class LessonActivity extends AppCompatActivity {
+public class LessonActivity extends BaseActivity {
 
 
 

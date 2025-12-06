@@ -52,7 +52,7 @@ import retrofit2.Response;
 
 
 
-public class DashboardActivity extends AppCompatActivity {
+public class DashboardActivity extends BaseActivity {
 
 
 
