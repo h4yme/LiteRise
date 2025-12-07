@@ -147,7 +147,7 @@ public class DashboardActivity extends BaseActivity {
         Students student = new Students();
         student.setEmail(email);
 
-        ApiService apiService = ApiClient.getRetrofitInstance().create(ApiService.class);
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         Call<Students> call = apiService.login(student);
 
         call.enqueue(new Callback<Students>() {
@@ -162,8 +162,8 @@ public class DashboardActivity extends BaseActivity {
                     }
 
                     // Update XP if available
-                    if (s.getTotal_xp() > 0) {
-                        session.saveXP(s.getTotal_xp());
+                    if (s.getXp() > 0) {
+                        session.saveXP(s.getXp());
                     }
 
                     // Reload UI with updated data
