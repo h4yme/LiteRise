@@ -17,13 +17,14 @@ import java.util.List;
 
 public class DashboardActivity extends BaseActivity {
 
-    private TextView tvHeaderXP, tvStreak, tvWelcome, tvMotivation;
-    private ImageView ivLeoMascot;
+    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation;
+    private ImageView ivLeoMascot, ivSettings;
     private MaterialButton btnContinueLesson;
     private android.widget.GridLayout gridModules;
     private SessionManager session;
     private ModulePriorityManager priorityManager;
     private int currentStreak = 0;
+    private int totalBadges = 7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +43,11 @@ public class DashboardActivity extends BaseActivity {
     private void initializeViews() {
         tvHeaderXP = findViewById(R.id.tvHeaderXP);
         tvStreak = findViewById(R.id.tvStreak);
+        tvBadges = findViewById(R.id.tvBadges);
         tvWelcome = findViewById(R.id.tvWelcome);
         tvMotivation = findViewById(R.id.tvMotivation);
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
+        ivSettings = findViewById(R.id.ivSettings);
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
         gridModules = findViewById(R.id.gridModules);
     }
@@ -59,13 +62,14 @@ public class DashboardActivity extends BaseActivity {
         int xp = session.getXP();
 
         if (nickname != null && !nickname.isEmpty()) {
-            tvWelcome.setText(String.format("Halo %s!", nickname));
+            tvWelcome.setText(String.format("Hello, %s", nickname));
         } else {
-            tvWelcome.setText("Halo Student!");
+            tvWelcome.setText("Hello, Student");
         }
 
         tvHeaderXP.setText(String.format("%d XP", xp));
-        tvStreak.setText(String.format("%d", currentStreak));
+        tvStreak.setText(String.format("%d-Day Streak", currentStreak));
+        tvBadges.setText(String.format("%d Badges", totalBadges));
     }
 
     /**
@@ -77,19 +81,8 @@ public class DashboardActivity extends BaseActivity {
         // Get modules ordered from weakest to strongest
         List<String> orderedModules = priorityManager.getOrderedModules();
 
-        // Module gradient backgrounds (matching design inspiration)
-        int[] moduleGradients = {
-                R.drawable.bg_module_gradient_pink,   // Priority 1 - weakest
-                R.drawable.bg_module_gradient_coral,  // Priority 2
-                R.drawable.bg_module_gradient_blue,   // Priority 3
-                R.drawable.bg_module_gradient_purple, // Priority 4
-                R.drawable.bg_module_gradient_green,  // Priority 5
-                R.drawable.bg_module_gradient_orange  // Priority 6 - strongest
-        };
-
         for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
             String moduleName = orderedModules.get(i);
-            int level = i + 1;
 
             View moduleCard = LayoutInflater.from(this).inflate(
                     R.layout.item_dashboard_module,
@@ -97,18 +90,8 @@ public class DashboardActivity extends BaseActivity {
                     false
             );
 
-            // Set views
-            android.widget.FrameLayout cardContainer = moduleCard.findViewById(R.id.moduleCardContainer);
-            TextView tvModuleLevel = moduleCard.findViewById(R.id.tvModuleLevel);
-            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
-
-            // Set gradient background
-            cardContainer.setBackgroundResource(moduleGradients[i]);
-
-            // Set module level
-            tvModuleLevel.setText(String.format("LEVEL %d", level));
-
             // Set module name
+            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
             tvModuleName.setText(moduleName);
 
             // Click listener to open module

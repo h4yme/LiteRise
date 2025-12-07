@@ -2,90 +2,37 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="0dp"
-    android:layout_height="160dp"
+    android:layout_height="140dp"
     android:layout_columnWeight="1"
-    android:layout_margin="6dp"
-    app:cardCornerRadius="20dp"
-    app:cardElevation="4dp"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <!-- Gradient Background Container -->
-    <FrameLayout
+    <!-- Simple frosted white background -->
+    <LinearLayout
         android:id="@+id/moduleCardContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="#55FFFFFF"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:gravity="bottom|start">
 
-        <!-- Frosted White Overlay -->
-        <View
+        <!-- Module Name -->
+        <TextView
+            android:id="@+id/tvModuleName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#33FFFFFF"
-            android:layout_marginStart="0dp"
-            android:layout_marginEnd="80dp"/>
-
-        <!-- Content Container -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            android:padding="16dp">
-
-            <!-- Left Section: Play Icon & Module Name -->
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:gravity="start|center_vertical">
-
-                <!-- Play Icon Circle -->
-                <ImageView
-                    android:id="@+id/ivPlayIcon"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_play_circle"
-                    app:tint="@android:color/white"
-                    android:contentDescription="Play Icon"
-                    android:layout_marginBottom="12dp"/>
-
-                <!-- Module Level Text -->
-                <TextView
-                    android:id="@+id/tvModuleLevel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LEVEL 1"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:alpha="0.9"
-                    android:layout_marginBottom="4dp"/>
-
-                <!-- Module Name -->
-                <TextView
-                    android:id="@+id/tvModuleName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Kota Matematika"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/poppins_bold"
-                    android:maxLines="2"
-                    android:ellipsize="end"/>
-            </LinearLayout>
-
-            <!-- Right Section: Decorative Illustration -->
-            <ImageView
-                android:id="@+id/ivModuleIllustration"
-                android:layout_width="100dp"
-                android:layout_height="match_parent"
-                android:src="@drawable/leo_placement_test"
-                android:scaleType="centerCrop"
-                android:contentDescription="Module Illustration"
-                android:layout_gravity="end|bottom"/>
-        </LinearLayout>
-    </FrameLayout>
+            android:layout_height="wrap_content"
+            android:text="Reading\nComprehension"
+            android:textSize="13sp"
+            android:textStyle="normal"
+            android:textColor="#FFFFFF"
+            android:fontFamily="@font/poppins"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:lineSpacingExtra="2dp"/>
+    </LinearLayout>
 </androidx.cardview.widget.CardView>
