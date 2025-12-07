@@ -54,6 +54,7 @@ public class DashboardActivity extends BaseActivity {
     private void setupListeners() {
         btnContinueLesson.setOnClickListener(v -> continueLesson());
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
+        ivSettings.setOnClickListener(v -> openSettings());
     }
 
     private void loadUserData() {
@@ -155,6 +156,11 @@ public class DashboardActivity extends BaseActivity {
                 "Continue lesson feature coming soon!",
                 android.widget.Toast.LENGTH_SHORT
         ).show();
+    }
+
+    private void openSettings() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
 
     @Override
