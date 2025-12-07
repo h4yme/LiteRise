@@ -60,101 +60,159 @@
 
                 android:layout_height="wrap_content"
 
-                android:orientation="horizontal"
-
-                android:gravity="center_vertical"
-
-                android:layout_marginBottom="20dp">
+                android:orientation="vertical">
 
 
 
-                <!-- Home Title -->
-
-                <TextView
-
-                    android:layout_width="0dp"
-
-                    android:layout_height="wrap_content"
-
-                    android:layout_weight="1"
-
-                    android:text="Home"
-
-                    android:textSize="24sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="#2D3436"
-
-                    android:fontFamily="@font/poppins_bold"/>
-
-
-
-                <!-- XP Badge -->
+                <!-- Top Row: Home Title and Badges -->
 
                 <LinearLayout
 
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
 
                     android:layout_height="wrap_content"
 
                     android:orientation="horizontal"
 
-                    android:background="@drawable/bg_rounded_white"
+                    android:gravity="center_vertical"
 
-                    android:paddingStart="12dp"
-
-                    android:paddingEnd="12dp"
-
-                    android:paddingTop="8dp"
-
-                    android:paddingBottom="8dp"
-
-                    android:layout_marginEnd="8dp"
-
-                    android:gravity="center">
+                    android:layout_marginBottom="12dp">
 
 
 
-                    <ImageView
-
-                        android:layout_width="16dp"
-
-                        android:layout_height="16dp"
-
-                        android:src="@drawable/ic_fire"
-
-                        android:layout_marginEnd="4dp"
-
-                        app:tint="#FF6B35"
-
-                        android:contentDescription="XP Icon"/>
-
-
+                    <!-- Home Title -->
 
                     <TextView
 
-                        android:id="@+id/tvHeaderXP"
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="1"
+
+                        android:text="Home"
+
+                        android:textSize="25sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#2D3436"
+
+                        android:fontFamily="@font/visby_bold"/>
+
+
+
+                    <!-- XP Badge -->
+
+                    <LinearLayout
 
                         android:layout_width="wrap_content"
 
                         android:layout_height="wrap_content"
 
-                        android:text="2500 XP"
+                        android:orientation="horizontal"
 
-                        android:textSize="12sp"
+                        android:background="@drawable/bg_rounded_white"
 
-                        android:textStyle="bold"
+                        android:paddingStart="12dp"
 
-                        android:textColor="#FF6B35"
+                        android:paddingEnd="12dp"
 
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:paddingTop="6dp"
+
+                        android:paddingBottom="6dp"
+
+                        android:layout_marginEnd="8dp"
+
+                        android:gravity="center">
+
+
+
+                        <ImageView
+
+                            android:layout_width="18dp"
+
+                            android:layout_height="18dp"
+
+                            android:src="@drawable/ic_star"
+
+                            android:layout_marginEnd="4dp"
+
+                            app:tint="#FFD700"
+
+                            android:contentDescription="XP Icon"/>
+
+
+
+                        <TextView
+
+                            android:id="@+id/tvHeaderXP"
+
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+
+                            android:text="2500 XP"
+
+                            android:textSize="11sp"
+
+                            android:textStyle="bold"
+
+                            android:textColor="#2D3436"
+
+                            android:fontFamily="@font/poppins_semibold"/>
+
+                    </LinearLayout>
+
+
+
+                    <!-- Shield Badge -->
+
+                    <ImageView
+
+                        android:layout_width="32dp"
+
+                        android:layout_height="32dp"
+
+                        android:src="@drawable/ic_star"
+
+                        android:background="@drawable/bg_rounded_white"
+
+                        android:padding="6dp"
+
+                        android:layout_marginEnd="8dp"
+
+                        app:tint="#FF6B35"
+
+                        android:contentDescription="Shield Badge"/>
+
+
+
+                    <!-- Settings Icon -->
+
+                    <ImageView
+
+                        android:id="@+id/ivSettings"
+
+                        android:layout_width="32dp"
+
+                        android:layout_height="32dp"
+
+                        android:src="@drawable/ic_settings"
+
+                        android:background="@drawable/bg_rounded_white"
+
+                        android:padding="6dp"
+
+                        app:tint="#636E72"
+
+                        android:contentDescription="Settings"/>
 
                 </LinearLayout>
 
 
 
-                <!-- Streak Badge -->
+                <!-- Pills Row: Streak and Badges -->
 
                 <LinearLayout
 
@@ -162,55 +220,113 @@
 
                     android:layout_height="wrap_content"
 
-                    android:orientation="horizontal"
-
-                    android:background="@drawable/bg_rounded_white"
-
-                    android:paddingStart="12dp"
-
-                    android:paddingEnd="12dp"
-
-                    android:paddingTop="8dp"
-
-                    android:paddingBottom="8dp"
-
-                    android:gravity="center">
+                    android:orientation="horizontal">
 
 
 
-                    <ImageView
+                    <!-- Streak Pill -->
 
-                        android:layout_width="16dp"
-
-                        android:layout_height="16dp"
-
-                        android:src="@drawable/ic_fire"
-
-                        android:layout_marginEnd="4dp"
-
-                        app:tint="#F39C12"
-
-                        android:contentDescription="Streak Icon"/>
-
-
-
-                    <TextView
-
-                        android:id="@+id/tvStreak"
+                    <LinearLayout
 
                         android:layout_width="wrap_content"
 
                         android:layout_height="wrap_content"
 
-                        android:text="7"
+                        android:orientation="horizontal"
 
-                        android:textSize="12sp"
+                        android:background="@drawable/bg_rounded_white"
 
-                        android:textStyle="bold"
+                        android:paddingStart="12dp"
 
-                        android:textColor="#F39C12"
+                        android:paddingEnd="12dp"
 
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:paddingTop="6dp"
+
+                        android:paddingBottom="6dp"
+
+                        android:layout_marginEnd="8dp"
+
+                        android:gravity="center">
+
+
+
+                        <ImageView
+
+                            android:layout_width="14dp"
+
+                            android:layout_height="14dp"
+
+                            android:src="@drawable/ic_fire"
+
+                            android:layout_marginEnd="4dp"
+
+                            app:tint="#FF6B35"
+
+                            android:contentDescription="Streak Icon"/>
+
+
+
+                        <TextView
+
+                            android:id="@+id/tvStreak"
+
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+
+                            android:text="10-Day Streak"
+
+                            android:textSize="10sp"
+
+                            android:textColor="#636E72"
+
+                            android:fontFamily="@font/poppins"/>
+
+                    </LinearLayout>
+
+
+
+                    <!-- Badges Pill -->
+
+                    <LinearLayout
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:orientation="horizontal"
+
+                        android:background="@drawable/bg_rounded_white"
+
+                        android:paddingStart="12dp"
+
+                        android:paddingEnd="12dp"
+
+                        android:paddingTop="6dp"
+
+                        android:paddingBottom="6dp"
+
+                        android:gravity="center">
+
+
+
+                        <TextView
+
+                            android:id="@+id/tvBadges"
+
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+
+                            android:text="7 Badges"
+
+                            android:textSize="10sp"
+
+                            android:textColor="#636E72"
+
+                            android:fontFamily="@font/poppins"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -230,7 +346,7 @@
 
                 android:gravity="center_vertical"
 
-                android:layout_marginBottom="20dp">
+                >
 
 
 
@@ -258,13 +374,13 @@
 
                         android:text="Hello, Jaimes"
 
-                        android:textSize="32sp"
+                        android:textSize="30sp"
 
                         android:textStyle="bold"
 
-                        android:textColor="#2D3436"
+                        android:textColor="#7C3AED"
 
-                        android:fontFamily="@font/poppins_bold"/>
+                        android:fontFamily="@font/visby_bold"/>
 
 
 
@@ -276,15 +392,19 @@
 
                         android:layout_height="wrap_content"
 
-                        android:text="Ready to learn something new today?"
+                        android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit,"
 
-                        android:textSize="14sp"
+                        android:textSize="12sp"
 
                         android:textColor="#636E72"
 
-                        android:fontFamily="@font/poppins"
+                        android:fontFamily="@font/visby_regular"
 
-                        android:layout_marginTop="4dp"/>
+                        android:layout_marginTop="4dp"
+
+                        android:maxLines="2"
+
+                        android:ellipsize="end"/>
 
                 </LinearLayout>
 
@@ -296,9 +416,9 @@
 
                     android:id="@+id/ivLeoMascot"
 
-                    android:layout_width="120dp"
+                    android:layout_width="140dp"
 
-                    android:layout_height="120dp"
+                    android:layout_height="140dp"
 
                     android:src="@drawable/leo_placement_test"
 

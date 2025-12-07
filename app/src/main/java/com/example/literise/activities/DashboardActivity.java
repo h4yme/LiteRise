@@ -12,8 +12,6 @@ import android.view.View;
 
 import android.widget.ImageView;
 
-import android.widget.LinearLayout;
-
 import android.widget.TextView;
 
 
@@ -36,9 +34,9 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-    private TextView tvHeaderXP, tvStreak, tvWelcome, tvMotivation;
+    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation;
 
-    private ImageView ivLeoMascot;
+    private ImageView ivLeoMascot, ivSettings;
 
     private MaterialButton btnContinueLesson;
 
@@ -48,7 +46,9 @@ public class DashboardActivity extends BaseActivity {
 
     private ModulePriorityManager priorityManager;
 
-    private int currentStreak = 0;
+    private int currentStreak = 10;
+
+    private int totalBadges = 7;
 
 
 
@@ -86,11 +86,15 @@ public class DashboardActivity extends BaseActivity {
 
         tvStreak = findViewById(R.id.tvStreak);
 
+        tvBadges = findViewById(R.id.tvBadges);
+
         tvWelcome = findViewById(R.id.tvWelcome);
 
         tvMotivation = findViewById(R.id.tvMotivation);
 
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
+
+        ivSettings = findViewById(R.id.ivSettings);
 
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
@@ -105,6 +109,8 @@ public class DashboardActivity extends BaseActivity {
         btnContinueLesson.setOnClickListener(v -> continueLesson());
 
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
+
+        ivSettings.setOnClickListener(v -> openSettings());
 
     }
 
@@ -132,7 +138,9 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d", currentStreak));
+        tvStreak.setText(String.format("%d-Day Streak", currentStreak));
+
+        tvBadges.setText(String.format("%d Badges", totalBadges));
 
     }
 
@@ -141,6 +149,8 @@ public class DashboardActivity extends BaseActivity {
     /**
 
      * Display 6 module cards ordered by priority (weakest to strongest)
+
+     * Simple frosted white cards matching DASHBOARD DESIGN.png
 
      */
 
@@ -156,51 +166,9 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-        // Module card background colors (soft gradients matching design)
-
-        int[] moduleColors = {
-
-                0xFFFDBEBD, // Soft pink (priority 1 - weakest)
-
-                0xFFFDD4BC, // Soft peach (priority 2)
-
-                0xFFFFF4CE, // Soft yellow (priority 3)
-
-                0xFFD4F1D4, // Soft green (priority 4)
-
-                0xFFBBDEFB, // Soft blue (priority 5)
-
-                0xFFD4C5F9  // Soft purple (priority 6 - strongest)
-
-        };
-
-
-
-        // Priority badge colors
-
-        int[] badgeColors = {
-
-                0xFFE74C3C, // Red (highest priority)
-
-                0xFFE67E22, // Orange
-
-                0xFFF39C12, // Yellow
-
-                0xFF00B894, // Green
-
-                0xFF0984E3, // Blue
-
-                0xFF6C5CE7  // Purple (lowest priority)
-
-        };
-
-
-
         for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
 
             String moduleName = orderedModules.get(i);
-
-            int priority = i + 1;
 
 
 
@@ -216,45 +184,19 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-            // Set views
+            // Set module icon based on module type
 
-            LinearLayout cardContainer = moduleCard.findViewById(R.id.moduleCardContainer);
+            ImageView ivModuleIcon = moduleCard.findViewById(R.id.ivModuleIcon);
 
-            TextView tvPriority = moduleCard.findViewById(R.id.tvPriorityNumber);
-
-            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
-
-            TextView tvProgress = moduleCard.findViewById(R.id.tvModuleProgress);
-
-
-
-            // Set card background color
-
-            cardContainer.setBackgroundColor(moduleColors[i]);
-
-
-
-            // Set priority badge
-
-            tvPriority.setText(String.valueOf(priority));
-
-            tvPriority.setBackgroundTintList(
-
-                    android.content.res.ColorStateList.valueOf(badgeColors[i])
-
-            );
+            ivModuleIcon.setImageResource(getModuleIcon(moduleName));
 
 
 
             // Set module name
 
+            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
+
             tvModuleName.setText(moduleName);
-
-
-
-            // Set progress (TODO: load from database)
-
-            tvProgress.setText("0/20");
 
 
 
@@ -267,6 +209,50 @@ public class DashboardActivity extends BaseActivity {
 
 
             gridModules.addView(moduleCard);
+
+        }
+
+    }
+
+
+
+    /**
+
+     * Get the appropriate icon for each module
+
+     */
+
+    private int getModuleIcon(String moduleName) {
+
+        switch (moduleName) {
+
+            case "Reading Comprehension":
+
+                return R.drawable.ic_book_reading;
+
+            case "Phonics & Pronunciation":
+
+                return R.drawable.ic_mic;
+
+            case "Vocabulary Building":
+
+                return R.drawable.ic_lightbulb;
+
+            case "Grammar & Syntax":
+
+                return R.drawable.ic_edit;
+
+            case "Reading Fluency":
+
+                return R.drawable.ic_timer;
+
+            case "Spelling & Writing":
+
+                return R.drawable.ic_pen;
+
+            default:
+
+                return R.drawable.ic_star; // Fallback icon
 
         }
 
@@ -330,7 +316,13 @@ public class DashboardActivity extends BaseActivity {
 
     }
 
+    private void openSettings() {
 
+        Intent intent = new Intent(this, SettingsActivity.class);
+
+        startActivity(intent);
+
+    }
 
     @Override
 
@@ -361,3 +353,4 @@ public class DashboardActivity extends BaseActivity {
     }
 
 }
+

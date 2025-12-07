@@ -184,6 +184,11 @@
             android:name=".activities.AssessmentResultsActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
     </application>
 
 

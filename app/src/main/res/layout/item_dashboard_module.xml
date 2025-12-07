@@ -10,11 +10,13 @@
 
     android:layout_columnWeight="1"
 
-    android:layout_margin="6dp"
+    android:layout_margin="8dp"
 
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="16dp"
 
-    app:cardElevation="4dp"
+    app:cardElevation="0dp"
+
+    app:cardBackgroundColor="#AAFFF5F0"
 
     android:clickable="true"
 
@@ -23,6 +25,8 @@
     android:foreground="?attr/selectableItemBackground">
 
 
+
+    <!-- Simple frosted background with warm peachy tint -->
 
     <LinearLayout
 
@@ -36,33 +40,23 @@
 
         android:padding="16dp"
 
-        android:gravity="center">
+        android:gravity="bottom|start">
 
+        <!-- Module Icon -->
 
+        <ImageView
 
-        <!-- Priority Badge -->
-
-        <TextView
-
-            android:id="@+id/tvPriorityNumber"
+            android:id="@+id/ivModuleIcon"
 
             android:layout_width="32dp"
 
             android:layout_height="32dp"
 
-            android:text="1"
+            android:src="@drawable/ic_book_reading"
 
-            android:textSize="16sp"
+            app:tint="#FFFFFF"
 
-            android:textStyle="bold"
-
-            android:textColor="@android:color/white"
-
-            android:background="@drawable/circle_badge_red"
-
-            android:gravity="center"
-
-            android:fontFamily="@font/poppins_bold"
+            android:contentDescription="Module Icon"
 
             android:layout_marginBottom="8dp"/>
 
@@ -80,71 +74,19 @@
 
             android:text="Reading\nComprehension"
 
-            android:textSize="14sp"
+            android:textSize="13sp"
 
-            android:textStyle="bold"
+            android:textStyle="normal"
 
-            android:textColor="#2D3436"
+            android:textColor="#FFFFFF"
 
-            android:fontFamily="@font/poppins_semibold"
-
-            android:gravity="center"
+            android:fontFamily="@font/poppins"
 
             android:maxLines="2"
 
-            android:ellipsize="end"/>
+            android:ellipsize="end"
 
-
-
-        <!-- Progress Indicator -->
-
-        <LinearLayout
-
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-
-            android:orientation="horizontal"
-
-            android:gravity="center"
-
-            android:layout_marginTop="8dp">
-
-
-
-            <ImageView
-
-                android:layout_width="12dp"
-
-                android:layout_height="12dp"
-
-                android:src="@drawable/ic_star"
-
-                app:tint="#FFD93D"
-
-                android:layout_marginEnd="4dp"
-
-                android:contentDescription="Progress Icon"/>
-
-
-
-            <TextView
-
-                android:id="@+id/tvModuleProgress"
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:text="0/20"
-
-                android:textSize="10sp"
-
-                android:textColor="#636E72"
-
-                android:fontFamily="@font/poppins"/>
-
-        </LinearLayout>
+            android:lineSpacingExtra="2dp"/>
 
     </LinearLayout>
 
