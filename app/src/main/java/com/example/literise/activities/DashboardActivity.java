@@ -20,6 +20,8 @@ public class DashboardActivity extends BaseActivity {
     private ImageView ivLeoMascot, ivSettings;
     private MaterialButton btnContinueLesson;
     private android.widget.GridLayout gridModules;
+    private View tutorialOverlay;
+    private MaterialButton btnGotIt;
     private SessionManager session;
     private ModulePriorityManager priorityManager;
     private int currentStreak = 10;
@@ -49,12 +51,18 @@ public class DashboardActivity extends BaseActivity {
         ivSettings = findViewById(R.id.ivSettings);
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
         gridModules = findViewById(R.id.gridModules);
+        tutorialOverlay = findViewById(R.id.tutorialOverlay);
+        btnGotIt = findViewById(R.id.btnGotIt);
     }
 
     private void setupListeners() {
         btnContinueLesson.setOnClickListener(v -> continueLesson());
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
         ivSettings.setOnClickListener(v -> openSettings());
+        btnGotIt.setOnClickListener(v -> dismissTutorial());
+
+        // Show tutorial on first visit
+        showTutorialIfFirstTime();
     }
 
     private void loadUserData() {
@@ -141,12 +149,10 @@ public class DashboardActivity extends BaseActivity {
     }
 
     private void openModule(String moduleName, int priority) {
-        // TODO: Navigate to ModuleLadderActivity
-        android.widget.Toast.makeText(
-                this,
-                "Opening " + moduleName + " (Priority " + (priority + 1) + ")",
-                android.widget.Toast.LENGTH_SHORT
-        ).show();
+        Intent intent = new Intent(this, ModuleLadderActivity.class);
+        intent.putExtra("module_name", moduleName);
+        intent.putExtra("priority", priority + 1);
+        startActivity(intent);
     }
 
     private void continueLesson() {
@@ -161,6 +167,23 @@ public class DashboardActivity extends BaseActivity {
     private void openSettings() {
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
+    }
+
+    private void showTutorialIfFirstTime() {
+        android.content.SharedPreferences prefs = getSharedPreferences("LiteRisePrefs", MODE_PRIVATE);
+        boolean hasSeenTutorial = prefs.getBoolean("dashboard_tutorial_seen", false);
+
+        if (!hasSeenTutorial) {
+            tutorialOverlay.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void dismissTutorial() {
+        tutorialOverlay.setVisibility(View.GONE);
+
+        // Mark tutorial as seen
+        android.content.SharedPreferences prefs = getSharedPreferences("LiteRisePrefs", MODE_PRIVATE);
+        prefs.edit().putBoolean("dashboard_tutorial_seen", true).apply();
     }
 
     @Override

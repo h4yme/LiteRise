@@ -147,6 +147,14 @@
 
         <activity
 
+            android:name=".activities.ModuleLadderActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+
             android:name=".activities.LessonActivity"
 
             android:exported="false"

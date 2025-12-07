@@ -263,4 +263,7 @@
 
         </LinearLayout>
     </ScrollView>
+
+    <!-- Tutorial Overlay -->
+    <include layout="@layout/tutorial_dashboard_overlay"/>
 </FrameLayout>
