@@ -5,21 +5,15 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.literise.R;
-import com.example.literise.api.ApiClient;
-import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
-import com.example.literise.models.Students;
 import com.example.literise.utils.ModulePriorityManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DashboardActivity extends BaseActivity {
 
@@ -51,14 +45,7 @@ public class DashboardActivity extends BaseActivity {
         priorityManager = new ModulePriorityManager(this);
 
         initializeViews();
-
-        // Fetch user data from API if nickname is not set
-        if (session.getNickname() == null || session.getNickname().isEmpty()) {
-            fetchUserDataFromAPI();
-        } else {
-            loadUserData();
-        }
-
+        loadUserData();
         displayModules();
         setupListeners();
     }
@@ -131,56 +118,6 @@ public class DashboardActivity extends BaseActivity {
         tvHeaderXP.setText(String.format("%d XP", xp));
         tvStreak.setText(String.format("%d-Day Streak", currentStreak));
         tvBadges.setText(String.format("%d Badges", totalBadges));
-    }
-
-    private void fetchUserDataFromAPI() {
-        int studentId = session.getStudentId();
-        String email = session.getEmail();
-
-        if (studentId == 0 || email == null) {
-            // No student ID or email, just load local data
-            loadUserData();
-            return;
-        }
-
-        // Create student object with email for login to get latest data
-        Students student = new Students();
-        student.setEmail(email);
-
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        Call<Students> call = apiService.login(student);
-
-        call.enqueue(new Callback<Students>() {
-            @Override
-            public void onResponse(Call<Students> call, Response<Students> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    Students s = response.body();
-
-                    // Update nickname if available
-                    if (s.getNickname() != null && !s.getNickname().isEmpty()) {
-                        session.saveNickname(s.getNickname());
-                    }
-
-                    // Update XP if available
-                    if (s.getXp() > 0) {
-                        session.saveXP(s.getXp());
-                    }
-
-                    // Reload UI with updated data
-                    loadUserData();
-                } else {
-                    // API call failed, load local data
-                    loadUserData();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Students> call, Throwable t) {
-                android.util.Log.e("DashboardActivity", "Failed to fetch user data", t);
-                // Load local data as fallback
-                loadUserData();
-            }
-        });
     }
 
     /**
