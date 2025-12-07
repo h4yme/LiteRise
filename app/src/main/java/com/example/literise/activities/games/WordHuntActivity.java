@@ -4,8 +4,6 @@ package com.example.literise.activities.games;
 
 import android.animation.ArgbEvaluator;
 
-import android.animation.ObjectAnimator;
-
 import android.animation.ValueAnimator;
 
 import android.content.Intent;
@@ -87,8 +85,6 @@ import com.google.android.material.button.MaterialButton;
 
 
 import java.util.ArrayList;
-
-import java.util.Collections;
 
 import java.util.HashSet;
 

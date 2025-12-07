@@ -20,8 +20,6 @@ import androidx.annotation.Nullable;
 
 import androidx.appcompat.app.AlertDialog;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import androidx.cardview.widget.CardView;
 
 
@@ -64,7 +62,7 @@ import retrofit2.Response;
 
 
 
-public class LessonActivity extends AppCompatActivity {
+public class LessonActivity extends BaseActivity {
 
 
 

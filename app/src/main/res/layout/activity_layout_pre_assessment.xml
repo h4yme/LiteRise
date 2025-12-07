@@ -495,7 +495,30 @@
 
                         android:layout_marginTop="8dp"/>
 
+
+
                 </LinearLayout>
+                <!-- TODO: Remove skip button after testing - temporary for pronunciation testing -->
+
+                <com.google.android.material.button.MaterialButton
+
+                    android:id="@+id/btnSkipPronunciation"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="36dp"
+
+                    android:text="Skip"
+
+                    android:textSize="12sp"
+
+                    app:cornerRadius="18dp"
+
+                    style="@style/Widget.Material3.Button.TextButton"
+
+                    android:layout_marginTop="8dp"
+
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -859,7 +882,7 @@
 
 
 
-        <!-- Speech Bubble (positioned in center-bottom area, above Leo) -->
+        <!-- Speech Bubble (positioned at top to avoid blocking choices) -->
 
         <androidx.cardview.widget.CardView
 
@@ -869,19 +892,19 @@
 
             android:layout_height="wrap_content"
 
-            android:layout_centerInParent="true"
+            android:layout_alignParentTop="true"
 
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="24dp"
 
-            android:layout_marginEnd="32dp"
+            android:layout_marginEnd="24dp"
 
-            android:layout_marginBottom="100dp"
+            android:layout_marginTop="400dp"
 
             app:cardBackgroundColor="@android:color/white"
 
             app:cardCornerRadius="20dp"
 
-            app:cardElevation="8dp">
+            app:cardElevation="12dp">
 
 
 
@@ -952,20 +975,23 @@
 
 
         <!-- Leo Mascot (bottom center, like in the design) -->
+        <!-- Leo Mascot (bottom-right corner, smaller to avoid blocking) -->
 
         <ImageView
 
             android:id="@+id/ivLeoMascot"
 
-            android:layout_width="200dp"
+            android:layout_width="175dp"
 
-            android:layout_height="200dp"
+            android:layout_height="175dp"
 
             android:layout_alignParentBottom="true"
 
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentEnd="true"
 
-            android:layout_marginBottom="60dp"
+            android:layout_marginBottom="16dp"
+
+
 
             android:src="@drawable/leo_placement_test"
 
@@ -975,7 +1001,7 @@
 
 
 
-        <!-- Tap to Continue (below Leo, at very bottom) -->
+        <!-- Tap to Continue (bottom-left, opposite of Leo) -->
 
         <TextView
 
@@ -987,9 +1013,11 @@
 
             android:layout_alignParentBottom="true"
 
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentStart="true"
 
             android:layout_marginBottom="16dp"
+
+            android:layout_marginStart="16dp"
 
             android:text="Tap to Continue"
 

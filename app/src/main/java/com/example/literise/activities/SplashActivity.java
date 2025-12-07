@@ -14,8 +14,6 @@ import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
 
-import com.example.literise.utils.AppConfig;
-
 public class SplashActivity extends AppCompatActivity {
 
 
