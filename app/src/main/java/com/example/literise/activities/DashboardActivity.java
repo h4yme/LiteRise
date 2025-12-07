@@ -97,10 +97,21 @@ public class DashboardActivity extends BaseActivity {
         String nickname = session.getNickname();
         int xp = session.getXP();
 
+        // Debug log
+        android.util.Log.d("DashboardActivity", "Nickname: " + nickname + ", XP: " + xp);
+
         if (nickname != null && !nickname.isEmpty()) {
             tvWelcome.setText(String.format("Hello, %s", nickname));
         } else {
-            tvWelcome.setText("Hello, Student");
+            // Fallback to fullname if nickname is not set
+            String fullname = session.getFullName();
+            if (fullname != null && !fullname.isEmpty()) {
+                // Extract first name from full name
+                String firstName = fullname.split(" ")[0];
+                tvWelcome.setText(String.format("Hello, %s", firstName));
+            } else {
+                tvWelcome.setText("Hello, Student");
+            }
         }
 
         tvHeaderXP.setText(String.format("%d XP", xp));

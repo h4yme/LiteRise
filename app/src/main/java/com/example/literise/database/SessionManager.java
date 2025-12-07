@@ -195,17 +195,20 @@ public class SessionManager {
     }
 
     public void saveNickname(String nickname) {
-
         editor.putString(KEY_NICKNAME, nickname);
+        editor.commit(); // Use commit() for immediate save
 
-        editor.apply();
-
+        // Debug log
+        android.util.Log.d("SessionManager", "Nickname saved: " + nickname);
     }
 
     public String getNickname() {
+        String nickname = prefs.getString(KEY_NICKNAME, null);
 
-        return prefs.getString(KEY_NICKNAME, null);
+        // Debug log
+        android.util.Log.d("SessionManager", "Nickname retrieved: " + nickname);
 
+        return nickname;
     }
 
     public void setAssessmentCompleted(boolean completed) {
