@@ -127,28 +127,28 @@
                         android:id="@+id/tvWelcome"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Hello, Jaimes"
-                        android:textSize="32sp"
+                        android:text="Halo Jaimes!"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-                        android:textColor="#2D3436"
+                        android:textColor="#8B5CF6"
                         android:fontFamily="@font/poppins_bold"/>
 
                     <TextView
                         android:id="@+id/tvMotivation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ready to learn something new today?"
-                        android:textSize="14sp"
+                        android:text="Ayo belajar bersama LiteRise"
+                        android:textSize="12sp"
                         android:textColor="#636E72"
                         android:fontFamily="@font/poppins"
-                        android:layout_marginTop="4dp"/>
+                        android:layout_marginTop="2dp"/>
                 </LinearLayout>
 
                 <!-- Leo Mascot -->
                 <ImageView
                     android:id="@+id/ivLeoMascot"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
                     android:src="@drawable/leo_placement_test"
                     android:scaleType="fitCenter"
                     android:contentDescription="Leo Mascot"/>

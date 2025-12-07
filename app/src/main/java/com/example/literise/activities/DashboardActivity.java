@@ -59,9 +59,9 @@ public class DashboardActivity extends BaseActivity {
         int xp = session.getXP();
 
         if (nickname != null && !nickname.isEmpty()) {
-            tvWelcome.setText(String.format("Hello, %s", nickname));
+            tvWelcome.setText(String.format("Halo %s!", nickname));
         } else {
-            tvWelcome.setText("Hello, Student");
+            tvWelcome.setText("Halo Student!");
         }
 
         tvHeaderXP.setText(String.format("%d XP", xp));
@@ -77,29 +77,19 @@ public class DashboardActivity extends BaseActivity {
         // Get modules ordered from weakest to strongest
         List<String> orderedModules = priorityManager.getOrderedModules();
 
-        // Module card background colors (soft gradients matching design)
-        int[] moduleColors = {
-                0xFFFDBEBD, // Soft pink (priority 1 - weakest)
-                0xFFFDD4BC, // Soft peach (priority 2)
-                0xFFFFF4CE, // Soft yellow (priority 3)
-                0xFFD4F1D4, // Soft green (priority 4)
-                0xFFBBDEFB, // Soft blue (priority 5)
-                0xFFD4C5F9  // Soft purple (priority 6 - strongest)
-        };
-
-        // Priority badge colors
-        int[] badgeColors = {
-                0xFFE74C3C, // Red (highest priority)
-                0xFFE67E22, // Orange
-                0xFFF39C12, // Yellow
-                0xFF00B894, // Green
-                0xFF0984E3, // Blue
-                0xFF6C5CE7  // Purple (lowest priority)
+        // Module gradient backgrounds (matching design inspiration)
+        int[] moduleGradients = {
+                R.drawable.bg_module_gradient_pink,   // Priority 1 - weakest
+                R.drawable.bg_module_gradient_coral,  // Priority 2
+                R.drawable.bg_module_gradient_blue,   // Priority 3
+                R.drawable.bg_module_gradient_purple, // Priority 4
+                R.drawable.bg_module_gradient_green,  // Priority 5
+                R.drawable.bg_module_gradient_orange  // Priority 6 - strongest
         };
 
         for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
             String moduleName = orderedModules.get(i);
-            int priority = i + 1;
+            int level = i + 1;
 
             View moduleCard = LayoutInflater.from(this).inflate(
                     R.layout.item_dashboard_module,
@@ -108,25 +98,18 @@ public class DashboardActivity extends BaseActivity {
             );
 
             // Set views
-            LinearLayout cardContainer = moduleCard.findViewById(R.id.moduleCardContainer);
-            TextView tvPriority = moduleCard.findViewById(R.id.tvPriorityNumber);
+            android.widget.FrameLayout cardContainer = moduleCard.findViewById(R.id.moduleCardContainer);
+            TextView tvModuleLevel = moduleCard.findViewById(R.id.tvModuleLevel);
             TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
-            TextView tvProgress = moduleCard.findViewById(R.id.tvModuleProgress);
 
-            // Set card background color
-            cardContainer.setBackgroundColor(moduleColors[i]);
+            // Set gradient background
+            cardContainer.setBackgroundResource(moduleGradients[i]);
 
-            // Set priority badge
-            tvPriority.setText(String.valueOf(priority));
-            tvPriority.setBackgroundTintList(
-                    android.content.res.ColorStateList.valueOf(badgeColors[i])
-            );
+            // Set module level
+            tvModuleLevel.setText(String.format("LEVEL %d", level));
 
             // Set module name
             tvModuleName.setText(moduleName);
-
-            // Set progress (TODO: load from database)
-            tvProgress.setText("0/20");
 
             // Click listener to open module
             final int moduleIndex = i;
