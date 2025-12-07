@@ -73,14 +73,24 @@ public class DashboardActivity extends BaseActivity {
     private void setupListeners() {
         btnContinueLesson.setOnClickListener(v -> continueLesson());
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
+
+        // Long press Leo to reset tutorial (for testing)
+        ivLeoMascot.setOnLongClickListener(v -> {
+            android.content.SharedPreferences prefs = getSharedPreferences("LiteRisePrefs", MODE_PRIVATE);
+            prefs.edit().putBoolean("dashboard_tutorial_seen", false).apply();
+            android.widget.Toast.makeText(this, "Tutorial reset! Restart the app to see it again.",
+                android.widget.Toast.LENGTH_LONG).show();
+            return true;
+        });
+
         ivSettings.setOnClickListener(v -> openSettings());
 
         // Tutorial listeners
         btnNext.setOnClickListener(v -> nextTutorialStep());
         btnSkip.setOnClickListener(v -> dismissTutorial());
 
-        // Show tutorial on first visit
-        showTutorialIfFirstTime();
+        // Show tutorial on first visit (with slight delay to ensure views are ready)
+        tutorialOverlay.post(() -> showTutorialIfFirstTime());
     }
 
     private void loadUserData() {
