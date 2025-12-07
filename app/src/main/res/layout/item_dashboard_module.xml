@@ -7,16 +7,16 @@
     android:layout_margin="8dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
+    app:cardBackgroundColor="#BBFFF5F0"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
 
-    <!-- Simple frosted white background -->
+    <!-- Simple frosted background with warm peachy tint -->
     <LinearLayout
         android:id="@+id/moduleCardContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#55FFFFFF"
         android:orientation="vertical"
         android:padding="16dp"
         android:gravity="bottom|start">
