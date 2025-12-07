@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.literise.R;
@@ -23,7 +22,7 @@ public class DashboardActivity extends BaseActivity {
     private android.widget.GridLayout gridModules;
     private SessionManager session;
     private ModulePriorityManager priorityManager;
-    private int currentStreak = 0;
+    private int currentStreak = 10;
     private int totalBadges = 7;
 
     @Override
@@ -74,6 +73,7 @@ public class DashboardActivity extends BaseActivity {
 
     /**
      * Display 6 module cards ordered by priority (weakest to strongest)
+     * Simple frosted white cards matching DASHBOARD DESIGN.png
      */
     private void displayModules() {
         gridModules.removeAllViews();
@@ -90,7 +90,7 @@ public class DashboardActivity extends BaseActivity {
                     false
             );
 
-            // Set module name
+            // Set module name - the only text on the simple card
             TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
             tvModuleName.setText(moduleName);
 
