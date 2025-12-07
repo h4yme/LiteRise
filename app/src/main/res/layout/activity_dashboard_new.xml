@@ -97,7 +97,7 @@
                         android:id="@+id/ivSettings"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
-                        android:src="@drawable/ic_star"
+                        android:src="@drawable/ic_settings"
                         android:background="@drawable/bg_rounded_white"
                         android:padding="6dp"
                         app:tint="#636E72"

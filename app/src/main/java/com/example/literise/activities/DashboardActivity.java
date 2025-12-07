@@ -90,7 +90,11 @@ public class DashboardActivity extends BaseActivity {
                     false
             );
 
-            // Set module name - the only text on the simple card
+            // Set module icon based on module type
+            ImageView ivModuleIcon = moduleCard.findViewById(R.id.ivModuleIcon);
+            ivModuleIcon.setImageResource(getModuleIcon(moduleName));
+
+            // Set module name
             TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
             tvModuleName.setText(moduleName);
 
@@ -99,6 +103,28 @@ public class DashboardActivity extends BaseActivity {
             moduleCard.setOnClickListener(v -> openModule(moduleName, moduleIndex));
 
             gridModules.addView(moduleCard);
+        }
+    }
+
+    /**
+     * Get the appropriate icon for each module
+     */
+    private int getModuleIcon(String moduleName) {
+        switch (moduleName) {
+            case "Reading Comprehension":
+                return R.drawable.ic_book_reading;
+            case "Phonics & Pronunciation":
+                return R.drawable.ic_mic;
+            case "Vocabulary Building":
+                return R.drawable.ic_lightbulb;
+            case "Grammar & Syntax":
+                return R.drawable.ic_edit;
+            case "Reading Fluency":
+                return R.drawable.ic_timer;
+            case "Spelling & Writing":
+                return R.drawable.ic_pen;
+            default:
+                return R.drawable.ic_star; // Fallback icon
         }
     }
 
