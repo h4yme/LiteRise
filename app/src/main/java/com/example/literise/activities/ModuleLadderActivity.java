@@ -73,7 +73,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         View previousNode = null;
 
-        for (int i = 1; i <= totalLessons; i++) {
+        // Display nodes from bottom to top (reversed order)
+        // So lesson 1 (current) is at the bottom near START button
+        for (int i = totalLessons; i >= 1; i--) {
             View nodeView = LayoutInflater.from(this).inflate(
                     R.layout.item_lesson_node,
                     lessonNodesContainer,
@@ -112,13 +114,18 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     RelativeLayout.LayoutParams.WRAP_CONTENT
             );
 
-            // Position below previous node
+            // Position above previous node (building from bottom to top)
             if (previousNode != null) {
-                params.addRule(RelativeLayout.BELOW, previousNode.getId());
-                params.topMargin = 0; // No extra margin, spacing is in item layout
+                params.addRule(RelativeLayout.ABOVE, previousNode.getId());
+                params.bottomMargin = 0; // No extra margin, spacing is in item layout
+            } else {
+                // First node (lesson 1) - position at bottom
+                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+                params.bottomMargin = (int) (20 * density); // Small margin from bottom
             }
 
             // Zigzag pattern - calculate horizontal position
+            // Use lesson number for pattern, not loop index
             int position = (i - 1) % 4; // Pattern repeats every 4 nodes
             int leftMargin;
 
