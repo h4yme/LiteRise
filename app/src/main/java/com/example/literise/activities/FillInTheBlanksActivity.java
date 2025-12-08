@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.literise.R;
@@ -73,7 +74,7 @@ public class FillInTheBlanksActivity extends AppCompatActivity {
         textView.setTextColor(0xFF2D3748);
         textView.setPadding(4, 4, 4, 4);
         try {
-            textView.setTypeface(getResources().getFont(R.font.poppins));
+            textView.setTypeface(ResourcesCompat.getFont(this, R.font.poppins));
         } catch (Exception e) {
             // Font not found, use default
         }
