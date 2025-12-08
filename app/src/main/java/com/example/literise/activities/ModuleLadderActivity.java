@@ -2,6 +2,7 @@ package com.example.literise.activities;
 
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -48,7 +49,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private int totalLessons = 10; // Total lessons per module
 
-    private int currentLesson = 1; // Current unlocked lesson
+    private int currentLesson = 3; // Current unlocked lesson
 
 
 
@@ -306,7 +307,36 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
                             android.widget.Toast.LENGTH_SHORT).show();
 
-                    // TODO: Navigate to lesson activity
+
+
+                    Intent intent;
+
+                    if (lessonNumber == 1) {
+
+                        // Lesson 1: Story Sequencing
+
+                        intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
+
+                    } else if (lessonNumber == 2) {
+
+                        // Lesson 2: Fill in the Blanks
+
+                        intent = new Intent(this, com.example.literise.activities.games.FillInTheBlanksActivity.class);
+
+                    } else if (lessonNumber == 3) {
+
+                        // Lesson 2: Fill in the Blanks
+
+                        intent = new Intent(this, com.example.literise.activities.games.PictureMatchActivity.class);
+
+                    } else{
+
+                        // Other lessons: Story Sequencing
+
+                        intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
+
+                    }
+                    startActivity(intent);
 
                 } else {
 

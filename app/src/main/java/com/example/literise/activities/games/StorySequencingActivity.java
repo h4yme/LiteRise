@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.literise.R;
 import com.example.literise.database.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,7 @@ public class StorySequencingActivity extends AppCompatActivity {
         recyclerStoryEvents.setLayoutManager(new LinearLayoutManager(this));
         recyclerStoryEvents.setAdapter(adapter);
 
-        // Setup drag and drop
+        // Setup drag and drop with animations
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
                 ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
             @Override
@@ -102,6 +103,32 @@ public class StorySequencingActivity extends AppCompatActivity {
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 // Not used
             }
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+                if (actionState == ItemTouchHelper.ACTION_STATE_DRAG && viewHolder != null) {
+                    // Animate when dragging starts - card scales up and glows
+                    viewHolder.itemView.animate()
+                            .scaleX(1.05f)
+                            .scaleY(1.05f)
+                            .alpha(0.9f)
+                            .setDuration(100);
+                    viewHolder.itemView.setElevation(16f);
+                }
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                // Animate when dragging ends - return to normal
+                viewHolder.itemView.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .alpha(1f)
+                        .setDuration(100);
+                viewHolder.itemView.setElevation(4f);
+            }
         });
 
         itemTouchHelper.attachToRecyclerView(recyclerStoryEvents);
@@ -109,7 +136,6 @@ public class StorySequencingActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
-
         btnCheckAnswer.setOnClickListener(v -> checkAnswer());
     }
 
@@ -117,33 +143,110 @@ public class StorySequencingActivity extends AppCompatActivity {
         boolean isCorrect = true;
         int correctCount = 0;
 
+        // Show visual feedback for each card
         for (int i = 0; i < storyEvents.size(); i++) {
             StoryEvent event = storyEvents.get(i);
+            RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
+
             if (event.correctOrder == i + 1) {
                 correctCount++;
+                // Correct - green border and bounce animation
+                if (holder != null) {
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                    card.setCardBackgroundColor(0xFFE8F5E9); // Light green
+                    card.setStrokeColor(0xFF4CAF50); // Green border
+                    card.setStrokeWidth(4);
+
+                    // Bounce animation
+                    holder.itemView.animate()
+                            .scaleX(1.1f)
+                            .scaleY(1.1f)
+                            .setDuration(150)
+                            .withEndAction(() -> {
+                                holder.itemView.animate()
+                                        .scaleX(1f)
+                                        .scaleY(1f)
+                                        .setDuration(150);
+                            });
+                }
             } else {
                 isCorrect = false;
+                // Wrong - red border and shake animation
+                if (holder != null) {
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                    card.setCardBackgroundColor(0xFFFFEBEE); // Light red
+                    card.setStrokeColor(0xFFF44336); // Red border
+                    card.setStrokeWidth(4);
+
+                    // Shake animation
+                    shakeView(holder.itemView);
+                }
             }
         }
 
-        // Calculate XP based on correctness
+        // Calculate XP based on correctness with star rating
         int xpEarned = 0;
+        int stars = 0;
         if (isCorrect) {
             xpEarned = 50; // Perfect score
-        } else {
-            // Partial credit: 5 XP per correct position
+            stars = 3;
+        } else if (correctCount >= 6) {
             xpEarned = correctCount * 5;
+            stars = 2;
+        } else if (correctCount >= 4) {
+            xpEarned = correctCount * 5;
+            stars = 1;
+        } else {
+            xpEarned = correctCount * 5;
+            stars = 0;
         }
 
         // Update session XP
         int currentXP = session.getXP();
         session.saveXP(currentXP + xpEarned);
 
-        // Show result dialog
-        showResultDialog(isCorrect, correctCount, storyEvents.size(), xpEarned);
+        // Make variables final for lambda
+
+        final boolean finalIsCorrect = isCorrect;
+
+        final int finalCorrectCount = correctCount;
+
+        final int finalTotal = storyEvents.size();
+
+        final int finalXpEarned = xpEarned;
+
+        final int finalStars = stars;
+
+
+
+        // Show result dialog after animation
+
+        recyclerStoryEvents.postDelayed(() -> {
+
+            showResultDialog(finalIsCorrect, finalCorrectCount, finalTotal, finalXpEarned, finalStars);
+        }, 800);
     }
 
-    private void showResultDialog(boolean isCorrect, int correctCount, int total, int xpEarned) {
+    private void shakeView(View view) {
+        // Vigorous shake animation for wrong answers
+        view.animate()
+                .translationX(-25f)
+                .setDuration(50)
+                .withEndAction(() -> view.animate()
+                        .translationX(25f)
+                        .setDuration(50)
+                        .withEndAction(() -> view.animate()
+                                .translationX(-25f)
+                                .setDuration(50)
+                                .withEndAction(() -> view.animate()
+                                        .translationX(25f)
+                                        .setDuration(50)
+                                        .withEndAction(() -> view.animate()
+                                                .translationX(0f)
+                                                .setDuration(50)))));
+    }
+
+    private void showResultDialog(boolean isCorrect, int correctCount, int total, int xpEarned, int stars) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_game_result, null);
 
@@ -152,23 +255,57 @@ public class StorySequencingActivity extends AppCompatActivity {
         TextView tvResultScore = dialogView.findViewById(R.id.tvResultScore);
         TextView tvResultAccuracy = dialogView.findViewById(R.id.tvResultAccuracy);
         TextView tvResultXP = dialogView.findViewById(R.id.tvResultXP);
+        TextView tvResultStreak = dialogView.findViewById(R.id.tvResultStreak);
         MaterialButton btnFinish = dialogView.findViewById(R.id.btnFinish);
 
         // Calculate accuracy percentage
         int accuracy = (int) ((correctCount * 100.0) / total);
 
+        // Set title and celebration based on performance
         if (isCorrect) {
-            tvResultTitle.setText("Perfect! 🎉");
+            tvResultTitle.setText("PERFECT! 🎉✨");
+            // Animate trophy - spin and scale up
+            ivTrophy.animate()
+                    .rotation(360f)
+                    .scaleX(1.2f)
+                    .scaleY(1.2f)
+                    .setDuration(500)
+                    .withEndAction(() -> ivTrophy.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(300));
+        } else if (accuracy >= 75) {
+            tvResultTitle.setText("Great Job! 🌟");
         } else if (accuracy >= 50) {
-            tvResultTitle.setText("Good Job!");
+            tvResultTitle.setText("Good Effort! 👍");
         } else {
-            tvResultTitle.setText("Keep Trying!");
+            tvResultTitle.setText("Keep Practicing! 💪");
         }
 
-        // Set stats
+        // Show star rating
+        String starDisplay = "";
+        for (int i = 0; i < 3; i++) {
+            if (i < stars) {
+                starDisplay += "⭐";
+            } else {
+                starDisplay += "☆";
+            }
+        }
+        tvResultStreak.setText(starDisplay);
+
+        // Set stats with fade-in animations
         tvResultScore.setText(String.valueOf(correctCount) + "/" + total);
         tvResultAccuracy.setText(accuracy + "%");
         tvResultXP.setText("+" + xpEarned + " XP");
+
+        // Animate stats - staggered fade-in
+        tvResultScore.setAlpha(0f);
+        tvResultAccuracy.setAlpha(0f);
+        tvResultXP.setAlpha(0f);
+
+        tvResultScore.animate().alpha(1f).setDuration(400).setStartDelay(200);
+        tvResultAccuracy.animate().alpha(1f).setDuration(400).setStartDelay(400);
+        tvResultXP.animate().alpha(1f).setDuration(400).setStartDelay(600);
 
         builder.setView(dialogView);
         AlertDialog dialog = builder.create();
@@ -176,10 +313,37 @@ public class StorySequencingActivity extends AppCompatActivity {
 
         btnFinish.setOnClickListener(v -> {
             dialog.dismiss();
-            finish();
+            if (isCorrect) {
+                finish(); // Go back to module ladder if perfect
+            } else {
+                // Reset game for retry
+                resetGame();
+            }
         });
 
         dialog.show();
+    }
+
+    private void resetGame() {
+        // Reset all card colors to default
+        for (int i = 0; i < storyEvents.size(); i++) {
+            RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
+            if (holder != null) {
+                MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                card.setCardBackgroundColor(0xFFFFFFFF); // White
+                card.setStrokeWidth(0);
+            }
+        }
+
+        // Shuffle events for new attempt
+        Collections.shuffle(storyEvents);
+        for (int i = 0; i < storyEvents.size(); i++) {
+            storyEvents.get(i).displayNumber = i + 1;
+        }
+        adapter.notifyDataSetChanged();
+
+        // Scroll to top for fresh start
+        recyclerStoryEvents.smoothScrollToPosition(0);
     }
 
     // StoryEvent model class
@@ -225,7 +389,7 @@ public class StorySequencingActivity extends AppCompatActivity {
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
-            CardView cardStoryEvent;
+            MaterialCardView cardStoryEvent;
             ImageView ivDragHandle;
             TextView tvEventNumber;
             TextView tvEventText;

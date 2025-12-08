@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardWordOption"
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:layout_margin="8dp"
+
+    app:cardCornerRadius="16dp"
+
+    app:cardElevation="4dp"
+
+    app:cardBackgroundColor="#FFFFFF">
+
+
+
+    <TextView
+
+        android:id="@+id/tvWord"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:paddingHorizontal="16dp"
+
+        android:paddingVertical="16dp"
+
+        android:text="running"
+
+        android:textSize="16sp"
+
+        android:textStyle="bold"
+
+        android:textColor="#7C3AED"
+
+        android:gravity="center"
+        android:fontFamily="@font/poppins_semibold"/>
+</com.google.android.material.card.MaterialCardView>
