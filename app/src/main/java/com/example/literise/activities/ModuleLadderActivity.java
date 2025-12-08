@@ -158,25 +158,15 @@ public class ModuleLadderActivity extends AppCompatActivity {
                         "Opening Lesson " + lessonNumber,
                         android.widget.Toast.LENGTH_SHORT).show();
 
-                    // Alternate between games for testing
-                    Intent intent;
-                    if (lessonNumber == 1) {
-                        // Lesson 1: Story Sequencing
-                        intent = new Intent(this, StorySequencingActivity.class);
-                    } else if (lessonNumber == 2) {
-                        // Lesson 2: Fill in the Blanks
-                        intent = new Intent(this, FillInTheBlanksActivity.class);
-                    } else if (lessonNumber == 3) {
-                        // Lesson 3: Picture Match
-                        intent = new Intent(this, PictureMatchActivity.class);
-                    } else if (lessonNumber == 4) {
-                        // Lesson 4: Dialogue Reading
-                        intent = new Intent(this, DialogueReadingActivity.class);
+                    // Launch game based on module type
+                    Intent intent = getGameIntentForModule(moduleName);
+                    if (intent != null) {
+                        startActivity(intent);
                     } else {
-                        // Other lessons: Story Sequencing
-                        intent = new Intent(this, StorySequencingActivity.class);
+                        android.widget.Toast.makeText(this,
+                            "Game coming soon for this module!",
+                            android.widget.Toast.LENGTH_SHORT).show();
                     }
-                    startActivity(intent);
                 } else {
                     // Locked lesson
                     android.widget.Toast.makeText(this,
@@ -187,5 +177,53 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             lessonNodesContainer.addView(wrapper);
         }
+    }
+
+    /**
+     * Maps each module to its specific game activity
+     */
+    private Intent getGameIntentForModule(String module) {
+        Intent intent = null;
+
+        switch (module) {
+            case "Reading Comprehension":
+                // Story Sequencing game
+                intent = new Intent(this, StorySequencingActivity.class);
+                break;
+
+            case "Reading Fluency":
+                // Fill in the Blanks game
+                intent = new Intent(this, FillInTheBlanksActivity.class);
+                break;
+
+            case "Spelling & Writing":
+                // Picture Match game
+                intent = new Intent(this, PictureMatchActivity.class);
+                break;
+
+            case "Phonics & Pronunciation":
+                // Dialogue Reading with Voice Recording
+                intent = new Intent(this, DialogueReadingActivity.class);
+                break;
+
+            case "Vocabulary Building":
+                // Word Hunt game (if exists)
+                intent = new Intent(this, StorySequencingActivity.class); // Placeholder
+                break;
+
+            case "Grammar Practice":
+                // Sentence Scramble game (if exists)
+                intent = new Intent(this, StorySequencingActivity.class); // Placeholder
+                break;
+
+            default:
+                // Unknown module - show toast
+                android.widget.Toast.makeText(this,
+                    "Module not yet configured: " + module,
+                    android.widget.Toast.LENGTH_SHORT).show();
+                break;
+        }
+
+        return intent;
     }
 }
