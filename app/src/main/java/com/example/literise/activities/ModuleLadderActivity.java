@@ -157,8 +157,19 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     android.widget.Toast.makeText(this,
                         "Opening Lesson " + lessonNumber,
                         android.widget.Toast.LENGTH_SHORT).show();
-                    // Navigate to StorySequencingActivity for testing
-                    Intent intent = new Intent(this, StorySequencingActivity.class);
+
+                    // Alternate between games for testing
+                    Intent intent;
+                    if (lessonNumber == 1) {
+                        // Lesson 1: Story Sequencing
+                        intent = new Intent(this, StorySequencingActivity.class);
+                    } else if (lessonNumber == 2) {
+                        // Lesson 2: Fill in the Blanks
+                        intent = new Intent(this, FillInTheBlanksActivity.class);
+                    } else {
+                        // Other lessons: Story Sequencing
+                        intent = new Intent(this, StorySequencingActivity.class);
+                    }
                     startActivity(intent);
                 } else {
                     // Locked lesson
