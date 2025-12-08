@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/cardDialogue"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:layout_marginVertical="8dp"
+
+    android:layout_marginHorizontal="4dp"
+
+    app:cardCornerRadius="16dp"
+
+    app:cardElevation="3dp"
+
+    app:cardBackgroundColor="#FFFFFF"
+
+    app:strokeColor="#E0E0E0"
+
+    app:strokeWidth="2dp">
+
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:orientation="vertical"
+
+        android:padding="16dp">
+
+
+
+        <!-- Top Section: Avatar + Dialogue -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+
+            android:gravity="center_vertical">
+
+
+
+            <!-- Avatar -->
+
+            <TextView
+
+                android:id="@+id/tvAvatar"
+
+                android:layout_width="50dp"
+
+                android:layout_height="50dp"
+
+                android:text="👧"
+
+                android:textSize="32sp"
+
+                android:gravity="center"
+
+                android:background="@drawable/bg_avatar_circle"
+
+                android:layout_marginEnd="12dp"/>
+
+
+
+            <!-- Dialogue Content -->
+
+            <LinearLayout
+
+                android:layout_width="0dp"
+
+                android:layout_height="wrap_content"
+
+                android:layout_weight="1"
+
+                android:orientation="vertical">
+
+
+
+                <!-- Speaker Name -->
+
+                <TextView
+
+                    android:id="@+id/tvSpeaker"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Anna"
+
+                    android:textSize="14sp"
+
+                    android:textStyle="bold"
+
+                    android:textColor="#7C3AED"
+
+                    android:fontFamily="@font/poppins_semibold"
+
+                    android:layout_marginBottom="4dp"/>
+
+
+
+                <!-- Dialogue Text -->
+
+                <TextView
+
+                    android:id="@+id/tvDialogueText"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Hello! How are you today?"
+
+                    android:textSize="16sp"
+
+                    android:textColor="#2D3748"
+
+                    android:fontFamily="@font/poppins"
+
+                    android:lineSpacingExtra="2dp"/>
+
+            </LinearLayout>
+
+
+
+            <!-- Checkmark (shown when recorded) -->
+
+            <ImageView
+
+                android:id="@+id/ivCheckmark"
+
+                android:layout_width="28dp"
+
+                android:layout_height="28dp"
+
+                android:src="@drawable/ic_check_circle"
+
+                app:tint="#4CAF50"
+
+                android:layout_marginStart="8dp"
+
+                android:visibility="gone"/>
+
+        </LinearLayout>
+
+
+
+        <!-- Button Section: Record + Play -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+
+            android:layout_marginTop="12dp"
+
+            android:gravity="end">
+
+
+
+            <!-- Record Button -->
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/btnRecord"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="40dp"
+
+                android:text="Record"
+
+                android:textSize="13sp"
+
+                android:fontFamily="@font/poppins_semibold"
+
+                app:icon="@drawable/ic_mic"
+
+                app:iconGravity="start"
+
+                app:iconSize="18dp"
+
+                app:iconTint="@android:color/holo_red_dark"
+
+                app:cornerRadius="20dp"
+
+                app:backgroundTint="#FFFFFF"
+
+                app:strokeColor="#EF5350"
+
+                app:strokeWidth="2dp"
+
+                android:textColor="#EF5350"
+
+                android:paddingHorizontal="16dp"
+
+                android:layout_marginEnd="8dp"
+
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+
+
+            <!-- Play Button -->
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/btnPlay"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="40dp"
+
+                android:text="Play"
+
+                android:textSize="13sp"
+
+                android:fontFamily="@font/poppins_semibold"
+
+                app:icon="@drawable/ic_play"
+
+                app:iconGravity="start"
+
+                app:iconSize="18dp"
+
+                app:iconTint="#2196F3"
+
+                app:cornerRadius="20dp"
+
+                app:backgroundTint="#FFFFFF"
+
+                app:strokeColor="#2196F3"
+
+                app:strokeWidth="2dp"
+
+                android:textColor="#2196F3"
+
+                android:paddingHorizontal="16dp"
+
+                android:visibility="gone"
+
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

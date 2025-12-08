@@ -49,7 +49,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private int totalLessons = 10; // Total lessons per module
 
-    private int currentLesson = 3; // Current unlocked lesson
+    private int currentLesson = 4; // Current unlocked lesson
 
 
 
@@ -328,6 +328,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
                         // Lesson 2: Fill in the Blanks
 
                         intent = new Intent(this, com.example.literise.activities.games.PictureMatchActivity.class);
+
+                    }else if (lessonNumber == 4) {
+
+                        // Lesson 2: Fill in the Blanks
+
+                        intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
 
                     } else{
 

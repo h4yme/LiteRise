@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent">
+
+
+
+    <!-- Gradient Background -->
+
+    <View
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:background="@drawable/bg_dashboard"/>
+
+
+
+    <!-- Main Content -->
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:orientation="vertical"
+
+        android:padding="20dp">
+
+
+
+        <!-- Header -->
+
+        <RelativeLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:layout_marginBottom="20dp">
+
+
+
+            <!-- Back Button -->
+
+            <ImageView
+
+                android:id="@+id/btnBack"
+
+                android:layout_width="32dp"
+
+                android:layout_height="32dp"
+
+                android:src="@drawable/ic_arrow_back"
+
+                android:layout_alignParentStart="true"
+
+                android:layout_centerVertical="true"
+
+                app:tint="#333333"
+
+                android:clickable="true"
+
+                android:focusable="true"
+
+                android:background="?attr/selectableItemBackgroundBorderless"
+
+                android:contentDescription="Back"/>
+
+
+
+            <!-- Title -->
+
+            <TextView
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:layout_centerInParent="true"
+
+                android:text="Dialogue Reading"
+
+                android:textSize="20sp"
+
+                android:textStyle="bold"
+
+                android:textColor="#333333"
+
+                android:fontFamily="@font/poppins_bold"/>
+
+        </RelativeLayout>
+
+
+
+        <!-- Instructions Card -->
+
+        <com.google.android.material.card.MaterialCardView
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            app:cardCornerRadius="16dp"
+
+            app:cardElevation="4dp"
+
+            android:layout_marginBottom="20dp"
+
+            app:cardBackgroundColor="#FFFFFF">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="16dp">
+
+
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="🎤 Instructions"
+
+                    android:textSize="16sp"
+
+                    android:textStyle="bold"
+
+                    android:textColor="#7C3AED"
+
+                    android:fontFamily="@font/poppins_semibold"
+
+                    android:layout_marginBottom="8dp"/>
+
+
+
+                <TextView
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Record yourself reading each dialogue line aloud! Tap Record, speak clearly, then tap Stop. Listen to your recordings and complete when done!"
+
+                    android:textSize="14sp"
+
+                    android:textColor="#666666"
+
+                    android:fontFamily="@font/poppins"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <!-- Progress Counter -->
+
+        <TextView
+
+            android:id="@+id/tvProgress"
+
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+
+            android:text="Read: 0/6"
+
+            android:textSize="16sp"
+
+            android:textStyle="bold"
+
+            android:textColor="#7C3AED"
+
+            android:fontFamily="@font/poppins_semibold"
+
+            android:layout_gravity="center"
+
+            android:layout_marginBottom="16dp"/>
+
+
+
+        <!-- Dialogue List -->
+
+        <androidx.recyclerview.widget.RecyclerView
+
+            android:id="@+id/recyclerDialogue"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="0dp"
+
+            android:layout_weight="1"
+
+            android:clipToPadding="false"
+
+            android:paddingVertical="8dp"/>
+
+
+
+        <!-- Complete Button -->
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/btnComplete"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="56dp"
+
+            android:layout_marginTop="16dp"
+
+            android:text="Complete Reading"
+
+            android:textSize="16sp"
+
+            android:textStyle="bold"
+
+            android:fontFamily="@font/poppins_semibold"
+
+            app:cornerRadius="16dp"
+
+            app:backgroundTint="#7C3AED"
+
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+
+</FrameLayout>
