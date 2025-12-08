@@ -3,8 +3,10 @@ package com.example.literise.activities;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.literise.R;
@@ -14,7 +16,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private TextView tvModuleTitle, tvModuleSubtitle;
-    private RelativeLayout lessonNodesContainer;
+    private LinearLayout lessonNodesContainer;
     private MaterialButton btnStart;
 
     private String moduleName;
@@ -66,24 +68,23 @@ public class ModuleLadderActivity extends AppCompatActivity {
         float density = getResources().getDisplayMetrics().density;
         int horizontalOffset = (int) (70 * density); // Offset from center for zigzag
 
-        // Get screen width to calculate center position
-        int screenWidth = getResources().getDisplayMetrics().widthPixels;
-        int nodeWidth = (int) (80 * density); // Node is 80dp wide
-        int centerPosition = (screenWidth - nodeWidth) / 2;
-
-        View previousNode = null;
-
         // Display nodes from bottom to top (reversed order)
         // So lesson 1 (current) is at the bottom near START button
         for (int i = totalLessons; i >= 1; i--) {
+            // Create a wrapper FrameLayout for horizontal positioning
+            FrameLayout wrapper = new FrameLayout(this);
+            LinearLayout.LayoutParams wrapperParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            wrapper.setLayoutParams(wrapperParams);
+
+            // Inflate the node view
             View nodeView = LayoutInflater.from(this).inflate(
                     R.layout.item_lesson_node,
-                    lessonNodesContainer,
+                    wrapper,
                     false
             );
-
-            // Set a unique ID for each node
-            nodeView.setId(View.generateViewId());
 
             ImageView ivNodeBackground = nodeView.findViewById(R.id.ivNodeBackground);
             ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
@@ -108,51 +109,42 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
             }
 
-            // Create zigzag pattern with absolute positioning
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-                    RelativeLayout.LayoutParams.WRAP_CONTENT,
-                    RelativeLayout.LayoutParams.WRAP_CONTENT
-            );
-
-            // Position above previous node (building from bottom to top)
-            if (previousNode != null) {
-                params.addRule(RelativeLayout.ABOVE, previousNode.getId());
-                params.bottomMargin = 0; // No extra margin, spacing is in item layout
-            } else {
-                // First node (lesson 1) - position at bottom
-                params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
-                params.bottomMargin = (int) (20 * density); // Small margin from bottom
-            }
-
             // Zigzag pattern - calculate horizontal position
-            // Use lesson number for pattern, not loop index
             int position = (i - 1) % 4; // Pattern repeats every 4 nodes
             int leftMargin;
 
             switch (position) {
                 case 0: // Center
-                    leftMargin = centerPosition;
+                    leftMargin = 0; // Will be centered by gravity
                     break;
                 case 1: // Right
-                    leftMargin = centerPosition + horizontalOffset;
+                    leftMargin = horizontalOffset;
                     break;
                 case 2: // Center
-                    leftMargin = centerPosition;
+                    leftMargin = 0;
                     break;
                 case 3: // Left
-                    leftMargin = centerPosition - horizontalOffset;
+                    leftMargin = -horizontalOffset;
                     break;
                 default:
-                    leftMargin = centerPosition;
+                    leftMargin = 0;
                     break;
             }
 
-            params.leftMargin = leftMargin;
+            // Position node within wrapper using FrameLayout params
+            FrameLayout.LayoutParams nodeParams = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+            );
+            nodeParams.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+            nodeParams.leftMargin = leftMargin;
+            nodeParams.rightMargin = -leftMargin; // Compensate
+            nodeView.setLayoutParams(nodeParams);
 
-            nodeView.setLayoutParams(params);
+            wrapper.addView(nodeView);
 
             final int lessonNumber = i;
-            nodeView.setOnClickListener(v -> {
+            wrapper.setOnClickListener(v -> {
                 if (lessonNumber <= currentLesson) {
                     // Can play this lesson
                     android.widget.Toast.makeText(this,
@@ -167,8 +159,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 }
             });
 
-            lessonNodesContainer.addView(nodeView);
-            previousNode = nodeView;
+            lessonNodesContainer.addView(wrapper);
         }
     }
 }

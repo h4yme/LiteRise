@@ -143,10 +143,11 @@
                     android:paddingBottom="40dp">
 
                     <!-- Lesson Nodes Container -->
-                    <RelativeLayout
+                    <LinearLayout
                         android:id="@+id/lessonNodesContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:orientation="vertical"
                         android:layout_centerHorizontal="true"/>
 
                     <!-- Leo Mascot (positioned mid-way) -->
