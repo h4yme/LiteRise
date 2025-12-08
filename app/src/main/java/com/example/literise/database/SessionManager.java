@@ -51,15 +51,8 @@ public class SessionManager {
 
         editor = prefs.edit();
 
-
-
-        // Auto-setup demo user if in demo mode
-
-        if (AppConfig.DEMO_MODE && !isLoggedIn()) {
-
-            setupDemoUser();
-
-        }
+        // Note: Demo user is set up in LoginActivity when user clicks login
+        // Not auto-setup here to allow showing the login screen
 
     }
 
