@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.literise.R;
@@ -17,6 +18,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private ImageView btnBack;
     private TextView tvModuleTitle, tvModuleSubtitle;
     private LinearLayout lessonNodesContainer;
+    private ScrollView scrollView;
     private MaterialButton btnStart;
 
     private String moduleName;
@@ -37,6 +39,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         initializeViews();
         setupListeners();
         displayLessonNodes();
+
+        // Scroll to bottom to show lesson 1 first
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     private void initializeViews() {
@@ -44,6 +49,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         tvModuleTitle = findViewById(R.id.tvModuleTitle);
         tvModuleSubtitle = findViewById(R.id.tvModuleSubtitle);
         lessonNodesContainer = findViewById(R.id.lessonNodesContainer);
+        scrollView = findViewById(R.id.scrollView);
         btnStart = findViewById(R.id.btnStart);
 
         // Set module title
@@ -68,8 +74,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         float density = getResources().getDisplayMetrics().density;
         int horizontalOffset = (int) (40 * density); // Reduced offset for narrower zigzag
 
-        // Display nodes from lesson 1 to 10 (top to bottom)
-        for (int i = 1; i <= totalLessons; i++) {
+        // Display nodes from lesson 10 to 1 (top to bottom)
+        // So lesson 1 ends up at the bottom near START button
+        for (int i = totalLessons; i >= 1; i--) {
             // Create a wrapper FrameLayout for horizontal positioning
             FrameLayout wrapper = new FrameLayout(this);
             LinearLayout.LayoutParams wrapperParams = new LinearLayout.LayoutParams(
