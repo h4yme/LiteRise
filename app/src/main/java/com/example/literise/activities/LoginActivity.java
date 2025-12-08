@@ -16,6 +16,7 @@ import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.Students;
+import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 
 import retrofit2.Call;
@@ -119,6 +120,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doLogin() {
+        // DEMO MODE: Auto-login with demo user
+        if (AppConfig.DEMO_MODE) {
+            performDemoLogin();
+            return;
+        }
+
         String email = etEmail.getText().toString().trim();
         String password = etPassword.getText().toString().trim();
 
@@ -306,5 +313,38 @@ public class LoginActivity extends AppCompatActivity {
                 CustomToast.showError(LoginActivity.this, "Connection error. Please try again.");
             }
         });
+    }
+
+    /**
+     * Demo mode login - bypass API and auto-login with demo user
+     */
+    private void performDemoLogin() {
+        SessionManager sessionManager = new SessionManager(LoginActivity.this);
+
+        // SessionManager auto-sets up demo user in constructor when DEMO_MODE is true
+        // But let's ensure it's set up properly
+        if (!sessionManager.isLoggedIn()) {
+            sessionManager.setupDemoUser();
+        }
+
+        CustomToast.showSuccess(LoginActivity.this, "Welcome to LiteRise Demo!");
+
+        Intent intent;
+
+        // Check if user has completed onboarding
+        if (!sessionManager.hasSeenWelcome()) {
+            // First time user - show welcome screens
+            intent = new Intent(LoginActivity.this, WelcomeActivity.class);
+        } else if (sessionManager.hasCompletedAssessment()) {
+            // Already completed assessment - go to dashboard
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        } else {
+            // Seen welcome but no assessment - go to adaptive assessment
+            intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
+        }
+
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
     }
 }

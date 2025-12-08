@@ -17,6 +17,7 @@ import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
+import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 import com.google.android.material.button.MaterialButton;
 
@@ -110,6 +111,14 @@ public class NicknameSetupActivity extends AppCompatActivity {
     }
 
     private void saveNicknameToBackend() {
+        // DEMO MODE: Skip backend save, just save locally
+        if (AppConfig.DEMO_MODE) {
+            saveNicknameLocally();
+            CustomToast.showSuccess(NicknameSetupActivity.this, "Nickname saved!");
+            nextScreen();
+            return;
+        }
+
         int studentId = sessionManager.getStudentId();
 
         if (studentId == 0) {
