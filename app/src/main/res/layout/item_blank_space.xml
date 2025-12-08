@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tvBlank"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:minWidth="100dp"
+    android:layout_margin="4dp"
+    android:padding="12dp"
+    android:text="______"
+    android:textSize="18sp"
+    android:textStyle="bold"
+    android:textColor="#7C3AED"
+    android:fontFamily="@font/poppins_semibold"
+    android:gravity="center"
+    android:background="@drawable/bg_blank_space"
+    android:clickable="true"
+    android:focusable="true"/>
