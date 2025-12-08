@@ -64,8 +64,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         // Convert dp to pixels for positioning
         float density = getResources().getDisplayMetrics().density;
-        int verticalSpacing = (int) (120 * density); // Spacing between nodes vertically
-        int horizontalOffset = (int) (60 * density); // Offset from center for zigzag
+        int horizontalOffset = (int) (70 * density); // Offset from center for zigzag
+
+        // Get screen width to calculate center position
+        int screenWidth = getResources().getDisplayMetrics().widthPixels;
+        int nodeWidth = (int) (80 * density); // Node is 80dp wide
+        int centerPosition = (screenWidth - nodeWidth) / 2;
 
         View previousNode = null;
 
@@ -102,7 +106,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
             }
 
-            // Create zigzag pattern: left, center, right, center, left...
+            // Create zigzag pattern with absolute positioning
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT,
                     RelativeLayout.LayoutParams.WRAP_CONTENT
@@ -114,24 +118,29 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 params.topMargin = 0; // No extra margin, spacing is in item layout
             }
 
-            // Zigzag pattern based on position
+            // Zigzag pattern - calculate horizontal position
             int position = (i - 1) % 4; // Pattern repeats every 4 nodes
+            int leftMargin;
+
             switch (position) {
                 case 0: // Center
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    leftMargin = centerPosition;
                     break;
                 case 1: // Right
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.leftMargin = horizontalOffset;
+                    leftMargin = centerPosition + horizontalOffset;
                     break;
                 case 2: // Center
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    leftMargin = centerPosition;
                     break;
                 case 3: // Left
-                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
-                    params.rightMargin = horizontalOffset;
+                    leftMargin = centerPosition - horizontalOffset;
+                    break;
+                default:
+                    leftMargin = centerPosition;
                     break;
             }
+
+            params.leftMargin = leftMargin;
 
             nodeView.setLayoutParams(params);
 
