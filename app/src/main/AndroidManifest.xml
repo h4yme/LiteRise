@@ -212,6 +212,16 @@
             android:screenOrientation="portrait" />
 
         <activity
+
+            android:name=".activities.PictureMatchActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".activities.PreAssessmentTutorialActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
