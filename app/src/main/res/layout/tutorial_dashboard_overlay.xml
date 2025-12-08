@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/tutorialOverlay"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent"
+
+    android:background="#B3000000"
+
+    android:clickable="true"
+
+    android:focusable="true"
+
+    android:visibility="gone">
+
+
+
+    <!-- Spotlight Circle (highlights specific elements) -->
+
+    <View
+
+        android:id="@+id/spotlightCircle"
+
+        android:layout_width="200dp"
+
+        android:layout_height="200dp"
+
+        android:background="@drawable/bg_spotlight_circle"
+
+        android:visibility="gone"/>
+
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:orientation="vertical"
+
+        android:padding="20dp">
+
+
+
+        <!-- Top Spacer (pushes content down) -->
+
+        <View
+
+            android:id="@+id/topSpacer"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="0dp"
+
+            android:layout_weight="1"/>
+
+
+
+        <!-- Tutorial Content Card -->
+
+        <androidx.cardview.widget.CardView
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            app:cardCornerRadius="24dp"
+
+            app:cardElevation="12dp"
+
+            app:cardBackgroundColor="#FFFFFF">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="28dp">
+
+
+
+                <!-- Step Indicator -->
+
+                <LinearLayout
+
+                    android:id="@+id/stepIndicatorContainer"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_marginBottom="20dp">
+
+
+
+                    <!-- Dots will be added programmatically -->
+
+                </LinearLayout>
+
+
+
+                <!-- Tutorial Title -->
+
+                <TextView
+
+                    android:id="@+id/tvTutorialTitle"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Welcome to LiteRise!"
+
+                    android:textSize="24sp"
+
+                    android:textStyle="bold"
+
+                    android:textColor="#2D3436"
+
+                    android:fontFamily="@font/poppins_bold"
+
+                    android:layout_marginBottom="12dp"/>
+
+
+
+                <!-- Tutorial Message -->
+
+                <TextView
+
+                    android:id="@+id/tvTutorialMessage"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Let's take a quick tour of your personalized learning dashboard!"
+
+                    android:textSize="15sp"
+
+                    android:textColor="#636E72"
+
+                    android:fontFamily="@font/poppins"
+
+                    android:lineSpacingExtra="4dp"
+
+                    android:layout_marginBottom="24dp"/>
+
+
+
+                <!-- Tutorial Image/Icon (optional) -->
+
+                <ImageView
+
+                    android:id="@+id/ivTutorialIcon"
+
+                    android:layout_width="80dp"
+
+                    android:layout_height="80dp"
+
+                    android:src="@drawable/leo_placement_test"
+
+                    android:scaleType="fitCenter"
+
+                    android:layout_gravity="center_horizontal"
+
+                    android:layout_marginBottom="24dp"
+
+                    android:visibility="gone"
+
+                    android:contentDescription="Tutorial Icon"/>
+
+
+
+                <!-- Button Container -->
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+
+                    android:gravity="center">
+
+
+
+                    <!-- Skip Button -->
+
+                    <com.google.android.material.button.MaterialButton
+
+                        android:id="@+id/btnSkip"
+
+                        android:layout_width="0dp"
+
+                        android:layout_height="56dp"
+
+                        android:layout_weight="1"
+
+                        android:text="Skip"
+
+                        android:textSize="15sp"
+
+                        android:textColor="#636E72"
+
+                        android:textAllCaps="false"
+
+                        app:cornerRadius="28dp"
+
+                        app:backgroundTint="#F5F5F5"
+
+                        android:fontFamily="@font/poppins_semibold"
+
+                        android:layout_marginEnd="8dp"
+
+                        app:strokeWidth="0dp"/>
+
+
+
+                    <!-- Next/Done Button -->
+
+                    <com.google.android.material.button.MaterialButton
+
+                        android:id="@+id/btnNext"
+
+                        android:layout_width="0dp"
+
+                        android:layout_height="56dp"
+
+                        android:layout_weight="1"
+
+                        android:text="Next"
+
+                        android:textSize="15sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#FFFFFF"
+
+                        android:textAllCaps="false"
+
+                        app:cornerRadius="28dp"
+
+                        app:backgroundTint="#8B5CF6"
+
+                        android:fontFamily="@font/poppins_semibold"
+
+                        android:layout_marginStart="8dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+
+
+        <!-- Bottom Spacer -->
+
+        <View
+
+            android:id="@+id/bottomSpacer"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="0dp"
+
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
+</FrameLayout>

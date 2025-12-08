@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:id="@+id/cardStoryEvent"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="wrap_content"
+
+    android:layout_marginBottom="12dp"
+
+    app:cardCornerRadius="16dp"
+
+    app:cardElevation="4dp"
+
+    app:cardBackgroundColor="#FFFFFF">
+
+
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal"
+
+        android:padding="16dp"
+
+        android:gravity="center_vertical">
+
+
+
+        <!-- Drag Handle -->
+
+        <ImageView
+
+            android:id="@+id/ivDragHandle"
+
+            android:layout_width="24dp"
+
+            android:layout_height="24dp"
+
+            android:src="@drawable/ic_drag_handle"
+
+            app:tint="#999999"
+
+            android:contentDescription="Drag to reorder"
+
+            android:layout_marginEnd="12dp"/>
+
+
+
+        <!-- Event Number Badge -->
+
+        <TextView
+
+            android:id="@+id/tvEventNumber"
+
+            android:layout_width="32dp"
+
+            android:layout_height="32dp"
+
+            android:background="@drawable/bg_event_number"
+
+            android:text="1"
+
+            android:textSize="14sp"
+
+            android:textStyle="bold"
+
+            android:textColor="#FFFFFF"
+
+            android:fontFamily="@font/poppins_semibold"
+
+            android:gravity="center"
+
+            android:layout_marginEnd="12dp"/>
+
+
+
+        <!-- Event Text -->
+
+        <TextView
+
+            android:id="@+id/tvEventText"
+
+            android:layout_width="0dp"
+
+            android:layout_height="wrap_content"
+
+            android:layout_weight="1"
+
+            android:text="A little girl named Emma found a puppy in the park."
+
+            android:textSize="14sp"
+
+            android:textColor="#333333"
+
+            android:fontFamily="@font/poppins"
+
+            android:lineSpacingExtra="4dp"/>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

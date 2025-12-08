@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+
+    android:layout_height="match_parent">
+
+
+
+    <!-- Purple Gradient Background -->
+
+    <ImageView
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:src="@drawable/bg_module"
+
+        android:scaleType="centerCrop"
+
+        android:contentDescription="Module Background"/>
+
+
+
+    <!-- Main Content -->
+
+    <LinearLayout
+
+        android:layout_width="match_parent"
+
+        android:layout_height="match_parent"
+
+        android:orientation="vertical">
+
+
+
+        <!-- Header -->
+
+        <RelativeLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:padding="20dp">
+
+
+
+            <!-- Back Button -->
+
+            <ImageView
+
+                android:id="@+id/btnBack"
+
+                android:layout_width="32dp"
+
+                android:layout_height="32dp"
+
+                android:src="@drawable/ic_arrow_back"
+
+                android:layout_alignParentStart="true"
+
+                android:layout_centerVertical="true"
+
+                app:tint="#FFFFFF"
+
+                android:clickable="true"
+
+                android:focusable="true"
+
+                android:background="?attr/selectableItemBackgroundBorderless"
+
+                android:contentDescription="Back"/>
+
+
+
+            <!-- Module Title -->
+
+            <LinearLayout
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:layout_toEndOf="@id/btnBack"
+
+                android:layout_marginStart="16dp"
+
+                android:layout_centerVertical="true"
+
+                android:orientation="vertical">
+
+
+
+                <TextView
+
+                    android:id="@+id/tvModuleTitle"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Reading Comprehension"
+
+                    android:textSize="18sp"
+
+                    android:textStyle="bold"
+
+                    android:textColor="#FFFFFF"
+
+                    android:fontFamily="@font/poppins_bold"/>
+
+
+
+                <TextView
+
+                    android:id="@+id/tvModuleSubtitle"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Pathway"
+
+                    android:textSize="12sp"
+
+                    android:textColor="#DDDDDD"
+
+                    android:fontFamily="@font/poppins"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+
+
+        <!-- Lesson Nodes Scroll Area -->
+
+        <FrameLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="0dp"
+
+            android:layout_weight="1">
+
+
+
+            <ScrollView
+                android:id="@+id/scrollView"
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent"
+
+                android:fillViewport="true"
+
+                android:scrollbars="none">
+
+
+
+                <RelativeLayout
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:paddingTop="40dp"
+
+                    android:paddingBottom="40dp">
+
+
+
+                    <!-- Lesson Nodes Container -->
+
+                    <LinearLayout
+
+                        android:id="@+id/lessonNodesContainer"
+
+                        android:layout_width="match_parent"
+
+                        android:layout_height="wrap_content"
+
+                        android:orientation="vertical"
+
+                        android:layout_centerHorizontal="true"/>
+
+
+
+                    <!-- Leo Mascot (positioned mid-way) -->
+
+                    <ImageView
+
+                        android:id="@+id/ivLeoMascot"
+
+                        android:layout_width="120dp"
+
+                        android:layout_height="120dp"
+
+                        android:src="@drawable/leo_placement_test"
+
+                        android:scaleType="fitCenter"
+
+                        android:layout_alignParentEnd="true"
+
+                        android:layout_marginEnd="40dp"
+
+                        android:layout_marginTop="300dp"
+
+                        android:contentDescription="Leo Mascot"/>
+
+                </RelativeLayout>
+
+            </ScrollView>
+
+        </FrameLayout>
+
+
+
+        <!-- START Button -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:gravity="center"
+
+            android:padding="20dp">
+
+
+
+            <TextView
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="START"
+
+                android:textSize="12sp"
+
+                android:textStyle="bold"
+
+                android:textColor="#FFFFFF"
+
+                android:fontFamily="@font/poppins_semibold"
+
+                android:layout_marginBottom="12dp"/>
+
+
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/btnStart"
+
+                android:layout_width="80dp"
+
+                android:layout_height="80dp"
+
+                android:text=""
+
+                android:insetTop="0dp"
+
+                android:insetBottom="0dp"
+
+                app:cornerRadius="40dp"
+
+                app:backgroundTint="#7C3AED"
+
+                app:elevation="8dp"
+
+                app:icon="@drawable/ic_star"
+
+                app:iconGravity="textStart"
+
+                app:iconTint="#FFFFFF"
+
+                app:iconSize="40dp"
+
+                app:iconPadding="0dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

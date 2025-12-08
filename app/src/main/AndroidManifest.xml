@@ -164,7 +164,15 @@
             android:theme="@style/Theme.LiteRise.NoActionBar"
 
             android:screenOrientation="portrait" />
+        <activity
 
+            android:name=".activities.games.StorySequencingActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+
+            android:screenOrientation="portrait" />
         <activity
 
             android:name=".activities.games.WordHuntActivity"
@@ -187,6 +195,11 @@
 
         <activity
             android:name=".activities.SettingsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.ModuleLadderActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
     </application>
