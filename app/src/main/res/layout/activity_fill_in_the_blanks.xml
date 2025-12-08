@@ -99,8 +99,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="20dp"
-                android:gravity="center"
-                android:flexWrap="wrap">
+                android:gravity="center_vertical">
 
                 <!-- Sentence parts will be added dynamically -->
             </LinearLayout>
