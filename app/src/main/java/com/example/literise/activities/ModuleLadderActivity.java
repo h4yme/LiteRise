@@ -24,7 +24,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private String moduleName;
     private int totalLessons = 10; // Total lessons per module
-    private int currentLesson = 1; // Current unlocked lesson
+    private int currentLesson = 2; // Current unlocked lesson (set to 2 for testing both games)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
