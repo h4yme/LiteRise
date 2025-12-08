@@ -222,6 +222,16 @@
             android:screenOrientation="portrait" />
 
         <activity
+
+            android:name=".activities.DialogueReadingActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".activities.PreAssessmentTutorialActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />

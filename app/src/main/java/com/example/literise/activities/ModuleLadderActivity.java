@@ -24,7 +24,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private String moduleName;
     private int totalLessons = 10; // Total lessons per module
-    private int currentLesson = 3; // Current unlocked lesson (set to 3 for testing all games)
+    private int currentLesson = 4; // Current unlocked lesson (set to 4 for testing all games)
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,6 +169,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     } else if (lessonNumber == 3) {
                         // Lesson 3: Picture Match
                         intent = new Intent(this, PictureMatchActivity.class);
+                    } else if (lessonNumber == 4) {
+                        // Lesson 4: Dialogue Reading
+                        intent = new Intent(this, DialogueReadingActivity.class);
                     } else {
                         // Other lessons: Story Sequencing
                         intent = new Intent(this, StorySequencingActivity.class);
