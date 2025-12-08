@@ -362,9 +362,15 @@ public class DialogueReadingActivity extends AppCompatActivity {
 
                 line.hasRecording = true;
 
-                line.isRead = true;
+                // Only increment if this line wasn't already recorded
 
-                linesRead++;
+                if (!line.isRead) {
+
+                    linesRead++;
+
+                }
+
+                line.isRead = true;
 
                 adapter.notifyItemChanged(currentRecordingPosition);
 

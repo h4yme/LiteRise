@@ -49,7 +49,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private int totalLessons = 10; // Total lessons per module
 
-    private int currentLesson = 4; // Current unlocked lesson
+    private int currentLesson = 1; // Current unlocked lesson
 
 
 
@@ -309,40 +309,23 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
 
 
-                    Intent intent;
+                    // Launch game based on module type
 
-                    if (lessonNumber == 1) {
+                    Intent intent = getGameIntentForModule(moduleName);
 
-                        // Lesson 1: Story Sequencing
+                    if (intent != null) {
 
-                        intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
+                        startActivity(intent);
 
-                    } else if (lessonNumber == 2) {
+                    } else {
 
-                        // Lesson 2: Fill in the Blanks
+                        android.widget.Toast.makeText(this,
 
-                        intent = new Intent(this, com.example.literise.activities.games.FillInTheBlanksActivity.class);
+                                "Game coming soon for this module!",
 
-                    } else if (lessonNumber == 3) {
-
-                        // Lesson 2: Fill in the Blanks
-
-                        intent = new Intent(this, com.example.literise.activities.games.PictureMatchActivity.class);
-
-                    }else if (lessonNumber == 4) {
-
-                        // Lesson 2: Fill in the Blanks
-
-                        intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
-
-                    } else{
-
-                        // Other lessons: Story Sequencing
-
-                        intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
+                                android.widget.Toast.LENGTH_SHORT).show();
 
                     }
-                    startActivity(intent);
 
                 } else {
 
@@ -363,6 +346,99 @@ public class ModuleLadderActivity extends AppCompatActivity {
             lessonNodesContainer.addView(wrapper);
 
         }
+
+    }
+    /**
+
+     * Maps each module to its specific game activity
+
+     */
+
+    private Intent getGameIntentForModule(String module) {
+
+        Intent intent = null;
+
+
+
+        switch (module) {
+
+            case "Reading Comprehension":
+
+                // Story Sequencing game
+
+                intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
+
+                break;
+
+
+
+            case "Reading Fluency":
+
+                // Fill in the Blanks game
+
+                intent = new Intent(this, com.example.literise.activities.games.FillInTheBlanksActivity.class);
+
+                break;
+
+
+
+            case "Spelling & Writing":
+
+                // Picture Match game
+
+                intent = new Intent(this, com.example.literise.activities.games.PictureMatchActivity.class);
+
+                break;
+
+
+
+            case "Phonics & Pronunciation":
+
+                // Dialogue Reading with Voice Recording
+
+                intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
+
+                break;
+
+
+
+            case "Vocabulary Building":
+
+                // Word Hunt game (if exists)
+
+                intent = new Intent(this, com.example.literise.activities.games.WordHuntActivity.class); // Placeholder
+
+                break;
+
+
+
+            case "Grammar & Syntax":
+
+                // Sentence Scramble game (if exists)
+
+                intent = new Intent(this, com.example.literise.activities.games.SentenceScrambleActivity.class); // Placeholder
+
+                break;
+
+
+
+            default:
+
+                // Unknown module - show toast
+
+                android.widget.Toast.makeText(this,
+
+                        "Module not yet configured: " + module,
+
+                        android.widget.Toast.LENGTH_SHORT).show();
+
+                break;
+
+        }
+
+
+
+        return intent;
 
     }
 
