@@ -1,24 +1,36 @@
 package com.example.literise.activities;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.literise.R;
 import com.example.literise.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DialogueReadingActivity extends AppCompatActivity {
+
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     private ImageView btnBack;
     private TextView tvProgress;
@@ -29,15 +41,47 @@ public class DialogueReadingActivity extends AppCompatActivity {
     private int linesRead = 0;
     private SessionManager session;
 
+    private MediaRecorder mediaRecorder;
+    private MediaPlayer mediaPlayer;
+    private int currentRecordingPosition = -1;
+    private Handler recordingAnimationHandler;
+    private Runnable recordingAnimationRunnable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dialogue_reading);
 
         session = new SessionManager(this);
+        recordingAnimationHandler = new Handler();
+
         initializeViews();
         setupDialogue();
         setupListeners();
+        checkAudioPermission();
+    }
+
+    private void checkAudioPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    REQUEST_RECORD_AUDIO_PERMISSION);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "🎤 Microphone ready!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Microphone permission required for voice recording",
+                        Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void initializeViews() {
@@ -70,52 +114,147 @@ public class DialogueReadingActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            stopRecording();
+            stopPlayback();
+            finish();
+        });
         btnComplete.setOnClickListener(v -> checkCompletion());
     }
 
-    private void onDialogueLineClicked(DialogueLine line, int position) {
-        if (line.isRead) {
-            return; // Already read
+    private void startRecording(int position) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Please grant microphone permission", Toast.LENGTH_SHORT).show();
+            checkAudioPermission();
+            return;
         }
 
-        // Mark as read
-        line.isRead = true;
-        linesRead++;
-        adapter.notifyItemChanged(position);
-        updateProgress();
+        // Stop any existing recording or playback
+        stopRecording();
+        stopPlayback();
 
-        // Animate the card
-        RecyclerView.ViewHolder holder = recyclerDialogue.findViewHolderForAdapterPosition(position);
-        if (holder != null) {
-            View itemView = holder.itemView;
-            itemView.animate()
-                    .scaleX(1.05f)
-                    .scaleY(1.05f)
-                    .setDuration(150)
-                    .withEndAction(() -> {
-                        itemView.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(150);
-                    });
-        }
+        DialogueLine line = dialogueLines.get(position);
+        String fileName = getAudioFilePath(position);
 
-        // Auto-scroll to next line
-        if (position < dialogueLines.size() - 1) {
-            recyclerDialogue.smoothScrollToPosition(position + 1);
+        try {
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+            mediaRecorder.setOutputFile(fileName);
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+
+            currentRecordingPosition = position;
+            line.isRecording = true;
+            line.audioFilePath = fileName;
+            adapter.notifyItemChanged(position);
+
+            // Auto-stop recording after 10 seconds
+            recordingAnimationHandler.postDelayed(() -> {
+                if (currentRecordingPosition == position) {
+                    stopRecording();
+                }
+            }, 10000);
+
+            Toast.makeText(this, "🎤 Recording...", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Failed to start recording", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 
+    private void stopRecording() {
+        if (mediaRecorder != null) {
+            try {
+                mediaRecorder.stop();
+                mediaRecorder.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            mediaRecorder = null;
+
+            if (currentRecordingPosition >= 0) {
+                DialogueLine line = dialogueLines.get(currentRecordingPosition);
+                line.isRecording = false;
+                line.hasRecording = true;
+                line.isRead = true;
+                linesRead++;
+                adapter.notifyItemChanged(currentRecordingPosition);
+                updateProgress();
+
+                Toast.makeText(this, "✅ Recording saved!", Toast.LENGTH_SHORT).show();
+
+                currentRecordingPosition = -1;
+            }
+        }
+    }
+
+    private void startPlayback(int position) {
+        stopPlayback();
+        stopRecording();
+
+        DialogueLine line = dialogueLines.get(position);
+        if (line.audioFilePath == null || !new File(line.audioFilePath).exists()) {
+            Toast.makeText(this, "No recording found", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(line.audioFilePath);
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+
+            line.isPlaying = true;
+            adapter.notifyItemChanged(position);
+
+            mediaPlayer.setOnCompletionListener(mp -> {
+                line.isPlaying = false;
+                adapter.notifyItemChanged(position);
+                stopPlayback();
+            });
+
+            Toast.makeText(this, "▶️ Playing...", Toast.LENGTH_SHORT).show();
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Failed to play recording", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private void stopPlayback() {
+        if (mediaPlayer != null) {
+            try {
+                if (mediaPlayer.isPlaying()) {
+                    mediaPlayer.stop();
+                }
+                mediaPlayer.release();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            mediaPlayer = null;
+        }
+    }
+
+    private String getAudioFilePath(int position) {
+        File directory = getExternalCacheDir();
+        if (directory != null) {
+            return directory.getAbsolutePath() + "/dialogue_line_" + position + ".3gp";
+        }
+        return getCacheDir().getAbsolutePath() + "/dialogue_line_" + position + ".3gp";
+    }
+
     private void updateProgress() {
-        tvProgress.setText("Read: " + linesRead + "/" + dialogueLines.size());
+        tvProgress.setText("Recorded: " + linesRead + "/" + dialogueLines.size());
     }
 
     private void checkCompletion() {
         boolean allRead = linesRead == dialogueLines.size();
 
         if (!allRead) {
-            // Show hint to read all lines
             showHintDialog();
             return;
         }
@@ -133,8 +272,8 @@ public class DialogueReadingActivity extends AppCompatActivity {
 
     private void showHintDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("Not Yet! 📖")
-                .setMessage("Please tap and read all dialogue lines before completing.")
+                .setTitle("Not Yet! 🎤")
+                .setMessage("Please record all dialogue lines before completing!")
                 .setPositiveButton("OK", null)
                 .show();
     }
@@ -151,7 +290,7 @@ public class DialogueReadingActivity extends AppCompatActivity {
         TextView tvResultStreak = dialogView.findViewById(R.id.tvResultStreak);
         MaterialButton btnFinish = dialogView.findViewById(R.id.btnFinish);
 
-        tvResultTitle.setText("EXCELLENT READING! 🎉📚");
+        tvResultTitle.setText("EXCELLENT READING! 🎉🎤");
 
         // Animate trophy
         ivTrophy.animate()
@@ -175,7 +314,7 @@ public class DialogueReadingActivity extends AppCompatActivity {
         }
         tvResultStreak.setText(starDisplay);
 
-        tvResultScore.setText(totalLines + " lines read");
+        tvResultScore.setText(totalLines + " lines recorded");
         tvResultAccuracy.setText("100%");
         tvResultXP.setText("+" + xpEarned + " XP");
 
@@ -200,18 +339,36 @@ public class DialogueReadingActivity extends AppCompatActivity {
         dialog.show();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopRecording();
+        stopPlayback();
+        if (recordingAnimationHandler != null) {
+            recordingAnimationHandler.removeCallbacksAndMessages(null);
+        }
+    }
+
     // DialogueLine model class
     private static class DialogueLine {
         String speaker;
         String avatar;
         String text;
         boolean isRead;
+        boolean hasRecording;
+        boolean isRecording;
+        boolean isPlaying;
+        String audioFilePath;
 
         DialogueLine(String speaker, String avatar, String text) {
             this.speaker = speaker;
             this.avatar = avatar;
             this.text = text;
             this.isRead = false;
+            this.hasRecording = false;
+            this.isRecording = false;
+            this.isPlaying = false;
+            this.audioFilePath = null;
         }
     }
 
@@ -239,35 +396,88 @@ public class DialogueReadingActivity extends AppCompatActivity {
             holder.tvAvatar.setText(line.avatar);
             holder.tvDialogueText.setText(line.text);
 
-            if (line.isRead) {
-                // Read state - green background
+            // Update UI based on recording state
+            if (line.isRecording) {
+                // Recording state - pulsing red
+                holder.cardDialogue.setCardBackgroundColor(0xFFFFEBEE);
+                holder.cardDialogue.setStrokeColor(0xFFEF5350);
+                holder.cardDialogue.setStrokeWidth(4);
+                holder.ivCheckmark.setVisibility(View.GONE);
+                holder.btnRecord.setVisibility(View.VISIBLE);
+                holder.btnPlay.setVisibility(View.GONE);
+                holder.btnRecord.setIconResource(R.drawable.ic_stop);
+                holder.btnRecord.setText("Stop");
+                holder.btnRecord.setIconTintResource(android.R.color.holo_red_dark);
+
+                // Pulsing animation
+                holder.cardDialogue.animate()
+                        .alpha(0.7f)
+                        .setDuration(500)
+                        .withEndAction(() -> {
+                            if (line.isRecording) {
+                                holder.cardDialogue.animate()
+                                        .alpha(1f)
+                                        .setDuration(500)
+                                        .withEndAction(() -> {
+                                            if (line.isRecording) {
+                                                notifyItemChanged(position);
+                                            }
+                                        });
+                            }
+                        });
+            } else if (line.isPlaying) {
+                // Playing state - blue
+                holder.cardDialogue.setCardBackgroundColor(0xFFE3F2FD);
+                holder.cardDialogue.setStrokeColor(0xFF2196F3);
+                holder.cardDialogue.setStrokeWidth(3);
+                holder.ivCheckmark.setVisibility(View.VISIBLE);
+                holder.btnRecord.setVisibility(View.VISIBLE);
+                holder.btnPlay.setVisibility(View.VISIBLE);
+                holder.btnPlay.setIconResource(R.drawable.ic_stop);
+                holder.btnPlay.setText("Stop");
+            } else if (line.hasRecording) {
+                // Has recording - green
                 holder.cardDialogue.setCardBackgroundColor(0xFFE8F5E9);
                 holder.cardDialogue.setStrokeColor(0xFF4CAF50);
                 holder.cardDialogue.setStrokeWidth(3);
                 holder.ivCheckmark.setVisibility(View.VISIBLE);
+                holder.btnRecord.setVisibility(View.VISIBLE);
+                holder.btnPlay.setVisibility(View.VISIBLE);
+                holder.btnRecord.setIconResource(R.drawable.ic_mic);
+                holder.btnRecord.setText("Re-record");
+                holder.btnRecord.setIconTintResource(android.R.color.holo_red_dark);
+                holder.btnPlay.setIconResource(R.drawable.ic_play);
+                holder.btnPlay.setText("Play");
             } else {
-                // Unread state - white background
+                // No recording - white
                 holder.cardDialogue.setCardBackgroundColor(0xFFFFFFFF);
                 holder.cardDialogue.setStrokeColor(0xFFE0E0E0);
                 holder.cardDialogue.setStrokeWidth(2);
                 holder.ivCheckmark.setVisibility(View.GONE);
+                holder.btnRecord.setVisibility(View.VISIBLE);
+                holder.btnPlay.setVisibility(View.GONE);
+                holder.btnRecord.setIconResource(R.drawable.ic_mic);
+                holder.btnRecord.setText("Record");
+                holder.btnRecord.setIconTintResource(android.R.color.holo_red_dark);
             }
 
-            holder.cardDialogue.setOnClickListener(v -> {
-                if (!line.isRead) {
-                    // Tap animation
-                    v.animate()
-                            .scaleX(0.98f)
-                            .scaleY(0.98f)
-                            .setDuration(100)
-                            .withEndAction(() -> {
-                                v.animate()
-                                        .scaleX(1f)
-                                        .scaleY(1f)
-                                        .setDuration(100);
-                            });
+            // Record button click
+            holder.btnRecord.setOnClickListener(v -> {
+                if (line.isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording(position);
+                }
+            });
 
-                    onDialogueLineClicked(line, position);
+            // Play button click
+            holder.btnPlay.setOnClickListener(v -> {
+                if (line.isPlaying) {
+                    stopPlayback();
+                    line.isPlaying = false;
+                    notifyItemChanged(position);
+                } else {
+                    startPlayback(position);
                 }
             });
         }
@@ -283,6 +493,8 @@ public class DialogueReadingActivity extends AppCompatActivity {
             TextView tvSpeaker;
             TextView tvDialogueText;
             ImageView ivCheckmark;
+            MaterialButton btnRecord;
+            MaterialButton btnPlay;
 
             ViewHolder(View itemView) {
                 super(itemView);
@@ -291,6 +503,8 @@ public class DialogueReadingActivity extends AppCompatActivity {
                 tvSpeaker = itemView.findViewById(R.id.tvSpeaker);
                 tvDialogueText = itemView.findViewById(R.id.tvDialogueText);
                 ivCheckmark = itemView.findViewById(R.id.ivCheckmark);
+                btnRecord = itemView.findViewById(R.id.btnRecord);
+                btnPlay = itemView.findViewById(R.id.btnPlay);
             }
         }
     }

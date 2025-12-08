@@ -67,7 +67,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="📖 Instructions"
+                    android:text="🎤 Instructions"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#7C3AED"
@@ -77,7 +77,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tap each dialogue line to read it aloud. Mark all lines as read to complete!"
+                    android:text="Record yourself reading each dialogue line aloud! Tap Record, speak clearly, then tap Stop. Listen to your recordings and complete when done!"
                     android:textSize="14sp"
                     android:textColor="#666666"
                     android:fontFamily="@font/poppins"/>
