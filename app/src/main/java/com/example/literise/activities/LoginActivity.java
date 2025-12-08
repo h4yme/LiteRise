@@ -120,14 +120,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doLogin() {
-        // DEMO MODE: Auto-login with demo user
+        String email = etEmail.getText().toString().trim();
+        String password = etPassword.getText().toString().trim();
+
+        // DEMO MODE: Accept any input and proceed with demo login
         if (AppConfig.DEMO_MODE) {
+            // Still show a message if fields are empty for better UX
+            if (email.isEmpty() || password.isEmpty()) {
+                CustomToast.showWarning(this, "Please enter email and password");
+                return;
+            }
+            // Accept any credentials in demo mode
             performDemoLogin();
             return;
         }
-
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
 
         if (email.isEmpty() || password.isEmpty()) {
             CustomToast.showWarning(this, "Please enter email and password");
