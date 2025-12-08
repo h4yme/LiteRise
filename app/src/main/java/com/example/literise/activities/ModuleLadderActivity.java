@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.literise.R;
@@ -14,7 +14,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private ImageView btnBack;
     private TextView tvModuleTitle, tvModuleSubtitle;
-    private LinearLayout lessonNodesContainer;
+    private RelativeLayout lessonNodesContainer;
     private MaterialButton btnStart;
 
     private String moduleName;
@@ -62,12 +62,22 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private void displayLessonNodes() {
         lessonNodesContainer.removeAllViews();
 
+        // Convert dp to pixels for positioning
+        float density = getResources().getDisplayMetrics().density;
+        int verticalSpacing = (int) (120 * density); // Spacing between nodes vertically
+        int horizontalOffset = (int) (60 * density); // Offset from center for zigzag
+
+        View previousNode = null;
+
         for (int i = 1; i <= totalLessons; i++) {
             View nodeView = LayoutInflater.from(this).inflate(
                     R.layout.item_lesson_node,
                     lessonNodesContainer,
                     false
             );
+
+            // Set a unique ID for each node
+            nodeView.setId(View.generateViewId());
 
             ImageView ivNodeBackground = nodeView.findViewById(R.id.ivNodeBackground);
             ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
@@ -92,6 +102,39 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
             }
 
+            // Create zigzag pattern: left, center, right, center, left...
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+                    RelativeLayout.LayoutParams.WRAP_CONTENT,
+                    RelativeLayout.LayoutParams.WRAP_CONTENT
+            );
+
+            // Position below previous node
+            if (previousNode != null) {
+                params.addRule(RelativeLayout.BELOW, previousNode.getId());
+                params.topMargin = 0; // No extra margin, spacing is in item layout
+            }
+
+            // Zigzag pattern based on position
+            int position = (i - 1) % 4; // Pattern repeats every 4 nodes
+            switch (position) {
+                case 0: // Center
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    break;
+                case 1: // Right
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    params.leftMargin = horizontalOffset;
+                    break;
+                case 2: // Center
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    break;
+                case 3: // Left
+                    params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+                    params.rightMargin = horizontalOffset;
+                    break;
+            }
+
+            nodeView.setLayoutParams(params);
+
             final int lessonNumber = i;
             nodeView.setOnClickListener(v -> {
                 if (lessonNumber <= currentLesson) {
@@ -109,6 +152,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
             });
 
             lessonNodesContainer.addView(nodeView);
+            previousNode = nodeView;
         }
     }
 }
