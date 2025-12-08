@@ -205,9 +205,16 @@ public class StorySequencingActivity extends AppCompatActivity {
         int currentXP = session.getXP();
         session.saveXP(currentXP + xpEarned);
 
+        // Make variables final for lambda
+        final boolean finalIsCorrect = isCorrect;
+        final int finalCorrectCount = correctCount;
+        final int finalTotal = storyEvents.size();
+        final int finalXpEarned = xpEarned;
+        final int finalStars = stars;
+
         // Show result dialog after animation
         recyclerStoryEvents.postDelayed(() -> {
-            showResultDialog(isCorrect, correctCount, storyEvents.size(), xpEarned, stars);
+            showResultDialog(finalIsCorrect, finalCorrectCount, finalTotal, finalXpEarned, finalStars);
         }, 800);
     }
 
