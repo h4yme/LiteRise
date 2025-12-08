@@ -66,11 +66,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         // Convert dp to pixels for positioning
         float density = getResources().getDisplayMetrics().density;
-        int horizontalOffset = (int) (70 * density); // Offset from center for zigzag
+        int horizontalOffset = (int) (40 * density); // Reduced offset for narrower zigzag
 
-        // Display nodes from bottom to top (reversed order)
-        // So lesson 1 (current) is at the bottom near START button
-        for (int i = totalLessons; i >= 1; i--) {
+        // Display nodes from lesson 1 to 10 (top to bottom)
+        for (int i = 1; i <= totalLessons; i++) {
             // Create a wrapper FrameLayout for horizontal positioning
             FrameLayout wrapper = new FrameLayout(this);
             LinearLayout.LayoutParams wrapperParams = new LinearLayout.LayoutParams(
