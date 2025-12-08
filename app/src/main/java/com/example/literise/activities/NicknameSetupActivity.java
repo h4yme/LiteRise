@@ -8,7 +8,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import com.example.literise.utils.AppConfig;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
@@ -111,7 +111,19 @@ public class NicknameSetupActivity extends AppCompatActivity {
 
     private void saveNicknameToBackend() {
         int studentId = sessionManager.getStudentId();
+        // DEMO MODE: Skip backend save, just save locally
 
+        if (AppConfig.DEMO_MODE) {
+
+            saveNicknameLocally();
+
+            CustomToast.showSuccess(NicknameSetupActivity.this, "Nickname saved!");
+
+            nextScreen();
+
+            return;
+
+        }
         if (studentId == 0) {
             // No student logged in - skip backend save
             saveNicknameLocally();

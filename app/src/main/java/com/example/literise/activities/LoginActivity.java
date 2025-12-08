@@ -8,7 +8,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-
+import com.example.literise.utils.AppConfig;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
@@ -120,7 +120,32 @@ public class LoginActivity extends AppCompatActivity {
 
     private void doLogin() {
         String email = etEmail.getText().toString().trim();
+
         String password = etPassword.getText().toString().trim();
+
+
+
+        // DEMO MODE: Accept any input and proceed with demo login
+
+        if (AppConfig.DEMO_MODE) {
+
+            // Still show a message if fields are empty for better UX
+
+            if (email.isEmpty() || password.isEmpty()) {
+
+                CustomToast.showWarning(this, "Please enter email and password");
+
+                return;
+
+            }
+
+            // Accept any credentials in demo mode
+
+            performDemoLogin();
+
+            return;
+
+        }
 
         if (email.isEmpty() || password.isEmpty()) {
             CustomToast.showWarning(this, "Please enter email and password");
@@ -306,5 +331,68 @@ public class LoginActivity extends AppCompatActivity {
                 CustomToast.showError(LoginActivity.this, "Connection error. Please try again.");
             }
         });
+    }
+    /**
+
+     * Demo mode login - bypass API and auto-login with demo user
+
+     */
+
+    private void performDemoLogin() {
+
+        SessionManager sessionManager = new SessionManager(LoginActivity.this);
+
+
+
+        // SessionManager auto-sets up demo user in constructor when DEMO_MODE is true
+
+        // But let's ensure it's set up properly
+
+        if (!sessionManager.isLoggedIn()) {
+
+            sessionManager.setupDemoUser();
+
+        }
+
+
+
+        CustomToast.showSuccess(LoginActivity.this, "Welcome to LiteRise Demo!");
+
+
+
+        Intent intent;
+
+
+
+        // Check if user has completed onboarding
+
+        if (!sessionManager.hasSeenWelcome()) {
+
+            // First time user - show welcome screens
+
+            intent = new Intent(LoginActivity.this, WelcomeActivity.class);
+
+        } else if (sessionManager.hasCompletedAssessment()) {
+
+            // Already completed assessment - go to dashboard
+
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
+
+        } else {
+
+            // Seen welcome but no assessment - go to adaptive assessment
+
+            intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
+
+        }
+
+
+
+        startActivity(intent);
+
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+        finish();
+
     }
 }

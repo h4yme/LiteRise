@@ -53,13 +53,7 @@ public class SessionManager {
 
 
 
-        // Auto-setup demo user if in demo mode
 
-        if (AppConfig.DEMO_MODE && !isLoggedIn()) {
-
-            setupDemoUser();
-
-        }
 
     }
 

@@ -628,13 +628,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         if (isCorrect == 1) {
             demoCorrectAnswers++;
         }
-
+/*
         // Show feedback
         if (isCorrect == 1) {
             CustomToast.showSuccess(this, "Correct!");
         } else {
             CustomToast.showError(this, "Incorrect");
-        }
+        }*/
 
         // Move to next question
         demoQuestionIndex++;
