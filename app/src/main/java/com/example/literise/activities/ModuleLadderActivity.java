@@ -1,5 +1,6 @@
 package com.example.literise.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -156,7 +157,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     android.widget.Toast.makeText(this,
                         "Opening Lesson " + lessonNumber,
                         android.widget.Toast.LENGTH_SHORT).show();
-                    // TODO: Navigate to lesson activity
+                    // Navigate to StorySequencingActivity for testing
+                    Intent intent = new Intent(this, StorySequencingActivity.class);
+                    startActivity(intent);
                 } else {
                     // Locked lesson
                     android.widget.Toast.makeText(this,
