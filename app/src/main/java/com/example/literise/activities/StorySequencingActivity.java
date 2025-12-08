@@ -9,13 +9,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.literise.R;
 import com.example.literise.utils.SessionManager;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -152,7 +152,7 @@ public class StorySequencingActivity extends AppCompatActivity {
                 correctCount++;
                 // Correct - green border and bounce
                 if (holder != null) {
-                    CardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
                     card.setCardBackgroundColor(0xFFE8F5E9); // Light green
                     card.setStrokeColor(0xFF4CAF50); // Green border
                     card.setStrokeWidth(4);
@@ -173,7 +173,7 @@ public class StorySequencingActivity extends AppCompatActivity {
                 isCorrect = false;
                 // Wrong - red border and shake
                 if (holder != null) {
-                    CardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
                     card.setCardBackgroundColor(0xFFFFEBEE); // Light red
                     card.setStrokeColor(0xFFF44336); // Red border
                     card.setStrokeWidth(4);
@@ -312,7 +312,7 @@ public class StorySequencingActivity extends AppCompatActivity {
         for (int i = 0; i < storyEvents.size(); i++) {
             RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
             if (holder != null) {
-                CardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+                MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
                 card.setCardBackgroundColor(0xFFFFFFFF); // White
                 card.setStrokeWidth(0);
             }
@@ -372,7 +372,7 @@ public class StorySequencingActivity extends AppCompatActivity {
         }
 
         static class ViewHolder extends RecyclerView.ViewHolder {
-            CardView cardStoryEvent;
+            MaterialCardView cardStoryEvent;
             ImageView ivDragHandle;
             TextView tvEventNumber;
             TextView tvEventText;
