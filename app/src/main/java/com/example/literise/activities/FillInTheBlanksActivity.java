@@ -115,7 +115,7 @@ public class FillInTheBlanksActivity extends AppCompatActivity {
         Collections.shuffle(wordOptions);
 
         adapter = new WordOptionAdapter(wordOptions);
-        recyclerWordOptions.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerWordOptions.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columns for bigger buttons
         recyclerWordOptions.setAdapter(adapter);
     }
 

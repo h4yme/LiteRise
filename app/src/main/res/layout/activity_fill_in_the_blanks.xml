@@ -84,7 +84,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Sentence Card -->
+        <!-- Sentence Card with Horizontal Scroll -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,16 +93,22 @@
             android:layout_marginBottom="24dp"
             app:cardBackgroundColor="#FFFFFF">
 
-            <LinearLayout
-                android:id="@+id/sentenceContainer"
+            <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:gravity="center_vertical">
+                android:scrollbars="none"
+                android:padding="20dp">
 
-                <!-- Sentence parts will be added dynamically -->
-            </LinearLayout>
+                <LinearLayout
+                    android:id="@+id/sentenceContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Sentence parts will be added dynamically -->
+                </LinearLayout>
+            </HorizontalScrollView>
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Word Options Title -->
@@ -123,7 +129,9 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:paddingBottom="16dp"/>
+            android:paddingTop="8dp"
+            android:paddingBottom="16dp"
+            android:scrollbars="vertical"/>
 
         <!-- Check Answer Button -->
         <com.google.android.material.button.MaterialButton
