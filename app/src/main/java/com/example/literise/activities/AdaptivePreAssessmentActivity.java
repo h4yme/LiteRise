@@ -66,7 +66,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private TextView tvItemTypeBadge, tvPronunciationWord, tvPronunciationGuide, tvMicStatus;
     private Button btnOptionA, btnOptionB, btnOptionC, btnOptionD;
     private MaterialButton btnContinue;
-    private MaterialButton btnSkipPronunciation;
+    private MaterialButton btnSkipPronunciation; // TODO: Remove after testing - temporary for pronunciation testing
     private CardView cardPassage, cardPronunciation, cardQuestion, cardMicButton;
     private ImageView ivMic;
     private ProgressBar progressBar;
@@ -100,42 +100,33 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private CardView cardSpeechBubble;
     private boolean isTutorialActive = false;
     private HashSet<String> tutorialShownForTypes = new HashSet<>();
-    private boolean isFirstTutorial = true;
+    private boolean isFirstTutorial = true; // Track if this is the very first tutorial
     private int tutorialStep = 0;
     private Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
     private int hintLevel = 0;
+
     // Sound effects
-
     private MediaPlayer soundClick;
-
     private MediaPlayer soundSuccess;
-    // Module priority tracking
 
+    // Voice-over narration for tutorial
+    private MediaPlayer tutorialVoiceOver;
+    private boolean isPlayingVoiceOver = false;
+
+    // Module priority tracking
     private ModulePriorityManager priorityManager;
 
-
-
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_layout_pre_assessment);
 
-
-
         session = new SessionManager(this);
-
         priorityManager = new ModulePriorityManager(this);
-
         initializeViews();
 
-
-
         // Clear previous assessment data for fresh start
-
         priorityManager.clearPerformance();
 
         // Get initial theta from student's current ability
@@ -161,7 +152,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         btnOptionC = findViewById(R.id.btnOptionC);
         btnOptionD = findViewById(R.id.btnOptionD);
         btnContinue = findViewById(R.id.btnContinue);
-        btnSkipPronunciation = findViewById(R.id.btnSkipPronunciation);
+        btnSkipPronunciation = findViewById(R.id.btnSkipPronunciation); // TODO: Remove after testing
+
         cardPassage = findViewById(R.id.cardPassage);
         cardPronunciation = findViewById(R.id.cardPronunciation);
         cardQuestion = findViewById(R.id.cardQuestion);
@@ -213,21 +205,16 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             }
             recordPronunciation();
         });
-// TODO: Remove skip button functionality after testing - temporary for pronunciation testing
 
+        // TODO: Remove skip button functionality after testing - temporary for pronunciation testing
         btnSkipPronunciation.setOnClickListener(v -> {
-
             // Skip pronunciation - set dummy answer and enable continue
-
             selectedAnswer = "SKIP";
-
             pronunciationScore = 50; // Neutral score for skipped questions
-
             btnContinue.setEnabled(true);
-
             tvMicStatus.setText("Skipped");
-
         });
+
         // Initialize tutorial views
         overlayDark = findViewById(R.id.overlayDark);
         tutorialContentLayout = findViewById(R.id.tutorialContentLayout);
@@ -237,8 +224,14 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
         cardSpeechBubble = findViewById(R.id.cardSpeechBubble);
 
-        // Initialize sound effects for tutorial
+        // Enable tap-to-skip voice-over functionality
+        tutorialContentLayout.setOnClickListener(v -> {
+            if (isPlayingVoiceOver) {
+                stopVoiceOver();
+            }
+        });
 
+        // Initialize sound effects for tutorial
         soundClick = MediaPlayer.create(this, R.raw.sound_button_click);
         soundSuccess = MediaPlayer.create(this, R.raw.sound_success);
     }
@@ -322,9 +315,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Calculate demo ability based on performance
         float accuracy = (demoQuestions.size() > 0) ? ((float) demoCorrectAnswers / demoQuestions.size()) * 100 : 0;
         double finalTheta = -1.0 + (accuracy / 100.0) * 3.0; // Map 0-100% to -1.0 to 2.0
-        // Calculate module priorities based on performance (weakest to strongest)
 
+        // Calculate module priorities based on performance (weakest to strongest)
         priorityManager.calculateModulePriorities();
+
         // Save ability to session
         session.saveAbility((float) finalTheta);
 
@@ -348,26 +342,17 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         String itemType = currentQuestion.getItemType() != null ? currentQuestion.getItemType() : "";
 
         tvTitle.setText("Placement Test");
+
         // Fix progress tracking for demo mode
-
         int currentQuestionNumber;
-
         int totalQuestions;
 
-
-
         if (AppConfig.DEMO_MODE) {
-
             currentQuestionNumber = demoQuestionIndex + 1;
-
             totalQuestions = demoQuestions.size();
-
         } else {
-
             currentQuestionNumber = itemsAnswered.size() + 1;
-
             totalQuestions = 20;
-
         }
 
         tvProgress.setText(String.format("Question %d of %d", currentQuestionNumber, totalQuestions));
@@ -440,9 +425,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         cardQuestion.setVisibility(View.GONE);
         gridOptions.setVisibility(View.GONE);
         tvMicStatus.setText("Tap to record");
-// TODO: Remove after testing - show skip button for pronunciation questions
 
+        // TODO: Remove after testing - show skip button for pronunciation questions
         btnSkipPronunciation.setVisibility(View.VISIBLE);
+
         tvPronunciationWord.setText(q.getItemText() != null ? q.getItemText() : "");
         tvPronunciationGuide.setText(q.getPassageText() != null ? "/" + q.getPassageText() + "/" : "");
 
@@ -500,6 +486,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private void handleMultipleChoiceQuestion(Question q) {
         tvQuestion.setText(q.getQuestionText());
         setOptionsVisibility(q);
+
         // Hide skip button for MCQ questions
         btnSkipPronunciation.setVisibility(View.GONE);
     }
@@ -570,28 +557,22 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         } else {
             isCorrect = selectedAnswer.equals(currentQuestion.getCorrectOption()) ? 1 : 0;
         }
+
         // Track performance for module prioritization (skip during tutorial)
-
         if (!isTutorialActive && currentQuestion.getItemType() != null) {
-
             priorityManager.recordPerformance(currentQuestion.getItemType(), isCorrect == 1);
-
         }
+
+        // During tutorial, skip validation and just proceed to next question
         if (isTutorialActive) {
-
             // Don't show correct/incorrect during tutorial - just practice
-
             playSound(soundClick);
-
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
-
                 loadNextAdaptiveQuestion();
-
             }, 500);
-
             return;
-
         }
+
         // DEMO MODE: Handle locally without API
         if (AppConfig.DEMO_MODE) {
             submitDemoAnswer(isCorrect);
@@ -619,13 +600,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
                     currentTheta = result.getNewTheta();
                     itemsAnswered.add(currentQuestion.getItemId());
-
-                    /*if (isCorrect == 1) {
+/*
+                    if (isCorrect == 1) {
                         CustomToast.showSuccess(AdaptivePreAssessmentActivity.this, "Correct!");
                     } else {
                         CustomToast.showError(AdaptivePreAssessmentActivity.this, "Incorrect");
-                    }*/
-
+                    }
+*/
                     loadNextAdaptiveQuestion();
                 } else {
                     CustomToast.showError(AdaptivePreAssessmentActivity.this, "Failed to submit answer");
@@ -653,8 +634,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             CustomToast.showSuccess(this, "Correct!");
         } else {
             CustomToast.showError(this, "Incorrect");
-        }*/
-
+        }
+*/
         // Move to next question
         demoQuestionIndex++;
 
@@ -729,6 +710,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         btnContinueDialog.setOnClickListener(v -> {
             dialog.dismiss();
+
+            // Calculate module priorities based on performance (weakest to strongest)
+            priorityManager.calculateModulePriorities();
+
             Intent intent = new Intent(AdaptivePreAssessmentActivity.this, AssessmentResultsActivity.class);
             // Pass the estimated ability score to results screen
             if (result.getFinalTheta() != null) {
@@ -1009,47 +994,77 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             speechRecognizer.destroy();
         }
         cancelHints();
+
         // Release sound resources
-
         if (soundClick != null) {
-
             soundClick.release();
-
         }
-
         if (soundSuccess != null) {
-
             soundSuccess.release();
-
         }
 
+        // Release voice-over resources
+        stopVoiceOver();
     }
 
-
-
     private void playSound(MediaPlayer sound) {
-
         if (sound != null) {
-
             try {
-
                 if (sound.isPlaying()) {
-
                     sound.seekTo(0);
-
                 } else {
-
                     sound.start();
-
                 }
-
             } catch (Exception e) {
-
                 android.util.Log.e("AdaptiveAssessment", "Error playing sound: " + e.getMessage());
-
             }
-
         }
+    }
+
+    // ============ Voice-Over Methods ============
+
+    private void playVoiceOver(String audioFileName) {
+        // Stop any currently playing voice-over
+        stopVoiceOver();
+
+        if (audioFileName == null || audioFileName.isEmpty()) {
+            return;
+        }
+
+        try {
+            // Get resource ID from audio file name (without .mp3 extension)
+            String resourceName = audioFileName.replace(".mp3", "").toLowerCase();
+            int resId = getResources().getIdentifier(resourceName, "raw", getPackageName());
+
+            if (resId != 0) {
+                tutorialVoiceOver = MediaPlayer.create(this, resId);
+                if (tutorialVoiceOver != null) {
+                    isPlayingVoiceOver = true;
+                    tutorialVoiceOver.setOnCompletionListener(mp -> {
+                        isPlayingVoiceOver = false;
+                    });
+                    tutorialVoiceOver.start();
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("AdaptiveAssessment", "Error playing voice-over: " + e.getMessage());
+            isPlayingVoiceOver = false;
+        }
+    }
+
+    private void stopVoiceOver() {
+        if (tutorialVoiceOver != null) {
+            try {
+                if (tutorialVoiceOver.isPlaying()) {
+                    tutorialVoiceOver.stop();
+                }
+                tutorialVoiceOver.release();
+            } catch (Exception e) {
+                android.util.Log.e("AdaptiveAssessment", "Error stopping voice-over: " + e.getMessage());
+            }
+            tutorialVoiceOver = null;
+        }
+        isPlayingVoiceOver = false;
     }
 
     // ============ Tutorial Methods ============
@@ -1091,80 +1106,48 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startSyntaxTutorial() {
         if (isFirstTutorial) {
-
-            // First tutorial - introduce Leo
-
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
-
                     "Hi! I'm Leo! 🦁",
-
                     "Welcome to the test! I'll help you along the way.\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
-
-                    "Let's Begin!"
-
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
-
             isFirstTutorial = false;
-
         } else {
-
-            // Subsequent tutorials - skip intro, go straight to instructions
-
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
-
                     "Syntax Question",
-
                     "Use the scrambled words to form a correct sentence!",
-
-                    "Got it!"
-
+                    "Got it!",
+                    "syntax_intro"
             );
-
         }
 
-
-
         // Slower timing - give kids 5 seconds to read message
-
         hintHandler.postDelayed(() -> {
-
             tutorialStep = 1;
-
             showTutorialStep(
-
                     "Read the Words",
-
                     "Look at the scrambled words in the card above.\n\nThese words need to be arranged correctly!",
-
-                    "Got it!"
-
+                    "Got it!",
+                    "syntax_read_the_words"
             );
-
             highlightView(cardPassage);
 
-
-
             // Slower timing - give kids 6 seconds to read and see highlighted passage
-
             hintHandler.postDelayed(() -> {
-
                 tutorialStep = 2;
-
                 // Hide dark overlay so student can read and choose clearly
-
                 overlayDark.setVisibility(View.GONE);
-
                 // Allow clicks through tutorial layout to reach options below
-
                 tutorialContentLayout.setClickable(false);
-
                 tutorialContentLayout.setFocusable(false);
-
                 showTutorialStep(
-
                         "Choose Your Answer",
                         "Now tap one of the options below that shows the correct sentence!",
-                        "Try It!"
+                        "Try It!",
+                        "syntax_choose_answer"
                 );
                 resetHighlights();
                 highlightView(cardQuestion);
@@ -1179,69 +1162,40 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startPronunciationTutorial() {
         if (isFirstTutorial) {
-
-            // First tutorial - introduce Leo
-
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
-
                     "Hi! I'm Leo! 🦁",
-
                     "Welcome to the test! I'll help you along the way.\n\nThis is a pronunciation question. You'll speak the word clearly!",
-
-                    "Let's Begin!"
-
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
-
             isFirstTutorial = false;
-
         } else {
-
-            // Subsequent tutorials - skip intro, go straight to instructions
-
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
-
                     "Pronunciation Question",
-
                     "You'll speak the word clearly into the microphone!",
-
-                    "Got it!"
-
+                    "Got it!",
+                    "pronunciation_intro"
             );
-
         }
 
-
-
         // Slower timing - give kids 5 seconds to read message
-
         hintHandler.postDelayed(() -> {
-
             tutorialStep = 1;
-
             // Hide dark overlay so student can tap microphone clearly
-
             overlayDark.setVisibility(View.GONE);
-
             // Allow clicks through tutorial layout to reach microphone button
-
             tutorialContentLayout.setClickable(false);
-
             tutorialContentLayout.setFocusable(false);
-
             showTutorialStep(
-
                     "Tap the Microphone",
-
                     "Tap the blue microphone button to record your pronunciation!",
-
-                    "Try It!"
-
+                    "Try It!",
+                    "pronunciation_tap_mic"
             );
-
             highlightView(cardMicButton);
-
             startProgressiveHints(new String[]{
-
                     "Tap the blue circle to record!",
                     "The microphone is waiting for you!",
                     "Go ahead, tap it!"
@@ -1251,84 +1205,53 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startGrammarTutorial() {
         if (isFirstTutorial) {
-
-            // First tutorial - introduce Leo
-
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
-
                     "Hi! I'm Leo! 🦁",
-
                     "Welcome to the test! I'll help you along the way.\n\nRead the question carefully and choose the best answer!",
-
-                    "Let's Begin!"
-
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
-
             isFirstTutorial = false;
-
         } else {
-
-            // Subsequent tutorials - skip intro, go straight to instructions
-
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
-
                     "Question Time",
-
                     "Read the question carefully and choose the best answer!",
-
-                    "Got it!"
-
+                    "Got it!",
+                    "grammar_intro"
             );
-
         }
 
-
-
         // Slower timing - give kids 5 seconds to read message
-
         hintHandler.postDelayed(() -> {
-
             tutorialStep = 1;
-
             showTutorialStep(
-
                     "Read the Question",
-
                     "Look at the question in the card.\n\nTake your time to understand it!",
-
-                    "Got it!"
-
+                    "Got it!",
+                    "grammar_read"
             );
-
             highlightView(cardQuestion);
 
-
-
             // Slower timing - give kids 6 seconds to read and see highlighted question
-
             hintHandler.postDelayed(() -> {
-
                 tutorialStep = 2;
-
                 // Hide dark overlay so student can read and choose clearly
-
                 overlayDark.setVisibility(View.GONE);
-
                 // Allow clicks through tutorial layout to reach options below
-
                 tutorialContentLayout.setClickable(false);
-
                 tutorialContentLayout.setFocusable(false);
-
                 showTutorialStep(
-
                         "Choose Your Answer",
                         "Now tap one of the options below that you think is correct!",
-                        "Try It!"
+                        "Try It!",
+                        "grammar_choose_description"
                 );
                 startProgressiveHints(new String[]{
-                        "Choose the answer you think is right!"
-
+                        "Tap any option to practice!",
+                        "Choose the answer you think is right!",
+                        "Go ahead, select an option!"
                 });
             }, 6000);
         }, 5000);
@@ -1338,29 +1261,48 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         cancelHints();
         resetHighlights();
         tutorialStep = 3;
+
+        // Play success sound when student interacts correctly
         playSound(soundSuccess);
-        celebrateInteraction("Excellent!");
+
+        celebrateInteraction("Excellent!", "final_excellent");
 
         // Slower timing - give kids 3 seconds to see the celebration
         hintHandler.postDelayed(() -> {
+            // Keep tutorial overlay non-clickable so Continue button can be pressed
             tutorialContentLayout.setClickable(false);
             tutorialContentLayout.setFocusable(false);
             showTutorialStep(
                     "Final Step: Continue",
                     "Great job! Now tap the Continue button below to move forward!",
-                    "Almost Done!"
+                    "Almost Done!",
+                    "final_almost_done"
             );
             highlightView(btnContinue);
             startProgressiveHints(new String[]{
+                    "Tap Continue to proceed!",
+                    "The Continue button is ready!",
                     "You're almost done! Tap Continue!"
             });
         }, 3000);
     }
 
     private void showTutorialStep(String title, String message, String tapText) {
+        showTutorialStep(title, message, tapText, null);
+    }
+
+    private void showTutorialStep(String title, String message, String tapText, String audioFileName) {
         tvTutorialTitle.setText(title);
         tvTutorialMessage.setText(message);
         tvTapToContinue.setText(tapText);
+
+        // Play subtle click sound when showing new tutorial step
+        playSound(soundClick);
+
+        // Play voice-over if provided
+        if (audioFileName != null && !audioFileName.isEmpty()) {
+            playVoiceOver(audioFileName);
+        }
 
         ScaleAnimation bounce = new ScaleAnimation(
                 0.95f, 1.0f,
@@ -1376,8 +1318,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         if (view == null) return;
 
         view.setAlpha(1.0f);
-
-
+        // Use moderate elevation without bringToFront to prevent teleporting
         view.setElevation(16f);
 
         ScaleAnimation pulse = new ScaleAnimation(
@@ -1435,8 +1376,17 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void celebrateInteraction(String message) {
+        celebrateInteraction(message, null);
+    }
+
+    private void celebrateInteraction(String message, String audioFileName) {
         cancelHints();
         tvTutorialMessage.setText(message);
+
+        // Play voice-over if provided
+        if (audioFileName != null && !audioFileName.isEmpty()) {
+            playVoiceOver(audioFileName);
+        }
 
         ScaleAnimation celebrate = new ScaleAnimation(
                 1.0f, 1.1f,
@@ -1454,7 +1404,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         isTutorialActive = false;
         cancelHints();
         resetHighlights();
+
+        // Stop any voice-over
+        stopVoiceOver();
+
+        // Play success sound when completing tutorial
         playSound(soundSuccess);
+
         AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.0f);
         fadeOut.setDuration(300);
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
@@ -1480,6 +1436,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         overlayDark.setVisibility(View.GONE);
         tutorialContentLayout.setVisibility(View.GONE);
         isTutorialActive = false;
+
+        // Stop any voice-over
+        stopVoiceOver();
+
         // Ensure tutorial doesn't block content
         tutorialContentLayout.setClickable(false);
         tutorialContentLayout.setFocusable(false);
