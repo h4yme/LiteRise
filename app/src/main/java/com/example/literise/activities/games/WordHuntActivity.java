@@ -288,11 +288,11 @@ public class WordHuntActivity extends AppCompatActivity {
 
 
 
-        btnHint = findViewById(R.id.btnHint);
+        btnHint = (MaterialButton) findViewById(R.id.btnHint);
 
-        btnShuffle = findViewById(R.id.btnShuffle);
+        btnShuffle = (MaterialButton) findViewById(R.id.btnShuffle);
 
-        cardDefinition = findViewById(R.id.cardDefinition);
+        cardDefinition = (CardView) findViewById(R.id.cardDefinition);
 
     }
 
