@@ -815,7 +815,7 @@ public class DemoDataProvider {
 
         q11.setQuestionText("education");
 
-        q11.setPronunciationGuide("/ed-ju-kei-shun/");
+        q11.setPhonetic("/ed-ju-kei-shun/");
 
         q11.setDifficulty(0.7f);
 
