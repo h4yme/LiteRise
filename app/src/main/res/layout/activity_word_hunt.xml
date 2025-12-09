@@ -213,14 +213,14 @@
 
     <!-- Hidden elements for backward compatibility -->
     <ProgressBar android:id="@+id/loadingProgress" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
-    <View android:id="@+id/progressBar" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
-    <View android:id="@+id/timerProgress" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <ProgressBar android:id="@+id/progressBar" style="@style/Widget.AppCompat.ProgressBar.Horizontal" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <ProgressBar android:id="@+id/timerProgress" style="@style/Widget.AppCompat.ProgressBar.Horizontal" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
     <TextView android:id="@+id/tvTimer" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
     <TextView android:id="@+id/tvScore" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
-    <View android:id="@+id/cardDefinition" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <androidx.cardview.widget.CardView android:id="@+id/cardDefinition" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
     <TextView android:id="@+id/tvFoundWord" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
     <TextView android:id="@+id/tvDefinition" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
     <TextView android:id="@+id/tvExample" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
-    <Button android:id="@+id/btnHint" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
-    <Button android:id="@+id/btnShuffle" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnHint" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnShuffle" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
 </FrameLayout>
