@@ -17,7 +17,7 @@
     </style>
     <!-- ✅ New improved option button style -->
 
-    <style name="OptionButtonStyleNew" parent="Widget.AppCompat.Button">
+    <style name="OptionButtonStyleNew">
 
         <item name="android:layout_width">match_parent</item>
 
