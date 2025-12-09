@@ -106,6 +106,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private Handler hintHandler = new Handler(Looper.getMainLooper());
     private Runnable hintRunnable;
     private int hintLevel = 0;
+    private Runnable pendingTutorialStep = null; // Track pending tutorial step for tap-to-skip
+    private String currentTutorialType = ""; // Track current tutorial type
 
     // Sound effects
     private MediaPlayer soundClick;
@@ -229,10 +231,14 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
         cardSpeechBubble = findViewById(R.id.cardSpeechBubble);
 
-        // Enable tap-to-skip voice-over functionality
+        // Enable tap-to-continue tutorial functionality
         tutorialContentLayout.setOnClickListener(v -> {
             if (isPlayingVoiceOver) {
                 stopVoiceOver();
+            }
+            // Allow tapping to advance to next tutorial step
+            if (isTutorialActive) {
+                advanceTutorialStep();
             }
         });
 
@@ -1094,6 +1100,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         hintLevel = 0;
 
         String itemType = q.getItemType() != null ? q.getItemType() : "";
+        currentTutorialType = itemType;
 
         // Show tutorial overlay
         overlayDark.setVisibility(View.VISIBLE);
@@ -1112,14 +1119,31 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         } else if ("Pronunciation".equalsIgnoreCase(itemType)) {
             // Check if it's speak-type or MCQ
             if (q.hasOptions() || q.isMCQ()) {
-                startGrammarTutorial(); // MCQ pronunciation
+                currentTutorialType = "Grammar"; // MCQ pronunciation
+                startGrammarTutorial();
             } else {
                 startPronunciationTutorial(); // Speak type
             }
         } else if ("Spelling".equalsIgnoreCase(itemType) || "Grammar".equalsIgnoreCase(itemType)) {
+            currentTutorialType = "Grammar";
             startGrammarTutorial();
         } else {
+            currentTutorialType = "Grammar";
             startGrammarTutorial();
+        }
+    }
+
+    /**
+     * Advance tutorial to next step when user taps (skip waiting)
+     */
+    private void advanceTutorialStep() {
+        if (!isTutorialActive) return;
+
+        // Cancel any pending delays
+        if (pendingTutorialStep != null) {
+            hintHandler.removeCallbacks(pendingTutorialStep);
+            pendingTutorialStep.run(); // Execute the next step immediately
+            pendingTutorialStep = null;
         }
     }
 
@@ -1129,7 +1153,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
-                    "Let's Begin!",
+                    "Tap to Continue",
                     "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
@@ -1138,24 +1162,26 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Syntax Question",
                     "Use the scrambled words to form a correct sentence!",
-                    "Got it!",
+                    "Tap to Continue",
                     "syntax_intro"
             );
         }
 
-        // Slower timing - give kids 5 seconds to read message
-        hintHandler.postDelayed(() -> {
+        // Allow tap to skip - give kids 5 seconds or tap to continue
+        pendingTutorialStep = () -> {
+            pendingTutorialStep = null;
             tutorialStep = 1;
             showTutorialStep(
                     "Read the Words",
                     "Look at the scrambled words in the card above.\n\nThese words need to be arranged correctly!",
-                    "Got it!",
+                    "Tap to Continue",
                     "syntax_read_the_words"
             );
             highlightView(cardPassage);
 
-            // Slower timing - give kids 6 seconds to read and see highlighted passage
-            hintHandler.postDelayed(() -> {
+            // Allow tap to skip - give kids 6 seconds or tap to continue
+            pendingTutorialStep = () -> {
+                pendingTutorialStep = null;
                 tutorialStep = 2;
                 // Hide dark overlay so student can read and choose clearly
                 overlayDark.setVisibility(View.GONE);
@@ -1175,8 +1201,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                         "Choose the answer that makes sense!",
                         "Go ahead, select an option!"
                 });
-            }, 6000);
-        }, 5000);
+            };
+            hintHandler.postDelayed(pendingTutorialStep, 6000);
+        };
+        hintHandler.postDelayed(pendingTutorialStep, 5000);
     }
 
     private void startPronunciationTutorial() {
@@ -1185,7 +1213,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nThis is a pronunciation question. You'll speak the word clearly!",
-                    "Let's Begin!",
+                    "Tap to Continue",
                     "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
@@ -1194,13 +1222,14 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Pronunciation Question",
                     "You'll speak the word clearly into the microphone!",
-                    "Got it!",
+                    "Tap to Continue",
                     "pronunciation_intro"
             );
         }
 
-        // Slower timing - give kids 5 seconds to read message
-        hintHandler.postDelayed(() -> {
+        // Allow tap to skip - give kids 5 seconds or tap to continue
+        pendingTutorialStep = () -> {
+            pendingTutorialStep = null;
             tutorialStep = 1;
             // Hide dark overlay so student can tap microphone clearly
             overlayDark.setVisibility(View.GONE);
@@ -1219,7 +1248,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     "The microphone is waiting for you!",
                     "Go ahead, tap it!"
             });
-        }, 5000);
+        };
+        hintHandler.postDelayed(pendingTutorialStep, 5000);
     }
 
     private void startGrammarTutorial() {
@@ -1228,7 +1258,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nRead the question carefully and choose the best answer!",
-                    "Let's Begin!",
+                    "Tap to Continue",
                     "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
@@ -1237,24 +1267,26 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Question Time",
                     "Read the question carefully and choose the best answer!",
-                    "Got it!",
+                    "Tap to Continue",
                     "grammar_intro"
             );
         }
 
-        // Slower timing - give kids 5 seconds to read message
-        hintHandler.postDelayed(() -> {
+        // Allow tap to skip - give kids 5 seconds or tap to continue
+        pendingTutorialStep = () -> {
+            pendingTutorialStep = null;
             tutorialStep = 1;
             showTutorialStep(
                     "Read the Question",
                     "Look at the question in the card.\n\nTake your time to understand it!",
-                    "Got it!",
+                    "Tap to Continue",
                     "grammar_read"
             );
             highlightView(cardQuestion);
 
-            // Slower timing - give kids 6 seconds to read and see highlighted question
-            hintHandler.postDelayed(() -> {
+            // Allow tap to skip - give kids 6 seconds or tap to continue
+            pendingTutorialStep = () -> {
+                pendingTutorialStep = null;
                 tutorialStep = 2;
                 // Hide dark overlay so student can read and choose clearly
                 overlayDark.setVisibility(View.GONE);
@@ -1272,11 +1304,19 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                         "Choose the answer you think is right!",
                         "Go ahead, select an option!"
                 });
-            }, 6000);
-        }, 5000);
+            };
+            hintHandler.postDelayed(pendingTutorialStep, 6000);
+        };
+        hintHandler.postDelayed(pendingTutorialStep, 5000);
     }
 
     private void proceedToFinalTutorialStep() {
+        // Cancel any pending tutorial steps
+        if (pendingTutorialStep != null) {
+            hintHandler.removeCallbacks(pendingTutorialStep);
+            pendingTutorialStep = null;
+        }
+
         cancelHints();
         resetHighlights();
         tutorialStep = 3;
@@ -1286,8 +1326,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         celebrateInteraction("Excellent!", "final_excellent");
 
-        // Slower timing - give kids 3 seconds to see the celebration
-        hintHandler.postDelayed(() -> {
+        // Allow tap to skip - give kids 3 seconds to see celebration or tap to continue
+        pendingTutorialStep = () -> {
+            pendingTutorialStep = null;
             // Keep tutorial overlay non-clickable so Continue button can be pressed
             tutorialContentLayout.setClickable(false);
             tutorialContentLayout.setFocusable(false);
@@ -1303,7 +1344,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                     "The Continue button is ready!",
                     "You're almost done! Tap Continue!"
             });
-        }, 3000);
+        };
+        hintHandler.postDelayed(pendingTutorialStep, 3000);
     }
 
     private void showTutorialStep(String title, String message, String tapText) {
@@ -1421,6 +1463,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void completeTutorial() {
         isTutorialActive = false;
+
+        // Cancel any pending tutorial steps
+        if (pendingTutorialStep != null) {
+            hintHandler.removeCallbacks(pendingTutorialStep);
+            pendingTutorialStep = null;
+        }
+
         cancelHints();
         resetHighlights();
 
@@ -1455,6 +1504,12 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         overlayDark.setVisibility(View.GONE);
         tutorialContentLayout.setVisibility(View.GONE);
         isTutorialActive = false;
+
+        // Cancel any pending tutorial steps
+        if (pendingTutorialStep != null) {
+            hintHandler.removeCallbacks(pendingTutorialStep);
+            pendingTutorialStep = null;
+        }
 
         // Stop any voice-over
         stopVoiceOver();
