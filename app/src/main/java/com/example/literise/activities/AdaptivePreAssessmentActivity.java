@@ -110,6 +110,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     private MediaPlayer soundClick;
     private MediaPlayer soundSuccess;
 
+    // Voice-over narration for tutorial
+    private MediaPlayer tutorialVoiceOver;
+    private boolean isPlayingVoiceOver = false;
+
     // Module priority tracking
     private ModulePriorityManager priorityManager;
 
@@ -219,6 +223,13 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         tvTapToContinue = findViewById(R.id.tvTapToContinue);
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
         cardSpeechBubble = findViewById(R.id.cardSpeechBubble);
+
+        // Enable tap-to-skip voice-over functionality
+        tutorialContentLayout.setOnClickListener(v -> {
+            if (isPlayingVoiceOver) {
+                stopVoiceOver();
+            }
+        });
 
         // Initialize sound effects for tutorial
         soundClick = MediaPlayer.create(this, R.raw.sound_button_click);
@@ -991,6 +1002,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         if (soundSuccess != null) {
             soundSuccess.release();
         }
+
+        // Release voice-over resources
+        stopVoiceOver();
     }
 
     private void playSound(MediaPlayer sound) {
@@ -1005,6 +1019,52 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 android.util.Log.e("AdaptiveAssessment", "Error playing sound: " + e.getMessage());
             }
         }
+    }
+
+    // ============ Voice-Over Methods ============
+
+    private void playVoiceOver(String audioFileName) {
+        // Stop any currently playing voice-over
+        stopVoiceOver();
+
+        if (audioFileName == null || audioFileName.isEmpty()) {
+            return;
+        }
+
+        try {
+            // Get resource ID from audio file name (without .mp3 extension)
+            String resourceName = audioFileName.replace(".mp3", "").toLowerCase();
+            int resId = getResources().getIdentifier(resourceName, "raw", getPackageName());
+
+            if (resId != 0) {
+                tutorialVoiceOver = MediaPlayer.create(this, resId);
+                if (tutorialVoiceOver != null) {
+                    isPlayingVoiceOver = true;
+                    tutorialVoiceOver.setOnCompletionListener(mp -> {
+                        isPlayingVoiceOver = false;
+                    });
+                    tutorialVoiceOver.start();
+                }
+            }
+        } catch (Exception e) {
+            android.util.Log.e("AdaptiveAssessment", "Error playing voice-over: " + e.getMessage());
+            isPlayingVoiceOver = false;
+        }
+    }
+
+    private void stopVoiceOver() {
+        if (tutorialVoiceOver != null) {
+            try {
+                if (tutorialVoiceOver.isPlaying()) {
+                    tutorialVoiceOver.stop();
+                }
+                tutorialVoiceOver.release();
+            } catch (Exception e) {
+                android.util.Log.e("AdaptiveAssessment", "Error stopping voice-over: " + e.getMessage());
+            }
+            tutorialVoiceOver = null;
+        }
+        isPlayingVoiceOver = false;
     }
 
     // ============ Tutorial Methods ============
@@ -1046,11 +1106,12 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startSyntaxTutorial() {
         if (isFirstTutorial) {
-            // First tutorial - introduce Leo
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
-                    "Let's Begin!"
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
         } else {
@@ -1216,12 +1277,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void showTutorialStep(String title, String message, String tapText) {
+        showTutorialStep(title, message, tapText, null);
+    }
+
+    private void showTutorialStep(String title, String message, String tapText, String audioFileName) {
         tvTutorialTitle.setText(title);
         tvTutorialMessage.setText(message);
         tvTapToContinue.setText(tapText);
 
         // Play subtle click sound when showing new tutorial step
         playSound(soundClick);
+
+        // Play voice-over if provided
+        if (audioFileName != null && !audioFileName.isEmpty()) {
+            playVoiceOver(audioFileName);
+        }
 
         ScaleAnimation bounce = new ScaleAnimation(
                 0.95f, 1.0f,
@@ -1315,6 +1385,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         cancelHints();
         resetHighlights();
 
+        // Stop any voice-over
+        stopVoiceOver();
+
         // Play success sound when completing tutorial
         playSound(soundSuccess);
 
@@ -1343,6 +1416,10 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         overlayDark.setVisibility(View.GONE);
         tutorialContentLayout.setVisibility(View.GONE);
         isTutorialActive = false;
+
+        // Stop any voice-over
+        stopVoiceOver();
+
         // Ensure tutorial doesn't block content
         tutorialContentLayout.setClickable(false);
         tutorialContentLayout.setFocusable(false);
