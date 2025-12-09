@@ -1140,7 +1140,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startSyntaxTutorial() {
         if (isFirstTutorial) {
-            // First tutorial - introduce Leo with voice-over
+
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nThis is a syntax question. Use the scrambled words to form a correct sentence!",
@@ -1149,7 +1149,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             );
             isFirstTutorial = false;
         } else {
-            // Subsequent tutorials - with voice-over
+
             showTutorialStep(
                     "Syntax Question",
                     "Use the scrambled words to form a correct sentence!",
