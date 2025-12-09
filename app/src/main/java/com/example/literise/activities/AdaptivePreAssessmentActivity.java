@@ -331,8 +331,18 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         String itemType = currentQuestion.getItemType() != null ? currentQuestion.getItemType() : "";
 
         tvTitle.setText("Placement Test");
-        int currentQuestionNumber = itemsAnswered.size() + 1;
-        int totalQuestions = 20;
+
+        // Fix progress tracking for demo mode
+        int currentQuestionNumber;
+        int totalQuestions;
+
+        if (AppConfig.DEMO_MODE) {
+            currentQuestionNumber = demoQuestionIndex + 1;
+            totalQuestions = demoQuestions.size();
+        } else {
+            currentQuestionNumber = itemsAnswered.size() + 1;
+            totalQuestions = 20;
+        }
 
         tvProgress.setText(String.format("Question %d of %d", currentQuestionNumber, totalQuestions));
         tvItemTypeBadge.setText(itemType);
