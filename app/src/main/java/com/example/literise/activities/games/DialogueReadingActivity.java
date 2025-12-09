@@ -68,8 +68,8 @@ public class DialogueReadingActivity extends BaseGameActivity {
 
 
     private ImageView btnBack;
+    private TextView tvProgress, tvScore;
 
-    private TextView tvProgress;
 
     private RecyclerView recyclerDialogue;
 
@@ -180,7 +180,7 @@ public class DialogueReadingActivity extends BaseGameActivity {
         recyclerDialogue = findViewById(R.id.recyclerDialogue);
 
         btnComplete = findViewById(R.id.btnComplete);
-
+        tvScore = findViewById(R.id.tvScore);
     }
 
 
