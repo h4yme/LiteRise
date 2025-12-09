@@ -284,11 +284,15 @@ public class WordHuntActivity extends BaseGameActivity {
 
 
 
-        btnHint = findViewById(R.id.btnHint);
+        btnHint = (MaterialButton) findViewById(R.id.btnHint);
 
-        btnShuffle = findViewById(R.id.btnShuffle);
 
-        cardDefinition = findViewById(R.id.cardDefinition);
+
+        btnShuffle = (MaterialButton) findViewById(R.id.btnShuffle);
+
+
+
+        cardDefinition = (CardView) findViewById(R.id.cardDefinition);
 
     }
 

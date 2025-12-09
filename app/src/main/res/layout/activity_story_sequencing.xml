@@ -32,77 +32,13 @@
 
         android:orientation="vertical"
 
-        android:padding="20dp">
+        android:padding="16dp">
 
 
 
-        <!-- Header -->
+        <!-- Modern Header with Score -->
 
-        <RelativeLayout
-
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-
-            android:layout_marginBottom="20dp">
-
-
-
-            <!-- Back Button -->
-
-            <ImageView
-
-                android:id="@+id/btnBack"
-
-                android:layout_width="32dp"
-
-                android:layout_height="32dp"
-
-                android:src="@drawable/ic_arrow_back"
-
-                android:layout_alignParentStart="true"
-
-                android:layout_centerVertical="true"
-
-                app:tint="#333333"
-
-                android:clickable="true"
-
-                android:focusable="true"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Back"/>
-
-
-
-            <!-- Title -->
-
-            <TextView
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:layout_centerInParent="true"
-
-                android:text="Story Sequencing"
-
-                android:textSize="20sp"
-
-                android:textStyle="bold"
-
-                android:textColor="#333333"
-
-                android:fontFamily="@font/poppins_bold"/>
-
-        </RelativeLayout>
-
-
-
-        <!-- Instructions Card -->
-
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
 
             android:layout_width="match_parent"
 
@@ -112,9 +48,172 @@
 
             app:cardElevation="4dp"
 
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="16dp"
 
             app:cardBackgroundColor="#FFFFFF">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+
+                android:gravity="center_vertical"
+
+                android:padding="16dp">
+
+
+
+                <ImageView
+
+                    android:id="@+id/btnBack"
+
+                    android:layout_width="32dp"
+
+                    android:layout_height="32dp"
+
+                    android:src="@drawable/ic_arrow_back"
+
+                    app:tint="#333333"
+
+                    android:clickable="true"
+
+                    android:focusable="true"
+
+                    android:background="?attr/selectableItemBackgroundBorderless"
+
+                    android:contentDescription="Back"/>
+
+
+
+                <LinearLayout
+
+                    android:layout_width="0dp"
+
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:orientation="vertical"
+
+                    android:layout_marginStart="12dp">
+
+
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="📚 Story Sequencing"
+
+                        android:textSize="18sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#333333"
+
+                        android:fontFamily="@font/poppins_bold"/>
+
+
+
+                    <TextView
+
+                        android:id="@+id/tvProgress"
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="Arrange the story events"
+
+                        android:textSize="12sp"
+
+                        android:fontFamily="@font/poppins"
+
+                        android:textColor="#7C3AED"/>
+
+                </LinearLayout>
+
+
+
+                <!-- Score Display -->
+
+                <LinearLayout
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+
+                    android:gravity="center"
+
+                    android:background="@drawable/rounded_bg_accent"
+
+                    android:padding="8dp">
+
+
+
+                    <ImageView
+
+                        android:layout_width="16dp"
+
+                        android:layout_height="16dp"
+
+                        android:src="@drawable/ic_star"
+
+                        app:tint="#FFD700"/>
+
+
+
+                    <TextView
+
+                        android:id="@+id/tvScore"
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="100"
+
+                        android:textSize="14sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#FFD700"
+
+                        android:fontFamily="@font/poppins_bold"
+
+                        android:layout_marginStart="4dp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- Instructions Card -->
+
+        <com.google.android.material.card.MaterialCardView
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            app:cardCornerRadius="20dp"
+
+            app:cardElevation="6dp"
+
+            android:layout_marginBottom="16dp"
+
+            app:cardBackgroundColor="#E8F5E9">
 
 
 
@@ -136,17 +235,17 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text="📖 Instructions"
+                    android:text="💡 How to Play"
 
-                    android:textSize="16sp"
+                    android:textSize="14sp"
 
                     android:textStyle="bold"
 
-                    android:textColor="#7C3AED"
+                    android:textColor="#2E7D32"
 
                     android:fontFamily="@font/poppins_semibold"
 
-                    android:layout_marginBottom="8dp"/>
+                    android:layout_marginBottom="4dp"/>
 
 
 
@@ -156,49 +255,169 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text="Drag the story events to put them in the correct order from first to last."
+                    android:text="Drag the story events to put them in the correct order from first to last!"
 
-                    android:textSize="14sp"
+                    android:textSize="12sp"
 
-                    android:textColor="#666666"
+                    android:textColor="#4CAF50"
 
                     android:fontFamily="@font/poppins"/>
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
 
 
-        <!-- Story Title -->
+        <!-- Timer and Stats Card -->
 
-        <TextView
+        <com.google.android.material.card.MaterialCardView
 
-            android:id="@+id/tvStoryTitle"
-
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
 
             android:layout_height="wrap_content"
 
-            android:text="The Lost Puppy"
+            app:cardCornerRadius="16dp"
 
-            android:textSize="18sp"
+            app:cardElevation="4dp"
 
-            android:textStyle="bold"
+            android:layout_marginBottom="12dp"
 
-            android:textColor="#333333"
-
-            android:fontFamily="@font/poppins_bold"
-
-            android:layout_marginBottom="16dp"/>
+            app:cardBackgroundColor="#FFF3E0">
 
 
 
-        <!-- Story Events List -->
+            <LinearLayout
 
-        <androidx.recyclerview.widget.RecyclerView
+                android:layout_width="match_parent"
 
-            android:id="@+id/recyclerStoryEvents"
+                android:layout_height="wrap_content"
+
+                android:orientation="horizontal"
+
+                android:gravity="center_vertical"
+
+                android:padding="12dp">
+
+
+
+                <!-- Timer -->
+
+                <LinearLayout
+
+                    android:layout_width="0dp"
+
+                    android:layout_height="wrap_content"
+
+                    android:layout_weight="1"
+
+                    android:orientation="horizontal"
+
+                    android:gravity="center_vertical">
+
+
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="⏱️"
+
+                        android:textSize="18sp"
+
+                        android:layout_marginEnd="4dp"/>
+
+
+
+                    <TextView
+
+                        android:id="@+id/tvTimer"
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="0:00"
+
+                        android:textSize="16sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#F57C00"
+
+                        android:fontFamily="@font/poppins_bold"/>
+
+                </LinearLayout>
+
+
+
+                <!-- Correct Counter -->
+
+                <LinearLayout
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+
+                    android:gravity="center_vertical"
+
+                    android:background="@drawable/rounded_bg_accent"
+
+                    android:padding="8dp">
+
+
+
+                    <TextView
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="✓"
+
+                        android:textSize="16sp"
+
+                        android:textColor="#4CAF50"
+
+                        android:textStyle="bold"
+
+                        android:layout_marginEnd="4dp"/>
+
+
+
+                    <TextView
+
+                        android:id="@+id/tvCorrectCount"
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="0/8"
+
+                        android:textSize="14sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#4CAF50"
+
+                        android:fontFamily="@font/poppins_bold"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <!-- Story Events Card -->
+
+        <com.google.android.material.card.MaterialCardView
 
             android:layout_width="match_parent"
 
@@ -206,9 +425,143 @@
 
             android:layout_weight="1"
 
-            android:clipToPadding="false"
+            app:cardCornerRadius="20dp"
 
-            android:paddingBottom="16dp"/>
+            app:cardElevation="6dp"
+
+            android:layout_marginBottom="12dp"
+
+            app:cardBackgroundColor="#FFFFFF">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent"
+
+                android:orientation="vertical"
+
+                android:padding="16dp">
+
+
+
+                <TextView
+
+                    android:id="@+id/tvStoryTitle"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="📖 The Lost Puppy"
+
+                    android:textSize="16sp"
+
+                    android:textStyle="bold"
+
+                    android:textColor="#7C3AED"
+
+                    android:fontFamily="@font/poppins_bold"
+
+                    android:layout_marginBottom="12dp"/>
+
+
+
+                <!-- Story Events List -->
+
+                <androidx.recyclerview.widget.RecyclerView
+
+                    android:id="@+id/recyclerStoryEvents"
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="0dp"
+
+                    android:layout_weight="1"
+
+                    android:clipToPadding="false"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <!-- Action Buttons -->
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="horizontal"
+
+            android:layout_marginBottom="12dp">
+
+
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/btnHint"
+
+                android:layout_width="0dp"
+
+                android:layout_height="60dp"
+
+                android:layout_weight="1"
+
+                android:text="💡 Hint"
+
+                android:textSize="16sp"
+
+                android:textStyle="bold"
+
+                android:fontFamily="@font/poppins_bold"
+
+                app:cornerRadius="20dp"
+
+                app:backgroundTint="#FF9800"
+
+                android:textColor="#FFFFFF"
+
+                android:layout_marginEnd="8dp"
+
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+
+
+            <com.google.android.material.button.MaterialButton
+
+                android:id="@+id/btnShuffle"
+
+                android:layout_width="0dp"
+
+                android:layout_height="60dp"
+
+                android:layout_weight="1"
+
+                android:text="🔀 Shuffle"
+
+                android:textSize="16sp"
+
+                android:textStyle="bold"
+
+                android:fontFamily="@font/poppins_bold"
+
+                app:cornerRadius="20dp"
+
+                app:backgroundTint="#2196F3"
+
+                android:textColor="#FFFFFF"
+
+                android:layout_marginStart="8dp"
+
+                style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+        </LinearLayout>
 
 
 
@@ -220,21 +573,27 @@
 
             android:layout_width="match_parent"
 
-            android:layout_height="56dp"
+            android:layout_height="60dp"
 
             android:text="Check Answer"
 
-            android:textSize="16sp"
+            android:textSize="18sp"
 
             android:textStyle="bold"
 
-            android:fontFamily="@font/poppins_semibold"
+            android:fontFamily="@font/poppins_bold"
 
-            app:cornerRadius="16dp"
+            app:cornerRadius="20dp"
 
-            app:backgroundTint="#7C3AED"
+            app:backgroundTint="#10B981"
 
-            android:textColor="#FFFFFF"/>
+            android:textColor="#FFFFFF"
+
+            app:icon="@drawable/ic_check"
+
+            app:iconGravity="textStart"
+
+            app:iconTint="#FFFFFF"/>
 
     </LinearLayout>
 

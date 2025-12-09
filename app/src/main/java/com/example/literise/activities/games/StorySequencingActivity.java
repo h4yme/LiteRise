@@ -1,35 +1,73 @@
 package com.example.literise.activities.games;
 
 import android.os.Bundle;
+import android.os.Handler;
+
 import android.view.LayoutInflater;
+
 import android.view.View;
+
 import android.view.ViewGroup;
+
 import android.widget.ImageView;
+
 import android.widget.TextView;
+
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AlertDialog;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.cardview.widget.CardView;
+
 import androidx.recyclerview.widget.ItemTouchHelper;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.literise.R;
+
 import com.example.literise.database.SessionManager;
+
 import com.google.android.material.button.MaterialButton;
+
 import com.google.android.material.card.MaterialCardView;
+
 import java.util.ArrayList;
+
 import java.util.Collections;
+
 import java.util.List;
+
+
 
 public class StorySequencingActivity extends BaseGameActivity {
 
+
+
     private ImageView btnBack;
-    private TextView tvStoryTitle;
+
+    private TextView tvStoryTitle, tvTimer, tvCorrectCount;
+
     private RecyclerView recyclerStoryEvents;
-    private MaterialButton btnCheckAnswer;
+
+    private MaterialButton btnCheckAnswer, btnHint, btnShuffle;
+
     private StoryEventAdapter adapter;
+
     private List<StoryEvent> storyEvents;
+
     private SessionManager session;
+
+    private Handler timerHandler = new Handler();
+
+    private long startTime;
+
+    private int hintsUsed = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,13 +79,59 @@ public class StorySequencingActivity extends BaseGameActivity {
         setupStoryData();
         setupRecyclerView();
         setupListeners();
+        startTimer();
+
     }
 
+
+
     private void initializeViews() {
+
         btnBack = findViewById(R.id.btnBack);
+
         tvStoryTitle = findViewById(R.id.tvStoryTitle);
+
+        tvTimer = findViewById(R.id.tvTimer);
+
+        tvCorrectCount = findViewById(R.id.tvCorrectCount);
+
         recyclerStoryEvents = findViewById(R.id.recyclerStoryEvents);
+
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
+
+        btnHint = findViewById(R.id.btnHint);
+
+        btnShuffle = findViewById(R.id.btnShuffle);
+
+    }
+
+
+
+    private void startTimer() {
+
+        startTime = System.currentTimeMillis();
+
+        timerHandler.post(new Runnable() {
+
+            @Override
+
+            public void run() {
+
+                long elapsedMillis = System.currentTimeMillis() - startTime;
+
+                int seconds = (int) (elapsedMillis / 1000);
+
+                int minutes = seconds / 60;
+
+                seconds = seconds % 60;
+
+                tvTimer.setText(String.format("%d:%02d", minutes, seconds));
+
+                timerHandler.postDelayed(this, 100);
+
+            }
+
+        });
     }
 
     private void setupStoryData() {
@@ -95,7 +179,7 @@ public class StorySequencingActivity extends BaseGameActivity {
                     storyEvents.get(i).displayNumber = i + 1;
                 }
                 adapter.notifyDataSetChanged();
-
+                updateRealTimeFeedback();
                 return true;
             }
 
@@ -135,14 +219,209 @@ public class StorySequencingActivity extends BaseGameActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+
+            timerHandler.removeCallbacksAndMessages(null);
+
+            finish();
+
+        });
+
         btnCheckAnswer.setOnClickListener(v -> checkAnswer());
+
+        btnHint.setOnClickListener(v -> showHint());
+
+        btnShuffle.setOnClickListener(v -> shuffleEvents());
+
+    }
+
+
+
+    private void updateRealTimeFeedback() {
+
+        int correctCount = 0;
+
+        for (int i = 0; i < storyEvents.size(); i++) {
+
+            StoryEvent event = storyEvents.get(i);
+
+            RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
+
+
+
+            if (event.correctOrder == i + 1) {
+
+                correctCount++;
+
+                // Correct position - subtle green hint
+
+                if (holder != null) {
+
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+
+                    card.setCardBackgroundColor(0xFFF1F8F4); // Very light green
+
+                    card.setStrokeColor(0xFFC8E6C9); // Light green border
+
+                    card.setStrokeWidth(2);
+
+                }
+
+            } else {
+
+                // Wrong position - neutral
+
+                if (holder != null) {
+
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+
+                    card.setCardBackgroundColor(0xFFFFFFFF); // White
+
+                    card.setStrokeWidth(0);
+
+                }
+
+            }
+
+        }
+
+        tvCorrectCount.setText(correctCount + "/" + storyEvents.size());
+
+    }
+
+
+
+    private void showHint() {
+
+        if (hintsUsed >= 3) {
+
+            Toast.makeText(this, "No more hints available!", Toast.LENGTH_SHORT).show();
+
+            return;
+
+        }
+
+
+
+        // Find first wrong position
+
+        for (int i = 0; i < storyEvents.size(); i++) {
+
+            StoryEvent event = storyEvents.get(i);
+
+            if (event.correctOrder != i + 1) {
+
+                // Show hint for this event
+
+                RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
+
+                if (holder != null) {
+
+                    MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+
+
+
+                    // Flash animation to draw attention
+
+                    card.setCardBackgroundColor(0xFFFFF9C4); // Light yellow
+
+                    card.setStrokeColor(0xFFFFEB3B); // Yellow border
+
+                    card.setStrokeWidth(4);
+
+
+
+                    holder.itemView.animate()
+
+                            .scaleX(1.1f)
+
+                            .scaleY(1.1f)
+
+                            .setDuration(200)
+
+                            .withEndAction(() -> {
+
+                                holder.itemView.animate()
+
+                                        .scaleX(1f)
+
+                                        .scaleY(1f)
+
+                                        .setDuration(200);
+
+                            });
+
+
+
+                    Toast.makeText(this, "Event #" + event.correctOrder + " should be at position " + event.correctOrder,
+
+                            Toast.LENGTH_LONG).show();
+
+                    hintsUsed++;
+
+                    btnHint.setText("💡 Hint (" + (3 - hintsUsed) + ")");
+
+                    break;
+
+                }
+
+            }
+
+        }
+
+    }
+
+
+
+    private void shuffleEvents() {
+
+        // Reset card backgrounds
+
+        for (int i = 0; i < storyEvents.size(); i++) {
+
+            RecyclerView.ViewHolder holder = recyclerStoryEvents.findViewHolderForAdapterPosition(i);
+
+            if (holder != null) {
+
+                MaterialCardView card = holder.itemView.findViewById(R.id.cardStoryEvent);
+
+                card.setCardBackgroundColor(0xFFFFFFFF); // White
+
+                card.setStrokeWidth(0);
+
+            }
+
+        }
+
+
+
+        // Shuffle events
+
+        Collections.shuffle(storyEvents);
+
+        for (int i = 0; i < storyEvents.size(); i++) {
+
+            storyEvents.get(i).displayNumber = i + 1;
+
+        }
+
+        adapter.notifyDataSetChanged();
+
+        updateRealTimeFeedback();
+
+
+
+        Toast.makeText(this, "Events shuffled!", Toast.LENGTH_SHORT).show();
     }
 
     private void checkAnswer() {
         boolean isCorrect = true;
         int correctCount = 0;
+        timerHandler.removeCallbacksAndMessages(null);
 
+        long elapsedMillis = System.currentTimeMillis() - startTime;
+
+        int elapsedSeconds = (int) (elapsedMillis / 1000);
         // Show visual feedback for each card
         for (int i = 0; i < storyEvents.size(); i++) {
             StoryEvent event = storyEvents.get(i);
@@ -184,22 +463,55 @@ public class StorySequencingActivity extends BaseGameActivity {
             }
         }
 
-        // Calculate XP based on correctness with star rating
+        // Calculate XP based on correctness with star rating, time bonus, and hint penalty
+
         int xpEarned = 0;
+
         int stars = 0;
+
         if (isCorrect) {
+
             xpEarned = 50; // Perfect score
+
             stars = 3;
+
+            // Time bonus: faster = more points
+
+            if (elapsedSeconds < 60) {
+
+                xpEarned += 20; // Speed bonus
+
+            } else if (elapsedSeconds < 120) {
+
+                xpEarned += 10; // Good time
+
+            }
+
         } else if (correctCount >= 6) {
+
             xpEarned = correctCount * 5;
+
             stars = 2;
+
         } else if (correctCount >= 4) {
+
             xpEarned = correctCount * 5;
+
             stars = 1;
+
         } else {
+
             xpEarned = correctCount * 5;
+
             stars = 0;
+
         }
+
+
+
+        // Hint penalty
+
+        xpEarned = Math.max(0, xpEarned - (hintsUsed * 5));
 
         // Update session XP
         int currentXP = session.getXP();

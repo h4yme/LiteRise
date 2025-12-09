@@ -4,6 +4,8 @@ package com.example.literise.activities.games;
 
 import android.os.Bundle;
 
+import android.os.Handler;
+
 import android.view.LayoutInflater;
 
 import android.view.View;
@@ -13,6 +15,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import android.widget.TextView;
+
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -46,7 +50,7 @@ public class PictureMatchActivity extends BaseGameActivity {
 
     private ImageView btnBack;
 
-    private TextView tvMatchCounter;
+    private TextView tvMatchCounter, tvTimer, tvCombo;
 
     private RecyclerView recyclerPictures, recyclerWords;
 
@@ -64,7 +68,13 @@ public class PictureMatchActivity extends BaseGameActivity {
 
     private int matchedCount = 0;
 
+    private int comboCount = 0;
+
     private SessionManager session;
+
+    private Handler timerHandler = new Handler();
+
+    private long startTime;
 
 
 
@@ -88,6 +98,8 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         setupListeners();
 
+        startTimer();
+
     }
 
 
@@ -98,11 +110,45 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         tvMatchCounter = findViewById(R.id.tvMatchCounter);
 
+        tvTimer = findViewById(R.id.tvTimer);
+
+        tvCombo = findViewById(R.id.tvCombo);
+
         recyclerPictures = findViewById(R.id.recyclerPictures);
 
         recyclerWords = findViewById(R.id.recyclerWords);
 
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
+
+    }
+
+
+
+    private void startTimer() {
+
+        startTime = System.currentTimeMillis();
+
+        timerHandler.post(new Runnable() {
+
+            @Override
+
+            public void run() {
+
+                long elapsedMillis = System.currentTimeMillis() - startTime;
+
+                int seconds = (int) (elapsedMillis / 1000);
+
+                int minutes = seconds / 60;
+
+                seconds = seconds % 60;
+
+                tvTimer.setText(String.format("%d:%02d", minutes, seconds));
+
+                timerHandler.postDelayed(this, 100);
+
+            }
+
+        });
 
     }
 
@@ -172,7 +218,13 @@ public class PictureMatchActivity extends BaseGameActivity {
 
     private void setupListeners() {
 
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+
+            timerHandler.removeCallbacksAndMessages(null);
+
+            finish();
+
+        });
 
         btnCheckAnswer.setOnClickListener(v -> checkAnswers());
 
@@ -228,11 +280,41 @@ public class PictureMatchActivity extends BaseGameActivity {
 
             // Correct match!
 
+            comboCount++;
+
+            tvCombo.setText(comboCount + "x");
+
+
+
+            // Show combo message for streaks
+
+            if (comboCount >= 3) {
+
+                Toast.makeText(this, "🔥 " + comboCount + " Combo! Amazing!", Toast.LENGTH_SHORT).show();
+
+            } else if (comboCount >= 2) {
+
+                Toast.makeText(this, "✨ " + comboCount + " Combo!", Toast.LENGTH_SHORT).show();
+
+            }
+
+
+
             makeMatch(selectedPicture, word, position);
 
         } else {
 
-            // Wrong match - shake both
+            // Wrong match - reset combo
+
+            comboCount = 0;
+
+            tvCombo.setText("0x");
+
+            Toast.makeText(this, "❌ Wrong match! Combo reset.", Toast.LENGTH_SHORT).show();
+
+
+
+            // Shake both
 
             shakeWord(position);
 
@@ -392,6 +474,16 @@ public class PictureMatchActivity extends BaseGameActivity {
 
     private void checkAnswers() {
 
+        // Stop timer
+
+        timerHandler.removeCallbacksAndMessages(null);
+
+        long elapsedMillis = System.currentTimeMillis() - startTime;
+
+        int elapsedSeconds = (int) (elapsedMillis / 1000);
+
+
+
         boolean allMatched = matchedCount == pictures.size();
 
         int correctCount = matchedCount;
@@ -400,7 +492,7 @@ public class PictureMatchActivity extends BaseGameActivity {
 
 
 
-        // Calculate XP and stars
+        // Calculate XP and stars with time bonus and combo bonus
 
         int xpEarned = 0;
 
@@ -413,6 +505,22 @@ public class PictureMatchActivity extends BaseGameActivity {
             xpEarned = 50;
 
             stars = 3;
+
+            // Time bonus: faster = more points
+
+            if (elapsedSeconds < 30) {
+
+                xpEarned += 25; // Speed demon!
+
+            } else if (elapsedSeconds < 60) {
+
+                xpEarned += 15; // Fast
+
+            } else if (elapsedSeconds < 90) {
+
+                xpEarned += 5; // Good time
+
+            }
 
         } else if (correctCount >= (total * 0.75)) {
 
@@ -431,6 +539,18 @@ public class PictureMatchActivity extends BaseGameActivity {
             xpEarned = correctCount * 5;
 
             stars = 0;
+
+        }
+
+
+
+        // Combo bonus: reward no mistakes
+
+        if (comboCount == total) {
+
+            xpEarned += 20; // Perfect combo!
+
+            Toast.makeText(this, "🎉 PERFECT COMBO! +20 XP Bonus!", Toast.LENGTH_LONG).show();
 
         }
 
@@ -600,7 +720,11 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         matchedCount = 0;
 
+        comboCount = 0;
+
         tvMatchCounter.setText("Matches: 0/" + pictures.size());
+
+        tvCombo.setText("0x");
 
         selectedPicture = null;
 
@@ -627,6 +751,12 @@ public class PictureMatchActivity extends BaseGameActivity {
         pictureAdapter.notifyDataSetChanged();
 
         wordAdapter.notifyDataSetChanged();
+
+
+
+        // Restart timer
+
+        startTimer();
 
     }
 

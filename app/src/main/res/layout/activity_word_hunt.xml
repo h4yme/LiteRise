@@ -1,94 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
 
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+
+    android:background="@drawable/bg_game">
 
 
 
-    <!-- Gradient Background -->
-
-    <View
-
-        android:layout_width="match_parent"
-
-        android:layout_height="match_parent"
-
-        android:background="@drawable/bg_game"/>
-
-
-
-    <!-- Main Content -->
+    <!-- Header -->
 
     <LinearLayout
 
+        android:id="@+id/header"
+
         android:layout_width="match_parent"
 
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
 
-        android:orientation="vertical"
+        android:orientation="horizontal"
 
-        android:padding="16dp">
+        android:gravity="center_vertical"
+
+        android:padding="16dp"
+
+        android:background="@color/white"
+
+        android:elevation="4dp"
+
+        app:layout_constraintTop_toTopOf="parent">
 
 
 
-        <!-- Modern Header with Stats -->
+        <ImageView
+
+            android:id="@+id/ivClose"
+
+            android:layout_width="40dp"
+
+            android:layout_height="40dp"
+
+            android:src="@drawable/ic_arrow_back"
+
+            android:padding="8dp"
+
+            android:background="?attr/selectableItemBackgroundBorderless"
+
+            app:tint="@color/text_primary"
+
+            android:contentDescription="Close" />
+
+
 
         <LinearLayout
 
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
 
             android:layout_height="wrap_content"
 
-            android:orientation="horizontal"
+            android:layout_weight="1"
 
-            android:gravity="center_vertical"
+            android:orientation="vertical"
 
-            android:layout_marginBottom="16dp">
-
-
-
-            <!-- Back Button -->
-
-            <ImageView
-
-                android:id="@+id/ivClose"
-
-                android:layout_width="40dp"
-
-                android:layout_height="40dp"
-
-                android:src="@drawable/ic_arrow_back"
-
-                android:padding="8dp"
-
-                app:tint="#333333"
-
-                android:clickable="true"
-
-                android:focusable="true"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Back"/>
+            android:layout_marginStart="12dp">
 
 
-
-            <Space
-
-                android:layout_width="0dp"
-
-                android:layout_height="1dp"
-
-                android:layout_weight="1"/>
-
-
-
-            <!-- Title -->
 
             <TextView
 
@@ -100,352 +80,518 @@
 
                 android:text="Word Hunt"
 
-                android:textSize="20sp"
+                android:textSize="18sp"
 
                 android:textStyle="bold"
 
-                android:textColor="#333333"
+                android:fontFamily="@font/poppins_bold"
 
-                android:fontFamily="@font/poppins_bold"/>
-
-
-
-            <Space
-
-                android:layout_width="0dp"
-
-                android:layout_height="1dp"
-
-                android:layout_weight="1"/>
+                android:textColor="@color/text_primary" />
 
 
 
-            <!-- Score Display -->
+            <TextView
 
-            <LinearLayout
+                android:id="@+id/tvProgress"
 
                 android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
 
-                android:orientation="horizontal"
+                android:text="0/8 words found"
 
-                android:gravity="center"
+                android:textSize="12sp"
 
-                android:background="@drawable/rounded_bg_accent"
+                android:fontFamily="@font/poppins"
 
-                android:padding="8dp">
-
-
-
-                <ImageView
-
-                    android:layout_width="16dp"
-
-                    android:layout_height="16dp"
-
-                    android:src="@drawable/ic_star"
-
-                    app:tint="#FFD700"/>
-
-
-
-                <TextView
-
-                    android:id="@+id/tvStars"
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="0"
-
-                    android:textSize="14sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="#FFD700"
-
-                    android:layout_marginStart="4dp"/>
-
-            </LinearLayout>
+                android:textColor="@color/gray_dark" />
 
         </LinearLayout>
 
 
 
-        <!-- Progress Card -->
+        <!-- Score -->
 
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
 
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
 
             android:layout_height="wrap_content"
 
-            app:cardCornerRadius="20dp"
+            android:orientation="horizontal"
 
-            app:cardElevation="6dp"
-
-            android:layout_marginBottom="16dp"
-
-            app:cardBackgroundColor="#FFFFFF">
+            android:gravity="center_vertical">
 
 
 
-            <LinearLayout
+            <ImageView
 
-                android:layout_width="match_parent"
+                android:layout_width="20dp"
+
+                android:layout_height="20dp"
+
+                android:src="@drawable/ic_star"
+
+                app:tint="@color/color_sunglow" />
+
+
+
+            <TextView
+
+                android:id="@+id/tvScore"
+
+                android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
 
-                android:orientation="vertical"
+                android:text="0"
 
-                android:padding="16dp">
+                android:textSize="16sp"
 
+                android:textStyle="bold"
 
+                android:fontFamily="@font/poppins_bold"
 
-                <TextView
+                android:textColor="@color/color_sunglow"
 
-                    android:id="@+id/tvProgress"
+                android:layout_marginStart="4dp" />
 
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Words Found: 0/8"
-
-                    android:textSize="16sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="#7C3AED"
-
-                    android:fontFamily="@font/poppins_semibold"/>
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="🔍 Swipe across letters to find hidden words!"
-
-                    android:textSize="14sp"
-
-                    android:textColor="#666666"
-
-                    android:fontFamily="@font/poppins"
-
-                    android:layout_marginTop="4dp"/>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-
-        <!-- Letter Grid with Modern Style -->
-
-        <com.google.android.material.card.MaterialCardView
-
-            android:id="@+id/cardGrid"
-
-            android:layout_width="match_parent"
-
-            android:layout_height="0dp"
-
-            android:layout_weight="1"
-
-            android:layout_marginBottom="12dp"
-
-            app:cardCornerRadius="24dp"
-
-            app:cardElevation="8dp"
-
-            app:cardBackgroundColor="#FFFFFF">
-
-
-
-            <GridLayout
-
-                android:id="@+id/letterGrid"
-
-                android:layout_width="match_parent"
-
-                android:layout_height="match_parent"
-
-                android:layout_gravity="center"
-
-                android:padding="12dp"/>
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-
-        <!-- Word List with Gradient -->
-
-        <com.google.android.material.card.MaterialCardView
-
-            android:id="@+id/cardWordList"
-
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-
-            android:layout_marginBottom="12dp"
-
-            app:cardCornerRadius="20dp"
-
-            app:cardElevation="6dp"
-
-            app:cardBackgroundColor="#7C3AED">
-
-
-
-            <LinearLayout
-
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-
-                android:orientation="vertical"
-
-                android:padding="16dp">
-
-
-
-                <LinearLayout
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    android:orientation="horizontal"
-
-                    android:gravity="center_vertical"
-
-                    android:layout_marginBottom="8dp">
-
-
-
-                    <TextView
-
-                        android:layout_width="0dp"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_weight="1"
-
-                        android:text="📚 Find These Words"
-
-                        android:textSize="14sp"
-
-                        android:textColor="#FFFFFF"
-
-                        android:textStyle="bold"
-
-                        android:fontFamily="@font/poppins_semibold"/>
-
-
-
-                    <TextView
-
-                        android:id="@+id/tvWordsRemaining"
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:text="8 left"
-
-                        android:textSize="12sp"
-
-                        android:textColor="#E0E0E0"
-
-                        android:fontFamily="@font/poppins"/>
-
-                </LinearLayout>
-
-
-
-                <com.google.android.flexbox.FlexboxLayout
-
-                    android:id="@+id/wordListContainer"
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    app:flexWrap="wrap"
-
-                    app:alignItems="center"
-
-                    app:justifyContent="flex_start"/>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-
-        <!-- Complete Button -->
-
-        <com.google.android.material.button.MaterialButton
-
-            android:id="@+id/btnComplete"
-
-            android:layout_width="match_parent"
-
-            android:layout_height="60dp"
-
-            android:text="Complete Word Hunt"
-
-            android:textSize="18sp"
-
-            android:textStyle="bold"
-
-            android:fontFamily="@font/poppins_bold"
-
-            app:cornerRadius="20dp"
-
-            app:backgroundTint="#10B981"
-
-            android:textColor="#FFFFFF"
-
-            app:icon="@drawable/ic_check"
-
-            app:iconGravity="textStart"
-
-            app:iconTint="#FFFFFF"/>
+        </LinearLayout>
 
     </LinearLayout>
 
 
 
-    <!-- Hidden elements for backward compatibility -->
+    <!-- Timer Bar -->
 
-    <ProgressBar android:id="@+id/loadingProgress" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+    <LinearLayout
 
-    <View android:id="@+id/progressBar" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:id="@+id/timerContainer"
 
-    <View android:id="@+id/timerProgress" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:layout_width="match_parent"
 
-    <TextView android:id="@+id/tvTimer" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:layout_height="wrap_content"
 
-    <TextView android:id="@+id/tvScore" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:orientation="horizontal"
 
-    <View android:id="@+id/cardDefinition" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:gravity="center_vertical"
 
-    <TextView android:id="@+id/tvFoundWord" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:paddingHorizontal="16dp"
 
-    <TextView android:id="@+id/tvDefinition" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:paddingVertical="8dp"
 
-    <TextView android:id="@+id/tvExample" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        android:background="@color/white"
 
-    <Button android:id="@+id/btnHint" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+        app:layout_constraintTop_toBottomOf="@id/header">
 
-    <Button android:id="@+id/btnShuffle" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
 
-</FrameLayout>
+
+        <ImageView
+
+            android:layout_width="20dp"
+
+            android:layout_height="20dp"
+
+            android:src="@drawable/ic_timer"
+
+            app:tint="@color/color_sunglow" />
+
+
+
+        <TextView
+
+            android:id="@+id/tvTimer"
+
+            android:layout_width="wrap_content"
+
+            android:layout_height="wrap_content"
+
+            android:text="2:00"
+
+            android:textSize="16sp"
+
+            android:textStyle="bold"
+
+            android:fontFamily="@font/poppins_bold"
+
+            android:textColor="@color/color_sunglow"
+
+            android:layout_marginStart="8dp" />
+
+
+
+        <ProgressBar
+
+            android:id="@+id/timerProgress"
+
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+
+            android:layout_width="0dp"
+
+            android:layout_height="6dp"
+
+            android:layout_weight="1"
+
+            android:layout_marginStart="12dp"
+
+            android:max="120"
+
+            android:progress="120"
+
+            android:progressTint="@color/color_sunglow"
+
+            android:progressBackgroundTint="@color/gray_light" />
+
+    </LinearLayout>
+
+
+
+    <!-- Progress Bar -->
+
+    <ProgressBar
+
+        android:id="@+id/progressBar"
+
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="4dp"
+
+        android:max="100"
+
+        android:progress="0"
+
+        android:progressTint="@color/color_jade1"
+
+        android:progressBackgroundTint="@color/gray_medium"
+
+        app:layout_constraintTop_toBottomOf="@id/timerContainer" />
+
+
+
+    <!-- Loading indicator -->
+
+    <ProgressBar
+
+        android:id="@+id/loadingProgress"
+
+        android:layout_width="48dp"
+
+        android:layout_height="48dp"
+
+        android:visibility="gone"
+
+        app:layout_constraintTop_toTopOf="parent"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+
+        app:layout_constraintStart_toStartOf="parent"
+
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+    <!-- Letter Grid Container -->
+
+    <androidx.cardview.widget.CardView
+
+        android:id="@+id/cardGrid"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="0dp"
+
+        android:layout_margin="16dp"
+
+        app:cardCornerRadius="20dp"
+
+        app:cardElevation="6dp"
+
+        app:cardBackgroundColor="@color/white"
+
+        app:layout_constraintTop_toBottomOf="@id/progressBar"
+
+        app:layout_constraintBottom_toTopOf="@id/cardWordList"
+
+        app:layout_constraintHeight_percent="0.5">
+
+
+
+        <GridLayout
+
+            android:id="@+id/letterGrid"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="match_parent"
+
+            android:layout_gravity="center"
+
+            android:padding="8dp" />
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <!-- Word List -->
+
+    <androidx.cardview.widget.CardView
+
+        android:id="@+id/cardWordList"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:layout_marginHorizontal="16dp"
+
+        android:layout_marginBottom="8dp"
+
+        app:cardCornerRadius="16dp"
+
+        app:cardElevation="4dp"
+
+        app:cardBackgroundColor="#7C3AED"
+
+        app:layout_constraintBottom_toTopOf="@id/cardDefinition">
+
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="12dp">
+
+
+
+            <TextView
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="📚 Words to Find"
+
+                android:textSize="12sp"
+
+                android:textColor="@color/white"
+
+                android:textStyle="bold"
+
+                android:fontFamily="@font/poppins_semibold"
+
+                android:layout_marginBottom="8dp" />
+
+
+
+            <com.google.android.flexbox.FlexboxLayout
+
+                android:id="@+id/wordListContainer"
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                app:flexWrap="wrap"
+
+                app:alignItems="center"
+
+                app:justifyContent="flex_start" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <!-- Definition Card (shows when word is found) -->
+
+    <androidx.cardview.widget.CardView
+
+        android:id="@+id/cardDefinition"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:layout_margin="16dp"
+
+        android:visibility="gone"
+
+        app:cardCornerRadius="16dp"
+
+        app:cardElevation="4dp"
+
+        app:cardBackgroundColor="@color/color_success_bg"
+
+        app:layout_constraintBottom_toTopOf="@id/buttonContainer">
+
+
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            android:orientation="vertical"
+
+            android:padding="16dp">
+
+
+
+            <TextView
+
+                android:id="@+id/tvFoundWord"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="WORD"
+
+                android:textSize="18sp"
+
+                android:textStyle="bold"
+
+                android:fontFamily="@font/poppins_bold"
+
+                android:textColor="@color/color_success" />
+
+
+
+            <TextView
+
+                android:id="@+id/tvDefinition"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Definition goes here"
+
+                android:textSize="14sp"
+
+                android:fontFamily="@font/poppins"
+
+                android:textColor="@color/text_primary"
+
+                android:layout_marginTop="4dp" />
+
+
+
+            <TextView
+
+                android:id="@+id/tvExample"
+
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+
+                android:text="Example: ..."
+
+                android:textSize="12sp"
+
+                android:textStyle="italic"
+
+                android:fontFamily="@font/poppins"
+
+                android:textColor="@color/gray_dark"
+
+                android:layout_marginTop="8dp"
+
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <!-- Bottom Buttons -->
+
+    <LinearLayout
+
+        android:id="@+id/buttonContainer"
+
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal"
+
+        android:padding="16dp"
+
+        android:background="@color/white"
+
+        android:elevation="8dp"
+
+        app:layout_constraintBottom_toBottomOf="parent">
+
+
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/btnHint"
+
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+            android:layout_width="0dp"
+
+            android:layout_height="48dp"
+
+            android:layout_weight="1"
+
+            android:text="Hint"
+
+            android:fontFamily="@font/poppins_semibold"
+
+            android:textColor="@color/color_sunglow"
+
+            app:strokeColor="@color/color_sunglow"
+
+            app:cornerRadius="12dp"
+
+            app:icon="@drawable/ic_lightbulb"
+
+            app:iconTint="@color/color_sunglow"
+
+            android:layout_marginEnd="8dp" />
+
+
+
+        <com.google.android.material.button.MaterialButton
+
+            android:id="@+id/btnShuffle"
+
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+
+            android:layout_width="0dp"
+
+            android:layout_height="48dp"
+
+            android:layout_weight="1"
+
+            android:text="Shuffle"
+
+            android:fontFamily="@font/poppins_semibold"
+
+            android:textColor="@color/gray_dark"
+
+            app:strokeColor="@color/gray_medium"
+
+            app:cornerRadius="12dp"
+
+            android:layout_marginStart="8dp" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
