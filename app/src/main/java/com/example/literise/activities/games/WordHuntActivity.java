@@ -1248,7 +1248,7 @@ public class WordHuntActivity extends BaseGameActivity {
 
             wordView.setPadding(16, 8, 16, 8);
 
-            wordView.setTag(word.getWordId());
+            wordView.setTag(word.getWord().toUpperCase()); // Use word string as tag for demo mode compatibility
 
 
 
@@ -1282,7 +1282,7 @@ public class WordHuntActivity extends BaseGameActivity {
 
             if (child instanceof TextView && child.getTag() != null) {
 
-                if ((int) child.getTag() == word.getWordId()) {
+                if (child.getTag().equals(word.getWord().toUpperCase())) {
 
                     TextView tv = (TextView) child;
 
