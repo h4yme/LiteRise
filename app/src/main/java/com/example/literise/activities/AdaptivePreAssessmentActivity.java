@@ -215,6 +215,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         // TODO: Remove skip button functionality after testing - temporary for pronunciation testing
         btnSkipPronunciation.setOnClickListener(v -> {
+            playSound(soundClick);
             // Skip pronunciation - set dummy answer and enable continue
             selectedAnswer = "SKIP";
             pronunciationScore = 50; // Neutral score for skipped questions
@@ -515,6 +516,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void selectAnswer(String option, Button selectedButton) {
+        playSound(soundClick);
         selectedAnswer = option;
         clearSelections();
         selectedButton.setSelected(true);
@@ -555,6 +557,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             return;
         }
 
+        playSound(soundClick);
         btnContinue.setEnabled(false);
         disableOptions();
         long timeSpent = (SystemClock.elapsedRealtime() - questionStartTime) / 1000;
@@ -638,6 +641,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Track correct answers
         if (isCorrect == 1) {
             demoCorrectAnswers++;
+            playSound(soundSuccess);
         }
 /*
         // Show feedback
@@ -762,6 +766,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     // Speech Recognition Methods
     private void recordPronunciation() {
+        playSound(soundClick);
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
