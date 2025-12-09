@@ -42,6 +42,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.literise.R;
 
+import com.example.literise.activities.BaseActivity;
 import com.example.literise.database.SessionManager;
 
 import com.google.android.material.button.MaterialButton;
@@ -58,7 +59,7 @@ import java.util.List;
 
 
 
-public class DialogueReadingActivity extends AppCompatActivity {
+public class DialogueReadingActivity extends BaseGameActivity {
 
 
 

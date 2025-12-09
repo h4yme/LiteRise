@@ -114,7 +114,7 @@ import retrofit2.Response;
 
  */
 
-public class WordHuntActivity extends AppCompatActivity {
+public class WordHuntActivity extends BaseGameActivity {
 
 
 
@@ -1248,7 +1248,7 @@ public class WordHuntActivity extends AppCompatActivity {
 
             wordView.setPadding(16, 8, 16, 8);
 
-            wordView.setTag(word.getWordId());
+            wordView.setTag(word.getWord().toUpperCase());
 
 
 
@@ -1282,7 +1282,7 @@ public class WordHuntActivity extends AppCompatActivity {
 
             if (child instanceof TextView && child.getTag() != null) {
 
-                if ((int) child.getTag() == word.getWordId()) {
+                if (child.getTag().equals(word.getWord().toUpperCase())) {
 
                     TextView tv = (TextView) child;
 

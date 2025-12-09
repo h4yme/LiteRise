@@ -1,74 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
 
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
     android:layout_width="match_parent"
 
-    android:layout_height="match_parent"
-
-    android:background="@color/gray_light">
+    android:layout_height="match_parent">
 
 
 
-    <!-- Header -->
+    <!-- Gradient Background -->
 
-    <LinearLayout
-
-        android:id="@+id/header"
+    <View
 
         android:layout_width="match_parent"
 
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
 
-        android:orientation="horizontal"
-
-        android:gravity="center_vertical"
-
-        android:padding="16dp"
-
-        android:background="@color/white"
-
-        android:elevation="4dp"
-
-        app:layout_constraintTop_toTopOf="parent">
+        android:background="@drawable/bg_game"/>
 
 
 
-        <ImageView
+    <!-- Main Content -->
 
-            android:id="@+id/ivClose"
+    <LinearLayout
 
-            android:layout_width="40dp"
+        android:layout_width="match_parent"
 
-            android:layout_height="40dp"
+        android:layout_height="match_parent"
 
-            android:src="@drawable/ic_arrow_back"
+        android:orientation="vertical"
 
-            android:padding="8dp"
-
-            android:background="?attr/selectableItemBackgroundBorderless"
-
-            app:tint="@color/text_primary"
-
-            android:contentDescription="Close" />
+        android:padding="16dp">
 
 
+
+        <!-- Modern Header with Stats -->
 
         <LinearLayout
 
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
 
             android:layout_height="wrap_content"
 
-            android:layout_weight="1"
+            android:orientation="horizontal"
 
-            android:orientation="vertical"
+            android:gravity="center_vertical"
 
-            android:layout_marginStart="12dp">
+            android:layout_marginBottom="16dp">
 
 
+
+            <!-- Back Button -->
+
+            <ImageView
+
+                android:id="@+id/ivClose"
+
+                android:layout_width="40dp"
+
+                android:layout_height="40dp"
+
+                android:src="@drawable/ic_arrow_back"
+
+                android:padding="8dp"
+
+                app:tint="#333333"
+
+                android:clickable="true"
+
+                android:focusable="true"
+
+                android:background="?attr/selectableItemBackgroundBorderless"
+
+                android:contentDescription="Back"/>
+
+
+
+            <Space
+
+                android:layout_width="0dp"
+
+                android:layout_height="1dp"
+
+                android:layout_weight="1"/>
+
+
+
+            <!-- Title -->
 
             <TextView
 
@@ -80,101 +100,27 @@
 
                 android:text="Sentence Scramble"
 
-                android:textSize="18sp"
+                android:textSize="20sp"
 
                 android:textStyle="bold"
 
-                android:textColor="@color/text_primary" />
+                android:textColor="#333333"
+
+                android:fontFamily="@font/poppins_bold"/>
 
 
 
-            <TextView
+            <Space
 
-                android:id="@+id/tvProgress"
+                android:layout_width="0dp"
 
-                android:layout_width="wrap_content"
+                android:layout_height="1dp"
 
-                android:layout_height="wrap_content"
-
-                android:text="1/10"
-
-                android:textSize="12sp"
-
-                android:textColor="@color/gray_dark" />
-
-        </LinearLayout>
+                android:layout_weight="1"/>
 
 
 
-        <!-- Score -->
-
-        <LinearLayout
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:orientation="horizontal"
-
-            android:gravity="center_vertical"
-
-            android:layout_marginEnd="12dp">
-
-
-
-            <ImageView
-
-                android:layout_width="20dp"
-
-                android:layout_height="20dp"
-
-                android:src="@drawable/ic_star"
-
-                app:tint="@color/color_sunglow" />
-
-
-
-            <TextView
-
-                android:id="@+id/tvScore"
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:text="0"
-
-                android:textSize="16sp"
-
-                android:textStyle="bold"
-
-                android:textColor="@color/color_sunglow"
-
-                android:layout_marginStart="4dp" />
-
-        </LinearLayout>
-
-
-
-        <!-- Streak Card -->
-
-        <androidx.cardview.widget.CardView
-
-            android:id="@+id/cardStreak"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:visibility="gone"
-
-            app:cardCornerRadius="12dp"
-
-            app:cardElevation="2dp"
-
-            app:cardBackgroundColor="@color/color_jade1">
-
-
+            <!-- Star Rating Display -->
 
             <LinearLayout
 
@@ -184,29 +130,29 @@
 
                 android:orientation="horizontal"
 
-                android:gravity="center_vertical"
+                android:gravity="center"
 
-                android:paddingHorizontal="10dp"
+                android:background="@drawable/rounded_bg_accent"
 
-                android:paddingVertical="4dp">
+                android:padding="8dp">
 
 
 
-                <View
+                <ImageView
 
-                    android:id="@+id/streakIndicator"
+                    android:layout_width="16dp"
 
-                    android:layout_width="8dp"
+                    android:layout_height="16dp"
 
-                    android:layout_height="8dp"
+                    android:src="@drawable/ic_star"
 
-                    android:background="@drawable/circle_gradient" />
+                    app:tint="#FFD700"/>
 
 
 
                 <TextView
 
-                    android:id="@+id/tvStreakCount"
+                    android:id="@+id/tvStars"
 
                     android:layout_width="wrap_content"
 
@@ -218,9 +164,169 @@
 
                     android:textStyle="bold"
 
-                    android:textColor="@color/white"
+                    android:textColor="#FFD700"
 
-                    android:layout_marginStart="6dp" />
+                    android:layout_marginStart="4dp"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+
+        <!-- Progress Card with Combo -->
+
+        <com.google.android.material.card.MaterialCardView
+
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+
+            app:cardCornerRadius="20dp"
+
+            app:cardElevation="6dp"
+
+            android:layout_marginBottom="16dp"
+
+            app:cardBackgroundColor="#FFFFFF">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="wrap_content"
+
+                android:orientation="vertical"
+
+                android:padding="16dp">
+
+
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:orientation="horizontal"
+
+                    android:gravity="center_vertical">
+
+
+
+                    <!-- Progress Text -->
+
+                    <TextView
+
+                        android:id="@+id/tvProgress"
+
+                        android:layout_width="0dp"
+
+                        android:layout_height="wrap_content"
+
+                        android:layout_weight="1"
+
+                        android:text="Question 1/10"
+
+                        android:textSize="16sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#7C3AED"
+
+                        android:fontFamily="@font/poppins_semibold"/>
+
+
+
+                    <!-- Combo Badge -->
+
+                    <TextView
+
+                        android:id="@+id/tvCombo"
+
+                        android:layout_width="wrap_content"
+
+                        android:layout_height="wrap_content"
+
+                        android:text="🔥 2x"
+
+                        android:textSize="14sp"
+
+                        android:textStyle="bold"
+
+                        android:textColor="#FF6B35"
+
+                        android:background="@drawable/rounded_bg_accent"
+
+                        android:padding="6dp"
+
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
+
+
+                <!-- Instructions -->
+
+                <TextView
+
+                    android:id="@+id/tvInstruction"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="✏️ Tap words to arrange them into a correct sentence"
+
+                    android:textSize="14sp"
+
+                    android:textColor="#666666"
+
+                    android:fontFamily="@font/poppins"
+
+                    android:layout_marginTop="8dp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+
+        <!-- Answer Drop Zone with Modern Style -->
+
+        <com.google.android.material.card.MaterialCardView
+
+            android:id="@+id/cardAnswerZone"
+
+            android:layout_width="match_parent"
+
+            android:layout_height="0dp"
+
+            android:layout_weight="0.35"
+
+            android:layout_marginBottom="12dp"
+
+            app:cardCornerRadius="24dp"
+
+            app:cardElevation="8dp"
+
+            app:strokeWidth="2dp"
+
+            app:strokeColor="#E0E0E0"
+
+            app:cardBackgroundColor="#F8F9FA">
+
+
+
+            <LinearLayout
+
+                android:layout_width="match_parent"
+
+                android:layout_height="match_parent"
+
+                android:orientation="vertical">
 
 
 
@@ -230,452 +336,209 @@
 
                     android:layout_height="wrap_content"
 
-                    android:text=" streak"
+                    android:text="📝 Your Answer"
 
-                    android:textSize="12sp"
+                    android:textSize="14sp"
 
-                    android:textColor="@color/white" />
+                    android:textColor="#7C3AED"
+
+                    android:textStyle="bold"
+
+                    android:fontFamily="@font/poppins_semibold"
+
+                    android:padding="16dp"/>
+
+
+
+                <com.google.android.flexbox.FlexboxLayout
+
+                    android:id="@+id/answerContainer"
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="match_parent"
+
+                    android:padding="16dp"
+
+                    android:minHeight="80dp"
+
+                    app:flexWrap="wrap"
+
+                    app:alignItems="flex_start"
+
+                    app:alignContent="flex_start"
+
+                    app:justifyContent="flex_start"/>
 
             </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-    </LinearLayout>
 
 
+        <!-- Word Bank with Gradient Background -->
 
-    <!-- Timer Bar -->
+        <com.google.android.material.card.MaterialCardView
 
-    <LinearLayout
-
-        android:id="@+id/timerContainer"
-
-        android:layout_width="match_parent"
-
-        android:layout_height="wrap_content"
-
-        android:orientation="horizontal"
-
-        android:gravity="center_vertical"
-
-        android:paddingHorizontal="16dp"
-
-        android:paddingVertical="8dp"
-
-        android:background="@color/white"
-
-        app:layout_constraintTop_toBottomOf="@id/header">
-
-
-
-        <ImageView
-
-            android:layout_width="20dp"
-
-            android:layout_height="20dp"
-
-            android:src="@drawable/ic_timer"
-
-            app:tint="@color/color_jade1" />
-
-
-
-        <TextView
-
-            android:id="@+id/tvTimer"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:text="3:00"
-
-            android:textSize="16sp"
-
-            android:textStyle="bold"
-
-            android:textColor="@color/color_jade1"
-
-            android:layout_marginStart="8dp" />
-
-
-
-        <ProgressBar
-
-            android:id="@+id/timerProgress"
-
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-
-            android:layout_width="0dp"
-
-            android:layout_height="6dp"
-
-            android:layout_weight="1"
-
-            android:layout_marginStart="12dp"
-
-            android:max="180"
-
-            android:progress="180"
-
-            android:progressTint="@color/color_jade1"
-
-            android:progressBackgroundTint="@color/gray_light" />
-
-    </LinearLayout>
-
-
-
-    <!-- Progress Bar -->
-
-    <ProgressBar
-
-        android:id="@+id/progressBar"
-
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-
-        android:layout_width="match_parent"
-
-        android:layout_height="4dp"
-
-        android:max="100"
-
-        android:progress="0"
-
-        android:progressTint="@color/color_sunglow"
-
-        android:progressBackgroundTint="@color/gray_medium"
-
-        app:layout_constraintTop_toBottomOf="@id/timerContainer" />
-
-
-
-    <!-- Instruction Card -->
-
-    <androidx.cardview.widget.CardView
-
-        android:id="@+id/cardInstruction"
-
-        android:layout_width="match_parent"
-
-        android:layout_height="wrap_content"
-
-        android:layout_margin="16dp"
-
-        app:cardCornerRadius="12dp"
-
-        app:cardElevation="2dp"
-
-        app:cardBackgroundColor="@color/white"
-
-        app:layout_constraintTop_toBottomOf="@id/progressBar">
-
-
-
-        <LinearLayout
+            android:id="@+id/cardWordBank"
 
             android:layout_width="match_parent"
 
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
 
-            android:orientation="vertical"
+            android:layout_weight="0.65"
 
-            android:padding="16dp">
+            android:layout_marginBottom="12dp"
 
+            app:cardCornerRadius="24dp"
 
+            app:cardElevation="8dp"
 
-            <TextView
-
-                android:id="@+id/tvInstruction"
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:text="Arrange these words to form a sentence:"
-
-                android:textSize="16sp"
-
-                android:textColor="@color/text_primary"
-
-                android:textStyle="bold" />
+            app:cardBackgroundColor="#7C3AED">
 
 
 
-            <TextView
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:text="Tap words to add, tap placed words to remove"
-
-                android:textSize="12sp"
-
-                android:textColor="@color/gray_dark"
-
-                android:layout_marginTop="4dp" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-
-
-    <!-- Answer Drop Zone -->
-
-    <androidx.cardview.widget.CardView
-
-        android:id="@+id/cardAnswerZone"
-
-        android:layout_width="match_parent"
-
-        android:layout_height="0dp"
-
-        android:layout_margin="16dp"
-
-        app:cardCornerRadius="16dp"
-
-        app:cardElevation="4dp"
-
-        app:cardBackgroundColor="@color/white"
-
-        app:layout_constraintTop_toBottomOf="@id/cardInstruction"
-
-        app:layout_constraintBottom_toTopOf="@id/cardWordBank"
-
-        app:layout_constraintHeight_percent="0.25">
-
-
-
-        <LinearLayout
-
-            android:layout_width="match_parent"
-
-            android:layout_height="match_parent"
-
-            android:orientation="vertical">
-
-
-
-            <TextView
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:text="Your Answer"
-
-                android:textSize="12sp"
-
-                android:textColor="@color/gray_dark"
-
-                android:textStyle="bold"
-
-                android:padding="12dp" />
-
-
-
-            <com.google.android.flexbox.FlexboxLayout
-
-                android:id="@+id/answerContainer"
+            <LinearLayout
 
                 android:layout_width="match_parent"
 
                 android:layout_height="match_parent"
 
-                android:background="@drawable/drop_zone_background"
+                android:orientation="vertical"
 
-                android:padding="12dp"
+                android:padding="16dp">
 
-                android:minHeight="80dp"
 
-                app:flexWrap="wrap"
 
-                app:alignItems="flex_start"
+                <LinearLayout
 
-                app:alignContent="flex_start"
+                    android:layout_width="match_parent"
 
-                app:justifyContent="flex_start" />
+                    android:layout_height="wrap_content"
 
-        </LinearLayout>
+                    android:orientation="horizontal"
 
-    </androidx.cardview.widget.CardView>
+                    android:gravity="center_vertical"
 
+                    android:layout_marginBottom="12dp">
 
 
-    <!-- Word Bank -->
 
-    <androidx.cardview.widget.CardView
+                    <TextView
 
-        android:id="@+id/cardWordBank"
+                        android:layout_width="0dp"
 
-        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
 
-        android:layout_height="wrap_content"
+                        android:layout_weight="1"
 
-        android:layout_margin="16dp"
+                        android:text="💬 Word Bank"
 
-        app:cardCornerRadius="16dp"
+                        android:textSize="14sp"
 
-        app:cardElevation="4dp"
+                        android:textColor="#FFFFFF"
 
-        app:cardBackgroundColor="@color/color_jade1"
+                        android:textStyle="bold"
 
-        app:layout_constraintBottom_toTopOf="@id/buttonContainer">
+                        android:fontFamily="@font/poppins_semibold"/>
 
 
 
-        <LinearLayout
+                    <TextView
 
-            android:layout_width="match_parent"
+                        android:id="@+id/tvWordsRemaining"
 
-            android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
 
-            android:orientation="vertical"
+                        android:layout_height="wrap_content"
 
-            android:padding="16dp">
+                        android:text="6 words"
 
+                        android:textSize="12sp"
 
+                        android:textColor="#E0E0E0"
 
-            <TextView
+                        android:fontFamily="@font/poppins"/>
 
-                android:layout_width="wrap_content"
+                </LinearLayout>
 
-                android:layout_height="wrap_content"
 
-                android:text="Word Bank"
 
-                android:textSize="14sp"
+                <com.google.android.flexbox.FlexboxLayout
 
-                android:textColor="@color/white"
+                    android:id="@+id/wordBankContainer"
 
-                android:textStyle="bold"
+                    android:layout_width="match_parent"
 
-                android:layout_marginBottom="12dp" />
+                    android:layout_height="match_parent"
 
+                    app:flexWrap="wrap"
 
+                    app:alignItems="center"
 
-            <com.google.android.flexbox.FlexboxLayout
+                    app:justifyContent="center"/>
 
-                android:id="@+id/wordBankContainer"
+            </LinearLayout>
 
-                android:layout_width="match_parent"
+        </com.google.android.material.card.MaterialCardView>
 
-                android:layout_height="wrap_content"
 
-                android:minHeight="60dp"
 
-                app:flexWrap="wrap"
-
-                app:alignItems="center"
-
-                app:justifyContent="center" />
-
-        </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-
-
-    <!-- Bottom Buttons -->
-
-    <LinearLayout
-
-        android:id="@+id/buttonContainer"
-
-        android:layout_width="match_parent"
-
-        android:layout_height="wrap_content"
-
-        android:orientation="horizontal"
-
-        android:padding="16dp"
-
-        android:background="@color/white"
-
-        android:elevation="8dp"
-
-        app:layout_constraintBottom_toBottomOf="parent">
-
-
-
-        <com.google.android.material.button.MaterialButton
-
-            android:id="@+id/btnHint"
-
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-
-            android:layout_width="0dp"
-
-            android:layout_height="48dp"
-
-            android:layout_weight="1"
-
-            android:text="Hint"
-            android:textSize="12dp"
-            android:textColor="@color/color_sunglow"
-
-            app:strokeColor="@color/color_sunglow"
-
-            app:cornerRadius="12dp"
-
-            app:icon="@drawable/ic_lightbulb"
-
-            app:iconTint="@color/color_sunglow"
-
-            android:layout_marginEnd="8dp" />
-
-
-
-        <com.google.android.material.button.MaterialButton
-
-            android:id="@+id/btnSkip"
-
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-
-            android:layout_width="0dp"
-
-            android:layout_height="48dp"
-
-            android:layout_weight="1"
-            android:textSize="12dp"
-            android:text="Skip"
-
-            android:textColor="@color/gray_dark"
-
-            app:strokeColor="@color/gray_medium"
-
-            app:cornerRadius="12dp"
-
-            android:layout_marginHorizontal="8dp" />
-
-
+        <!-- Modern Action Button -->
 
         <com.google.android.material.button.MaterialButton
 
             android:id="@+id/btnCheck"
 
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
 
-            android:layout_height="48dp"
+            android:layout_height="60dp"
 
-            android:layout_weight="1.5"
-            android:textSize="12dp"
-            android:text="Check"
+            android:text="Check Answer"
 
-            android:textColor="@color/white"
+            android:textSize="18sp"
 
-            app:backgroundTint="@color/color_jade1"
+            android:textStyle="bold"
 
-            app:cornerRadius="12dp"
+            android:fontFamily="@font/poppins_bold"
 
-            android:enabled="false"
+            app:cornerRadius="20dp"
 
-            android:layout_marginStart="8dp" />
+            app:backgroundTint="#10B981"
+
+            android:textColor="#FFFFFF"
+
+            app:icon="@drawable/ic_check"
+
+            app:iconGravity="textStart"
+
+            app:iconTint="#FFFFFF"
+
+            android:enabled="false"/>
 
     </LinearLayout>
 
 
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Hidden elements for backward compatibility -->
+
+    <ProgressBar android:id="@+id/progressBar" style="@style/Widget.AppCompat.ProgressBar.Horizontal" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <ProgressBar android:id="@+id/timerProgress" style="@style/Widget.AppCompat.ProgressBar.Horizontal" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <TextView android:id="@+id/tvTimer" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <TextView android:id="@+id/tvScore" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <androidx.cardview.widget.CardView android:id="@+id/cardStreak" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <TextView android:id="@+id/tvStreakCount" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <View android:id="@+id/streakIndicator" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnHint" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <com.google.android.material.button.MaterialButton android:id="@+id/btnSkip" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+
+    <androidx.cardview.widget.CardView android:id="@+id/cardInstruction" android:layout_width="0dp" android:layout_height="0dp" android:visibility="gone"/>
+</FrameLayout>

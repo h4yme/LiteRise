@@ -106,7 +106,7 @@ import retrofit2.Response;
 
  */
 
-public class SentenceScrambleActivity extends AppCompatActivity {
+public class SentenceScrambleActivity extends BaseGameActivity {
 
 
 

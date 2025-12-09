@@ -13,24 +13,47 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.literise.R;
 import com.example.literise.database.SessionManager;
 
+import com.example.literise.utils.MusicManager;
+
+
+
 public class WelcomeActivity extends AppCompatActivity {
 
+
+
     private ImageView ivWelcomeScreen;
+
     private TextView tvSkip;
+
     private TextView tvTapToContinue;
+
     private View rootLayout;
 
+
+
     private int currentScreen = 0; // 0 to 4 (5 screens)
+
     private final int[] welcomeImages = {
+
             R.drawable.welcome_slide_1,
+
             R.drawable.welcome_slide_2,
+
             R.drawable.welcome_slide_3,
+
             R.drawable.welcome_slide_4,
+
             R.drawable.welcome_slide_5
+
     };
 
+
+
     private MediaPlayer soundPlayer;
+
     private SessionManager sessionManager;
+
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +63,7 @@ public class WelcomeActivity extends AppCompatActivity {
         // Initialize SessionManager
         sessionManager = new SessionManager(this);
 
+        musicManager = MusicManager.getInstance(this);
         // Initialize views
         ivWelcomeScreen = findViewById(R.id.ivWelcomeScreen);
         tvSkip = findViewById(R.id.tvSkip);
@@ -118,6 +142,33 @@ public class WelcomeActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
     }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        // Play intro music when activity becomes visible
+
+        musicManager.playMusic(MusicManager.MusicType.INTRO);
+
+    }
+
+
+
+    @Override
+
+    protected void onPause() {
+
+        super.onPause();
+
+        // Pause music when activity goes to background
+
+        musicManager.pause();
+
+    }
+
+
 
     @Override
     protected void onDestroy() {

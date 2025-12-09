@@ -18,35 +18,65 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
 import com.example.literise.utils.CustomToast;
+import com.example.literise.utils.MusicManager;
+
 import com.google.android.material.button.MaterialButton;
 
+
+
 import retrofit2.Call;
+
 import retrofit2.Callback;
+
 import retrofit2.Response;
+
+
 
 public class NicknameSetupActivity extends AppCompatActivity {
 
+
+
     private ImageView ivNicknameScreen;
+
     private TextView tvSkip;
+
     private TextView tvTapToContinue;
+
     private EditText etNickname;
+
     private MaterialButton btnContinue;
+
     private TextView tvGreeting;
+
     private View rootLayout;
 
+
+
     private int currentScreen = 0; // 0 to 3 (4 screens)
+
     private final int[] nicknameImages = {
+
             R.drawable.nickname_slide_1,
+
             R.drawable.nickname_slide_2,
+
             R.drawable.nickname_slide_3,
+
             R.drawable.nickname_slide_4
+
     };
 
+
+
     private String nickname = "";
+
     private MediaPlayer soundPlayer;
+
     private SessionManager sessionManager;
+
     private ApiService apiService;
 
+    private MusicManager musicManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,7 +85,8 @@ public class NicknameSetupActivity extends AppCompatActivity {
         // Initialize SessionManager and API
         sessionManager = new SessionManager(this);
         apiService = ApiClient.getClient(this).create(ApiService.class);
-
+        // Initialize music manager
+        musicManager = MusicManager.getInstance(this);
         // Initialize views
         ivNicknameScreen = findViewById(R.id.ivNicknameScreen);
         tvSkip = findViewById(R.id.tvSkip);
@@ -240,6 +271,33 @@ public class NicknameSetupActivity extends AppCompatActivity {
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
     }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        // Play nickname music when activity becomes visible
+
+        musicManager.playMusic(MusicManager.MusicType.NICKNAME);
+
+    }
+
+
+
+    @Override
+
+    protected void onPause() {
+
+        super.onPause();
+
+        // Pause music when activity goes to background
+
+        musicManager.pause();
+
+    }
+
+
 
     @Override
     protected void onDestroy() {

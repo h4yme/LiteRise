@@ -30,6 +30,7 @@ import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
 
+import com.example.literise.utils.MusicManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class AssessmentResultsActivity extends BaseActivity {
 
     private MaterialButton btnContinueToDashboard;
 
-
+    private MusicManager musicManager;
 
     private SessionManager sessionManager;
 
@@ -74,7 +75,7 @@ public class AssessmentResultsActivity extends BaseActivity {
         // Initialize SessionManager
 
         sessionManager = new SessionManager(this);
-
+        musicManager = MusicManager.getInstance(this);
 
 
         // Initialize views
@@ -478,7 +479,59 @@ public class AssessmentResultsActivity extends BaseActivity {
 
 
     @Override
+    protected void onResume() {
 
+
+
+        super.onResume();
+
+
+
+        // Play victory music when showing results
+
+
+
+        musicManager.playMusic(MusicManager.MusicType.VICTORY);
+
+
+
+    }
+
+
+
+
+
+
+
+    @Override
+
+
+
+    protected void onPause() {
+
+
+
+        super.onPause();
+
+
+
+        // Pause music when activity goes to background
+
+
+
+        musicManager.pause();
+
+
+
+    }
+
+
+
+
+
+
+
+    @Override
     public void onBackPressed() {
 
         // Prevent going back to assessment
