@@ -806,6 +806,27 @@ public class DemoDataProvider {
 
 
 
+        // Pronunciation Question (Speak-type)
+        com.example.literise.models.Question q11 = new com.example.literise.models.Question();
+
+        q11.setItemId(2011);
+
+        q11.setItemType("Pronunciation");
+
+        q11.setQuestionText("education");
+
+        q11.setPronunciationGuide("/ed-ju-kei-shun/");
+
+        q11.setDifficulty(0.7f);
+
+        q11.setDiscrimination(1.0f);
+
+        q11.setMCQ(false); // This is a speak-type pronunciation question
+
+        questions.add(q11);
+
+
+
         return questions;
 
     }
