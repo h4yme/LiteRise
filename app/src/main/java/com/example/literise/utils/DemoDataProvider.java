@@ -822,11 +822,15 @@ public class DemoDataProvider {
 
 
 
-        q11.setQuestionText("education");
+        q11.setItemText("education"); // Word to pronounce
 
 
 
-        q11.setPhonetic("/ed-ju-kei-shun/");
+        q11.setPassageText("ed-ju-kei-shun"); // Phonetic guide (without slashes)
+
+
+
+        q11.setDefinition("The process of receiving or giving systematic instruction, especially at a school or university.");
 
 
 
