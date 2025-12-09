@@ -19,7 +19,7 @@ public class DashboardActivity extends BaseActivity {
 
     private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation;
     private ImageView ivLeoMascot, ivSettings;
-    private MaterialButton btnContinueLesson;
+    private MaterialButton btnContinueLesson, btnPostAssessment;
     private android.widget.GridLayout gridModules;
 
     // Tutorial views
@@ -59,6 +59,7 @@ public class DashboardActivity extends BaseActivity {
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
         ivSettings = findViewById(R.id.ivSettings);
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
+        btnPostAssessment = findViewById(R.id.btnPostAssessment);
         gridModules = findViewById(R.id.gridModules);
 
         // Tutorial views
@@ -73,6 +74,7 @@ public class DashboardActivity extends BaseActivity {
 
     private void setupListeners() {
         btnContinueLesson.setOnClickListener(v -> continueLesson());
+        btnPostAssessment.setOnClickListener(v -> startPostAssessment());
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
 
         // Long press Leo to reset tutorial (for testing)
@@ -202,6 +204,12 @@ public class DashboardActivity extends BaseActivity {
                 "Continue lesson feature coming soon!",
                 android.widget.Toast.LENGTH_SHORT
         ).show();
+    }
+
+    private void startPostAssessment() {
+        Intent intent = new Intent(this, AdaptivePreAssessmentActivity.class);
+        intent.putExtra("is_post_assessment", true);
+        startActivity(intent);
     }
 
     private void openSettings() {
