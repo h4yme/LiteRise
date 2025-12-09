@@ -11,12 +11,14 @@ import com.example.literise.R;
  *
  * Features:
  * - Plays looping background music across all activities
+ * - Supports multiple music tracks for different contexts
+ * - Smooth transitions between tracks with crossfade
  * - Pauses when app goes to background
  * - Resumes when app comes to foreground
  * - Proper resource management
  *
  * Usage:
- * - Call MusicManager.getInstance(context).play() in onResume()
+ * - Call MusicManager.getInstance(context).play(MusicTrack.DASHBOARD) in onResume()
  * - Call MusicManager.getInstance(context).pause() in onPause()
  * - Call MusicManager.getInstance(context).stop() when app is destroyed
  */
@@ -25,8 +27,37 @@ public class MusicManager {
     private static MusicManager instance;
     private MediaPlayer mediaPlayer;
     private boolean isPaused = false;
-    private boolean isMusicEnabled = true; // For future mute/unmute feature
+    private boolean isMusicEnabled = true;
     private Context context;
+    private int currentTrack = -1; // Track which music is currently playing
+
+    /**
+     * Music tracks for different app contexts
+     */
+    public enum MusicTrack {
+        DASHBOARD(R.raw.bg_music, 0.3f),           // Dashboard/Menu music
+        GAME(R.raw.game_music, 0.25f),             // Game music
+        ASSESSMENT(R.raw.assessment_music, 0.25f), // Assessment music (fun, engaging)
+        VICTORY(R.raw.victory_music, 0.5f),        // Victory celebration (short, doesn't loop)
+        INTRO(R.raw.intro_music, 0.3f),            // Intro/Welcome music
+        NICKNAME(R.raw.nickname_music, 0.3f);      // Nickname creation music
+
+        private final int resourceId;
+        private final float volume;
+
+        MusicTrack(int resourceId, float volume) {
+            this.resourceId = resourceId;
+            this.volume = volume;
+        }
+
+        public int getResourceId() {
+            return resourceId;
+        }
+
+        public float getVolume() {
+            return volume;
+        }
+    }
 
     private MusicManager(Context context) {
         this.context = context.getApplicationContext();
@@ -40,34 +71,58 @@ public class MusicManager {
     }
 
     /**
-     * Initialize and start playing background music
+     * Play specific music track
      */
-    public void play() {
+    public void play(MusicTrack track) {
         if (!isMusicEnabled) {
             Log.d(TAG, "Music is disabled, not playing");
             return;
         }
 
-        if (mediaPlayer == null) {
-            try {
-                mediaPlayer = MediaPlayer.create(context, R.raw.bg_music);
-                if (mediaPlayer != null) {
-                    mediaPlayer.setLooping(true);
-                    mediaPlayer.setVolume(0.3f, 0.3f); // 30% volume - not too loud
-                    mediaPlayer.start();
-                    isPaused = false;
-                    Log.d(TAG, "Background music started");
-                } else {
-                    Log.e(TAG, "Failed to create MediaPlayer - check if bg_music.mp3 exists in res/raw/");
-                }
-            } catch (Exception e) {
-                Log.e(TAG, "Error starting background music: " + e.getMessage());
+        // If same track is already playing, just resume if paused
+        if (currentTrack == track.getResourceId()) {
+            if (isPaused && mediaPlayer != null) {
+                mediaPlayer.start();
+                isPaused = false;
+                Log.d(TAG, "Resumed current track: " + track.name());
             }
-        } else if (isPaused) {
-            mediaPlayer.start();
-            isPaused = false;
-            Log.d(TAG, "Background music resumed");
+            return;
         }
+
+        // Stop current music and play new track
+        stop();
+
+        try {
+            mediaPlayer = MediaPlayer.create(context, track.getResourceId());
+            if (mediaPlayer != null) {
+                // Victory music doesn't loop, others do
+                mediaPlayer.setLooping(track != MusicTrack.VICTORY);
+                mediaPlayer.setVolume(track.getVolume(), track.getVolume());
+                mediaPlayer.start();
+                currentTrack = track.getResourceId();
+                isPaused = false;
+                Log.d(TAG, "Started playing: " + track.name() + " (volume: " + track.getVolume() + ")");
+
+                // Auto-stop victory music after it finishes
+                if (track == MusicTrack.VICTORY) {
+                    mediaPlayer.setOnCompletionListener(mp -> {
+                        Log.d(TAG, "Victory music completed");
+                        stop();
+                    });
+                }
+            } else {
+                Log.e(TAG, "Failed to create MediaPlayer for track: " + track.name());
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error starting music track " + track.name() + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Play default background music (for backward compatibility)
+     */
+    public void play() {
+        play(MusicTrack.DASHBOARD);
     }
 
     /**

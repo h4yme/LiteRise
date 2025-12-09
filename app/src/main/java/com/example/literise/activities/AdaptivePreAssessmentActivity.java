@@ -988,6 +988,22 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Play assessment music (fun, engaging)
+        com.example.literise.utils.MusicManager.getInstance(this).play(
+                com.example.literise.utils.MusicManager.MusicTrack.ASSESSMENT
+        );
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when activity goes to background
+        com.example.literise.utils.MusicManager.getInstance(this).pause();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (speechRecognizer != null) {

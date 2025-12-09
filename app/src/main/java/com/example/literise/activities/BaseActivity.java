@@ -11,8 +11,12 @@ import com.example.literise.utils.MusicManager;
  * - Play background music when activity starts/resumes
  * - Pause background music when activity pauses
  * - Handle music across activity transitions seamlessly
+ * - Support different music tracks for different contexts
  *
- * Activities that should NOT have music (e.g., Login, Placement Test):
+ * Override getMusicTrack() to specify which music to play
+ * Override shouldPlayMusic() to disable music for specific activities
+ *
+ * Activities that should NOT have music (e.g., Login):
  * - Should extend AppCompatActivity directly instead of BaseActivity
  */
 public abstract class BaseActivity extends AppCompatActivity {
@@ -30,7 +34,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onResume();
         // Start/resume background music when activity becomes visible
         if (shouldPlayMusic()) {
-            musicManager.play();
+            musicManager.play(getMusicTrack());
         }
     }
 
@@ -41,6 +45,16 @@ public abstract class BaseActivity extends AppCompatActivity {
         if (shouldPlayMusic()) {
             musicManager.pause();
         }
+    }
+
+    /**
+     * Override this method to specify which music track to play
+     * Default is DASHBOARD music (menu/navigation music)
+     *
+     * @return MusicTrack to play for this activity
+     */
+    protected MusicManager.MusicTrack getMusicTrack() {
+        return MusicManager.MusicTrack.DASHBOARD;
     }
 
     /**
