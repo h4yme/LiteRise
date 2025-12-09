@@ -8,91 +8,54 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/bg_game"/>
+        android:background="@drawable/bg_dashboard_gradient"/>
 
     <!-- Main Content -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="20dp">
 
-        <!-- Modern Header with Stats -->
-        <LinearLayout
+        <!-- Header -->
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="20dp">
 
             <!-- Back Button -->
             <ImageView
                 android:id="@+id/btnBack"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:src="@drawable/ic_arrow_back"
-                android:padding="8dp"
+                android:layout_alignParentStart="true"
+                android:layout_centerVertical="true"
                 app:tint="#333333"
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:contentDescription="Back"/>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
-
             <!-- Title -->
             <TextView
-                android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
                 android:text="Dialogue Reading"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="#333333"
                 android:fontFamily="@font/poppins_bold"/>
+        </RelativeLayout>
 
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="1"/>
-
-            <!-- Score Display -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center"
-                android:background="@drawable/rounded_bg_accent"
-                android:padding="8dp">
-
-                <ImageView
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
-                    android:src="@drawable/ic_star"
-                    app:tint="#FFD700"/>
-
-                <TextView
-                    android:id="@+id/tvStars"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFD700"
-                    android:layout_marginStart="4dp"/>
-            </LinearLayout>
-        </LinearLayout>
-
-        <!-- Progress Card -->
+        <!-- Instructions Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="6dp"
-            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="4dp"
+            android:layout_marginBottom="20dp"
             app:cardBackgroundColor="#FFFFFF">
 
             <LinearLayout
@@ -102,58 +65,59 @@
                 android:padding="16dp">
 
                 <TextView
-                    android:id="@+id/tvProgress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Read: 0/6"
+                    android:text="🎤 Instructions"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#7C3AED"
-                    android:fontFamily="@font/poppins_semibold"/>
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginBottom="8dp"/>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="🎤 Record yourself reading each dialogue line aloud!"
+                    android:text="Record yourself reading each dialogue line aloud! Tap Record, speak clearly, then tap Stop. Listen to your recordings and complete when done!"
                     android:textSize="14sp"
                     android:textColor="#666666"
-                    android:fontFamily="@font/poppins"
-                    android:layout_marginTop="4dp"/>
+                    android:fontFamily="@font/poppins"/>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Progress Counter -->
+        <TextView
+            android:id="@+id/tvProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Read: 0/6"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/poppins_semibold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"/>
+
         <!-- Dialogue List -->
-        <com.google.android.material.card.MaterialCardView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerDialogue"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_marginBottom="12dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerDialogue"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:padding="12dp"/>
-        </com.google.android.material.card.MaterialCardView>
+            android:clipToPadding="false"
+            android:paddingVertical="8dp"/>
 
         <!-- Complete Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnComplete"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
             android:text="Complete Reading"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:fontFamily="@font/poppins_bold"
-            app:cornerRadius="20dp"
-            app:backgroundTint="#10B981"
-            android:textColor="#FFFFFF"
-            app:icon="@drawable/ic_check"
-            app:iconGravity="textStart"
-            app:iconTint="#FFFFFF"/>
+            android:fontFamily="@font/poppins_semibold"
+            app:cornerRadius="16dp"
+            app:backgroundTint="#7C3AED"
+            android:textColor="#FFFFFF"/>
     </LinearLayout>
 </FrameLayout>

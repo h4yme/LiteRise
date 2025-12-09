@@ -33,7 +33,7 @@ public class DialogueReadingActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 
     private ImageView btnBack;
-    private TextView tvProgress, tvStars;
+    private TextView tvProgress;
     private RecyclerView recyclerDialogue;
     private MaterialButton btnComplete;
     private DialogueAdapter adapter;
@@ -87,7 +87,6 @@ public class DialogueReadingActivity extends AppCompatActivity {
     private void initializeViews() {
         btnBack = findViewById(R.id.btnBack);
         tvProgress = findViewById(R.id.tvProgress);
-        tvStars = findViewById(R.id.tvStars);
         recyclerDialogue = findViewById(R.id.recyclerDialogue);
         btnComplete = findViewById(R.id.btnComplete);
     }
