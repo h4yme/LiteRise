@@ -64,7 +64,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private TextView tvTitle, tvProgress, tvPassage, tvPassageText, tvQuestion;
     private TextView tvItemTypeBadge, tvPronunciationWord, tvPronunciationGuide, tvMicStatus;
-    private Button btnOptionA, btnOptionB, btnOptionC, btnOptionD;
+    private androidx.appcompat.widget.AppCompatButton btnOptionA, btnOptionB, btnOptionC, btnOptionD;
     private MaterialButton btnContinue;
     private MaterialButton btnSkipPronunciation; // TODO: Remove after testing - temporary for pronunciation testing
     private CardView cardPassage, cardPronunciation, cardQuestion, cardMicButton;
@@ -503,7 +503,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         btnOptionD.setVisibility(!q.getOptionD().isEmpty() ? View.VISIBLE : View.GONE);
     }
 
-    private void selectAnswer(String option, Button selectedButton) {
+    private void selectAnswer(String option, androidx.appcompat.widget.AppCompatButton selectedButton) {
         selectedAnswer = option;
         clearSelections();
         selectedButton.setSelected(true);
