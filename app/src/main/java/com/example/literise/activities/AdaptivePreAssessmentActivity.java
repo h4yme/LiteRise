@@ -1115,11 +1115,12 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             );
             isFirstTutorial = false;
         } else {
-            // Subsequent tutorials - skip intro, go straight to instructions
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
                     "Syntax Question",
                     "Use the scrambled words to form a correct sentence!",
-                    "Got it!"
+                    "Got it!",
+                    "syntax_intro"
             );
         }
 
@@ -1129,7 +1130,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Read the Words",
                     "Look at the scrambled words in the card above.\n\nThese words need to be arranged correctly!",
-                    "Got it!"
+                    "Got it!",
+                    "syntax_read_the_words"
             );
             highlightView(cardPassage);
 
@@ -1144,7 +1146,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 showTutorialStep(
                         "Choose Your Answer",
                         "Now tap one of the options below that shows the correct sentence!",
-                        "Try It!"
+                        "Try It!",
+                        "syntax_choose_answer"
                 );
                 resetHighlights();
                 highlightView(cardQuestion);
@@ -1159,19 +1162,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startPronunciationTutorial() {
         if (isFirstTutorial) {
-            // First tutorial - introduce Leo
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nThis is a pronunciation question. You'll speak the word clearly!",
-                    "Let's Begin!"
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
         } else {
-            // Subsequent tutorials - skip intro, go straight to instructions
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
                     "Pronunciation Question",
                     "You'll speak the word clearly into the microphone!",
-                    "Got it!"
+                    "Got it!",
+                    "pronunciation_intro"
             );
         }
 
@@ -1186,7 +1191,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Tap the Microphone",
                     "Tap the blue microphone button to record your pronunciation!",
-                    "Try It!"
+                    "Try It!",
+                    "pronunciation_tap_mic"
             );
             highlightView(cardMicButton);
             startProgressiveHints(new String[]{
@@ -1199,19 +1205,21 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
     private void startGrammarTutorial() {
         if (isFirstTutorial) {
-            // First tutorial - introduce Leo
+            // First tutorial - introduce Leo with voice-over
             showTutorialStep(
                     "Hi! I'm Leo! 🦁",
                     "Welcome to the test! I'll help you along the way.\n\nRead the question carefully and choose the best answer!",
-                    "Let's Begin!"
+                    "Let's Begin!",
+                    "leo_intro_hi_there_im_leo"
             );
             isFirstTutorial = false;
         } else {
-            // Subsequent tutorials - skip intro, go straight to instructions
+            // Subsequent tutorials - with voice-over
             showTutorialStep(
                     "Question Time",
                     "Read the question carefully and choose the best answer!",
-                    "Got it!"
+                    "Got it!",
+                    "grammar_intro"
             );
         }
 
@@ -1221,7 +1229,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Read the Question",
                     "Look at the question in the card.\n\nTake your time to understand it!",
-                    "Got it!"
+                    "Got it!",
+                    "grammar_read"
             );
             highlightView(cardQuestion);
 
@@ -1236,7 +1245,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 showTutorialStep(
                         "Choose Your Answer",
                         "Now tap one of the options below that you think is correct!",
-                        "Try It!"
+                        "Try It!",
+                        "grammar_choose_description"
                 );
                 startProgressiveHints(new String[]{
                         "Tap any option to practice!",
@@ -1255,7 +1265,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
         // Play success sound when student interacts correctly
         playSound(soundSuccess);
 
-        celebrateInteraction("Excellent!");
+        celebrateInteraction("Excellent!", "final_excellent");
 
         // Slower timing - give kids 3 seconds to see the celebration
         hintHandler.postDelayed(() -> {
@@ -1265,7 +1275,8 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
             showTutorialStep(
                     "Final Step: Continue",
                     "Great job! Now tap the Continue button below to move forward!",
-                    "Almost Done!"
+                    "Almost Done!",
+                    "final_almost_done"
             );
             highlightView(btnContinue);
             startProgressiveHints(new String[]{
@@ -1365,8 +1376,17 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     }
 
     private void celebrateInteraction(String message) {
+        celebrateInteraction(message, null);
+    }
+
+    private void celebrateInteraction(String message, String audioFileName) {
         cancelHints();
         tvTutorialMessage.setText(message);
+
+        // Play voice-over if provided
+        if (audioFileName != null && !audioFileName.isEmpty()) {
+            playVoiceOver(audioFileName);
+        }
 
         ScaleAnimation celebrate = new ScaleAnimation(
                 1.0f, 1.1f,
