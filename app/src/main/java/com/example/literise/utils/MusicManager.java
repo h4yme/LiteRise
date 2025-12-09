@@ -24,6 +24,8 @@ import com.example.literise.R;
 
  * - Plays looping background music across all activities
 
+ * - Supports different music tracks for different contexts
+
  * - Pauses when app goes to background
 
  * - Resumes when app comes to foreground
@@ -34,7 +36,7 @@ import com.example.literise.R;
 
  * Usage:
 
- * - Call MusicManager.getInstance(context).play() in onResume()
+ * - Call MusicManager.getInstance(context).playMusic(MusicType) in onResume()
 
  * - Call MusicManager.getInstance(context).pause() in onPause()
 
@@ -55,6 +57,52 @@ public class MusicManager {
     private boolean isMusicEnabled = true; // For future mute/unmute feature
 
     private Context context;
+
+    private MusicType currentMusicType = null;
+
+
+
+    /**
+
+     * Enum for different music contexts in the app
+
+     */
+
+    public enum MusicType {
+
+        INTRO(R.raw.intro_music),           // Welcome/Intro screens
+
+        NICKNAME(R.raw.nickname_music),     // Nickname setup screen
+
+        ASSESSMENT(R.raw.assessment_music), // Pre-assessment/test
+
+        VICTORY(R.raw.victory_music),       // Results/completion
+
+        GAME(R.raw.game_music),             // Game activities
+
+        DASHBOARD(R.raw.bg_music);          // Dashboard/main menu
+
+
+
+        private final int resourceId;
+
+
+
+        MusicType(int resourceId) {
+
+            this.resourceId = resourceId;
+
+        }
+
+
+
+        public int getResourceId() {
+
+            return resourceId;
+
+        }
+
+    }
 
 
 
@@ -82,11 +130,15 @@ public class MusicManager {
 
     /**
 
-     * Initialize and start playing background music
+     * Initialize and start playing background music with specified music type
+
+     *
+
+     * @param musicType The type of music to play
 
      */
 
-    public void play() {
+    public void playMusic(MusicType musicType) {
 
         if (!isMusicEnabled) {
 
@@ -98,45 +150,85 @@ public class MusicManager {
 
 
 
-        if (mediaPlayer == null) {
+        // If same music is already playing, just resume if paused
 
-            try {
+        if (currentMusicType == musicType && mediaPlayer != null) {
 
-                mediaPlayer = MediaPlayer.create(context, R.raw.bg_music);
+            if (isPaused) {
 
-                if (mediaPlayer != null) {
+                mediaPlayer.start();
 
-                    mediaPlayer.setLooping(true);
+                isPaused = false;
 
-                    mediaPlayer.setVolume(0.3f, 0.3f); // 30% volume - not too loud
-
-                    mediaPlayer.start();
-
-                    isPaused = false;
-
-                    Log.d(TAG, "Background music started");
-
-                } else {
-
-                    Log.e(TAG, "Failed to create MediaPlayer - check if bg_music.mp3 exists in res/raw/");
-
-                }
-
-            } catch (Exception e) {
-
-                Log.e(TAG, "Error starting background music: " + e.getMessage());
+                Log.d(TAG, musicType + " music resumed");
 
             }
 
-        } else if (isPaused) {
-
-            mediaPlayer.start();
-
-            isPaused = false;
-
-            Log.d(TAG, "Background music resumed");
+            return;
 
         }
+
+
+
+        // Stop current music before switching
+
+        if (mediaPlayer != null) {
+
+            mediaPlayer.stop();
+
+            mediaPlayer.release();
+
+            mediaPlayer = null;
+
+        }
+
+
+
+        // Start new music
+
+        try {
+
+            mediaPlayer = MediaPlayer.create(context, musicType.getResourceId());
+
+            if (mediaPlayer != null) {
+
+                mediaPlayer.setLooping(true);
+
+                mediaPlayer.setVolume(0.3f, 0.3f); // 30% volume - not too loud
+
+                mediaPlayer.start();
+
+                isPaused = false;
+
+                currentMusicType = musicType;
+
+                Log.d(TAG, musicType + " music started");
+
+            } else {
+
+                Log.e(TAG, "Failed to create MediaPlayer for " + musicType);
+
+            }
+
+        } catch (Exception e) {
+
+            Log.e(TAG, "Error starting " + musicType + " music: " + e.getMessage());
+
+        }
+
+    }
+
+
+
+    /**
+
+     * Play default dashboard music (for backward compatibility)
+
+     */
+
+    public void play() {
+
+        playMusic(MusicType.DASHBOARD);
 
     }
 

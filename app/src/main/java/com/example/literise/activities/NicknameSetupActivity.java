@@ -18,6 +18,7 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.ResponseModel;
 import com.example.literise.models.Students;
 import com.example.literise.utils.CustomToast;
+import com.example.literise.utils.MusicManager;
 import com.google.android.material.button.MaterialButton;
 
 import retrofit2.Call;
@@ -46,6 +47,7 @@ public class NicknameSetupActivity extends AppCompatActivity {
     private MediaPlayer soundPlayer;
     private SessionManager sessionManager;
     private ApiService apiService;
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +57,9 @@ public class NicknameSetupActivity extends AppCompatActivity {
         // Initialize SessionManager and API
         sessionManager = new SessionManager(this);
         apiService = ApiClient.getClient(this).create(ApiService.class);
+
+        // Initialize music manager
+        musicManager = MusicManager.getInstance(this);
 
         // Initialize views
         ivNicknameScreen = findViewById(R.id.ivNicknameScreen);
@@ -239,6 +244,20 @@ public class NicknameSetupActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Play nickname music when activity becomes visible
+        musicManager.playMusic(MusicManager.MusicType.NICKNAME);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when activity goes to background
+        musicManager.pause();
     }
 
     @Override

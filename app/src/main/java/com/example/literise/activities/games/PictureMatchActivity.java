@@ -40,7 +40,7 @@ import java.util.List;
 
 
 
-public class PictureMatchActivity extends AppCompatActivity {
+public class PictureMatchActivity extends BaseGameActivity {
 
 
 

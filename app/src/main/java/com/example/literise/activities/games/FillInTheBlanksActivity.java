@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class FillInTheBlanksActivity extends AppCompatActivity {
+public class FillInTheBlanksActivity extends BaseGameActivity {
 
     private ImageView btnBack;
     private LinearLayout sentenceContainer;

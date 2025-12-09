@@ -114,7 +114,7 @@ import retrofit2.Response;
 
  */
 
-public class WordHuntActivity extends AppCompatActivity {
+public class WordHuntActivity extends BaseGameActivity {
 
 
 

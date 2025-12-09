@@ -58,7 +58,7 @@ import java.util.List;
 
 
 
-public class DialogueReadingActivity extends AppCompatActivity {
+public class DialogueReadingActivity extends BaseGameActivity {
 
 
 

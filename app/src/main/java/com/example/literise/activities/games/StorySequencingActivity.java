@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class StorySequencingActivity extends AppCompatActivity {
+public class StorySequencingActivity extends BaseGameActivity {
 
     private ImageView btnBack;
     private TextView tvStoryTitle;

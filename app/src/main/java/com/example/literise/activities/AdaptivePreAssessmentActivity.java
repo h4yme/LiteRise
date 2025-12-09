@@ -46,6 +46,7 @@ import com.example.literise.utils.AppConfig;
 import com.example.literise.utils.CustomToast;
 import com.example.literise.utils.DemoDataProvider;
 import com.example.literise.utils.ModulePriorityManager;
+import com.example.literise.utils.MusicManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -117,6 +118,9 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
     // Module priority tracking
     private ModulePriorityManager priorityManager;
 
+    // Music manager
+    private MusicManager musicManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +128,7 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
 
         session = new SessionManager(this);
         priorityManager = new ModulePriorityManager(this);
+        musicManager = MusicManager.getInstance(this);
         initializeViews();
 
         // Clear previous assessment data for fresh start
@@ -985,6 +990,20 @@ public class AdaptivePreAssessmentActivity extends AppCompatActivity {
                 Toast.makeText(this, "Microphone permission required for pronunciation", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Play assessment music when activity becomes visible
+        musicManager.playMusic(MusicManager.MusicType.ASSESSMENT);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when activity goes to background
+        musicManager.pause();
     }
 
     @Override

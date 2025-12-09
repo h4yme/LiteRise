@@ -12,6 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
 import com.example.literise.database.SessionManager;
+import com.example.literise.utils.MusicManager;
 
 public class WelcomeActivity extends AppCompatActivity {
 
@@ -31,6 +32,7 @@ public class WelcomeActivity extends AppCompatActivity {
 
     private MediaPlayer soundPlayer;
     private SessionManager sessionManager;
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,9 @@ public class WelcomeActivity extends AppCompatActivity {
 
         // Initialize SessionManager
         sessionManager = new SessionManager(this);
+
+        // Initialize music manager
+        musicManager = MusicManager.getInstance(this);
 
         // Initialize views
         ivWelcomeScreen = findViewById(R.id.ivWelcomeScreen);
@@ -117,6 +122,20 @@ public class WelcomeActivity extends AppCompatActivity {
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Play intro music when activity becomes visible
+        musicManager.playMusic(MusicManager.MusicType.INTRO);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when activity goes to background
+        musicManager.pause();
     }
 
     @Override
