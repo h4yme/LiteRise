@@ -25,124 +25,102 @@
                 android:layout_width="1dp"
                 android:layout_height="40dp" />
 
-            <!-- App Branding Card -->
-            <LinearLayout
-                android:layout_width="match_parent"
+            <!-- App Logo/Title -->
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:text="LiteRise"
+                android:textSize="48sp"
+                android:textStyle="bold"
+                android:textColor="#6C5CE7"
+                android:fontFamily="@font/visby_bold"
+                android:letterSpacing="-0.02"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Tagline -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Read • Learn • Rise!"
+                android:textSize="16sp"
+                android:textColor="#A29BFE"
+                android:fontFamily="@font/visby_medium"
+                android:letterSpacing="0.05"
+                android:layout_marginBottom="32dp" />
+
+            <!-- Leo Character - Circular -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                app:cardCornerRadius="90dp"
+                app:cardElevation="12dp"
+                android:layout_marginBottom="24dp">
+
+                <ImageView
+                    android:id="@+id/ivLeo"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/leo_welcome_1"
+                    android:contentDescription="Leo the Lion"
+                    android:scaleType="centerCrop"
+                    android:padding="16dp" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Welcome Text -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Hi! I'm Leo! 👋"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#2D3436"
+                android:fontFamily="@font/visby_bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Let's start your amazing reading adventure!"
+                android:textSize="15sp"
+                android:textColor="#636E72"
+                android:fontFamily="@font/visby_regular"
                 android:gravity="center"
-                android:padding="32dp">
+                android:layout_marginBottom="32dp" />
 
-                <!-- App Logo/Title -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LiteRise"
-                    android:textSize="48sp"
-                    android:textStyle="bold"
-                    android:textColor="#6C5CE7"
-                    android:fontFamily="@font/visby_bold"
-                    android:letterSpacing="-0.02"
-                    android:layout_marginBottom="8dp" />
-
-                <!-- Tagline -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Read • Learn • Rise!"
-                    android:textSize="16sp"
-                    android:textColor="#A29BFE"
-                    android:fontFamily="@font/visby_medium"
-                    android:letterSpacing="0.05"
-                    android:layout_marginBottom="48dp" />
-
-                <!-- Leo Character -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="220dp"
-                    android:layout_height="220dp"
-                    app:cardCornerRadius="110dp"
-                    app:cardElevation="12dp"
-                    android:layout_marginBottom="32dp">
-
-                    <ImageView
-                        android:id="@+id/ivLeo"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:src="@drawable/leo_welcome_1"
-                        android:contentDescription="Leo the Lion"
-                        android:scaleType="centerCrop"
-                        android:padding="16dp" />
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Welcome Message Card -->
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="#FFFFFF"
-                    android:layout_marginBottom="32dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="28dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Hi! I'm Leo! 👋"
-                            android:textSize="28sp"
-                            android:textStyle="bold"
-                            android:textColor="#2D3436"
-                            android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="12dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Let's start your amazing\nreading adventure!"
-                            android:textSize="16sp"
-                            android:textColor="#636E72"
-                            android:fontFamily="@font/visby_regular"
-                            android:gravity="center"
-                            android:lineSpacingExtra="4dp" />
-
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-            </LinearLayout>
-
-            <!-- Action Buttons Container -->
-            <LinearLayout
+            <!-- Login Button Card with Scene Illustration -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
 
-                <!-- Login Button Card -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardLogin"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="#6C5CE7"
-                    android:layout_marginBottom="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
+                    android:orientation="vertical">
 
+                    <!-- Purple Scene Illustration -->
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:src="@drawable/scene_illustration_purple"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="Purple scene" />
+
+                    <!-- Login Content -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="24dp">
+                        android:padding="20dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -156,7 +134,7 @@
                                 android:text="Login"
                                 android:textSize="24sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/white"
+                                android:textColor="#2D3436"
                                 android:fontFamily="@font/visby_bold"
                                 android:layout_marginBottom="4dp" />
 
@@ -165,8 +143,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Welcome back, friend!"
                                 android:textSize="14sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.9"
+                                android:textColor="#636E72"
                                 android:fontFamily="@font/visby_regular" />
 
                         </LinearLayout>
@@ -176,33 +153,49 @@
                             android:layout_height="48dp"
                             android:text="→"
                             android:textSize="32sp"
-                            android:textColor="@android:color/white"
+                            android:textColor="#6C5CE7"
                             android:gravity="center"
                             android:fontFamily="@font/visby_bold" />
 
                     </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+                </LinearLayout>
 
-                <!-- Register Button Card -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/cardRegister"
+            </androidx.cardview.widget.CardView>
+
+            <!-- Register Button Card with Scene Illustration -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardRegister"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="#FFFFFF"
+                android:layout_marginBottom="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="#00D9A5"
-                    android:layout_marginBottom="16dp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:foreground="?attr/selectableItemBackground">
+                    android:orientation="vertical">
 
+                    <!-- Coral/Orange Scene Illustration -->
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:src="@drawable/scene_illustration_coral"
+                        android:scaleType="centerCrop"
+                        android:contentDescription="Coral scene" />
+
+                    <!-- Register Content -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="24dp">
+                        android:padding="20dp">
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -216,7 +209,7 @@
                                 android:text="Register"
                                 android:textSize="24sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/white"
+                                android:textColor="#2D3436"
                                 android:fontFamily="@font/visby_bold"
                                 android:layout_marginBottom="4dp" />
 
@@ -225,8 +218,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="New here? Join us!"
                                 android:textSize="14sp"
-                                android:textColor="@android:color/white"
-                                android:alpha="0.9"
+                                android:textColor="#636E72"
                                 android:fontFamily="@font/visby_regular" />
 
                         </LinearLayout>
@@ -236,15 +228,15 @@
                             android:layout_height="48dp"
                             android:text="→"
                             android:textSize="32sp"
-                            android:textColor="@android:color/white"
+                            android:textColor="#00D9A5"
                             android:gravity="center"
                             android:fontFamily="@font/visby_bold" />
 
                     </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+                </LinearLayout>
 
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <!-- Bottom Spacer -->
             <View

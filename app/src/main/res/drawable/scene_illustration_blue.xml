@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="300dp"
+    android:height="180dp"
+    android:viewportWidth="300"
+    android:viewportHeight="180">
+
+    <!-- Sky/Background - Blue -->
+    <path
+        android:fillColor="#3498DB"
+        android:pathData="M0,0 L300,0 L300,180 L0,180 Z" />
+
+    <!-- Ground/Grass Platform -->
+    <path
+        android:fillColor="#A8E6A1"
+        android:pathData="M180,100 L300,120 L300,180 L180,160 Z" />
+
+    <!-- River -->
+    <path
+        android:fillColor="#5DADE2"
+        android:pathData="M200,115 L240,120 L240,160 L200,155 Z" />
+
+    <!-- River Light Reflection -->
+    <path
+        android:fillColor="#85C1E9"
+        android:fillAlpha="0.5"
+        android:pathData="M205,120 L235,123 L235,125 L205,122 Z M210,135 L230,137 L230,139 L210,137 Z" />
+
+    <!-- Building Base (Orange) -->
+    <path
+        android:fillColor="#F39C12"
+        android:pathData="M245,105 L275,115 L275,145 L245,135 Z" />
+
+    <!-- Building Side (Dark Orange) -->
+    <path
+        android:fillColor="#E67E22"
+        android:pathData="M275,115 L285,110 L285,140 L275,145 Z" />
+
+    <!-- Building Top -->
+    <path
+        android:fillColor="#F8C471"
+        android:pathData="M245,105 L275,115 L285,110 L255,100 Z" />
+
+    <!-- Windows -->
+    <path
+        android:fillColor="#34495E"
+        android:pathData="M250,115 L255,117 L255,125 L250,123 Z M260,120 L265,122 L265,130 L260,128 Z M250,128 L255,130 L255,138 L250,136 Z" />
+
+    <!-- Tree 1 - Trunk -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M190,125 L195,127 L195,145 L190,143 Z" />
+
+    <!-- Tree 1 - Foliage (Round) -->
+    <path
+        android:fillColor="#6B8E23"
+        android:pathData="M192,110 C192,105 197,100 203,100 C209,100 214,105 214,110 C214,115 209,125 203,125 C197,125 192,115 192,110 Z" />
+
+    <!-- Tree 1 - Foliage Shadow -->
+    <path
+        android:fillColor="#556B2F"
+        android:fillAlpha="0.4"
+        android:pathData="M195,115 C195,112 198,110 202,110 C206,110 209,112 209,115 C209,118 206,122 202,122 C198,122 195,118 195,115 Z" />
+
+    <!-- Tree 2 - Smaller Pine -->
+    <path
+        android:fillColor="#228B22"
+        android:pathData="M215,135 L220,130 L225,135 L220,140 Z M217,140 L220,138 L223,140 L220,145 Z" />
+
+    <!-- Tree 3 - Smallest -->
+    <path
+        android:fillColor="#32CD32"
+        android:pathData="M235,140 L238,137 L241,140 L238,145 Z" />
+
+    <!-- Lamp Post -->
+    <path
+        android:fillColor="#7F8C8D"
+        android:pathData="M268,100 L270,100 L270,135 L268,135 Z" />
+
+    <!-- Lamp -->
+    <path
+        android:fillColor="#F4D03F"
+        android:pathData="M265,95 L273,95 L271,100 L267,100 Z" />
+
+    <!-- Lamp Light -->
+    <path
+        android:fillColor="#FCF3CF"
+        android:fillAlpha="0.6"
+        android:pathData="M266,98 C266,96 269,94 272,94 C275,94 278,96 278,98 C278,100 275,102 272,102 C269,102 266,100 266,98 Z" />
+
+    <!-- Sign Post -->
+    <path
+        android:fillColor="#8B4513"
+        android:pathData="M250,95 L252,95 L252,115 L250,115 Z" />
+
+    <!-- Sign Board -->
+    <path
+        android:fillColor="#E8F8F5"
+        android:pathData="M245,90 L260,90 L260,95 L245,95 Z" />
+
+    <!-- Road/Path -->
+    <path
+        android:fillColor="#D5D8DC"
+        android:pathData="M180,145 L200,148 L200,160 L180,157 Z" />
+
+    <!-- Road Markings -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M185,150 L187,150 L187,152 L185,152 Z M192,153 L194,153 L194,155 L192,155 Z" />
+
+</vector>
