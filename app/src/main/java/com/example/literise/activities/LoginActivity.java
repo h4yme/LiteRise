@@ -8,6 +8,7 @@ import android.view.animation.AlphaAnimation;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import com.example.literise.utils.AppConfig;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,6 +28,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText etEmail, etPassword;
     Button btnLogin;
     ImageView ivPasswordToggle;
+    TextView tvSignUp;
     boolean isPasswordVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,7 @@ public class LoginActivity extends AppCompatActivity {
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
         ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
+        tvSignUp = findViewById(R.id.tvSignUp);
 
 
 
@@ -116,6 +119,15 @@ public class LoginActivity extends AppCompatActivity {
                     .start();
 
         });
+
+        // Sign Up link click
+        if (tvSignUp != null) {
+            tvSignUp.setOnClickListener(v -> {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            });
+        }
     }
 
     private void doLogin() {
