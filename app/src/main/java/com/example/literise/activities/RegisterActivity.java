@@ -1,30 +1,29 @@
 package com.example.literise.activities;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.literise.R;
+import com.example.literise.adapters.RegisterPagerAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.fragments.RegisterStep1Fragment;
+import com.example.literise.fragments.RegisterStep2Fragment;
+import com.example.literise.fragments.RegisterStep3Fragment;
+import com.example.literise.fragments.RegisterStep4Fragment;
 import com.example.literise.models.RegisterRequest;
 import com.example.literise.models.RegisterResponse;
 import com.example.literise.utils.CustomToast;
 import com.google.android.material.button.MaterialButton;
-
-import java.util.Calendar;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -32,14 +31,22 @@ import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText etNickname, etFirstName, etLastName, etBirthday, etEmail, etPassword, etConfirmPassword;
-    Spinner spinnerGender, spinnerSchool;
-    CheckBox cbParentPermission;
-    MaterialButton btnRegister;
-    ImageView btnBack;
+    private ViewPager2 viewPager;
+    private MaterialButton btnNext, btnPrevious;
+    private ImageView btnBack;
+    private TextView tvStepTitle, tvStepSubtitle;
+    private View step1Indicator, step2Indicator, step3Indicator, step4Indicator;
 
-    private String selectedBirthday = "";
-    private int selectedSchoolId = 1; // Default school ID
+    private RegisterPagerAdapter pagerAdapter;
+    private int currentStep = 0;
+
+    private String[] stepTitles = {"About You", "Birthday & Gender", "School Info", "Account Setup"};
+    private String[] stepSubtitles = {
+            "Tell us about yourself",
+            "When were you born?",
+            "Where do you study?",
+            "Create your account"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,18 +54,22 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         // Initialize views
+        viewPager = findViewById(R.id.viewPager);
+        btnNext = findViewById(R.id.btnNext);
+        btnPrevious = findViewById(R.id.btnPrevious);
         btnBack = findViewById(R.id.btnBack);
-        etNickname = findViewById(R.id.etNickname);
-        etFirstName = findViewById(R.id.etFirstName);
-        etLastName = findViewById(R.id.etLastName);
-        etBirthday = findViewById(R.id.etBirthday);
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
-        spinnerGender = findViewById(R.id.spinnerGender);
-        spinnerSchool = findViewById(R.id.spinnerSchool);
-        cbParentPermission = findViewById(R.id.cbParentPermission);
-        btnRegister = findViewById(R.id.btnRegister);
+        tvStepTitle = findViewById(R.id.tvStepTitle);
+        tvStepSubtitle = findViewById(R.id.tvStepSubtitle);
+
+        step1Indicator = findViewById(R.id.step1Indicator);
+        step2Indicator = findViewById(R.id.step2Indicator);
+        step3Indicator = findViewById(R.id.step3Indicator);
+        step4Indicator = findViewById(R.id.step4Indicator);
+
+        // Setup ViewPager
+        pagerAdapter = new RegisterPagerAdapter(this);
+        viewPager.setAdapter(pagerAdapter);
+        viewPager.setUserInputEnabled(false); // Disable swipe
 
         // Fade-in animation
         View rootView = findViewById(android.R.id.content);
@@ -66,12 +77,14 @@ public class RegisterActivity extends AppCompatActivity {
         fadeIn.setDuration(800);
         rootView.startAnimation(fadeIn);
 
-        // Setup spinners
-        setupGenderSpinner();
-        setupSchoolSpinner();
-
-        // Birthday picker
-        etBirthday.setOnClickListener(v -> showDatePicker());
+        // ViewPager page change listener
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                currentStep = position;
+                updateUI();
+            }
+        });
 
         // Back button
         btnBack.setOnClickListener(v -> {
@@ -79,183 +92,153 @@ public class RegisterActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         });
 
-        // Text watchers for validation
-        TextWatcher validationWatcher = new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                validateForm();
+        // Previous button
+        btnPrevious.setOnClickListener(v -> {
+            if (currentStep > 0) {
+                viewPager.setCurrentItem(currentStep - 1, true);
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
-        };
-
-        etNickname.addTextChangedListener(validationWatcher);
-        etFirstName.addTextChangedListener(validationWatcher);
-        etLastName.addTextChangedListener(validationWatcher);
-        etEmail.addTextChangedListener(validationWatcher);
-        etPassword.addTextChangedListener(validationWatcher);
-        etConfirmPassword.addTextChangedListener(validationWatcher);
-
-        cbParentPermission.setOnCheckedChangeListener((buttonView, isChecked) -> validateForm());
-
-        // Register button click
-        btnRegister.setOnClickListener(v -> {
-            v.animate()
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
-                    .setDuration(100)
-                    .withEndAction(() -> {
-                        v.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start();
-                        doRegister();
-                    })
-                    .start();
         });
+
+        // Next button
+        btnNext.setOnClickListener(v -> {
+            if (validateCurrentStep()) {
+                if (currentStep < 3) {
+                    viewPager.setCurrentItem(currentStep + 1, true);
+                } else {
+                    // Last step - submit registration
+                    doRegister();
+                }
+            }
+        });
+
+        updateUI();
     }
 
-    private void setupGenderSpinner() {
-        String[] genders = {"Select Gender", "Male", "Female", "Other"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, genders);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerGender.setAdapter(adapter);
+    private void updateUI() {
+        // Update step title and subtitle
+        tvStepTitle.setText(stepTitles[currentStep]);
+        tvStepSubtitle.setText(stepSubtitles[currentStep]);
+
+        // Update indicators
+        updateIndicator(step1Indicator, currentStep >= 0);
+        updateIndicator(step2Indicator, currentStep >= 1);
+        updateIndicator(step3Indicator, currentStep >= 2);
+        updateIndicator(step4Indicator, currentStep >= 3);
+
+        // Update button visibility
+        if (currentStep == 0) {
+            btnPrevious.setVisibility(View.GONE);
+            btnNext.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                    0, btnNext.getLayoutParams().height, 1f
+            ));
+        } else {
+            btnPrevious.setVisibility(View.VISIBLE);
+            btnNext.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                    0, btnNext.getLayoutParams().height, 1f
+            ));
+        }
+
+        // Update Next button text
+        if (currentStep == 3) {
+            btnNext.setText("Create Account");
+        } else {
+            btnNext.setText("Next");
+        }
     }
 
-    private void setupSchoolSpinner() {
-        // Mock schools - In production, fetch from API
-        String[] schools = {
-                "Select School",
-                "Tandang Sora Elementary School",
-                "Quezon City Elementary School",
-                "Manila Central School",
-                "Other School"
-        };
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, schools);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerSchool.setAdapter(adapter);
+    private void updateIndicator(View indicator, boolean isActive) {
+        indicator.setBackgroundColor(isActive ? 0xFF6C5CE7 : 0xFFE0E0E0);
     }
 
-    private void showDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR) - 7; // Default to 7 years old (Grade 1)
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
+    private boolean validateCurrentStep() {
+        Fragment fragment = getSupportFragmentManager().findFragmentByTag("f" + currentStep);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(
-                this,
-                (view, selectedYear, selectedMonth, selectedDay) -> {
-                    selectedBirthday = String.format("%04d-%02d-%02d", selectedYear, selectedMonth + 1, selectedDay);
-                    etBirthday.setText(selectedBirthday);
-                    validateForm();
-                },
-                year, month, day
-        );
+        switch (currentStep) {
+            case 0:
+                if (fragment instanceof RegisterStep1Fragment) {
+                    RegisterStep1Fragment step1 = (RegisterStep1Fragment) fragment;
+                    if (step1.getNickname().isEmpty() || step1.getFirstName().isEmpty() || step1.getLastName().isEmpty()) {
+                        CustomToast.showWarning(this, "Please fill in all fields");
+                        return false;
+                    }
+                    return true;
+                }
+                break;
 
-        // Set max date to today (can't be born in future)
-        datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+            case 1:
+                if (fragment instanceof RegisterStep2Fragment) {
+                    RegisterStep2Fragment step2 = (RegisterStep2Fragment) fragment;
+                    if (step2.getBirthday().isEmpty()) {
+                        CustomToast.showWarning(this, "Please select your birthday");
+                        return false;
+                    }
+                    if (step2.getGender().equals("Select Gender")) {
+                        CustomToast.showWarning(this, "Please select your gender");
+                        return false;
+                    }
+                    return true;
+                }
+                break;
 
-        // Set min date to 100 years ago
-        Calendar minDate = Calendar.getInstance();
-        minDate.set(Calendar.YEAR, year - 100);
-        datePickerDialog.getDatePicker().setMinDate(minDate.getTimeInMillis());
+            case 2:
+                if (fragment instanceof RegisterStep3Fragment) {
+                    RegisterStep3Fragment step3 = (RegisterStep3Fragment) fragment;
+                    if (!step3.isValid()) {
+                        CustomToast.showWarning(this, "Please select your school");
+                        return false;
+                    }
+                    return true;
+                }
+                break;
 
-        datePickerDialog.show();
-    }
-
-    private void validateForm() {
-        String nickname = etNickname.getText().toString().trim();
-        String firstName = etFirstName.getText().toString().trim();
-        String lastName = etLastName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
-
-        boolean isValid = !nickname.isEmpty() &&
-                !firstName.isEmpty() &&
-                !lastName.isEmpty() &&
-                !selectedBirthday.isEmpty() &&
-                spinnerGender.getSelectedItemPosition() > 0 &&
-                spinnerSchool.getSelectedItemPosition() > 0 &&
-                !email.isEmpty() &&
-                password.length() >= 6 &&
-                password.equals(confirmPassword) &&
-                cbParentPermission.isChecked();
-
-        btnRegister.setEnabled(isValid);
-        btnRegister.setAlpha(isValid ? 1.0f : 0.5f);
+            case 3:
+                if (fragment instanceof RegisterStep4Fragment) {
+                    RegisterStep4Fragment step4 = (RegisterStep4Fragment) fragment;
+                    if (!step4.isValid()) {
+                        CustomToast.showWarning(this, "Please complete all fields correctly");
+                        return false;
+                    }
+                    return true;
+                }
+                break;
+        }
+        return true;
     }
 
     private void doRegister() {
-        String nickname = etNickname.getText().toString().trim();
-        String firstName = etFirstName.getText().toString().trim();
-        String lastName = etLastName.getText().toString().trim();
-        String email = etEmail.getText().toString().trim();
-        String password = etPassword.getText().toString().trim();
-        String confirmPassword = etConfirmPassword.getText().toString().trim();
-        String gender = spinnerGender.getSelectedItem().toString();
+        // Get data from all fragments
+        RegisterStep1Fragment step1 = (RegisterStep1Fragment) getSupportFragmentManager().findFragmentByTag("f0");
+        RegisterStep2Fragment step2 = (RegisterStep2Fragment) getSupportFragmentManager().findFragmentByTag("f1");
+        RegisterStep3Fragment step3 = (RegisterStep3Fragment) getSupportFragmentManager().findFragmentByTag("f2");
+        RegisterStep4Fragment step4 = (RegisterStep4Fragment) getSupportFragmentManager().findFragmentByTag("f3");
 
-        // Final validation
-        if (nickname.isEmpty() || firstName.isEmpty() || lastName.isEmpty()) {
-            CustomToast.showWarning(this, "Please fill in all required fields");
+        if (step1 == null || step2 == null || step3 == null || step4 == null) {
+            CustomToast.showError(this, "Please complete all steps");
             return;
         }
 
-        if (selectedBirthday.isEmpty()) {
-            CustomToast.showWarning(this, "Please select your birthday");
-            return;
-        }
-
-        if (spinnerGender.getSelectedItemPosition() == 0) {
-            CustomToast.showWarning(this, "Please select your gender");
-            return;
-        }
-
-        if (spinnerSchool.getSelectedItemPosition() == 0) {
-            CustomToast.showWarning(this, "Please select your school");
-            return;
-        }
-
-        if (!email.contains("@")) {
-            CustomToast.showWarning(this, "Please enter a valid email address");
-            return;
-        }
-
-        if (password.length() < 6) {
-            CustomToast.showWarning(this, "Password must be at least 6 characters");
-            return;
-        }
-
-        if (!password.equals(confirmPassword)) {
-            CustomToast.showWarning(this, "Passwords do not match");
-            return;
-        }
-
-        if (!cbParentPermission.isChecked()) {
-            CustomToast.showWarning(this, "Parent permission is required");
-            return;
-        }
-
-        // Map school selection to school_id (adjust based on your database)
-        selectedSchoolId = spinnerSchool.getSelectedItemPosition(); // Simple mapping for now
+        String nickname = step1.getNickname();
+        String firstName = step1.getFirstName();
+        String lastName = step1.getLastName();
+        String birthday = step2.getBirthday();
+        String gender = step2.getGender();
+        int schoolId = step3.getSchoolId();
+        String email = step4.getEmail();
+        String password = step4.getPassword();
 
         // Disable button during API call
-        btnRegister.setEnabled(false);
+        btnNext.setEnabled(false);
+        btnNext.setText("Creating Account...");
 
         // Create register request
         RegisterRequest request = new RegisterRequest(
                 nickname,
                 firstName,
                 lastName,
-                selectedBirthday,
+                birthday,
                 gender,
-                selectedSchoolId,
-                "Grade 1", // Fixed for this app
+                schoolId,
+                "Grade 1",
                 email,
                 password
         );
@@ -265,7 +248,8 @@ public class RegisterActivity extends AppCompatActivity {
         apiService.register(request).enqueue(new Callback<RegisterResponse>() {
             @Override
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
-                btnRegister.setEnabled(true);
+                btnNext.setEnabled(true);
+                btnNext.setText("Create Account");
 
                 if (response.isSuccessful() && response.body() != null) {
                     RegisterResponse registerResponse = response.body();
@@ -299,7 +283,8 @@ public class RegisterActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
-                btnRegister.setEnabled(true);
+                btnNext.setEnabled(true);
+                btnNext.setText("Create Account");
                 CustomToast.showError(RegisterActivity.this, "Connection error. Please try again.");
             }
         });
