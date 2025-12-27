@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.literise.R;
+
 import com.example.literise.adapters.RegisterPagerAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -268,8 +269,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                         CustomToast.showSuccess(RegisterActivity.this, "Registration successful!");
 
-                        // Navigate to WelcomeActivity
-                        Intent intent = new Intent(RegisterActivity.this, WelcomeActivity.class);
+                        // Navigate to Welcome Tutorial
+                        Intent intent = new Intent(RegisterActivity.this, WelcomeTutorialActivity.class);
                         startActivity(intent);
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();

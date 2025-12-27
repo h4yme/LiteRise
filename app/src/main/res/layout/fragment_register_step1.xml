@@ -27,16 +27,17 @@
                 android:orientation="vertical">
 
                 <!-- LEO IMAGE (SAGAD RIGHT) -->
+
+                <!-- FORM CONTENT (PADDED) -->
                 <ImageView
                     android:layout_width="375px"
                     android:layout_height="375px"
-                    android:layout_marginTop="10dp"
                     android:layout_gravity="end"
+                    android:layout_marginTop="10dp"
                     android:contentDescription="Leo excited"
                     android:padding="0dp"
                     android:src="@drawable/peeking_leo" />
 
-                <!-- FORM CONTENT (PADDED) -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

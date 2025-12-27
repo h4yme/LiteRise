@@ -13,10 +13,7 @@
         android:scaleType="centerCrop"
         android:contentDescription="Placement Test Background" />
     <!-- Content ScrollView -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,7 +57,7 @@
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
                 app:cardBackgroundColor="#FFFFFF"
-                android:layout_marginBottom="32dp">
+                android:layout_marginBottom="25dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -72,8 +69,8 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Welcome Back! 👋"
-                        android:textSize="28sp"
+                        android:text="Welcome Learners!"
+                        android:textSize="25sp"
                         android:textStyle="bold"
                         android:textColor="#2D3436"
                         android:fontFamily="@font/visby_bold"
@@ -84,7 +81,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Log in to start your reading adventure"
-                        android:textSize="15sp"
+                        android:textSize="13sp"
                         android:textColor="#636E72"
                         android:fontFamily="@font/visby_regular"
                         android:layout_marginBottom="32dp" />
@@ -223,7 +220,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="16dp">
+                android:layout_marginTop="0dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -256,6 +253,6 @@
 
         </LinearLayout>
 
-    </ScrollView>
+
 
 </FrameLayout>

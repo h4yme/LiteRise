@@ -104,6 +104,26 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Welcome Tutorial Screen -->
+
+        <activity
+
+            android:name=".WelcomeTutorialActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Placement Intro Screen -->
+
+        <activity
+
+            android:name=".PlacementIntroActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Welcome/Intro Screens -->
 
 
