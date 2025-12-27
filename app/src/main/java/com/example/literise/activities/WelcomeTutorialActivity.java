@@ -16,16 +16,41 @@ import com.example.literise.utils.MusicManager;
 public class WelcomeTutorialActivity extends AppCompatActivity {
 
     private ImageView ivTutorialScreen;
+    private ImageView ivLeoCharacter;
+    private TextView tvTutorialTitle;
+    private TextView tvTutorialDescription;
     private TextView btnSkip;
     private TextView tvTapToContinue;
     private View rootLayout;
 
     private int currentScreen = 0; // 0 to 3 (4 screens)
-    private final int[] tutorialImages = {
+
+    private final int[] tutorialBackgrounds = {
             R.drawable.tutorial_slide_1,
             R.drawable.tutorial_slide_2,
             R.drawable.tutorial_slide_3,
             R.drawable.tutorial_slide_4
+    };
+
+    private final int[] leoImages = {
+            R.drawable.leo_welcome_1,
+            R.drawable.leo_welcome_2,
+            R.drawable.leo_welcome_3,
+            R.drawable.leo_welcome_4
+    };
+
+    private final String[] tutorialTitles = {
+            "Welcome to LiteRise!",
+            "Learn and Play!",
+            "Practice Reading!",
+            "Ready to Start?"
+    };
+
+    private final String[] tutorialDescriptions = {
+            "I'm Leo, your reading buddy!\nI'll help you learn to read in a fun way!",
+            "We'll play fun games and\nearn exciting rewards as you learn!",
+            "You'll practice reading out loud\nand I'll help you improve!",
+            "Let's find your reading level first\nso I can give you the perfect lessons!"
     };
 
     private MediaPlayer soundPlayer;
@@ -40,6 +65,9 @@ public class WelcomeTutorialActivity extends AppCompatActivity {
 
         // Initialize views
         ivTutorialScreen = findViewById(R.id.ivTutorialScreen);
+        ivLeoCharacter = findViewById(R.id.ivLeoCharacter);
+        tvTutorialTitle = findViewById(R.id.tvTutorialTitle);
+        tvTutorialDescription = findViewById(R.id.tvTutorialDescription);
         btnSkip = findViewById(R.id.btnSkip);
         tvTapToContinue = findViewById(R.id.tvTapToContinue);
         rootLayout = findViewById(R.id.rootLayout);
@@ -72,15 +100,24 @@ public class WelcomeTutorialActivity extends AppCompatActivity {
             fadeOut.setDuration(150);
             fadeOut.setFillAfter(true);
 
-            ivTutorialScreen.startAnimation(fadeOut);
+            rootLayout.startAnimation(fadeOut);
 
-            // Change image
-            ivTutorialScreen.postDelayed(() -> {
-                ivTutorialScreen.setImageResource(tutorialImages[currentScreen]);
+            // Change content
+            rootLayout.postDelayed(() -> {
+                // Update background
+                ivTutorialScreen.setImageResource(tutorialBackgrounds[currentScreen]);
 
+                // Update Leo character
+                ivLeoCharacter.setImageResource(leoImages[currentScreen]);
+
+                // Update title and description
+                tvTutorialTitle.setText(tutorialTitles[currentScreen]);
+                tvTutorialDescription.setText(tutorialDescriptions[currentScreen]);
+
+                // Fade in animation
                 AlphaAnimation fadeInScreen = new AlphaAnimation(0.7f, 1.0f);
                 fadeInScreen.setDuration(150);
-                ivTutorialScreen.startAnimation(fadeInScreen);
+                rootLayout.startAnimation(fadeInScreen);
 
                 // Change text on last screen
                 if (currentScreen == 3) {
