@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.RegisterActivity">
+
+    <!-- Background Image -->
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/bg_splash_login"
+        android:scaleType="centerCrop"
+        android:contentDescription="Background" />
+
+    <!-- Content ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="32dp">
+
+            <!-- Back Button -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp">
+
+                <ImageView
+                    android:id="@+id/btnBack"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@android:drawable/ic_menu_revert"
+                    android:contentDescription="Back"
+                    app:tint="@android:color/white"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:padding="4dp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <!-- Leo Character (smaller) -->
+            <ImageView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:src="@drawable/leo_nickname_excited"
+                android:contentDescription="Leo excited"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Welcome Heading -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Let's get to know you!"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_bold"
+                android:gravity="center"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Nickname Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nickname *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Nickname Input -->
+            <EditText
+                android:id="@+id/etNickname"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="What should we call you?"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textPersonName"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- First Name Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="First Name *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- First Name Input -->
+            <EditText
+                android:id="@+id/etFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="Enter your first name"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textPersonName"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Last Name Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Last Name *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Last Name Input -->
+            <EditText
+                android:id="@+id/etLastName"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="Enter your last name"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textPersonName"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Birthday Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Birthday *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Birthday Input -->
+            <EditText
+                android:id="@+id/etBirthday"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="YYYY-MM-DD"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="date"
+                android:focusable="false"
+                android:clickable="true"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Gender Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Gender *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Gender Spinner -->
+            <Spinner
+                android:id="@+id/spinnerGender"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- School Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="School *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- School Spinner -->
+            <Spinner
+                android:id="@+id/spinnerSchool"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Grade Level Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Grade Level"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Grade Level Display (Fixed) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:text="Grade 1"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_medium"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Email Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Email Address *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Email Input -->
+            <EditText
+                android:id="@+id/etEmail"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="yourname@example.com"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textEmailAddress"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Password Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Password *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Password Input -->
+            <EditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="Minimum 6 characters"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textPassword"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Confirm Password Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Password *"
+                android:textSize="13sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Confirm Password Input -->
+            <EditText
+                android:id="@+id/etConfirmPassword"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@drawable/bg_rounded_white"
+                android:hint="Re-enter your password"
+                android:textColorHint="#999999"
+                android:textColor="#333333"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:inputType="textPassword"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Parent Permission Checkbox -->
+            <CheckBox
+                android:id="@+id/cbParentPermission"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="My parent allows me to use this app"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:fontFamily="@font/visby_regular"
+                android:buttonTint="#FFC126"
+                android:layout_marginBottom="24dp" />
+
+            <!-- Register Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRegister"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="REGISTER"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:textAllCaps="false"
+                android:fontFamily="@font/visby_bold"
+                app:backgroundTint="#4CAF50"
+                app:cornerRadius="12dp"
+                android:elevation="4dp"
+                android:enabled="false"
+                android:layout_marginBottom="32dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</FrameLayout>

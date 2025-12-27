@@ -30,6 +30,8 @@ import com.example.literise.models.SubmitSingleRequest;
 
 import com.example.literise.models.WordHuntResponse;
 import com.example.literise.models.LessonProgressResponse;
+import com.example.literise.models.RegisterRequest;
+import com.example.literise.models.RegisterResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -52,6 +54,11 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("login.php")
     Call<Students> login(@Body Students student);
+
+    // 📝 Register
+    @Headers("Content-Type: application/json")
+    @POST("register.php")
+    Call<RegisterResponse> register(@Body RegisterRequest request);
 
     @Headers("Content-Type: application/json")
     @POST("get_preassessment_items.php")
