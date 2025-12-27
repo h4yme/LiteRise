@@ -14,11 +14,17 @@
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:scrollbars="none"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
             <!-- Lock Icon -->
             <TextView
@@ -136,7 +142,9 @@
                 android:fontFamily="@font/visby_regular"
                 android:buttonTint="#6C5CE7" />
 
-        </LinearLayout>
+            </LinearLayout>
+
+        </ScrollView>
 
     </androidx.cardview.widget.CardView>
 
