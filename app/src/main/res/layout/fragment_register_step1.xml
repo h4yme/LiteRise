@@ -51,6 +51,7 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
+                android:imeOptions="actionNext"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="16dp" />
@@ -77,6 +78,7 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
+                android:imeOptions="actionNext"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="16dp" />
@@ -103,6 +105,7 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
+                android:imeOptions="actionDone"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp" />
 

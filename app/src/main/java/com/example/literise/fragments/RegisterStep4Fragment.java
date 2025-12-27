@@ -3,11 +3,14 @@ package com.example.literise.fragments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -61,6 +64,29 @@ public class RegisterStep4Fragment extends Fragment {
         etPassword.addTextChangedListener(validationWatcher);
         etConfirmPassword.addTextChangedListener(validationWatcher);
         cbParentPermission.setOnCheckedChangeListener((buttonView, isChecked) -> validateStep());
+
+        // Handle keyboard navigation
+        etEmail.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    etPassword.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        etPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    etConfirmPassword.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void validateStep() {

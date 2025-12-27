@@ -3,10 +3,13 @@ package com.example.literise.fragments;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -57,6 +60,29 @@ public class RegisterStep1Fragment extends Fragment {
         etNickname.addTextChangedListener(validationWatcher);
         etFirstName.addTextChangedListener(validationWatcher);
         etLastName.addTextChangedListener(validationWatcher);
+
+        // Handle keyboard navigation
+        etNickname.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    etFirstName.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        etFirstName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                    etLastName.requestFocus();
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void validateStep() {
