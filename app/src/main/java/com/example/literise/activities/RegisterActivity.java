@@ -227,6 +227,29 @@ public class RegisterActivity extends AppCompatActivity {
         String email = step4.getEmail();
         String password = step4.getPassword();
 
+        // ============================================
+        // TESTING MODE: Bypass API and navigate directly
+        // ============================================
+
+        // Save mock session data for testing
+        SessionManager sessionManager = new SessionManager(this);
+        String fullName = firstName + " " + lastName;
+        sessionManager.saveStudent(999, fullName, email); // Mock student ID
+        sessionManager.saveToken("mock_token_for_testing"); // Mock token
+        sessionManager.saveNickname(nickname);
+
+        CustomToast.showSuccess(this, "Registration successful!");
+
+        // Navigate to Welcome Tutorial
+        Intent intent = new Intent(this, WelcomeTutorialActivity.class);
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
+
+        // ============================================
+        // PRODUCTION CODE (commented out for testing)
+        // ============================================
+        /*
         // Disable button during API call
         btnNext.setEnabled(false);
         btnNext.setText("Creating Account...");
@@ -289,5 +312,6 @@ public class RegisterActivity extends AppCompatActivity {
                 CustomToast.showError(RegisterActivity.this, "Connection error. Please try again.");
             }
         });
+        */
     }
 }

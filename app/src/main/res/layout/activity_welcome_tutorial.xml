@@ -27,11 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/layoutBottom"
-        android:layout_below="@+id/btnSkip"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp" />
+        android:layout_below="@+id/btnSkip" />
 
     <!-- Bottom Layout -->
     <LinearLayout
