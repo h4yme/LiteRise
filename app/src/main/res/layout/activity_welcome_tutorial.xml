@@ -1,69 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:id="@+id/rootLayout">
 
-    <!-- Skip Button -->
+    <!-- Tutorial Screen Image -->
+    <ImageView
+        android:id="@+id/ivTutorialScreen"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/tutorial_slide_1"
+        android:scaleType="centerCrop"
+        android:contentDescription="Tutorial screen" />
+
+    <!-- Skip Button (Top Right) -->
     <TextView
         android:id="@+id/btnSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
         android:text="Skip"
         android:textSize="16sp"
-        android:textColor="#636E72"
+        android:textColor="@android:color/white"
         android:fontFamily="@font/visby_medium"
-        android:padding="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:background="?attr/selectableItemBackground" />
+        android:padding="20dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless" />
 
-    <!-- ViewPager2 for Tutorial Cards -->
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/layoutBottom"
-        android:layout_below="@+id/btnSkip" />
-
-    <!-- Bottom Layout -->
-    <LinearLayout
-        android:id="@+id/layoutBottom"
-        android:layout_width="match_parent"
+    <!-- Tap to Continue Text (Bottom Center) -->
+    <TextView
+        android:id="@+id/tvTapToContinue"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center">
+        android:text="Tap to continue"
+        android:textSize="14sp"
+        android:textColor="@android:color/white"
+        android:alpha="0.8"
+        android:fontFamily="@font/visby_regular"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="40dp" />
 
-        <!-- Dots Indicator -->
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tabIndicator"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            app:tabBackground="@drawable/tab_selector"
-            app:tabGravity="center"
-            app:tabIndicatorHeight="0dp"
-            app:tabPaddingStart="4dp"
-            app:tabPaddingEnd="4dp" />
-
-        <!-- Next Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNext"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Next"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            android:fontFamily="@font/visby_bold"
-            android:background="@drawable/bg_button_modern_primary"
-            android:elevation="0dp"
-            app:backgroundTint="@null" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</FrameLayout>
