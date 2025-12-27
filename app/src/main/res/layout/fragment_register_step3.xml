@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Modern Card -->
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
+        app:cardBackgroundColor="#FFFFFF"
+        android:layout_gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- School Illustration -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🏫"
+                android:textSize="56sp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="20dp" />
+
+            <!-- School Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="School *"
+                android:textSize="14sp"
+                android:textColor="#2D3436"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- School Spinner -->
+            <Spinner
+                android:id="@+id/spinnerSchool"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bg_input_modern"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Grade Level Label -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Grade Level"
+                android:textSize="14sp"
+                android:textColor="#2D3436"
+                android:fontFamily="@font/visby_medium"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Grade Level Display (Fixed) -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="@drawable/bg_input_modern"
+                android:text="Grade 1"
+                android:textColor="#2D3436"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_medium"
+                android:gravity="center_vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
