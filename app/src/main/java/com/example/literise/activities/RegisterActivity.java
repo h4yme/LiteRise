@@ -12,8 +12,6 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.literise.R;
-
-import com.example.literise.WelcomeTutorialActivity;
 import com.example.literise.adapters.RegisterPagerAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
