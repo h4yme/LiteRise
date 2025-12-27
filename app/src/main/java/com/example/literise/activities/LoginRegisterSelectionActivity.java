@@ -4,24 +4,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
-import com.google.android.material.button.MaterialButton;
 
 public class LoginRegisterSelectionActivity extends AppCompatActivity {
 
-    MaterialButton btnLogin, btnRegister;
+    CardView cardLogin, cardRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_register_selection);
 
-        btnLogin = findViewById(R.id.btnLogin);
-        btnRegister = findViewById(R.id.btnRegister);
+        cardLogin = findViewById(R.id.cardLogin);
+        cardRegister = findViewById(R.id.cardRegister);
 
         // Fade-in animation on load
         View rootView = findViewById(android.R.id.content);
@@ -29,12 +28,12 @@ public class LoginRegisterSelectionActivity extends AppCompatActivity {
         fadeIn.setDuration(800);
         rootView.startAnimation(fadeIn);
 
-        // Login button click
-        btnLogin.setOnClickListener(v -> {
-            // Button press animation
+        // Login card click
+        cardLogin.setOnClickListener(v -> {
+            // Card press animation
             v.animate()
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
+                    .scaleX(0.97f)
+                    .scaleY(0.97f)
                     .setDuration(100)
                     .withEndAction(() -> {
                         v.animate()
@@ -47,12 +46,12 @@ public class LoginRegisterSelectionActivity extends AppCompatActivity {
                     .start();
         });
 
-        // Register button click
-        btnRegister.setOnClickListener(v -> {
-            // Button press animation
+        // Register card click
+        cardRegister.setOnClickListener(v -> {
+            // Card press animation
             v.animate()
-                    .scaleX(0.95f)
-                    .scaleY(0.95f)
+                    .scaleX(0.97f)
+                    .scaleY(0.97f)
                     .setDuration(100)
                     .withEndAction(() -> {
                         v.animate()
