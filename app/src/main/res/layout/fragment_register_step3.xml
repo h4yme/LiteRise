@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <!-- Modern Card -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
@@ -18,16 +18,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="28dp">
+            android:padding="20dp">
 
             <!-- School Illustration -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🏫"
-                android:textSize="64sp"
+                android:textSize="56sp"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="20dp" />
 
             <!-- School Label -->
             <TextView
@@ -43,11 +43,11 @@
             <Spinner
                 android:id="@+id/spinnerSchool"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 android:background="@drawable/bg_input_modern"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:layout_marginBottom="20dp" />
+                android:layout_marginBottom="16dp" />
 
             <!-- Grade Level Label -->
             <TextView
@@ -62,15 +62,15 @@
             <!-- Grade Level Display (Fixed) -->
             <TextView
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 android:background="@drawable/bg_input_modern"
                 android:text="Grade 1"
                 android:textColor="#2D3436"
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_medium"
                 android:gravity="center_vertical"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp" />
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
 
         </LinearLayout>
 

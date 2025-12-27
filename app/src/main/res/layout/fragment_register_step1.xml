@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="16dp">
 
     <!-- Modern Card -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="3dp"
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
@@ -18,16 +18,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="28dp">
+            android:padding="20dp">
 
             <!-- Leo Character Small -->
             <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
                 android:src="@drawable/leo_nickname_excited"
                 android:contentDescription="Leo excited"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="20dp" />
 
             <!-- Nickname Label -->
             <TextView
@@ -43,7 +43,7 @@
             <EditText
                 android:id="@+id/etNickname"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 android:background="@drawable/bg_input_modern"
                 android:hint="What should we call you?"
                 android:textColorHint="#B2BEC3"
@@ -51,9 +51,9 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="16dp" />
 
             <!-- First Name Label -->
             <TextView
@@ -69,7 +69,7 @@
             <EditText
                 android:id="@+id/etFirstName"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 android:background="@drawable/bg_input_modern"
                 android:hint="Enter your first name"
                 android:textColorHint="#B2BEC3"
@@ -77,9 +77,9 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp"
-                android:layout_marginBottom="20dp" />
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginBottom="16dp" />
 
             <!-- Last Name Label -->
             <TextView
@@ -95,7 +95,7 @@
             <EditText
                 android:id="@+id/etLastName"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="50dp"
                 android:background="@drawable/bg_input_modern"
                 android:hint="Enter your last name"
                 android:textColorHint="#B2BEC3"
@@ -103,8 +103,8 @@
                 android:textSize="15sp"
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPersonName"
-                android:paddingStart="20dp"
-                android:paddingEnd="20dp" />
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
 
         </LinearLayout>
 
