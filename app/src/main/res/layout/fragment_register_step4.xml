@@ -52,6 +52,9 @@
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textEmailAddress"
                 android:imeOptions="actionNext"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:clickable="true"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="16dp" />
@@ -79,6 +82,9 @@
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPassword"
                 android:imeOptions="actionNext"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:clickable="true"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="16dp" />
@@ -106,6 +112,9 @@
                 android:fontFamily="@font/visby_regular"
                 android:inputType="textPassword"
                 android:imeOptions="actionDone"
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:clickable="true"
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
                 android:layout_marginBottom="16dp" />
