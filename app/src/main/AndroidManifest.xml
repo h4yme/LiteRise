@@ -74,11 +74,31 @@
 
 
 
+        <!-- ✅ Login/Register Selection Screen -->
+
+        <activity
+
+            android:name=".activities.LoginRegisterSelectionActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Login Screen -->
 
         <activity
 
             android:name=".activities.LoginActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Register Screen -->
+
+        <activity
+
+            android:name=".activities.RegisterActivity"
 
             android:exported="false"
 
