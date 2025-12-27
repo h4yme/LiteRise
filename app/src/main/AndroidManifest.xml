@@ -108,7 +108,7 @@
 
         <activity
 
-            android:name=".WelcomeTutorialActivity"
+            android:name=".activities.WelcomeTutorialActivity"
 
             android:exported="false"
 
@@ -118,7 +118,7 @@
 
         <activity
 
-            android:name=".PlacementIntroActivity"
+            android:name=".activities.PlacementIntroActivity"
 
             android:exported="false"
 
@@ -256,6 +256,7 @@
             android:name=".activities.ModuleLadderActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
+
     </application>
 
 

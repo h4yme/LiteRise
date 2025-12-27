@@ -1,85 +1,139 @@
-package com.example.literise.activities;
+package com.example.literise;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.literise.R;
 import com.example.literise.activities.PlacementIntroActivity;
-import com.example.literise.adapters.TutorialPagerAdapter;
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
+import com.example.literise.utils.MusicManager;
 
 public class WelcomeTutorialActivity extends AppCompatActivity {
 
-    private ViewPager2 viewPager;
-    private TabLayout tabIndicator;
-    private MaterialButton btnNext;
+    private ImageView ivTutorialScreen;
     private TextView btnSkip;
-    private TutorialPagerAdapter adapter;
+    private TextView tvTapToContinue;
+    private View rootLayout;
+
+    private int currentScreen = 0; // 0 to 3 (4 screens)
+    private final int[] tutorialImages = {
+            R.drawable.tutorial_slide_1,
+            R.drawable.tutorial_slide_2,
+            R.drawable.tutorial_slide_3,
+            R.drawable.tutorial_slide_4
+    };
+
+    private MediaPlayer soundPlayer;
+    private MusicManager musicManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_tutorial);
 
-        viewPager = findViewById(R.id.viewPager);
-        tabIndicator = findViewById(R.id.tabIndicator);
-        btnNext = findViewById(R.id.btnNext);
+        musicManager = MusicManager.getInstance(this);
+
+        // Initialize views
+        ivTutorialScreen = findViewById(R.id.ivTutorialScreen);
         btnSkip = findViewById(R.id.btnSkip);
+        tvTapToContinue = findViewById(R.id.tvTapToContinue);
+        rootLayout = findViewById(R.id.rootLayout);
 
-        // Setup ViewPager2
-        adapter = new TutorialPagerAdapter(this);
-        viewPager.setAdapter(adapter);
+        // Fade-in animation
+        AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
+        fadeIn.setDuration(800);
+        rootLayout.startAnimation(fadeIn);
 
-        // Link TabLayout with ViewPager2
-        new TabLayoutMediator(tabIndicator, viewPager,
-                (tab, position) -> {
-                    // Tab configuration handled by tab_selector drawable
-                }
-        ).attach();
-
-        // Update button text based on current page
-        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                if (position == 3) {
-                    btnNext.setText("START!");
-                    btnSkip.setVisibility(View.GONE);
-                } else {
-                    btnNext.setText("Next");
-                    btnSkip.setVisibility(View.VISIBLE);
-                }
-            }
-        });
-
-        // Next button click
-        btnNext.setOnClickListener(v -> {
-            int currentItem = viewPager.getCurrentItem();
-            if (currentItem < 3) {
-                viewPager.setCurrentItem(currentItem + 1, true);
-            } else {
-                // Navigate to Placement Intro
-                navigateToPlacementIntro();
-            }
+        // Tap anywhere to continue
+        rootLayout.setOnClickListener(v -> {
+            playClickSound();
+            nextScreen();
         });
 
         // Skip button click
         btnSkip.setOnClickListener(v -> {
+            playClickSound();
             navigateToPlacementIntro();
         });
+    }
+
+    private void nextScreen() {
+        if (currentScreen < 3) {
+            // Move to next screen
+            currentScreen++;
+
+            // Fade transition animation
+            AlphaAnimation fadeOut = new AlphaAnimation(1.0f, 0.7f);
+            fadeOut.setDuration(150);
+            fadeOut.setFillAfter(true);
+
+            ivTutorialScreen.startAnimation(fadeOut);
+
+            // Change image
+            ivTutorialScreen.postDelayed(() -> {
+                ivTutorialScreen.setImageResource(tutorialImages[currentScreen]);
+
+                AlphaAnimation fadeInScreen = new AlphaAnimation(0.7f, 1.0f);
+                fadeInScreen.setDuration(150);
+                ivTutorialScreen.startAnimation(fadeInScreen);
+
+                // Change text on last screen
+                if (currentScreen == 3) {
+                    tvTapToContinue.setText("Tap to start");
+                }
+            }, 150);
+
+        } else {
+            // Last screen - proceed to placement test
+            navigateToPlacementIntro();
+        }
+    }
+
+    private void playClickSound() {
+        try {
+            if (soundPlayer != null) {
+                soundPlayer.release();
+            }
+            soundPlayer = MediaPlayer.create(this, R.raw.sound_button_click);
+            soundPlayer.setOnCompletionListener(MediaPlayer::release);
+            soundPlayer.start();
+        } catch (Exception e) {
+            // Sound file might not exist - ignore
+        }
     }
 
     private void navigateToPlacementIntro() {
         Intent intent = new Intent(this, PlacementIntroActivity.class);
         startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Play intro music when activity becomes visible
+        musicManager.playMusic(MusicManager.MusicType.INTRO);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause music when activity goes to background
+        musicManager.pause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (soundPlayer != null) {
+            soundPlayer.release();
+            soundPlayer = null;
+        }
     }
 }

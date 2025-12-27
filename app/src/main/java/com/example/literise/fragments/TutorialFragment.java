@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,18 +15,18 @@ import com.example.literise.R;
 
 public class TutorialFragment extends Fragment {
 
-    private static final String ARG_EMOJI = "emoji";
+    private static final String ARG_IMAGE_RES = "image_res";
     private static final String ARG_TITLE = "title";
     private static final String ARG_DESCRIPTION = "description";
 
-    private String emoji;
+    private int imageRes;
     private String title;
     private String description;
 
-    public static TutorialFragment newInstance(String emoji, String title, String description) {
+    public static TutorialFragment newInstance(int imageRes, String title, String description) {
         TutorialFragment fragment = new TutorialFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_EMOJI, emoji);
+        args.putInt(ARG_IMAGE_RES, imageRes);
         args.putString(ARG_TITLE, title);
         args.putString(ARG_DESCRIPTION, description);
         fragment.setArguments(args);
@@ -36,7 +37,7 @@ public class TutorialFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            emoji = getArguments().getString(ARG_EMOJI);
+            imageRes = getArguments().getInt(ARG_IMAGE_RES);
             title = getArguments().getString(ARG_TITLE);
             description = getArguments().getString(ARG_DESCRIPTION);
         }
@@ -52,11 +53,11 @@ public class TutorialFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        TextView tvLeoEmoji = view.findViewById(R.id.tvLeoEmoji);
+        ImageView ivLeoImage = view.findViewById(R.id.ivLeoImage);
         TextView tvTutorialTitle = view.findViewById(R.id.tvTutorialTitle);
         TextView tvTutorialDescription = view.findViewById(R.id.tvTutorialDescription);
 
-        tvLeoEmoji.setText(emoji);
+        ivLeoImage.setImageResource(imageRes);
         tvTutorialTitle.setText(title);
         tvTutorialDescription.setText(description);
     }
