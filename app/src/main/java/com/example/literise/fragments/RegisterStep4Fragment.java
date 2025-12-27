@@ -87,6 +87,25 @@ public class RegisterStep4Fragment extends Fragment {
                 return false;
             }
         });
+
+        // Add focus change listeners for smooth scrolling
+        etEmail.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
+
+        etPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
+
+        etConfirmPassword.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
     }
 
     private void validateStep() {

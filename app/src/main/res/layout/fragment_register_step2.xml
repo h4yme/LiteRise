@@ -14,71 +14,79 @@
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:scrollbars="none"
+            android:fillViewport="true">
 
-            <!-- Birthday Icon -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎂"
-                android:textSize="56dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp" />
-
-            <!-- Birthday Label -->
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Birthday *"
-                android:textSize="14sp"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/visby_medium"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical"
+                android:padding="20dp">
 
-            <!-- Birthday Input -->
-            <EditText
-                android:id="@+id/etBirthday"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_modern"
-                android:hint="YYYY-MM-DD"
-                android:textColorHint="#B2BEC3"
-                android:textColor="#2D3436"
-                android:textSize="15sp"
-                android:fontFamily="@font/visby_regular"
-                android:inputType="none"
-                android:focusable="false"
-                android:clickable="true"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="16dp"
-                android:drawableEnd="@android:drawable/ic_menu_my_calendar"
-                android:drawablePadding="12dp" />
+                <!-- Birthday Icon -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎂"
+                    android:textSize="56dp"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp" />
 
-            <!-- Gender Label -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Gender *"
-                android:textSize="14sp"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/visby_medium"
-                android:layout_marginBottom="8dp" />
+                <!-- Birthday Label -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Birthday *"
+                    android:textSize="14sp"
+                    android:textColor="#2D3436"
+                    android:fontFamily="@font/visby_medium"
+                    android:layout_marginBottom="8dp" />
 
-            <!-- Gender Spinner -->
-            <Spinner
-                android:id="@+id/spinnerGender"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_modern"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+                <!-- Birthday Input -->
+                <EditText
+                    android:id="@+id/etBirthday"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_modern"
+                    android:hint="YYYY-MM-DD"
+                    android:textColorHint="#B2BEC3"
+                    android:textColor="#2D3436"
+                    android:textSize="15sp"
+                    android:fontFamily="@font/visby_regular"
+                    android:inputType="none"
+                    android:focusable="false"
+                    android:clickable="true"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+                    android:drawablePadding="12dp" />
 
-        </LinearLayout>
+                <!-- Gender Label -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gender *"
+                    android:textSize="14sp"
+                    android:textColor="#2D3436"
+                    android:fontFamily="@font/visby_medium"
+                    android:layout_marginBottom="8dp" />
+
+                <!-- Gender Spinner -->
+                <Spinner
+                    android:id="@+id/spinnerGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:background="@drawable/bg_input_modern"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp" />
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </androidx.cardview.widget.CardView>
 

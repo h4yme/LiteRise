@@ -9,107 +9,122 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         app:cardCornerRadius="20dp"
         app:cardElevation="1dp"
-        app:cardBackgroundColor="#FFFFFF"
-        android:layout_gravity="center">
+        app:cardBackgroundColor="#FFFFFF">
 
-        <LinearLayout
+        <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:fillViewport="true"
+            android:scrollbars="none">
 
-            <!-- Leo Character Small -->
-            <ImageView
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:src="@drawable/leo_nickname_excited"
-                android:contentDescription="Leo excited"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="20dp" />
-
-            <!-- Nickname Label -->
-            <TextView
+            <!-- ROOT CONTAINER (NO PADDING) -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Nickname *"
-                android:textSize="14sp"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/visby_medium"
-                android:layout_marginBottom="8dp" />
+                android:orientation="vertical">
 
-            <!-- Nickname Input -->
-            <EditText
-                android:id="@+id/etNickname"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_modern"
-                android:hint="What should we call you?"
-                android:textColorHint="#B2BEC3"
-                android:textColor="#2D3436"
-                android:textSize="15sp"
-                android:fontFamily="@font/visby_regular"
-                android:inputType="textPersonName"
-                android:imeOptions="actionNext"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="16dp" />
+                <!-- LEO IMAGE (SAGAD RIGHT) -->
+                <ImageView
+                    android:layout_width="375px"
+                    android:layout_height="375px"
+                    android:layout_marginTop="10dp"
+                    android:layout_gravity="end"
+                    android:contentDescription="Leo excited"
+                    android:padding="0dp"
+                    android:src="@drawable/peeking_leo" />
 
-            <!-- First Name Label -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="First Name *"
-                android:textSize="14sp"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/visby_medium"
-                android:layout_marginBottom="8dp" />
+                <!-- FORM CONTENT (PADDED) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-            <!-- First Name Input -->
-            <EditText
-                android:id="@+id/etFirstName"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_modern"
-                android:hint="Enter your first name"
-                android:textColorHint="#B2BEC3"
-                android:textColor="#2D3436"
-                android:textSize="15sp"
-                android:fontFamily="@font/visby_regular"
-                android:inputType="textPersonName"
-                android:imeOptions="actionNext"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
-                android:layout_marginBottom="16dp" />
+                    <!-- Nickname Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nickname *"
+                        android:fontFamily="@font/visby_medium"
+                        android:textSize="14sp"
+                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp" />
 
-            <!-- Last Name Label -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Last Name *"
-                android:textSize="14sp"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/visby_medium"
-                android:layout_marginBottom="8dp" />
+                    <!-- Nickname Input -->
+                    <EditText
+                        android:id="@+id/etNickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="What should we call you?"
+                        android:fontFamily="@font/visby_regular"
+                        android:textColor="#2D3436"
+                        android:textColorHint="#B2BEC3"
+                        android:textSize="15sp"
+                        android:inputType="textPersonName"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
 
-            <!-- Last Name Input -->
-            <EditText
-                android:id="@+id/etLastName"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@drawable/bg_input_modern"
-                android:hint="Enter your last name"
-                android:textColorHint="#B2BEC3"
-                android:textColor="#2D3436"
-                android:textSize="15sp"
-                android:fontFamily="@font/visby_regular"
-                android:inputType="textPersonName"
-                android:imeOptions="actionDone"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp" />
+                    <!-- First Name Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="First Name *"
+                        android:fontFamily="@font/visby_medium"
+                        android:textSize="14sp"
+                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp" />
 
-        </LinearLayout>
+                    <!-- First Name Input -->
+                    <EditText
+                        android:id="@+id/etFirstName"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="Enter your first name"
+                        android:fontFamily="@font/visby_regular"
+                        android:textColor="#2D3436"
+                        android:textColorHint="#B2BEC3"
+                        android:textSize="15sp"
+                        android:inputType="textPersonName"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
+
+                    <!-- Last Name Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Last Name *"
+                        android:fontFamily="@font/visby_medium"
+                        android:textSize="14sp"
+                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp" />
+
+                    <!-- Last Name Input -->
+                    <EditText
+                        android:id="@+id/etLastName"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="Enter your last name"
+                        android:fontFamily="@font/visby_regular"
+                        android:textColor="#2D3436"
+                        android:textColorHint="#B2BEC3"
+                        android:textSize="15sp"
+                        android:inputType="textPersonName"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </ScrollView>
 
     </androidx.cardview.widget.CardView>
 

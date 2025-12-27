@@ -83,6 +83,25 @@ public class RegisterStep1Fragment extends Fragment {
                 return false;
             }
         });
+
+        // Add focus change listeners for smooth scrolling
+        etNickname.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
+
+        etFirstName.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
+
+        etLastName.setOnFocusChangeListener((v, hasFocus) -> {
+            if (hasFocus) {
+                v.post(() -> v.getParent().requestChildFocus(v, v));
+            }
+        });
     }
 
     private void validateStep() {
