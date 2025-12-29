@@ -7,287 +7,252 @@
     tools:context=".activities.LoginRegisterSelectionActivity">
 
     <!-- Gradient Background -->
-    <View
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/selection_screen_gradient" />
+        android:src="@drawable/bg_splash_login"
+        android:scaleType="centerCrop"
+        android:contentDescription="Placement Test Background" />
+
+    <!-- Floating Elements Overlay Illustration - Partial Top View -->
+    <ImageView
+        android:id="@+id/ivFloatingElements"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:alpha="0.7"
+        android:contentDescription="Floating educational elements"
+        android:scaleType="centerCrop"
+        android:src="@drawable/floating_elements_overlay" />
 
     <!-- Content Layout -->
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="440dp"
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <LinearLayout
+        <!-- Welcome Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="1dp"
+            android:fontFamily="@font/visby_regular"
+            android:text="Welcome"
+            android:textColor="@android:color/white"
+            android:textSize="22sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:fontFamily="@font/visby_bold"
+            android:text="to LiteRise!"
+            android:textColor="@android:color/white"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <!-- Description -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="18dp"
+            android:alpha="0.9"
+            android:fontFamily="@font/visby_regular"
+            android:lineSpacingExtra="1dp"
+            android:text="Play, Learn, and Explore with Exciting\nReading Adventures!"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+
+        <!-- Login Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="32dp">
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
-            <!-- Top Spacer -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="60dp" />
-
-            <!-- Leo Character -->
-            <ImageView
-                android:id="@+id/ivLeo"
-                android:layout_width="160dp"
-                android:layout_height="160dp"
-                android:src="@drawable/leo_welcome_1"
-                android:contentDescription="Leo the Lion"
-                android:layout_marginBottom="24dp" />
-
-            <!-- App Logo/Title -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LiteRise"
-                android:textSize="52sp"
-                android:textStyle="bold"
-                android:textColor="@android:color/white"
-                android:fontFamily="@font/visby_bold"
-                android:letterSpacing="-0.02"
-                android:shadowColor="#40000000"
-                android:shadowDx="0"
-                android:shadowDy="4"
-                android:shadowRadius="12"
-                android:layout_marginBottom="8dp" />
-
-            <!-- Tagline -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Read • Learn • Rise!"
-                android:textSize="18sp"
-                android:textColor="@android:color/white"
-                android:fontFamily="@font/visby_medium"
-                android:letterSpacing="0.05"
-                android:alpha="0.9"
-                android:shadowColor="#40000000"
-                android:shadowDx="0"
-                android:shadowDy="2"
-                android:shadowRadius="8"
-                android:layout_marginBottom="48dp" />
-
-            <!-- Welcome Text -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="How would you like to start?"
-                android:textSize="20sp"
-                android:textColor="@android:color/white"
-                android:fontFamily="@font/visby_medium"
-                android:gravity="center"
-                android:alpha="0.95"
-                android:shadowColor="#40000000"
-                android:shadowDx="0"
-                android:shadowDy="2"
-                android:shadowRadius="6"
-                android:layout_marginBottom="32dp" />
-
-            <!-- Login Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardLogin"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="12dp"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_height="wrap_content">
 
-                <FrameLayout
+                <!-- Gradient Background for Login Card -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="57dp"
+                    android:background="@drawable/login_card_gradient" />
 
-                    <!-- Gradient Background for Login Card -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/login_card_gradient" />
+                <!-- Content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
-                    <!-- Content -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:padding="28dp">
+                    <!-- Icon Circle -->
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="10dp">
 
-                        <!-- Icon Circle -->
-                        <FrameLayout
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:layout_marginEnd="20dp">
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/icon_circle_white" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/icon_circle_white" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="👤"
-                                android:textSize="32sp"
-                                android:gravity="center" />
-
-                        </FrameLayout>
-
-                        <!-- Text Content -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Login"
-                                android:textSize="28sp"
-                                android:textStyle="bold"
-                                android:textColor="@android:color/white"
-                                android:fontFamily="@font/visby_bold"
-                                android:shadowColor="#40000000"
-                                android:shadowDx="0"
-                                android:shadowDy="2"
-                                android:shadowRadius="4"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Welcome back, friend!"
-                                android:textSize="15sp"
-                                android:textColor="@android:color/white"
-                                android:fontFamily="@font/visby_regular"
-                                android:alpha="0.9" />
-
-                        </LinearLayout>
-
-                        <!-- Arrow -->
                         <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:text="→"
-                            android:textSize="28sp"
-                            android:textColor="@android:color/white"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:gravity="center"
-                            android:fontFamily="@font/visby_bold" />
+                            android:text="👨🏻‍💼"
+                            android:textSize="18sp" />
+
+                    </FrameLayout>
+
+                    <!-- Text Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:fontFamily="@font/visby_bold"
+                            android:text="Login"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.9"
+                            android:fontFamily="@font/visby_regular"
+                            android:text="Welcome my, friend!"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
-                </FrameLayout>
+                    <!-- Arrow -->
+                    <TextView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:text="→"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
 
-            </androidx.cardview.widget.CardView>
+                </LinearLayout>
 
-            <!-- Register Card -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/cardRegister"
+            </FrameLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Register Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
+
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="28dp"
-                app:cardElevation="12dp"
-                android:layout_marginBottom="20dp"
-                android:clickable="true"
-                android:focusable="true">
+                android:layout_height="wrap_content">
 
-                <FrameLayout
+                <!-- Gradient Background for Register Card -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="57dp"
+                    android:background="@drawable/register_card_gradient" />
 
-                    <!-- Gradient Background for Register Card -->
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/register_card_gradient" />
+                <!-- Content -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
-                    <!-- Content -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:padding="28dp">
+                    <!-- Icon Circle -->
+                    <FrameLayout
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="10dp">
 
-                        <!-- Icon Circle -->
-                        <FrameLayout
-                            android:layout_width="64dp"
-                            android:layout_height="64dp"
-                            android:layout_marginEnd="20dp">
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/icon_circle_white" />
 
-                            <View
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:background="@drawable/icon_circle_white" />
-
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:text="✨"
-                                android:textSize="32sp"
-                                android:gravity="center" />
-
-                        </FrameLayout>
-
-                        <!-- Text Content -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Register"
-                                android:textSize="28sp"
-                                android:textStyle="bold"
-                                android:textColor="@android:color/white"
-                                android:fontFamily="@font/visby_bold"
-                                android:shadowColor="#40000000"
-                                android:shadowDx="0"
-                                android:shadowDy="2"
-                                android:shadowRadius="4"
-                                android:layout_marginBottom="4dp" />
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="New here? Join the adventure!"
-                                android:textSize="15sp"
-                                android:textColor="@android:color/white"
-                                android:fontFamily="@font/visby_regular"
-                                android:alpha="0.9" />
-
-                        </LinearLayout>
-
-                        <!-- Arrow -->
                         <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:text="→"
-                            android:textSize="28sp"
-                            android:textColor="@android:color/white"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:gravity="center"
-                            android:fontFamily="@font/visby_bold" />
+                            android:text="📝"
+                            android:textSize="18sp" />
+
+                    </FrameLayout>
+
+                    <!-- Text Content -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="0dp"
+                            android:fontFamily="@font/visby_bold"
+                            android:text="Register"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:alpha="0.9"
+                            android:fontFamily="@font/visby_regular"
+                            android:text="New here? Join the adventure!"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
-                </FrameLayout>
+                    <!-- Arrow -->
+                    <TextView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:text="→"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
 
-            </androidx.cardview.widget.CardView>
+                </LinearLayout>
 
-            <!-- Bottom Spacer -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="40dp" />
+            </FrameLayout>
 
-        </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
-    </ScrollView>
+    </LinearLayout>
 
 </FrameLayout>
