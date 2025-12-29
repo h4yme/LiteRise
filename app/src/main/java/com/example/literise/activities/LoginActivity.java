@@ -27,6 +27,7 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     Button btnLogin;
+    private ImageView btnBack;
     ImageView ivPasswordToggle;
     TextView tvSignUp;
     boolean isPasswordVisible = false;
@@ -34,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-
+        btnBack = findViewById(R.id.btnBack);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
         btnLogin = findViewById(R.id.btnLogin);
