@@ -12,103 +12,70 @@
         android:layout_height="match_parent"
         android:background="@drawable/selection_screen_gradient" />
 
-    <!-- Floating Illustrations - Smaller and More Subtle -->
+    <!-- Floating Illustrations - More Visible -->
     <!-- Top Left - Book -->
     <ImageView
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:src="@drawable/floating_book_3d"
-        android:alpha="0.5"
+        android:alpha="0.7"
         android:layout_marginStart="15dp"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="40dp"
         android:contentDescription="Floating book"
         android:rotation="-15" />
 
     <!-- Top Right - Star -->
     <ImageView
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:src="@drawable/floating_star_3d"
-        android:alpha="0.6"
+        android:alpha="0.75"
         android:layout_gravity="end"
         android:layout_marginEnd="20dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="60dp"
         android:contentDescription="Floating star" />
-
-    <!-- Top Right Corner - Star Small -->
-    <ImageView
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:src="@drawable/floating_star_3d"
-        android:alpha="0.45"
-        android:layout_gravity="end"
-        android:layout_marginEnd="50dp"
-        android:layout_marginTop="140dp"
-        android:contentDescription="Sparkle" />
 
     <!-- Middle Left - Coin -->
     <ImageView
-        android:layout_width="38dp"
-        android:layout_height="38dp"
+        android:layout_width="42dp"
+        android:layout_height="42dp"
         android:src="@drawable/floating_coin_3d"
-        android:alpha="0.55"
+        android:alpha="0.7"
         android:layout_marginStart="10dp"
-        android:layout_marginTop="220dp"
+        android:layout_marginTop="180dp"
         android:contentDescription="Floating coin"
         android:rotation="25" />
 
     <!-- Middle Right - Globe -->
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
         android:src="@drawable/floating_globe_3d"
-        android:alpha="0.5"
+        android:alpha="0.65"
         android:layout_gravity="end"
         android:layout_marginEnd="15dp"
-        android:layout_marginTop="320dp"
+        android:layout_marginTop="260dp"
         android:contentDescription="Globe" />
-
-    <!-- Bottom Left - Book Small -->
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/floating_book_3d"
-        android:alpha="0.45"
-        android:layout_gravity="bottom"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="200dp"
-        android:contentDescription="Pencil"
-        android:rotation="-20" />
 
     <!-- Bottom Right - Star Small -->
     <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/floating_star_3d"
-        android:alpha="0.5"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="160dp"
-        android:contentDescription="Small star" />
-
-    <!-- Bottom Center - Coin Small -->
-    <ImageView
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:src="@drawable/floating_coin_3d"
-        android:alpha="0.4"
-        android:layout_gravity="bottom|center_horizontal"
+        android:src="@drawable/floating_star_3d"
+        android:alpha="0.65"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="120dp"
-        android:contentDescription="Sparkle" />
+        android:contentDescription="Small star" />
 
     <!-- Top Center - Small Coin -->
     <ImageView
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:src="@drawable/floating_coin_3d"
-        android:alpha="0.4"
+        android:alpha="0.55"
         android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="100dp"
         android:contentDescription="Small coin"
         android:rotation="-30" />
 
@@ -123,34 +90,34 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="center_horizontal"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingTop="20dp"
-            android:paddingBottom="20dp">
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp">
 
             <!-- Top Spacer -->
             <View
                 android:layout_width="1dp"
-                android:layout_height="40dp" />
+                android:layout_height="20dp" />
 
             <!-- Leo Character with Glow -->
             <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
                 <!-- Glow Circle -->
                 <View
-                    android:layout_width="160dp"
-                    android:layout_height="160dp"
+                    android:layout_width="130dp"
+                    android:layout_height="130dp"
                     android:layout_gravity="center"
                     android:background="@drawable/leo_glow_circle" />
 
                 <!-- Leo Character -->
                 <ImageView
                     android:id="@+id/ivLeo"
-                    android:layout_width="140dp"
-                    android:layout_height="140dp"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
                     android:layout_gravity="center"
                     android:src="@drawable/leo_reading_3d"
                     android:contentDescription="Leo the Lion" />
@@ -162,7 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="LiteRise"
-                android:textSize="40sp"
+                android:textSize="36sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/visby_bold"
@@ -171,14 +138,14 @@
                 android:shadowDx="0"
                 android:shadowDy="3"
                 android:shadowRadius="8"
-                android:layout_marginBottom="4dp" />
+                android:layout_marginBottom="2dp" />
 
             <!-- Tagline -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Read • Learn • Rise!"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/visby_medium"
                 android:letterSpacing="0.05"
@@ -187,14 +154,14 @@
                 android:shadowDx="0"
                 android:shadowDy="2"
                 android:shadowRadius="6"
-                android:layout_marginBottom="32dp" />
+                android:layout_marginBottom="24dp" />
 
             <!-- Welcome Text -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="How would you like to start?"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textColor="@android:color/white"
                 android:fontFamily="@font/visby_medium"
                 android:gravity="center"
@@ -203,16 +170,16 @@
                 android:shadowDx="0"
                 android:shadowDy="2"
                 android:shadowRadius="4"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="20dp" />
 
             <!-- Login Card -->
             <androidx.cardview.widget.CardView
                 android:id="@+id/cardLogin"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -232,13 +199,16 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="20dp">
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
 
                         <!-- Icon Circle -->
                         <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"
+                            android:layout_marginEnd="14dp">
 
                             <View
                                 android:layout_width="match_parent"
@@ -249,7 +219,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text="👤"
-                                android:textSize="26sp"
+                                android:textSize="24sp"
                                 android:gravity="center" />
 
                         </FrameLayout>
@@ -265,7 +235,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Login"
-                                android:textSize="22sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="@android:color/white"
                                 android:fontFamily="@font/visby_bold"
@@ -279,7 +249,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Welcome back, friend!"
-                                android:textSize="13sp"
+                                android:textSize="12sp"
                                 android:textColor="@android:color/white"
                                 android:fontFamily="@font/visby_regular"
                                 android:alpha="0.9" />
@@ -288,10 +258,10 @@
 
                         <!-- Arrow -->
                         <TextView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:text="→"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textColor="@android:color/white"
                             android:gravity="center"
                             android:fontFamily="@font/visby_bold" />
@@ -307,9 +277,9 @@
                 android:id="@+id/cardRegister"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
-                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="6dp"
+                android:layout_marginBottom="12dp"
                 android:clickable="true"
                 android:focusable="true">
 
@@ -329,13 +299,16 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="20dp">
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:paddingTop="16dp"
+                        android:paddingBottom="16dp">
 
                         <!-- Icon Circle -->
                         <FrameLayout
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
-                            android:layout_marginEnd="16dp">
+                            android:layout_width="46dp"
+                            android:layout_height="46dp"
+                            android:layout_marginEnd="14dp">
 
                             <View
                                 android:layout_width="match_parent"
@@ -346,7 +319,7 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text="✨"
-                                android:textSize="26sp"
+                                android:textSize="24sp"
                                 android:gravity="center" />
 
                         </FrameLayout>
@@ -362,7 +335,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Register"
-                                android:textSize="22sp"
+                                android:textSize="20sp"
                                 android:textStyle="bold"
                                 android:textColor="@android:color/white"
                                 android:fontFamily="@font/visby_bold"
@@ -376,7 +349,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="New here? Join the adventure!"
-                                android:textSize="13sp"
+                                android:textSize="12sp"
                                 android:textColor="@android:color/white"
                                 android:fontFamily="@font/visby_regular"
                                 android:alpha="0.9" />
@@ -385,10 +358,10 @@
 
                         <!-- Arrow -->
                         <TextView
-                            android:layout_width="32dp"
-                            android:layout_height="32dp"
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
                             android:text="→"
-                            android:textSize="24sp"
+                            android:textSize="22sp"
                             android:textColor="@android:color/white"
                             android:gravity="center"
                             android:fontFamily="@font/visby_bold" />
@@ -402,7 +375,7 @@
             <!-- Bottom Spacer -->
             <View
                 android:layout_width="1dp"
-                android:layout_height="20dp" />
+                android:layout_height="16dp" />
 
         </LinearLayout>
 
