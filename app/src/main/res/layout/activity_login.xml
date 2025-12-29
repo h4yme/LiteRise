@@ -23,6 +23,17 @@
         android:contentDescription="Floating educational elements"
         android:alpha="0.5" />
 
+    <!-- Leo Character - Floating on Top Right -->
+    <ImageView
+        android:id="@+id/ivLeoWaiting"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="180dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Leo waiting"
+        android:src="@drawable/leo_waiting" />
+
     <!-- Content ScrollView -->
     <ScrollView
         android:layout_width="match_parent"
