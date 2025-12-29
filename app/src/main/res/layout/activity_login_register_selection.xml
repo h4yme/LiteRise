@@ -16,63 +16,63 @@
     <ImageView
         android:id="@+id/ivFloatingElements"
         android:layout_width="match_parent"
-        android:layout_height="270dp"
+        android:layout_height="match_parent"
         android:layout_gravity="top"
-        android:src="@drawable/floating_elements_overlay"
-        android:scaleType="centerCrop"
+        android:alpha="0.7"
         android:contentDescription="Floating educational elements"
-        android:alpha="0.7" />
+        android:scaleType="centerCrop"
+        android:src="@drawable/floating_elements_overlay" />
 
     <!-- Content Layout -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="290dp"
+        android:layout_marginTop="420dp"
         android:orientation="vertical"
-        android:padding="18dp"
-        android:layout_marginTop="185dp">
+        android:padding="20dp">
 
         <!-- Welcome Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome"
-            android:textSize="17sp"
-            android:textColor="@android:color/white"
+            android:layout_marginBottom="1dp"
             android:fontFamily="@font/visby_regular"
-            android:layout_marginBottom="0dp" />
+            android:text="Welcome"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="to LiteRise!"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
+            android:layout_marginBottom="4dp"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginBottom="3dp" />
+            android:text="to LiteRise!"
+            android:textColor="@android:color/white"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
         <!-- Description -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Play, Learn, and Explore with Exciting\nReading Adventures!"
-            android:textSize="10sp"
-            android:textColor="@android:color/white"
-            android:fontFamily="@font/visby_regular"
+            android:layout_marginBottom="18dp"
             android:alpha="0.9"
-            android:lineSpacingExtra="0dp"
-            android:layout_marginBottom="12dp" />
+            android:fontFamily="@font/visby_regular"
+            android:lineSpacingExtra="1dp"
+            android:text="Play, Learn, and Explore with Exciting\nReading Adventures!"
+            android:textColor="@android:color/white"
+            android:textSize="11sp" />
 
         <!-- Login Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="8dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -81,22 +81,22 @@
                 <!-- Gradient Background for Login Card -->
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="70dp"
                     android:background="@drawable/login_card_gradient" />
 
                 <!-- Content -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="8dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <!-- Icon Circle -->
                     <FrameLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginEnd="8dp">
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="10dp">
 
                         <View
                             android:layout_width="match_parent"
@@ -106,9 +106,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:gravity="center"
                             android:text="👤"
-                            android:textSize="16sp"
-                            android:gravity="center" />
+                            android:textSize="18sp" />
 
                     </FrameLayout>
 
@@ -122,33 +122,33 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Login"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"
+                            android:layout_marginBottom="0dp"
                             android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="0dp" />
+                            android:text="Login"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Welcome back, friend!"
-                            android:textSize="9sp"
-                            android:textColor="@android:color/white"
+                            android:alpha="0.9"
                             android:fontFamily="@font/visby_regular"
-                            android:alpha="0.9" />
+                            android:text="Welcome back, friend!"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
                     <!-- Arrow -->
                     <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="→"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/white"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:fontFamily="@font/visby_bold"
                         android:gravity="center"
-                        android:fontFamily="@font/visby_bold" />
+                        android:text="→"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
@@ -161,11 +161,11 @@
             android:id="@+id/cardRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="14dp"
-            app:cardElevation="4dp"
-            android:layout_marginBottom="6dp"
+            android:layout_marginBottom="8dp"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -174,22 +174,22 @@
                 <!-- Gradient Background for Register Card -->
                 <View
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="70dp"
                     android:background="@drawable/register_card_gradient" />
 
                 <!-- Content -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="8dp">
+                    android:orientation="horizontal"
+                    android:padding="10dp">
 
                     <!-- Icon Circle -->
                     <FrameLayout
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginEnd="8dp">
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginEnd="10dp">
 
                         <View
                             android:layout_width="match_parent"
@@ -199,9 +199,9 @@
                         <TextView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:gravity="center"
                             android:text="✨"
-                            android:textSize="16sp"
-                            android:gravity="center" />
+                            android:textSize="18sp" />
 
                     </FrameLayout>
 
@@ -215,33 +215,33 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Register"
-                            android:textSize="15sp"
-                            android:textStyle="bold"
-                            android:textColor="@android:color/white"
+                            android:layout_marginBottom="0dp"
                             android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="0dp" />
+                            android:text="Register"
+                            android:textColor="@android:color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="New here? Join the adventure!"
-                            android:textSize="9sp"
-                            android:textColor="@android:color/white"
+                            android:alpha="0.9"
                             android:fontFamily="@font/visby_regular"
-                            android:alpha="0.9" />
+                            android:text="New here? Join the adventure!"
+                            android:textColor="@android:color/white"
+                            android:textSize="10sp" />
 
                     </LinearLayout>
 
                     <!-- Arrow -->
                     <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="→"
-                        android:textSize="14sp"
-                        android:textColor="@android:color/white"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:fontFamily="@font/visby_bold"
                         android:gravity="center"
-                        android:fontFamily="@font/visby_bold" />
+                        android:text="→"
+                        android:textColor="@android:color/white"
+                        android:textSize="16sp" />
 
                 </LinearLayout>
 
