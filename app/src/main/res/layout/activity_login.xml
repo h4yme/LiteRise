@@ -4,16 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA"
     tools:context=".activities.LoginActivity">
+
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/bg_splash_login"
         android:scaleType="centerCrop"
         android:contentDescription="Placement Test Background" />
-    <!-- Content ScrollView -->
 
+    <!-- Leo Character - Floating on Top Right -->
+    <ImageView
+        android:id="@+id/ivLeoWaiting"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="91dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Leo waiting"
+        android:src="@drawable/leo_waiting" />
+
+    <!-- Content ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,27 +41,29 @@
             <!-- Top Spacer -->
             <View
                 android:layout_width="1dp"
-                android:layout_height="32dp" />
+                android:layout_height="60dp" />
 
             <!-- App Branding -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="LiteRise"
-                android:textSize="42sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:fontFamily="@font/visby_bold"
-                android:letterSpacing="-0.02"
-                android:layout_marginBottom="8dp" />
 
             <!-- Tagline -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/visby_bold"
+                android:letterSpacing="-0.02"
+                android:text="LiteRise"
+                android:textColor="@android:color/white"
+                android:textSize="42sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="Read • Learn • Rise!"
                 android:textSize="14sp"
-                android:textColor="@color/white"
+                android:textColor="@android:color/white"
+                android:alpha="0.9"
                 android:fontFamily="@font/visby_medium"
                 android:letterSpacing="0.05"
                 android:layout_marginBottom="48dp" />
@@ -55,13 +73,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
+                app:cardElevation="0dp"
                 app:cardBackgroundColor="#FFFFFF"
-                android:layout_marginBottom="25dp">
+                android:layout_marginBottom="32dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="28dp">
 
@@ -69,79 +87,109 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Welcome Learners!"
-                        android:textSize="25sp"
-                        android:textStyle="bold"
-                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="@font/visby_bold"
-                        android:layout_marginBottom="8dp" />
+                        android:text="Welcome Learners!"
+                        android:textColor="#2D3436"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
 
                     <!-- Subtitle -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Log in to start your reading adventure"
-                        android:textSize="13sp"
-                        android:textColor="#636E72"
+                        android:layout_marginBottom="32dp"
                         android:fontFamily="@font/visby_regular"
-                        android:layout_marginBottom="32dp" />
+                        android:text="Log in to start your reading adventure"
+                        android:textColor="#636E72"
+                        android:textSize="15sp" />
 
                     <!-- Email Label -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Email Address"
-                        android:textSize="14sp"
-                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="@font/visby_medium"
-                        android:layout_marginBottom="8dp" />
+                        android:text="Email Address"
+                        android:textColor="#2D3436"
+                        android:textSize="14sp" />
 
-                    <!-- Email Input -->
-                    <EditText
-                        android:id="@+id/etEmail"
+                    <!-- Email Input with Icon -->
+                    <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:background="@drawable/bg_input_modern"
-                        android:hint="yourname@example.com"
-                        android:textColorHint="#B2BEC3"
-                        android:textColor="#2D3436"
-                        android:textSize="15sp"
-                        android:fontFamily="@font/visby_regular"
-                        android:inputType="textEmailAddress"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:layout_marginBottom="20dp" />
+                        android:layout_marginBottom="20dp"
+                        android:background="@drawable/bg_input_modern">
+
+                        <TextView
+                            android:id="@+id/tvEmailIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:text="📧"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/etEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toEndOf="@id/tvEmailIcon"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/visby_regular"
+                            android:hint="yourname@example.com"
+                            android:inputType="textEmailAddress"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="20dp"
+                            android:textColor="#2D3436"
+                            android:textColorHint="#B2BEC3"
+                            android:textSize="15sp" />
+
+                    </RelativeLayout>
 
                     <!-- Password Label -->
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Password"
-                        android:textSize="14sp"
-                        android:textColor="#2D3436"
+                        android:layout_marginBottom="8dp"
                         android:fontFamily="@font/visby_medium"
-                        android:layout_marginBottom="8dp" />
+                        android:text="Password"
+                        android:textColor="#2D3436"
+                        android:textSize="14sp" />
 
-                    <!-- Password Input Container -->
+                    <!-- Password Input Container with Icon -->
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
-                        android:background="@drawable/bg_input_modern"
-                        android:layout_marginBottom="16dp">
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/bg_input_modern">
+
+                        <TextView
+                            android:id="@+id/tvPasswordIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:text="🔒"
+                            android:textSize="20sp" />
 
                         <EditText
                             android:id="@+id/etPassword"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:layout_toStartOf="@id/ivPasswordToggle"
+                            android:layout_toEndOf="@id/tvPasswordIcon"
                             android:background="@android:color/transparent"
-                            android:hint="Enter your password"
-                            android:textColorHint="#B2BEC3"
-                            android:textColor="#2D3436"
-                            android:textSize="15sp"
                             android:fontFamily="@font/visby_regular"
+                            android:hint="Enter your password"
                             android:inputType="textPassword"
-                            android:paddingStart="20dp"
-                            android:paddingEnd="56dp" />
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:textColor="#2D3436"
+                            android:textColorHint="#B2BEC3"
+                            android:textSize="15sp" />
 
                         <ImageView
                             android:id="@+id/ivPasswordToggle"
@@ -150,8 +198,8 @@
                             android:layout_alignParentEnd="true"
                             android:layout_centerVertical="true"
                             android:layout_marginEnd="16dp"
-                            android:src="@android:drawable/ic_menu_view"
                             android:contentDescription="Toggle password visibility"
+                            android:src="@android:drawable/ic_menu_view"
                             app:tint="#B2BEC3" />
 
                     </RelativeLayout>
@@ -160,19 +208,19 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
+                        android:layout_marginBottom="28dp"
                         android:gravity="center_vertical"
-                        android:layout_marginBottom="28dp">
+                        android:orientation="horizontal">
 
                         <CheckBox
                             android:id="@+id/cbRememberMe"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Remember me"
-                            android:textSize="13sp"
-                            android:textColor="#636E72"
+                            android:buttonTint="#6C5CE7"
                             android:fontFamily="@font/visby_regular"
-                            android:buttonTint="#6C5CE7" />
+                            android:text="Remember me"
+                            android:textColor="#636E72"
+                            android:textSize="13sp" />
 
                         <Space
                             android:layout_width="0dp"
@@ -183,14 +231,14 @@
                             android:id="@+id/tvForgotPassword"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Forgot Password?"
-                            android:textSize="13sp"
-                            android:textColor="#6C5CE7"
-                            android:fontFamily="@font/visby_medium"
+                            android:background="?attr/selectableItemBackgroundBorderless"
                             android:clickable="true"
                             android:focusable="true"
-                            android:background="?attr/selectableItemBackgroundBorderless"
-                            android:padding="8dp" />
+                            android:fontFamily="@font/visby_medium"
+                            android:padding="8dp"
+                            android:text="Forgot Password?"
+                            android:textColor="#6C5CE7"
+                            android:textSize="13sp" />
 
                     </LinearLayout>
 
@@ -202,7 +250,7 @@
                         android:layout_height="58dp"
                         android:elevation="0dp"
                         android:fontFamily="@font/visby_bold"
-                        android:text="Let's Read!"
+                        android:text="Let's Read! 📚"
                         android:textAllCaps="false"
                         android:textColor="@color/white"
                         android:textSize="17sp"
@@ -220,14 +268,15 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:layout_marginTop="0dp">
+                android:layout_marginTop="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="New to LiteRise? "
                     android:textSize="14sp"
-                    android:textColor="@color/white"
+                    android:textColor="@android:color/white"
+                    android:alpha="0.9"
                     android:fontFamily="@font/visby_regular" />
 
                 <TextView
@@ -236,7 +285,7 @@
                     android:layout_height="wrap_content"
                     android:text="Sign Up Here!"
                     android:textSize="14sp"
-                    android:textColor="#FFC126"
+                    android:textColor="@android:color/white"
                     android:textStyle="bold"
                     android:fontFamily="@font/visby_bold"
                     android:clickable="true"
@@ -253,6 +302,6 @@
 
         </LinearLayout>
 
-
+    </ScrollView>
 
 </FrameLayout>
