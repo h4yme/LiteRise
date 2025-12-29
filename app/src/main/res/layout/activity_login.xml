@@ -292,7 +292,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="Leo waiting"
-        android:src="@drawable/leo_waiting" />
+        android:src="@drawable/leo_waiting"
+        android:elevation="10dp" />
 
     <!-- Back Button - Must be last to be on top -->
     <ImageView
@@ -307,6 +308,7 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="8dp"
         android:layout_marginTop="30dp"
-        android:layout_marginStart="16dp"/>
+        android:layout_marginStart="16dp"
+        android:elevation="10dp" />
 
 </FrameLayout>
