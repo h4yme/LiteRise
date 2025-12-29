@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".activities.LoginActivity">
 
-    <!-- Background Image -->
+
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -14,29 +14,36 @@
         android:scaleType="centerCrop"
         android:contentDescription="Placement Test Background" />
 
-    <!-- Back Button - Floating on Top Left -->
-    <ImageButton
+    <ImageView
+        android:id="@+id/ivFloatingElements"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="top"
+        android:alpha="0.6"
+        android:contentDescription="Floating educational elements"
+        android:scaleType="centerCrop"
+        android:src="@drawable/login_floating2" />
+    <ImageView
         android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="top|start"
-        android:layout_marginTop="40dp"
-        android:layout_marginStart="20dp"
-        android:background="@drawable/icon_circle_white"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:src="@android:drawable/ic_menu_revert"
-        android:contentDescription="Go back"
-        android:padding="12dp"
+        android:contentDescription="Back"
         app:tint="@color/white"
-        android:scaleType="fitCenter" />
-
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="16dp"/>
     <!-- Leo Character - Floating on Top Right -->
     <ImageView
         android:id="@+id/ivLeoWaiting"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
         android:layout_gravity="top|end"
-        android:layout_marginTop="70dp"
-        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
         android:contentDescription="Leo waiting"
         android:src="@drawable/leo_waiting" />
 
@@ -56,46 +63,11 @@
             <!-- Top Spacer -->
             <View
                 android:layout_width="1dp"
-                android:layout_height="50dp" />
+                android:layout_height="60dp" />
 
-            <!-- App Branding with Subtle Background -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:padding="16dp"
-                android:layout_marginBottom="40dp">
+            <!-- App Branding -->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="LiteRise"
-                    android:textSize="42sp"
-                    android:textStyle="bold"
-                    android:textColor="@android:color/white"
-                    android:fontFamily="@font/visby_bold"
-                    android:letterSpacing="-0.02"
-                    android:shadowColor="#80000000"
-                    android:shadowDx="0"
-                    android:shadowDy="2"
-                    android:shadowRadius="8"
-                    android:layout_marginBottom="4dp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Read • Learn • Rise!"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
-                    android:fontFamily="@font/visby_medium"
-                    android:letterSpacing="0.05"
-                    android:shadowColor="#80000000"
-                    android:shadowDx="0"
-                    android:shadowDy="1"
-                    android:shadowRadius="4" />
-
-            </LinearLayout>
 
             <!-- Welcome Card -->
             <androidx.cardview.widget.CardView
