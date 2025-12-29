@@ -23,29 +23,6 @@
         android:contentDescription="Floating educational elements"
         android:scaleType="centerCrop"
         android:src="@drawable/login_floating2" />
-    <ImageView
-        android:id="@+id/btnBack"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:src="@android:drawable/ic_menu_revert"
-        android:contentDescription="Back"
-        app:tint="@color/white"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:padding="8dp"
-        android:layout_marginTop="30dp"
-        android:layout_marginStart="16dp"/>
-    <!-- Leo Character - Floating on Top Right -->
-    <ImageView
-        android:id="@+id/ivLeoWaiting"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:layout_gravity="top|end"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="16dp"
-        android:contentDescription="Leo waiting"
-        android:src="@drawable/leo_waiting" />
 
     <!-- Content ScrollView -->
     <ScrollView
@@ -305,5 +282,31 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <!-- Leo Character - Floating on Top Right -->
+    <ImageView
+        android:id="@+id/ivLeoWaiting"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:contentDescription="Leo waiting"
+        android:src="@drawable/leo_waiting" />
+
+    <!-- Back Button - Must be last to be on top -->
+    <ImageView
+        android:id="@+id/btnBack"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@android:drawable/ic_menu_revert"
+        android:contentDescription="Back"
+        app:tint="@color/white"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:padding="8dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="16dp"/>
 
 </FrameLayout>
