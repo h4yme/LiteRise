@@ -12,35 +12,31 @@
         android:layout_height="match_parent"
         android:background="@drawable/selection_screen_gradient" />
 
-    <!-- Floating Elements Overlay Illustration -->
+    <!-- Floating Elements Overlay Illustration - Partial Top View -->
     <ImageView
         android:id="@+id/ivFloatingElements"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="350dp"
+        android:layout_gravity="top"
         android:src="@drawable/floating_elements_overlay"
         android:scaleType="centerCrop"
         android:contentDescription="Floating educational elements"
-        android:alpha="0.85" />
+        android:alpha="0.7" />
 
     <!-- Content Layout -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="24dp">
-
-        <!-- Top Spacer for vertical centering -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+        android:padding="24dp"
+        android:layout_marginTop="240dp">
 
         <!-- Welcome Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Welcome"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textColor="@android:color/white"
             android:fontFamily="@font/visby_regular"
             android:layout_marginBottom="2dp" />
@@ -49,32 +45,32 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="to LiteRise!"
-            android:textSize="26sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="6dp" />
 
         <!-- Description -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Play, Learn, and Explore with Exciting\nReading Adventures!"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textColor="@android:color/white"
             android:fontFamily="@font/visby_regular"
             android:alpha="0.9"
             android:lineSpacingExtra="2dp"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="24dp" />
 
         <!-- Login Card -->
         <androidx.cardview.widget.CardView
             android:id="@+id/cardLogin"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="10dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -94,13 +90,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="16dp">
+                    android:padding="12dp">
 
                     <!-- Icon Circle -->
                     <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="14dp">
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="12dp">
 
                         <View
                             android:layout_width="match_parent"
@@ -111,7 +107,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="👤"
-                            android:textSize="24sp"
+                            android:textSize="20sp"
                             android:gravity="center" />
 
                     </FrameLayout>
@@ -127,17 +123,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Login"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"
                             android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="2dp" />
+                            android:layout_marginBottom="1dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Welcome back, friend!"
-                            android:textSize="13sp"
+                            android:textSize="11sp"
                             android:textColor="@android:color/white"
                             android:fontFamily="@font/visby_regular"
                             android:alpha="0.9" />
@@ -146,10 +142,10 @@
 
                     <!-- Arrow -->
                     <TextView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:text="→"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         android:fontFamily="@font/visby_bold" />
@@ -165,9 +161,9 @@
             android:id="@+id/cardRegister"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="8dp"
-            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="10dp"
             android:clickable="true"
             android:focusable="true">
 
@@ -187,13 +183,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:padding="16dp">
+                    android:padding="12dp">
 
                     <!-- Icon Circle -->
                     <FrameLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:layout_marginEnd="14dp">
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="12dp">
 
                         <View
                             android:layout_width="match_parent"
@@ -204,7 +200,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:text="✨"
-                            android:textSize="24sp"
+                            android:textSize="20sp"
                             android:gravity="center" />
 
                     </FrameLayout>
@@ -220,17 +216,17 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Register"
-                            android:textSize="20sp"
+                            android:textSize="17sp"
                             android:textStyle="bold"
                             android:textColor="@android:color/white"
                             android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="2dp" />
+                            android:layout_marginBottom="1dp" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="New here? Join the adventure!"
-                            android:textSize="13sp"
+                            android:textSize="11sp"
                             android:textColor="@android:color/white"
                             android:fontFamily="@font/visby_regular"
                             android:alpha="0.9" />
@@ -239,10 +235,10 @@
 
                     <!-- Arrow -->
                     <TextView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:text="→"
-                        android:textSize="22sp"
+                        android:textSize="18sp"
                         android:textColor="@android:color/white"
                         android:gravity="center"
                         android:fontFamily="@font/visby_bold" />
@@ -252,12 +248,6 @@
             </FrameLayout>
 
         </androidx.cardview.widget.CardView>
-
-        <!-- Bottom Spacer -->
-        <View
-            android:layout_width="1dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
 
     </LinearLayout>
 
