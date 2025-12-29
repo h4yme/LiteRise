@@ -12,72 +12,15 @@
         android:layout_height="match_parent"
         android:background="@drawable/selection_screen_gradient" />
 
-    <!-- Floating Illustrations - More Visible -->
-    <!-- Top Left - Book -->
+    <!-- Floating Elements Overlay Illustration -->
     <ImageView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:src="@drawable/floating_book_3d"
-        android:alpha="0.7"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="40dp"
-        android:contentDescription="Floating book"
-        android:rotation="-15" />
-
-    <!-- Top Right - Star -->
-    <ImageView
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:src="@drawable/floating_star_3d"
-        android:alpha="0.75"
-        android:layout_gravity="end"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="60dp"
-        android:contentDescription="Floating star" />
-
-    <!-- Middle Left - Coin -->
-    <ImageView
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:src="@drawable/floating_coin_3d"
-        android:alpha="0.7"
-        android:layout_marginStart="10dp"
-        android:layout_marginTop="180dp"
-        android:contentDescription="Floating coin"
-        android:rotation="25" />
-
-    <!-- Middle Right - Globe -->
-    <ImageView
-        android:layout_width="55dp"
-        android:layout_height="55dp"
-        android:src="@drawable/floating_globe_3d"
-        android:alpha="0.65"
-        android:layout_gravity="end"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="260dp"
-        android:contentDescription="Globe" />
-
-    <!-- Bottom Right - Star Small -->
-    <ImageView
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/floating_star_3d"
-        android:alpha="0.65"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="20dp"
-        android:layout_marginBottom="120dp"
-        android:contentDescription="Small star" />
-
-    <!-- Top Center - Small Coin -->
-    <ImageView
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:src="@drawable/floating_coin_3d"
-        android:alpha="0.55"
-        android:layout_gravity="top|center_horizontal"
-        android:layout_marginTop="100dp"
-        android:contentDescription="Small coin"
-        android:rotation="-30" />
+        android:id="@+id/ivFloatingElements"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/floating_elements_overlay"
+        android:scaleType="fitXY"
+        android:contentDescription="Floating educational elements"
+        android:alpha="0.9" />
 
     <!-- Content Layout -->
     <ScrollView
