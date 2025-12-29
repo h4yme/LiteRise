@@ -23,7 +23,7 @@
         android:alpha="0.7"
         android:contentDescription="Floating educational elements"
         android:scaleType="centerCrop"
-        android:src="@drawable/floating_elements_overlay" />
+        android:src="@drawable/floating_elements_overlay2" />
 
     <!-- Content Layout -->
     <LinearLayout

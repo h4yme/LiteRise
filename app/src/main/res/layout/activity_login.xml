@@ -14,13 +14,15 @@
         android:scaleType="centerCrop"
         android:contentDescription="Placement Test Background" />
 
+
+
     <!-- Leo Character - Floating on Top Right -->
     <ImageView
         android:id="@+id/ivLeoWaiting"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_gravity="top|end"
-        android:layout_marginTop="91dp"
+        android:layout_marginTop="14dp"
         android:layout_marginEnd="16dp"
         android:contentDescription="Leo waiting"
         android:src="@drawable/leo_waiting" />
@@ -34,8 +36,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:gravity="center_horizontal"
+            android:orientation="vertical"
             android:padding="24dp">
 
             <!-- Top Spacer -->
@@ -46,36 +48,16 @@
             <!-- App Branding -->
 
             <!-- Tagline -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/visby_bold"
-                android:letterSpacing="-0.02"
-                android:text="LiteRise"
-                android:textColor="@android:color/white"
-                android:textSize="42sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Read • Learn • Rise!"
-                android:textSize="14sp"
-                android:textColor="@android:color/white"
-                android:alpha="0.9"
-                android:fontFamily="@font/visby_medium"
-                android:letterSpacing="0.05"
-                android:layout_marginBottom="48dp" />
 
             <!-- Welcome Card -->
             <androidx.cardview.widget.CardView
+                android:layout_marginTop="50dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
+                android:layout_marginBottom="32dp"
                 app:cardBackgroundColor="#FFFFFF"
-                android:layout_marginBottom="32dp">
+                app:cardCornerRadius="24dp"
+                app:cardElevation="0dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -266,32 +248,32 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:layout_marginTop="16dp">
+                android:orientation="horizontal">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="New to LiteRise? "
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
                     android:alpha="0.9"
-                    android:fontFamily="@font/visby_regular" />
+                    android:fontFamily="@font/visby_regular"
+                    android:text="New to LiteRise? "
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp" />
 
                 <TextView
                     android:id="@+id/tvSignUp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Sign Up Here!"
-                    android:textSize="14sp"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:fontFamily="@font/visby_bold"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="8dp" />
+                    android:fontFamily="@font/visby_bold"
+                    android:padding="8dp"
+                    android:text="Sign Up Here!"
+                    android:textColor="#FFC126"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
             </LinearLayout>
 
