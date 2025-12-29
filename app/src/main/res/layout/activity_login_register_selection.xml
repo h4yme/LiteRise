@@ -72,7 +72,8 @@
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -165,7 +166,8 @@
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="16dp"
-            app:cardElevation="0dp">
+            app:cardElevation="0dp"
+            app:cardBackgroundColor="@android:color/transparent">
 
             <FrameLayout
                 android:layout_width="match_parent"
