@@ -12,6 +12,106 @@
         android:layout_height="match_parent"
         android:background="@drawable/selection_screen_gradient" />
 
+    <!-- Floating Illustrations -->
+    <!-- Top Left - Book -->
+    <ImageView
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/ic_floating_book"
+        android:alpha="0.8"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="40dp"
+        android:contentDescription="Floating book"
+        android:rotation="-15" />
+
+    <!-- Top Right - Star -->
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/ic_floating_star"
+        android:alpha="0.9"
+        android:layout_gravity="end"
+        android:layout_marginEnd="30dp"
+        android:layout_marginTop="60dp"
+        android:contentDescription="Floating star" />
+
+    <!-- Top Right Corner - Sparkle -->
+    <ImageView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/ic_floating_sparkle"
+        android:alpha="0.7"
+        android:layout_gravity="end"
+        android:layout_marginEnd="60dp"
+        android:layout_marginTop="120dp"
+        android:contentDescription="Sparkle" />
+
+    <!-- Middle Left - Coin -->
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/ic_floating_coin"
+        android:alpha="0.85"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="200dp"
+        android:contentDescription="Floating coin"
+        android:rotation="25" />
+
+    <!-- Middle Right - Globe -->
+    <ImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:src="@drawable/ic_floating_globe"
+        android:alpha="0.75"
+        android:layout_gravity="end"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="280dp"
+        android:contentDescription="Globe" />
+
+    <!-- Bottom Left - Pencil -->
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:src="@drawable/ic_floating_pencil"
+        android:alpha="0.8"
+        android:layout_gravity="bottom"
+        android:layout_marginStart="40dp"
+        android:layout_marginBottom="180dp"
+        android:contentDescription="Pencil"
+        android:rotation="-20" />
+
+    <!-- Bottom Right - Star Small -->
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:src="@drawable/ic_floating_star"
+        android:alpha="0.7"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="220dp"
+        android:contentDescription="Small star" />
+
+    <!-- Bottom Center - Sparkle -->
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/ic_floating_sparkle"
+        android:alpha="0.8"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="140dp"
+        android:contentDescription="Sparkle" />
+
+    <!-- Top Center - Small Coin -->
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_floating_coin"
+        android:alpha="0.6"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="100dp"
+        android:contentDescription="Small coin"
+        android:rotation="-30" />
+
     <!-- Content Layout -->
     <ScrollView
         android:layout_width="match_parent"

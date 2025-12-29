@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="32dp"
+    android:height="32dp"
+    android:viewportWidth="32"
+    android:viewportHeight="32">
+
+    <!-- Star -->
+    <path
+        android:fillColor="#FFD700"
+        android:pathData="M16,2 L19.5,12.5 L30,16 L19.5,19.5 L16,30 L12.5,19.5 L2,16 L12.5,12.5 Z"/>
+
+    <!-- Star Highlight -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.4"
+        android:pathData="M16,2 L18,10 L16,16 L14,10 Z"/>
+</vector>
