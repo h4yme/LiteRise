@@ -8,8 +8,22 @@
 
 // Only try to use PHPMailer if it's available
 $phpmailerAvailable = false;
+
+// Check for Composer vendor autoload
 if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
     require_once __DIR__ . '/../vendor/autoload.php';
+    $phpmailerAvailable = class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+}
+
+// Check for PHPMailer in src folder (alternative installation)
+if (!$phpmailerAvailable && file_exists(__DIR__ . '/PHPMailer.php')) {
+    require_once __DIR__ . '/PHPMailer.php';
+    if (file_exists(__DIR__ . '/Exception.php')) {
+        require_once __DIR__ . '/Exception.php';
+    }
+    if (file_exists(__DIR__ . '/SMTP.php')) {
+        require_once __DIR__ . '/SMTP.php';
+    }
     $phpmailerAvailable = class_exists('PHPMailer\\PHPMailer\\PHPMailer');
 }
 
