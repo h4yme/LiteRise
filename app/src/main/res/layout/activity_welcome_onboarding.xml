@@ -52,10 +52,8 @@
             app:tabBackground="@drawable/tab_dot_selector"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp"
-            app:tabMaxWidth="40dp"
-            app:tabMinWidth="40dp"
-            app:tabPaddingEnd="8dp"
-            app:tabPaddingStart="8dp" />
+            app:tabMaxWidth="48dp"
+            app:tabMinWidth="48dp" />
 
         <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton
