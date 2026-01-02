@@ -70,7 +70,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="50dp"
                     android:background="@drawable/bg_input_modern"
-                    android:text="Grade 1"
+                    android:text="Grade 3"
                     android:textColor="#2D3436"
                     android:textSize="15sp"
                     android:fontFamily="@font/visby_medium"
