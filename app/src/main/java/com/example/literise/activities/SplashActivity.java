@@ -29,77 +29,20 @@ public class SplashActivity extends AppCompatActivity {
 
 
         new Handler().postDelayed(() -> {
-
             SessionManager session = new SessionManager(SplashActivity.this);
-
             Intent intent;
 
-
-
             if (session.isLoggedIn()) {
-
-                // 🎯 Launch Adaptive Assessment (personalized questions)
-
-
-
-
-
-                if (!session.hasSeenWelcome()) {
-
-                    // First time user - show welcome/intro screens
-
-                    intent = new Intent(SplashActivity.this, WelcomeActivity.class);
-
-                } else {
-
-                    // 🎯 Launch Adaptive Assessment (personalized questions)
-
-                    float ability = session.getAbility();
-
-
-
-                    if (ability == 0.0f || Math.abs(ability) < 0.01f) {
-
-
-
-                        // No assessment taken yet - go to assessment
-
-
-
-                        intent = new Intent(SplashActivity.this, AdaptivePreAssessmentActivity.class);
-
-
-
-                    } else {
-
-
-
-                        // Assessment already taken - go to dashboard
-
-
-
-                        intent = new Intent(SplashActivity.this, DashboardActivity.class);
-
-
-
-                    }
-
-                }
-
+                // Logged in - go directly to Dashboard
+                intent = new Intent(SplashActivity.this, DashboardActivity.class);
             } else {
-
+                // Not logged in - show login/register selection
                 intent = new Intent(SplashActivity.this, LoginRegisterSelectionActivity.class);
-
             }
 
-
-
             startActivity(intent);
-
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
             finish();
-
         }, 2000);
 
     }

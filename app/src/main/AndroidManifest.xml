@@ -116,14 +116,6 @@
 
         <!-- ✅ Welcome Tutorial Screen -->
 
-        <activity
-
-            android:name=".activities.WelcomeTutorialActivity"
-
-            android:exported="false"
-
-            android:theme="@style/Theme.LiteRise.NoActionBar" />
-
         <!-- ✅ Placement Intro Screen -->
 
         <activity

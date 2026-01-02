@@ -301,51 +301,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
-
-
-                    Intent intent;
-
-
-
-                    // Check if user has seen welcome screens (now synced with server)
-
-
-
-                    if (!sessionManager.hasSeenWelcome()) {
-
-
-
-                        // First time user - show welcome/intro screens
-
-
-
-                        intent = new Intent(LoginActivity.this, WelcomeActivity.class);
-
-
-
-                    } else if (sessionManager.hasCompletedAssessment()) {
-
-
-
-                        // Already completed assessment - go to dashboard
-
-
-
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
-
-
-
-                    } else {
-
-
-
-                        // Seen welcome but no assessment - go to adaptive assessment
-
-
-
-                        intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
-
-                    }
+                    // Go directly to Dashboard (no onboarding/assessment screens)
+                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
@@ -386,40 +343,10 @@ public class LoginActivity extends AppCompatActivity {
 
         CustomToast.showSuccess(LoginActivity.this, "Welcome to LiteRise Demo!");
 
-
-
-        Intent intent;
-
-
-
-        // Check if user has completed onboarding
-
-        if (!sessionManager.hasSeenWelcome()) {
-
-            // First time user - show welcome screens
-
-            intent = new Intent(LoginActivity.this, WelcomeActivity.class);
-
-        } else if (sessionManager.hasCompletedAssessment()) {
-
-            // Already completed assessment - go to dashboard
-
-            intent = new Intent(LoginActivity.this, DashboardActivity.class);
-
-        } else {
-
-            // Seen welcome but no assessment - go to adaptive assessment
-
-            intent = new Intent(LoginActivity.this, AdaptivePreAssessmentActivity.class);
-
-        }
-
-
-
+        // Go directly to Dashboard (no onboarding/assessment screens)
+        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
         startActivity(intent);
-
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-
         finish();
 
     }
