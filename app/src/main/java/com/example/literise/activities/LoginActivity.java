@@ -29,7 +29,7 @@ public class LoginActivity extends AppCompatActivity {
     Button btnLogin;
     ImageView ivPasswordToggle;
     ImageView btnBack;
-    TextView tvSignUp;
+    TextView tvSignUp, tvForgotPassword;
     boolean isPasswordVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,7 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
         tvSignUp = findViewById(R.id.tvSignUp);
+        tvForgotPassword = findViewById(R.id.tvForgotPassword);
 
         // Back button click listener
         btnBack.setOnClickListener(v -> {
@@ -130,6 +131,15 @@ public class LoginActivity extends AppCompatActivity {
         if (tvSignUp != null) {
             tvSignUp.setOnClickListener(v -> {
                 Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+            });
+        }
+
+        // Forgot Password link click
+        if (tvForgotPassword != null) {
+            tvForgotPassword.setOnClickListener(v -> {
+                Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             });

@@ -104,6 +104,16 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Forgot Password Screen -->
+
+        <activity
+
+            android:name=".activities.ForgotPasswordActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Welcome Tutorial Screen -->
 
         <activity
