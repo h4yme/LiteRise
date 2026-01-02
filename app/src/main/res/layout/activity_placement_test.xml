@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F9FA">
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/topBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/white"
+        android:elevation="2dp">
+
+        <!-- Back Button -->
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_arrow_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:padding="4dp"
+            app:tint="#2C3E50" />
+
+        <!-- Progress Bar -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="8dp"
+                    android:layout_weight="1"
+                    android:max="100"
+                    android:progress="12"
+                    android:progressDrawable="@drawable/progress_bar_placement"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="3/25"
+                    android:textColor="#2C3E50"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Skip Button -->
+        <TextView
+            android:id="@+id/btnSkip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/visby_medium"
+            android:padding="8dp"
+            android:text="Skip"
+            android:textColor="#7F8C8D"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+    <!-- Main Content Container -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:layout_above="@id/bottomContainer"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <!-- Category Badge -->
+            <LinearLayout
+                android:id="@+id/categoryBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/category_badge_bg"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp">
+
+                <TextView
+                    android:id="@+id/tvCategoryIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📚"
+                    android:textSize="16sp"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tvCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="Category 1: Oral Language"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+            <!-- Question Type Badge -->
+            <LinearLayout
+                android:id="@+id/questionTypeBadge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/question_type_badge_bg"
+                android:padding="12dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✨"
+                    android:textSize="18sp"
+                    android:layout_marginEnd="8dp" />
+
+                <TextView
+                    android:id="@+id/tvQuestionType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="Choose the Correct Word"
+                    android:textColor="#2C3E50"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/ic_info"
+                    android:layout_marginStart="8dp"
+                    app:tint="#7F8C8D" />
+
+            </LinearLayout>
+
+            <!-- Question Card Container (Dynamic) -->
+            <FrameLayout
+                android:id="@+id/questionContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <!-- Bottom Container -->
+    <LinearLayout
+        android:id="@+id/bottomContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@color/white"
+        android:elevation="4dp">
+
+        <!-- Leo Hint -->
+        <LinearLayout
+            android:id="@+id/leoHintContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/leo_happy"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:id="@+id/tvLeoHint"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/visby_medium"
+                android:text="Pick the right word!"
+                android:textColor="#7F8C8D"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+        <!-- Action Buttons -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- Continue Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnContinue"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="0dp"
+                android:layout_height="54dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/visby_bold"
+                android:text="Continue"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:backgroundTint="#4ECDC4"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_arrow_forward"
+                app:iconGravity="end"
+                app:iconTint="@color/white"
+                android:layout_marginEnd="8dp" />
+
+            <!-- Retry Button (Hidden initially) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRetry"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="54dp"
+                android:fontFamily="@font/visby_medium"
+                android:text="Retry"
+                android:textAllCaps="false"
+                android:textColor="#7F8C8D"
+                android:textSize="16sp"
+                app:strokeColor="#BDC3C7"
+                app:strokeWidth="2dp"
+                app:cornerRadius="16dp"
+                app:icon="@drawable/ic_refresh"
+                app:iconGravity="start"
+                app:iconTint="#7F8C8D"
+                android:visibility="gone"
+                android:layout_marginStart="8dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>

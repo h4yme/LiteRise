@@ -144,6 +144,16 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Placement Test Screen -->
+
+        <activity
+
+            android:name=".activities.PlacementTestActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
 
         <activity
