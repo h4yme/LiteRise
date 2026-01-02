@@ -6,10 +6,18 @@
  */
 
 // Test configuration
-$API_BASE_URL = 'http://localhost/literise/api';
+// IMPORTANT: Update this URL to match your XAMPP setup
+// Common URLs:
+// - http://localhost/api (if files are in C:\xampp\htdocs\api)
+// - http://localhost/literise/api (if files are in C:\xampp\htdocs\literise\api)
+// - http://localhost:8080/api (if using port 8080)
+$API_BASE_URL = 'http://localhost/api';
 $TEST_EMAIL = 'test_' . time() . '@example.com';
 $TEST_PASSWORD = 'TestPass123';
 $TEST_NEW_PASSWORD = 'NewPass123';
+
+echo "Testing API at: $API_BASE_URL\n";
+echo "========================================\n\n";
 
 echo "========================================\n";
 echo "LiteRise API Test Suite\n";
