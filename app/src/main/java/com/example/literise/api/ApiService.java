@@ -4,13 +4,9 @@ import com.example.literise.models.GetNextItemRequest;
 
 import com.example.literise.models.NextItemResponse;
 
-import com.example.literise.models.PreAssessmentResponse;
-
 import com.example.literise.models.PronunciationRequest;
 
 import com.example.literise.models.PronunciationResponse;
-
-import com.example.literise.models.Question;
 
 import com.example.literise.models.ResponseModel;
 
@@ -38,10 +34,6 @@ import com.example.literise.models.VerifyOTPRequest;
 import com.example.literise.models.VerifyOTPResponse;
 import com.example.literise.models.ResetPasswordRequest;
 import com.example.literise.models.ResetPasswordResponse;
-import java.util.List;
-
-import java.util.Map;
-
 
 
 import retrofit2.Call;
@@ -80,10 +72,6 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("reset_password.php")
     Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);
-
-    @Headers("Content-Type: application/json")
-    @POST("get_preassessment_items.php")
-    Call<PreAssessmentResponse> getPreAssessmentItems();
 
     @Headers("Content-Type: application/json")
     @POST("submit_responses.php")
