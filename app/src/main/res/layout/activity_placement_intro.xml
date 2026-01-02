@@ -1,100 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="@color/white">
 
-    <ScrollView
+    <!-- Background decoration -->
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="300dp"
+        android:src="@drawable/placement_intro_bg"
+        android:scaleType="centerCrop"
+        android:alpha="0.1" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+    <!-- Content -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:gravity="center">
+
+        <!-- Leo Character Large -->
+        <ImageView
+            android:id="@+id/ivLeoIntro"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
+            android:src="@drawable/leo_happy"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Welcome Text -->
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            android:padding="24dp">
+            android:fontFamily="@font/visby_bold"
+            android:text="Welcome!"
+            android:textColor="#2C3E50"
+            android:textSize="32sp"
+            android:layout_marginBottom="8dp" />
 
-            <!-- Top Spacer -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/visby_medium"
+            android:text="Let's find your perfect reading level"
+            android:textAlignment="center"
+            android:textColor="#7F8C8D"
+            android:textSize="16sp"
+            android:layout_marginBottom="32dp" />
 
-            <!-- Main Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
-                app:cardBackgroundColor="#FFFFFF">
+        <!-- Start Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnStartPlacement"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="match_parent"
+            android:layout_height="58dp"
+            android:fontFamily="@font/visby_bold"
+            android:text="Let's Start!"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="17sp"
+            app:backgroundTint="#FF8C42"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_arrow_forward"
+            app:iconGravity="end"
+            app:iconTint="@color/white" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="40dp"
-                    android:gravity="center">
+    </LinearLayout>
 
-                    <!-- Leo Character -->
-                    <ImageView
-                        android:layout_width="160dp"
-                        android:layout_height="160dp"
-                        android:src="@drawable/leo_placement_test"
-                        android:contentDescription="Leo the Lion"
-                        android:layout_marginBottom="32dp" />
-
-                    <!-- Title -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Let's Find Your Level!"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_bold"
-                        android:gravity="center"
-                        android:layout_marginBottom="16dp" />
-
-                    <!-- Description -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="I'll ask you a few questions to find the perfect reading level for you. Don't worry, it's fun!"
-                        android:textSize="16sp"
-                        android:textColor="#636E72"
-                        android:fontFamily="@font/visby_regular"
-                        android:gravity="center"
-                        android:lineSpacingExtra="4dp"
-                        android:layout_marginBottom="32dp" />
-
-                    <!-- Start Button -->
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnStartPlacement"
-                        android:layout_width="match_parent"
-                        android:layout_height="56dp"
-                        android:text="Let's Go!"
-                        android:textSize="16sp"
-                        android:textColor="#FFFFFF"
-                        android:fontFamily="@font/visby_bold"
-                        android:background="@drawable/bg_button_modern_primary"
-                        android:elevation="0dp"
-                        app:backgroundTint="@null" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Bottom Spacer -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
-</FrameLayout>
+</RelativeLayout>

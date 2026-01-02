@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    
+    <!-- Circular background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0" />
+    
+    <!-- Leo character placeholder - Orange circle with face -->
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M60,20C40,20,24,36,24,56C24,76,40,92,60,92C80,92,96,76,96,56C96,36,80,20,60,20Z" />
+    
+    <!-- Eyes -->
+    <circle
+        android:fillColor="#2C3E50"
+        android:cx="48"
+        android:cy="52"
+        android:radius="4" />
+    <circle
+        android:fillColor="#2C3E50"
+        android:cx="72"
+        android:cy="52"
+        android:radius="4" />
+    
+    <!-- Smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M45,65 Q60,75 75,65" />
+    
+</vector>

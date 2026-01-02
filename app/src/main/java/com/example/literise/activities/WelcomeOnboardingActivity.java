@@ -97,9 +97,8 @@ public class WelcomeOnboardingActivity extends AppCompatActivity {
         SessionManager sessionManager = new SessionManager(this);
         sessionManager.setHasSeenWelcome(true);
 
-        // Navigate to Placement Intro (to be built)
-        // For now, go to Dashboard
-        Intent intent = new Intent(WelcomeOnboardingActivity.this, DashboardActivity.class);
+        // Navigate to Placement Intro
+        Intent intent = new Intent(WelcomeOnboardingActivity.this, PlacementIntroActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
