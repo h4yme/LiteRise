@@ -114,28 +114,15 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
-        <!-- ✅ Welcome Tutorial Screen -->
-
-        <!-- ✅ Placement Intro Screen -->
+        <!-- ✅ Welcome Onboarding Screen -->
 
         <activity
 
-            android:name=".activities.PlacementIntroActivity"
+            android:name=".activities.WelcomeOnboardingActivity"
 
             android:exported="false"
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
-
-        <!-- ✅ Welcome/Intro Screens -->
-
-
-        <!-- ✅ Pre-Assessment Screen (Fixed Mode - 20 questions) -->
-
-
-        <!-- ✅ Adaptive Pre-Assessment Screen (Adaptive Mode - 10-15 questions) -->
-
-
-        <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
 
         <activity
 
@@ -205,6 +192,8 @@
             android:theme="@style/Theme.LiteRise.NoActionBar"
 
             android:screenOrientation="portrait" />
+
+
 
         <activity
             android:name=".activities.SettingsActivity"

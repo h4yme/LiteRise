@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder for Slide 1: Discover Stories from Islamic History -->
+<!-- Replace this with your custom vector drawable -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#FFE4CC"
+        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+
+    <!-- Book icon (simplified) -->
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M80,100 L200,100 L200,180 L80,180 Z" />
+
+    <path
+        android:fillColor="#2D3436"
+        android:pathData="M140,100 L140,180"
+        android:strokeWidth="3"
+        android:strokeColor="#2D3436" />
+
+    <!-- Mosque silhouette (simplified) -->
+    <path
+        android:fillColor="#6C5CE7"
+        android:pathData="M100,70 L120,50 L140,70 L160,50 L180,70 L180,90 L100,90 Z" />
+
+</vector>

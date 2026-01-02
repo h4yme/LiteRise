@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder for Slide 2: Fun Quizzes After Each Story -->
+<!-- Replace this with your custom vector drawable -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#FFF4E6"
+        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+
+    <!-- Quiz card (simplified) -->
+    <path
+        android:fillColor="#FFD93D"
+        android:pathData="M70,80 L210,80 A10,10 0 0 1 220,90 L220,190 A10,10 0 0 1 210,200 L70,200 A10,10 0 0 1 60,190 L60,90 A10,10 0 0 1 70,80 Z" />
+
+    <!-- Check marks -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M90,120 L100,130 L120,110"
+        android:strokeWidth="4"
+        android:strokeColor="#4CAF50"
+        android:fillType="nonZero" />
+
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M90,160 L100,170 L120,150"
+        android:strokeWidth="4"
+        android:strokeColor="#4CAF50"
+        android:fillType="nonZero" />
+
+</vector>

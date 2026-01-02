@@ -238,7 +238,7 @@ public class RegisterActivity extends AppCompatActivity {
                 birthday,
                 gender,
                 schoolId,
-                "3",
+                "3", // grade_level - Grade 3 for research study
                 email,
                 password
         );
@@ -271,8 +271,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                         CustomToast.showSuccess(RegisterActivity.this, registerResponse.getMessage());
 
-                        // Navigate to Welcome Tutorial
-                        Intent intent = new Intent(RegisterActivity.this, DashboardActivity.class);
+                        // Navigate to Welcome Onboarding (first time user)
+                        Intent intent = new Intent(RegisterActivity.this, WelcomeOnboardingActivity.class);
                         startActivity(intent);
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();
