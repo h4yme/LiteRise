@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Placeholder for Slide 3: Grow with Rewards -->
+<!-- Replace this with your custom vector drawable -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Background circle -->
+    <path
+        android:fillColor="#E8F5E9"
+        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+
+    <!-- Trophy (simplified) -->
+    <path
+        android:fillColor="#FFC126"
+        android:pathData="M110,80 L170,80 L170,130 A30,30 0 0 1 110,130 Z" />
+
+    <path
+        android:fillColor="#FFC126"
+        android:pathData="M130,130 L150,130 L150,160 L130,160 Z" />
+
+    <path
+        android:fillColor="#FFC126"
+        android:pathData="M120,160 L160,160 L165,170 L115,170 Z" />
+
+    <!-- Stars -->
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M80,100 L85,110 L95,110 L87,116 L90,126 L80,120 L70,126 L73,116 L65,110 L75,110 Z" />
+
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M200,100 L205,110 L215,110 L207,116 L210,126 L200,120 L190,126 L193,116 L185,110 L195,110 Z" />
+
+</vector>

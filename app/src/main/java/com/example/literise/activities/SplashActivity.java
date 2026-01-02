@@ -33,8 +33,14 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent;
 
             if (session.isLoggedIn()) {
-                // Logged in - go directly to Dashboard
-                intent = new Intent(SplashActivity.this, DashboardActivity.class);
+                // Check if user has seen welcome onboarding
+                if (!session.hasSeenWelcome()) {
+                    // Show welcome onboarding
+                    intent = new Intent(SplashActivity.this, WelcomeOnboardingActivity.class);
+                } else {
+                    // Go directly to Dashboard
+                    intent = new Intent(SplashActivity.this, DashboardActivity.class);
+                }
             } else {
                 // Not logged in - show login/register selection
                 intent = new Intent(SplashActivity.this, LoginRegisterSelectionActivity.class);

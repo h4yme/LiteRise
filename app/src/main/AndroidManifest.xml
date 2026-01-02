@@ -114,6 +114,16 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Welcome Onboarding Screen -->
+
+        <activity
+
+            android:name=".activities.WelcomeOnboardingActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Welcome Tutorial Screen -->
 
         <activity

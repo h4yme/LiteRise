@@ -301,8 +301,15 @@ public class LoginActivity extends AppCompatActivity {
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
-                    // Go directly to Dashboard (no onboarding/assessment screens)
-                    Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    // Check if user has seen welcome onboarding
+                    Intent intent;
+                    if (!sessionManager.hasSeenWelcome()) {
+                        // First time - show welcome onboarding
+                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                    } else {
+                        // Returning user - go to Dashboard
+                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                    }
                     startActivity(intent);
                     overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                     finish();
@@ -343,8 +350,15 @@ public class LoginActivity extends AppCompatActivity {
 
         CustomToast.showSuccess(LoginActivity.this, "Welcome to LiteRise Demo!");
 
-        // Go directly to Dashboard (no onboarding/assessment screens)
-        Intent intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        // Check if user has seen welcome onboarding
+        Intent intent;
+        if (!sessionManager.hasSeenWelcome()) {
+            // First time - show welcome onboarding
+            intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+        } else {
+            // Returning user - go to Dashboard
+            intent = new Intent(LoginActivity.this, DashboardActivity.class);
+        }
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
