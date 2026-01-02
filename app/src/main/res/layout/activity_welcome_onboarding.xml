@@ -43,7 +43,7 @@
         android:padding="24dp"
         android:gravity="center_horizontal">
 
-        <!-- Page Indicator Dots -->
+        <!-- Page Indicator Lines -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabDots"
             android:layout_width="wrap_content"
@@ -52,8 +52,8 @@
             app:tabBackground="@drawable/tab_dot_selector"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp"
-            app:tabPaddingEnd="8dp"
-            app:tabPaddingStart="8dp" />
+            app:tabPaddingEnd="4dp"
+            app:tabPaddingStart="4dp" />
 
         <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton
