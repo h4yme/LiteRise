@@ -27,14 +27,15 @@ public class LoginActivity extends AppCompatActivity {
 
     EditText etEmail, etPassword;
     Button btnLogin;
-    private ImageView btnBack;
     ImageView ivPasswordToggle;
+    ImageView btnBack;
     TextView tvSignUp;
     boolean isPasswordVisible = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
         btnBack = findViewById(R.id.btnBack);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
@@ -42,7 +43,11 @@ public class LoginActivity extends AppCompatActivity {
         ivPasswordToggle = findViewById(R.id.ivPasswordToggle);
         tvSignUp = findViewById(R.id.tvSignUp);
 
-
+        // Back button click listener
+        btnBack.setOnClickListener(v -> {
+            finish();
+            overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        });
 
         // Password visibility toggle
 
