@@ -3,11 +3,14 @@
 /**
  * LiteRise Email Utility
  * Handles sending emails for OTP and notifications
+ * Supports both SMTP (via PHPMailer) and basic PHP mail()
  */
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 /**
- * Send email using PHP's mail() function
- * For production, consider using PHPMailer or SendGrid
+ * Send email using SMTP (PHPMailer) or fallback to PHP mail()
  *
  * @param string $to Recipient email
  * @param string $subject Email subject
@@ -20,9 +23,67 @@ function sendEmail($to, $subject, $htmlBody, $from = null) {
     if (!$from) {
         $from = $_ENV['EMAIL_FROM'] ?? 'noreply@literise.com';
     }
-
     $fromName = $_ENV['EMAIL_FROM_NAME'] ?? 'LiteRise';
 
+    // Check if SMTP is enabled
+    $smtpEnabled = isset($_ENV['SMTP_ENABLED']) && $_ENV['SMTP_ENABLED'] === 'true';
+
+    if ($smtpEnabled && class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        return sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName);
+    } else {
+        return sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName);
+    }
+}
+
+/**
+ * Send email using PHPMailer with SMTP
+ */
+function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
+    try {
+        $mail = new PHPMailer(true);
+
+        // SMTP Configuration
+        $mail->isSMTP();
+        $mail->Host = $_ENV['SMTP_HOST'] ?? 'smtp.gmail.com';
+        $mail->SMTPAuth = true;
+        $mail->Username = $_ENV['SMTP_USERNAME'] ?? '';
+        $mail->Password = $_ENV['SMTP_PASSWORD'] ?? '';
+        $mail->SMTPSecure = $_ENV['SMTP_ENCRYPTION'] ?? 'tls';
+        $mail->Port = (int)($_ENV['SMTP_PORT'] ?? 587);
+
+        // Sender and recipient
+        $mail->setFrom($from, $fromName);
+        $mail->addAddress($to);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->CharSet = 'UTF-8';
+        $mail->Subject = $subject;
+        $mail->Body = $htmlBody;
+        $mail->AltBody = strip_tags($htmlBody);
+
+        // Send
+        $result = $mail->send();
+
+        if ($result) {
+            error_log("Email sent successfully via SMTP to: $to");
+            return true;
+        } else {
+            error_log("Failed to send email via SMTP to: $to");
+            return false;
+        }
+
+    } catch (Exception $e) {
+        error_log("SMTP Email Error: {$mail->ErrorInfo}");
+        error_log("Exception: " . $e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Send email using basic PHP mail() function (fallback)
+ */
+function sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName) {
     // Email headers
     $headers = [
         'MIME-Version: 1.0',
