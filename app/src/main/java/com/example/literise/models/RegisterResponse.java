@@ -10,11 +10,14 @@ public class RegisterResponse {
     @SerializedName("message")
     private String message;
 
-    @SerializedName("student_id")
-    private int studentId;
+    @SerializedName("student")
+    private StudentData student;
 
     @SerializedName("token")
     private String token;
+
+    @SerializedName("error")
+    private String error;
 
     // Getters and Setters
     public boolean isSuccess() { return success; }
@@ -23,9 +26,17 @@ public class RegisterResponse {
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
 
-    public int getStudentId() { return studentId; }
-    public void setStudentId(int studentId) { this.studentId = studentId; }
+    public StudentData getStudent() { return student; }
+    public void setStudent(StudentData student) { this.student = student; }
 
     public String getToken() { return token; }
     public void setToken(String token) { this.token = token; }
+
+    public String getError() { return error; }
+    public void setError(String error) { this.error = error; }
+
+    // Convenience method for student ID
+    public int getStudentId() {
+        return student != null ? student.getStudentID() : 0;
+    }
 }

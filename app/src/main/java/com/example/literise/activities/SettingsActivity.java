@@ -276,7 +276,7 @@ public class SettingsActivity extends AppCompatActivity {
 
                     session.logout();
 
-                    Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+                    Intent intent = new Intent(SettingsActivity.this, LoginRegisterSelectionActivity.class);
 
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 

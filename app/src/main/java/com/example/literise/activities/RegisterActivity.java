@@ -226,29 +226,6 @@ public class RegisterActivity extends AppCompatActivity {
         String email = step4.getEmail();
         String password = step4.getPassword();
 
-        // ============================================
-        // TESTING MODE: Bypass API and navigate directly
-        // ============================================
-
-        // Save mock session data for testing
-        SessionManager sessionManager = new SessionManager(this);
-        String fullName = firstName + " " + lastName;
-        sessionManager.saveStudent(999, fullName, email); // Mock student ID
-        sessionManager.saveToken("mock_token_for_testing"); // Mock token
-        sessionManager.saveNickname(nickname);
-
-        CustomToast.showSuccess(this, "Registration successful!");
-
-        // Navigate to Welcome Tutorial
-        Intent intent = new Intent(this, WelcomeTutorialActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-        finish();
-
-        // ============================================
-        // PRODUCTION CODE (commented out for testing)
-        // ============================================
-        /*
         // Disable button during API call
         btnNext.setEnabled(false);
         btnNext.setText("Creating Account...");
@@ -261,7 +238,7 @@ public class RegisterActivity extends AppCompatActivity {
                 birthday,
                 gender,
                 schoolId,
-                "Grade 1",
+                "1", // grade_level as string
                 email,
                 password
         );
@@ -277,11 +254,14 @@ public class RegisterActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     RegisterResponse registerResponse = response.body();
 
-                    if (registerResponse.isSuccess()) {
+                    if (registerResponse.isSuccess() && registerResponse.getStudent() != null) {
                         // Save session data
                         SessionManager sessionManager = new SessionManager(RegisterActivity.this);
-                        String fullName = firstName + " " + lastName;
-                        sessionManager.saveStudent(registerResponse.getStudentId(), fullName, email);
+                        sessionManager.saveStudent(
+                                registerResponse.getStudentId(),
+                                registerResponse.getStudent().getFullName(),
+                                email
+                        );
 
                         if (registerResponse.getToken() != null && !registerResponse.getToken().isEmpty()) {
                             sessionManager.saveToken(registerResponse.getToken());
@@ -289,7 +269,7 @@ public class RegisterActivity extends AppCompatActivity {
 
                         sessionManager.saveNickname(nickname);
 
-                        CustomToast.showSuccess(RegisterActivity.this, "Registration successful!");
+                        CustomToast.showSuccess(RegisterActivity.this, registerResponse.getMessage());
 
                         // Navigate to Welcome Tutorial
                         Intent intent = new Intent(RegisterActivity.this, WelcomeTutorialActivity.class);
@@ -297,7 +277,12 @@ public class RegisterActivity extends AppCompatActivity {
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();
                     } else {
-                        CustomToast.showError(RegisterActivity.this, registerResponse.getMessage());
+                        String errorMessage = registerResponse.getError() != null ?
+                                registerResponse.getError() :
+                                (registerResponse.getMessage() != null ?
+                                        registerResponse.getMessage() :
+                                        "Registration failed");
+                        CustomToast.showError(RegisterActivity.this, errorMessage);
                     }
                 } else {
                     CustomToast.showError(RegisterActivity.this, "Registration failed. Please try again.");
@@ -308,9 +293,8 @@ public class RegisterActivity extends AppCompatActivity {
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
                 btnNext.setEnabled(true);
                 btnNext.setText("Create Account");
-                CustomToast.showError(RegisterActivity.this, "Connection error. Please try again.");
+                CustomToast.showError(RegisterActivity.this, "Connection error: " + t.getMessage());
             }
         });
-        */
     }
 }
