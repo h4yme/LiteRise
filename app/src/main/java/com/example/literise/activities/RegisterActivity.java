@@ -271,8 +271,8 @@ public class RegisterActivity extends AppCompatActivity {
 
                         CustomToast.showSuccess(RegisterActivity.this, registerResponse.getMessage());
 
-                        // Navigate to Welcome Tutorial
-                        Intent intent = new Intent(RegisterActivity.this, WelcomeTutorialActivity.class);
+                        // Navigate directly to Dashboard
+                        Intent intent = new Intent(RegisterActivity.this, DashboardActivity.class);
                         startActivity(intent);
                         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                         finish();
