@@ -1,34 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Placeholder for Slide 2: Fun Quizzes After Each Story -->
 <!-- Replace this with your custom vector drawable -->
+<!-- Dimensions: 1080 x 1330 (portrait aspect ratio) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="280dp"
-    android:height="280dp"
-    android:viewportWidth="280"
-    android:viewportHeight="280">
+    android:width="1080dp"
+    android:height="1330dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1330">
 
     <!-- Background circle -->
     <path
         android:fillColor="#FFF4E6"
-        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+        android:pathData="M540,665m-500,0a500,500 0,1 1,1000 0a500,500 0,1 1,-1000 0" />
 
     <!-- Quiz card (simplified) -->
     <path
         android:fillColor="#FFD93D"
-        android:pathData="M70,80 L210,80 A10,10 0 0 1 220,90 L220,190 A10,10 0 0 1 210,200 L70,200 A10,10 0 0 1 60,190 L60,90 A10,10 0 0 1 70,80 Z" />
+        android:pathData="M240,450 L840,450 A30,30 0 0 1 870,480 L870,850 A30,30 0 0 1 840,880 L240,880 A30,30 0 0 1 210,850 L210,480 A30,30 0 0 1 240,450 Z" />
 
     <!-- Check marks -->
     <path
         android:fillColor="#4CAF50"
-        android:pathData="M90,120 L100,130 L120,110"
-        android:strokeWidth="4"
+        android:pathData="M320,580 L370,630 L470,530"
+        android:strokeWidth="12"
         android:strokeColor="#4CAF50"
         android:fillType="nonZero" />
 
     <path
         android:fillColor="#4CAF50"
-        android:pathData="M90,160 L100,170 L120,150"
-        android:strokeWidth="4"
+        android:pathData="M320,740 L370,790 L470,690"
+        android:strokeWidth="12"
         android:strokeColor="#4CAF50"
         android:fillType="nonZero" />
 

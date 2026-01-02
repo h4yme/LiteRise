@@ -1,37 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Placeholder for Slide 3: Grow with Rewards -->
 <!-- Replace this with your custom vector drawable -->
+<!-- Dimensions: 1080 x 1330 (portrait aspect ratio) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="280dp"
-    android:height="280dp"
-    android:viewportWidth="280"
-    android:viewportHeight="280">
+    android:width="1080dp"
+    android:height="1330dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1330">
 
     <!-- Background circle -->
     <path
         android:fillColor="#E8F5E9"
-        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+        android:pathData="M540,665m-500,0a500,500 0,1 1,1000 0a500,500 0,1 1,-1000 0" />
 
     <!-- Trophy (simplified) -->
     <path
         android:fillColor="#FFC126"
-        android:pathData="M110,80 L170,80 L170,130 A30,30 0 0 1 110,130 Z" />
+        android:pathData="M390,450 L690,450 L690,600 A150,150 0 0 1 390,600 Z" />
 
     <path
         android:fillColor="#FFC126"
-        android:pathData="M130,130 L150,130 L150,160 L130,160 Z" />
+        android:pathData="M480,600 L600,600 L600,750 L480,750 Z" />
 
     <path
         android:fillColor="#FFC126"
-        android:pathData="M120,160 L160,160 L165,170 L115,170 Z" />
+        android:pathData="M450,750 L630,750 L650,800 L430,800 Z" />
 
     <!-- Stars -->
     <path
         android:fillColor="#FF8C42"
-        android:pathData="M80,100 L85,110 L95,110 L87,116 L90,126 L80,120 L70,126 L73,116 L65,110 L75,110 Z" />
+        android:pathData="M280,550 L300,590 L345,590 L310,615 L325,655 L280,630 L235,655 L250,615 L215,590 L260,590 Z" />
 
     <path
         android:fillColor="#FF8C42"
-        android:pathData="M200,100 L205,110 L215,110 L207,116 L210,126 L200,120 L190,126 L193,116 L185,110 L195,110 Z" />
+        android:pathData="M800,550 L820,590 L865,590 L830,615 L845,655 L800,630 L755,655 L770,615 L735,590 L780,590 Z" />
 
 </vector>

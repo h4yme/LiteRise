@@ -9,12 +9,14 @@
     <!-- Slide Image -->
     <ImageView
         android:id="@+id/ivSlideImage"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginBottom="40dp"
         android:contentDescription="Onboarding illustration"
         android:scaleType="fitCenter"
-        android:src="@drawable/onboarding_slide_1" />
+        android:src="@drawable/onboarding_slide_1"
+        android:adjustViewBounds="true" />
 
     <!-- Title -->
     <TextView

@@ -1,31 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Placeholder for Slide 1: Discover Stories from Islamic History -->
 <!-- Replace this with your custom vector drawable -->
+<!-- Dimensions: 1080 x 1330 (portrait aspect ratio) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="280dp"
-    android:height="280dp"
-    android:viewportWidth="280"
-    android:viewportHeight="280">
+    android:width="1080dp"
+    android:height="1330dp"
+    android:viewportWidth="1080"
+    android:viewportHeight="1330">
 
     <!-- Background circle -->
     <path
         android:fillColor="#FFE4CC"
-        android:pathData="M140,140m-130,0a130,130 0,1 1,260 0a130,130 0,1 1,-260 0" />
+        android:pathData="M540,665m-500,0a500,500 0,1 1,1000 0a500,500 0,1 1,-1000 0" />
 
     <!-- Book icon (simplified) -->
     <path
         android:fillColor="#FF8C42"
-        android:pathData="M80,100 L200,100 L200,180 L80,180 Z" />
+        android:pathData="M340,500 L740,500 L740,700 L340,700 Z" />
 
     <path
         android:fillColor="#2D3436"
-        android:pathData="M140,100 L140,180"
-        android:strokeWidth="3"
+        android:pathData="M540,500 L540,700"
+        android:strokeWidth="8"
         android:strokeColor="#2D3436" />
 
     <!-- Mosque silhouette (simplified) -->
     <path
         android:fillColor="#6C5CE7"
-        android:pathData="M100,70 L120,50 L140,70 L160,50 L180,70 L180,90 L100,90 Z" />
+        android:pathData="M390,400 L465,300 L540,400 L615,300 L690,400 L690,480 L390,480 Z" />
 
 </vector>
