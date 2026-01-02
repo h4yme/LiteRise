@@ -16,7 +16,7 @@ public class AppConfig {
 
     // Set to false for normal online mode with API
 
-    public static final boolean DEMO_MODE = true;
+    public static final boolean DEMO_MODE = false;
 
 
 
