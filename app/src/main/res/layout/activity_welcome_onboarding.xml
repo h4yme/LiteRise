@@ -47,11 +47,13 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabDots"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="8dp"
             android:layout_marginBottom="24dp"
             app:tabBackground="@drawable/tab_dot_selector"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp"
+            app:tabMaxWidth="32dp"
+            app:tabMinWidth="32dp"
             app:tabPaddingEnd="4dp"
             app:tabPaddingStart="4dp" />
 
