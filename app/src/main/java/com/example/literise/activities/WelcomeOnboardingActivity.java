@@ -12,13 +12,11 @@ import com.example.literise.R;
 import com.example.literise.adapters.OnboardingSlideAdapter;
 import com.example.literise.database.SessionManager;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 
 public class WelcomeOnboardingActivity extends AppCompatActivity {
 
     private ViewPager2 viewPager;
-    private TabLayout tabDots;
+    private View indicator1, indicator2, indicator3;
     private MaterialButton btnContinue;
     private TextView tvSkip;
     private OnboardingSlideAdapter adapter;
@@ -30,18 +28,15 @@ public class WelcomeOnboardingActivity extends AppCompatActivity {
 
         // Initialize views
         viewPager = findViewById(R.id.viewPager);
-        tabDots = findViewById(R.id.tabDots);
+        indicator1 = findViewById(R.id.indicator1);
+        indicator2 = findViewById(R.id.indicator2);
+        indicator3 = findViewById(R.id.indicator3);
         btnContinue = findViewById(R.id.btnContinue);
         tvSkip = findViewById(R.id.tvSkip);
 
         // Setup ViewPager with adapter
         adapter = new OnboardingSlideAdapter(this);
         viewPager.setAdapter(adapter);
-
-        // Link TabLayout dots with ViewPager
-        new TabLayoutMediator(tabDots, viewPager, (tab, position) -> {
-            // Just creates the dots, no text needed
-        }).attach();
 
         // Skip button
         tvSkip.setOnClickListener(v -> finishOnboarding());
@@ -58,18 +53,43 @@ public class WelcomeOnboardingActivity extends AppCompatActivity {
             }
         });
 
-        // Update button text based on current page
+        // Update button text and indicators based on current page
         viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected(position);
+
+                // Update button text
                 if (position == adapter.getItemCount() - 1) {
                     btnContinue.setText("Get Started!");
                 } else {
                     btnContinue.setText("Continue");
                 }
+
+                // Update indicators
+                updateIndicators(position);
             }
         });
+    }
+
+    private void updateIndicators(int position) {
+        // Reset all indicators to inactive
+        indicator1.setBackgroundResource(R.drawable.indicator_inactive);
+        indicator2.setBackgroundResource(R.drawable.indicator_inactive);
+        indicator3.setBackgroundResource(R.drawable.indicator_inactive);
+
+        // Set the current indicator to active
+        switch (position) {
+            case 0:
+                indicator1.setBackgroundResource(R.drawable.indicator_active);
+                break;
+            case 1:
+                indicator2.setBackgroundResource(R.drawable.indicator_active);
+                break;
+            case 2:
+                indicator3.setBackgroundResource(R.drawable.indicator_active);
+                break;
+        }
     }
 
     private void finishOnboarding() {
