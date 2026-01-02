@@ -238,7 +238,7 @@ public class RegisterActivity extends AppCompatActivity {
                 birthday,
                 gender,
                 schoolId,
-                "1", // grade_level as string
+                "3", // grade_level - Grade 3 for research study
                 email,
                 password
         );
