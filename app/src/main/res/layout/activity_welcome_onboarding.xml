@@ -52,8 +52,8 @@
             app:tabBackground="@drawable/tab_dot_selector"
             app:tabGravity="center"
             app:tabIndicatorHeight="0dp"
-            app:tabMaxWidth="32dp"
-            app:tabMinWidth="32dp"
+            app:tabMaxWidth="40dp"
+            app:tabMinWidth="40dp"
             app:tabPaddingEnd="8dp"
             app:tabPaddingStart="8dp" />
 
