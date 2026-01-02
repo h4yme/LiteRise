@@ -6,8 +6,12 @@
  * Supports both SMTP (via PHPMailer) and basic PHP mail()
  */
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// Only try to use PHPMailer if it's available
+$phpmailerAvailable = false;
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    $phpmailerAvailable = class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+}
 
 /**
  * Send email using SMTP (PHPMailer) or fallback to PHP mail()
@@ -19,16 +23,18 @@ use PHPMailer\PHPMailer\Exception;
  * @return bool True if email sent successfully
  */
 function sendEmail($to, $subject, $htmlBody, $from = null) {
+    global $phpmailerAvailable;
+
     // Default sender
     if (!$from) {
         $from = $_ENV['EMAIL_FROM'] ?? 'noreply@literise.com';
     }
     $fromName = $_ENV['EMAIL_FROM_NAME'] ?? 'LiteRise';
 
-    // Check if SMTP is enabled
+    // Check if SMTP is enabled and PHPMailer is available
     $smtpEnabled = isset($_ENV['SMTP_ENABLED']) && $_ENV['SMTP_ENABLED'] === 'true';
 
-    if ($smtpEnabled && class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    if ($smtpEnabled && $phpmailerAvailable) {
         return sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName);
     } else {
         return sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName);
@@ -40,7 +46,7 @@ function sendEmail($to, $subject, $htmlBody, $from = null) {
  */
 function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
     try {
-        $mail = new PHPMailer(true);
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
         // SMTP Configuration
         $mail->isSMTP();
@@ -73,9 +79,8 @@ function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
             return false;
         }
 
-    } catch (Exception $e) {
-        error_log("SMTP Email Error: {$mail->ErrorInfo}");
-        error_log("Exception: " . $e->getMessage());
+    } catch (\Exception $e) {
+        error_log("SMTP Email Error: " . $e->getMessage());
         return false;
     }
 }
