@@ -32,6 +32,12 @@ import com.example.literise.models.WordHuntResponse;
 import com.example.literise.models.LessonProgressResponse;
 import com.example.literise.models.RegisterRequest;
 import com.example.literise.models.RegisterResponse;
+import com.example.literise.models.ForgotPasswordRequest;
+import com.example.literise.models.ForgotPasswordResponse;
+import com.example.literise.models.VerifyOTPRequest;
+import com.example.literise.models.VerifyOTPResponse;
+import com.example.literise.models.ResetPasswordRequest;
+import com.example.literise.models.ResetPasswordResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -59,6 +65,21 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("register.php")
     Call<RegisterResponse> register(@Body RegisterRequest request);
+
+    // 🔑 Forgot Password - Request OTP
+    @Headers("Content-Type: application/json")
+    @POST("forgot_password.php")
+    Call<ForgotPasswordResponse> forgotPassword(@Body ForgotPasswordRequest request);
+
+    // 🔍 Verify OTP
+    @Headers("Content-Type: application/json")
+    @POST("verify_otp.php")
+    Call<VerifyOTPResponse> verifyOTP(@Body VerifyOTPRequest request);
+
+    // 🔄 Reset Password
+    @Headers("Content-Type: application/json")
+    @POST("reset_password.php")
+    Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);
 
     @Headers("Content-Type: application/json")
     @POST("get_preassessment_items.php")
