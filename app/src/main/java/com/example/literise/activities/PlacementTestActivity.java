@@ -1,6 +1,7 @@
 package com.example.literise.activities;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -72,7 +73,6 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int previousCategory = 0;
     private String selectedAnswer = "";
     private int questionsPerCategory = 6; // Approximate
-    private static final int CATEGORY_TRANSITION_REQUEST = 1001;
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
 
     @Override
@@ -160,18 +160,78 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Play transition sound
         soundEffectsHelper.playTransition();
 
-        Intent intent = new Intent(PlacementTestActivity.this, CategoryTransitionActivity.class);
-        intent.putExtra("category_number", currentCategory);
-        startActivityForResult(intent, CATEGORY_TRANSITION_REQUEST);
-    }
+        // Create dialog
+        Dialog dialog = new Dialog(this);
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_category_transition, null);
+        dialog.setContentView(dialogView);
+        dialog.setCancelable(false);
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CATEGORY_TRANSITION_REQUEST) {
+        // Make dialog background transparent to show rounded corners
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        // Get views
+        TextView tvCategoryIcon = dialogView.findViewById(R.id.tvCategoryIcon);
+        TextView tvCategoryTitle = dialogView.findViewById(R.id.tvCategoryTitle);
+        TextView tvCategoryName = dialogView.findViewById(R.id.tvCategoryName);
+        TextView tvLeoMessage = dialogView.findViewById(R.id.tvLeoMessage);
+        MaterialButton btnContinue = dialogView.findViewById(R.id.btnContinue);
+
+        // Set category info
+        String icon = "";
+        String title = "";
+        String name = "";
+        String message = "";
+
+        switch (currentCategory) {
+            case 1:
+                icon = "📚";
+                title = "Ready?";
+                name = "Category 1: Oral Language";
+                message = "Let's start with some fun questions about listening and speaking! You've got this! 🌟";
+                break;
+            case 2:
+                icon = "🔤";
+                title = "Great Job!";
+                name = "Category 2: Word Knowledge";
+                message = "Now let's test your word knowledge! You're doing amazing! 🌟";
+                break;
+            case 3:
+                icon = "📖";
+                title = "Awesome Work!";
+                name = "Category 3: Reading Comprehension";
+                message = "Time for some fun stories! Let's see how well you understand what you read! 📚";
+                break;
+            case 4:
+                icon = "✏️";
+                title = "Almost There!";
+                name = "Category 4: Language Structure";
+                message = "Last category! Let's work on grammar and sentences! You're doing wonderfully! 💪";
+                break;
+        }
+
+        tvCategoryIcon.setText(icon);
+        tvCategoryTitle.setText(title);
+        tvCategoryName.setText(name);
+        tvLeoMessage.setText(message);
+
+        // Speak Leo's message
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (textToSpeechHelper != null && textToSpeechHelper.isInitialized()) {
+                textToSpeechHelper.speak(message, null);
+            }
+        }, 500);
+
+        // Continue button
+        btnContinue.setOnClickListener(v -> {
+            dialog.dismiss();
             // Continue with next question after transition
             loadNextQuestion();
-        }
+        });
+
+        // Show dialog with fade animation
+        dialog.show();
     }
 
     private void displayCurrentQuestion() {
