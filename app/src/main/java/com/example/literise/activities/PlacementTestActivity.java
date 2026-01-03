@@ -671,6 +671,13 @@ public class PlacementTestActivity extends AppCompatActivity {
         CardView optionD = questionView.findViewById(R.id.optionD);
 
         View.OnClickListener optionClickListener = v -> {
+            // Safety check: ensure options list has enough items
+            List<String> options = currentQuestion.getOptions();
+            if (options == null || options.size() < 4) {
+                Toast.makeText(this, "Error: Question options not loaded properly", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             // Play pop sound and animation
             soundEffectsHelper.playPop();
             android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.option_pop);
@@ -686,10 +693,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             ((CardView) v).setCardBackgroundColor(getColor(R.color.option_selected));
 
             // Store selected answer
-            if (v.getId() == R.id.optionA) selectedAnswer = currentQuestion.getOptions().get(0);
-            else if (v.getId() == R.id.optionB) selectedAnswer = currentQuestion.getOptions().get(1);
-            else if (v.getId() == R.id.optionC) selectedAnswer = currentQuestion.getOptions().get(2);
-            else if (v.getId() == R.id.optionD) selectedAnswer = currentQuestion.getOptions().get(3);
+            if (v.getId() == R.id.optionA) selectedAnswer = options.get(0);
+            else if (v.getId() == R.id.optionB) selectedAnswer = options.get(1);
+            else if (v.getId() == R.id.optionC) selectedAnswer = options.get(2);
+            else if (v.getId() == R.id.optionD) selectedAnswer = options.get(3);
 
             // Enable continue button with animation
             btnContinue.setEnabled(true);
