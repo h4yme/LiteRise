@@ -1,11 +1,12 @@
 package com.example.literise.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android:widget.ImageView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -13,7 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
+import com.example.literise.database.QuestionBankHelper;
+import com.example.literise.models.PlacementQuestion;
+import com.example.literise.utils.IRTEngine;
 import com.google.android.material.button.MaterialButton;
+
+import java.util.List;
 
 public class PlacementTestActivity extends AppCompatActivity {
 
@@ -25,23 +31,35 @@ public class PlacementTestActivity extends AppCompatActivity {
     private TextView tvCategoryIcon, tvCategoryName;
     private TextView tvQuestionType;
     private FrameLayout questionContainer;
+    private LinearLayout leoHintContainer;
     private TextView tvLeoHint;
     private MaterialButton btnContinue, btnRetry;
+
+    // IRT Engine and Question Bank
+    private IRTEngine irtEngine;
+    private QuestionBankHelper questionBankHelper;
+    private PlacementQuestion currentQuestion;
+    private List<PlacementQuestion> categoryQuestions;
 
     // Question tracking
     private int currentQuestionNumber = 1;
     private int totalQuestions = 25;
     private int currentCategory = 1;
     private String selectedAnswer = "";
+    private int questionsPerCategory = 6; // Approximate
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_placement_test);
 
+        // Initialize IRT Engine and Question Bank
+        irtEngine = new IRTEngine();
+        questionBankHelper = new QuestionBankHelper(this);
+
         initViews();
         setupListeners();
-        loadQuestion();
+        loadNextQuestion();
     }
 
     private void initViews() {
@@ -53,6 +71,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvCategoryName = findViewById(R.id.tvCategoryName);
         tvQuestionType = findViewById(R.id.tvQuestionType);
         questionContainer = findViewById(R.id.questionContainer);
+        leoHintContainer = findViewById(R.id.leoHintContainer);
         tvLeoHint = findViewById(R.id.tvLeoHint);
         btnContinue = findViewById(R.id.btnContinue);
         btnRetry = findViewById(R.id.btnRetry);
@@ -60,10 +79,10 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> onBackPressed());
-        
+
         btnSkip.setOnClickListener(v -> {
-            // Skip to next question
-            nextQuestion();
+            // Skip to next question (counts as incorrect)
+            checkAnswer();
         });
 
         btnContinue.setOnClickListener(v -> {
@@ -76,23 +95,50 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnRetry.setOnClickListener(v -> {
             // Reload current question
             selectedAnswer = "";
-            loadQuestion();
+            displayCurrentQuestion();
         });
     }
 
-    private void loadQuestion() {
+    private void loadNextQuestion() {
+        // Update category based on question number
+        updateCurrentCategory();
+
+        // Load questions for current category
+        categoryQuestions = questionBankHelper.getQuestionsByCategory(currentCategory);
+
+        // Use IRT engine to select best question
+        currentQuestion = irtEngine.selectNextQuestion(categoryQuestions);
+
+        if (currentQuestion != null) {
+            displayCurrentQuestion();
+        } else {
+            // No more questions in category, move to next category or finish
+            if (currentCategory < 4) {
+                currentCategory++;
+                loadNextQuestion();
+            } else {
+                showResults();
+            }
+        }
+    }
+
+    private void displayCurrentQuestion() {
         // Update progress
         updateProgress();
 
-        // Update category
-        updateCategory();
+        // Update category badge
+        updateCategoryBadge();
 
-        // Load question fragment
-        loadMultipleChoiceQuestion();
+        // Load question based on type
+        loadQuestionView();
+
+        // Show Leo hint
+        showLeoHint();
 
         // Reset buttons
         btnContinue.setEnabled(false);
         btnRetry.setVisibility(View.GONE);
+        selectedAnswer = "";
     }
 
     private void updateProgress() {
@@ -101,7 +147,19 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvProgress.setText(currentQuestionNumber + "/" + totalQuestions);
     }
 
-    private void updateCategory() {
+    private void updateCurrentCategory() {
+        if (currentQuestionNumber <= questionsPerCategory) {
+            currentCategory = 1;
+        } else if (currentQuestionNumber <= questionsPerCategory * 2) {
+            currentCategory = 2;
+        } else if (currentQuestionNumber <= questionsPerCategory * 3) {
+            currentCategory = 3;
+        } else {
+            currentCategory = 4;
+        }
+    }
+
+    private void updateCategoryBadge() {
         String categoryIcon = "";
         String categoryName = "";
 
@@ -128,6 +186,14 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvCategoryName.setText(categoryName);
     }
 
+    private void loadQuestionView() {
+        if (currentQuestion == null) return;
+
+        // For now, all questions are multiple choice
+        // Later: switch based on questionType
+        loadMultipleChoiceQuestion();
+    }
+
     private void loadMultipleChoiceQuestion() {
         // Inflate multiple choice question layout
         questionContainer.removeAllViews();
@@ -135,14 +201,62 @@ public class PlacementTestActivity extends AppCompatActivity {
                 .inflate(R.layout.fragment_question_multiple_choice, questionContainer, false);
         questionContainer.addView(questionView);
 
-        // Set question type
-        tvQuestionType.setText("Choose the Correct Word");
+        // Set question type based on subcategory
+        String questionTypeText = getQuestionTypeText(currentQuestion.getSubcategory());
+        tvQuestionType.setText(questionTypeText);
 
-        // Set Leo hint
-        tvLeoHint.setText("Pick the right word!");
+        // Set question text
+        TextView tvQuestion = questionView.findViewById(R.id.tvQuestion);
+        tvQuestion.setText(currentQuestion.getQuestionText());
+
+        // Set answer options
+        List<String> options = currentQuestion.getOptions();
+        if (options != null && options.size() >= 4) {
+            TextView tvOptionA = questionView.findViewById(R.id.tvOptionA);
+            TextView tvOptionB = questionView.findViewById(R.id.tvOptionB);
+            TextView tvOptionC = questionView.findViewById(R.id.tvOptionC);
+            TextView tvOptionD = questionView.findViewById(R.id.tvOptionD);
+
+            tvOptionA.setText(options.get(0));
+            tvOptionB.setText(options.get(1));
+            tvOptionC.setText(options.get(2));
+            tvOptionD.setText(options.get(3));
+        }
 
         // Setup option click listeners
         setupOptionClickListeners(questionView);
+    }
+
+    private String getQuestionTypeText(String subcategory) {
+        switch (subcategory) {
+            case "Vocabulary":
+                return "✨ Choose the Correct Word";
+            case "Phonological":
+                return "🎵 Sound Recognition";
+            case "Phonics":
+                return "🔤 Letter Sounds";
+            case "Word Study":
+                return "📝 Word Families";
+            case "Narrative":
+                return "📖 Story Comprehension";
+            case "Informational":
+                return "📰 Reading for Information";
+            case "Grammar":
+                return "✏️ Grammar Skills";
+            case "Sentence Construction":
+                return "🔨 Build Sentences";
+            default:
+                return "✨ Answer the Question";
+        }
+    }
+
+    private void showLeoHint() {
+        if (currentQuestion != null && currentQuestion.getLeoHint() != null) {
+            leoHintContainer.setVisibility(View.VISIBLE);
+            tvLeoHint.setText(currentQuestion.getLeoHint());
+        } else {
+            leoHintContainer.setVisibility(View.GONE);
+        }
     }
 
     private void setupOptionClickListeners(View questionView) {
@@ -162,10 +276,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             ((CardView) v).setCardBackgroundColor(getColor(R.color.option_selected));
 
             // Store selected answer
-            if (v.getId() == R.id.optionA) selectedAnswer = "A";
-            else if (v.getId() == R.id.optionB) selectedAnswer = "B";
-            else if (v.getId() == R.id.optionC) selectedAnswer = "C";
-            else if (v.getId() == R.id.optionD) selectedAnswer = "D";
+            if (v.getId() == R.id.optionA) selectedAnswer = currentQuestion.getOptions().get(0);
+            else if (v.getId() == R.id.optionB) selectedAnswer = currentQuestion.getOptions().get(1);
+            else if (v.getId() == R.id.optionC) selectedAnswer = currentQuestion.getOptions().get(2);
+            else if (v.getId() == R.id.optionD) selectedAnswer = currentQuestion.getOptions().get(3);
 
             // Enable continue button
             btnContinue.setEnabled(true);
@@ -178,32 +292,41 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void checkAnswer() {
-        // TODO: Implement IRT answer checking
-        // For now, just move to next question
-        nextQuestion();
-    }
+        if (currentQuestion == null) return;
 
-    private void nextQuestion() {
+        boolean isCorrect = false;
+
+        if (!selectedAnswer.isEmpty()) {
+            // Check if answer is correct
+            isCorrect = selectedAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
+        }
+
+        // Update IRT engine with result
+        irtEngine.updateTheta(currentQuestion, isCorrect);
+
+        // Move to next question
         currentQuestionNumber++;
 
         if (currentQuestionNumber > totalQuestions) {
             // Test complete - show results
             showResults();
         } else {
-            // Update category based on question number
-            if (currentQuestionNumber <= 7) currentCategory = 1;
-            else if (currentQuestionNumber <= 14) currentCategory = 2;
-            else if (currentQuestionNumber <= 21) currentCategory = 3;
-            else currentCategory = 4;
-
-            selectedAnswer = "";
-            loadQuestion();
+            loadNextQuestion();
         }
     }
 
     private void showResults() {
-        // TODO: Navigate to PlacementResultActivity
-        // For now, go back to dashboard
+        // TODO: Navigate to PlacementResultActivity with IRT results
+        // For now, just show toast and finish
+        int placementLevel = irtEngine.calculatePlacementLevel();
+        String levelName = irtEngine.getPlacementLevelName();
+        double accuracy = irtEngine.getAccuracyPercentage();
+
+        // Log results for debugging
+        System.out.println("Placement Level: " + placementLevel + " - " + levelName);
+        System.out.println("Accuracy: " + accuracy + "%");
+        System.out.println("Theta: " + irtEngine.getTheta());
+
         finish();
     }
 
@@ -212,5 +335,13 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Show confirmation dialog before exiting
         // For now, just finish
         super.onBackPressed();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (questionBankHelper != null) {
+            questionBankHelper.close();
+        }
     }
 }
