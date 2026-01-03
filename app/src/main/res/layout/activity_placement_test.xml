@@ -1,57 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_placement_gradient">
-
-    <!-- Floating Decorative Elements -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="⭐"
-        android:textSize="32sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginTop="120dp"
-        android:layout_marginEnd="30dp"
-        android:alpha="0.6"
-        android:rotation="15" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="✨"
-        android:textSize="28sp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="180dp"
-        android:layout_marginStart="20dp"
-        android:alpha="0.5"
-        android:rotation="-20" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="🌟"
-        android:textSize="24sp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="25dp"
-        android:alpha="0.4"
-        android:rotation="25" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="💫"
-        android:textSize="30sp"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:alpha="0.5"
-        android:rotation="-15" />
+    android:background="@color/white">
 
     <!-- Top Bar -->
     <LinearLayout
@@ -61,57 +14,40 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        android:background="@color/white"
-        android:elevation="2dp">
+        app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Back Button -->
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:src="@drawable/ic_arrow_back"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            app:tint="#2C3E50" />
+        <!-- Back Button (Circular) -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            app:cardBackgroundColor="#FFE8E8"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_arrow_back"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="8dp"
+                app:tint="#E74C3C" />
+
+        </androidx.cardview.widget.CardView>
 
         <!-- Progress Bar -->
-        <LinearLayout
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="8dp"
             android:layout_weight="1"
-            android:orientation="vertical"
+            android:max="100"
+            android:progress="12"
+            android:progressTint="#FFD93D"
+            android:progressBackgroundTint="#F0F0F0"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="0dp"
-                    android:layout_height="8dp"
-                    android:layout_weight="1"
-                    android:max="100"
-                    android:progress="12"
-                    android:progressDrawable="@drawable/progress_bar_placement"
-                    android:layout_marginEnd="8dp" />
-
-                <TextView
-                    android:id="@+id/tvProgress"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:fontFamily="@font/visby_bold"
-                    android:text="3/25"
-                    android:textColor="#2C3E50"
-                    android:textSize="12sp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
+            android:layout_marginEnd="12dp" />
 
         <!-- Skip Button -->
         <TextView
@@ -121,155 +57,101 @@
             android:background="?attr/selectableItemBackgroundBorderless"
             android:clickable="true"
             android:focusable="true"
-            android:fontFamily="@font/visby_medium"
+            android:fontFamily="@font/visby_bold"
             android:padding="8dp"
             android:text="Skip"
-            android:textColor="#7F8C8D"
+            android:textColor="#95A5A6"
             android:textSize="14sp" />
 
     </LinearLayout>
 
-    <!-- Main Content Container -->
-    <ScrollView
+    <!-- Main Content Container (Non-scrollable) -->
+    <LinearLayout
+        android:id="@+id/contentContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:layout_above="@id/bottomContainer"
-        android:fillViewport="true">
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:paddingTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/topBar"
+        app:layout_constraintBottom_toTopOf="@id/bottomContainer">
 
+        <!-- Question Type Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
 
-            <!-- Category Badge -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/categoryBadge"
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/primary_purple"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                android:layout_marginBottom="20dp">
+                android:text="✨"
+                android:textSize="18sp"
+                android:layout_marginEnd="8dp" />
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
-
-                    <TextView
-                        android:id="@+id/tvCategoryIcon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📚"
-                        android:textSize="20sp"
-                        android:layout_marginEnd="8dp" />
-
-                    <TextView
-                        android:id="@+id/tvCategoryName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
-                        android:text="Category 1: Oral Language"
-                        android:textColor="@color/white"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Question Type Badge -->
-            <androidx.cardview.widget.CardView
-                android:id="@+id/questionTypeBadge"
-                android:layout_width="match_parent"
+            <TextView
+                android:id="@+id/tvQuestionType"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/accent_yellow"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="8dp"
-                android:layout_marginBottom="24dp">
+                android:layout_weight="1"
+                android:fontFamily="@font/visby_bold"
+                android:text="Correct Word"
+                android:textColor="#2C3E50"
+                android:textSize="16sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="16dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="✨"
-                        android:textSize="24sp"
-                        android:layout_marginEnd="10dp" />
-
-                    <TextView
-                        android:id="@+id/tvQuestionType"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
-                        android:text="Choose the Correct Word"
-                        android:textColor="#2C3E50"
-                        android:textSize="16sp"
-                        android:shadowColor="#40FFFFFF"
-                        android:shadowDx="0"
-                        android:shadowDy="1"
-                        android:shadowRadius="2" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Question Card Container (Dynamic) -->
-            <FrameLayout
-                android:id="@+id/questionContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp" />
+            <View
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:background="@drawable/bg_circle"
+                android:backgroundTint="#2C3E50" />
 
         </LinearLayout>
 
-    </ScrollView>
+        <!-- Question Card Container (Dynamic) -->
+        <FrameLayout
+            android:id="@+id/questionContainer"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
 
     <!-- Bottom Container -->
     <LinearLayout
         android:id="@+id/bottomContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:orientation="vertical"
         android:padding="20dp"
         android:background="@color/white"
-        android:elevation="4dp">
+        app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- Leo Hint -->
+        <!-- Leo Hint (Hidden initially) -->
         <androidx.cardview.widget.CardView
             android:id="@+id/leoHintContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="18dp"
+            android:layout_marginBottom="12dp"
             android:visibility="gone"
             app:cardBackgroundColor="#E8F5E9"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp">
+            app:cardCornerRadius="16dp"
+            app:cardElevation="2dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:padding="16dp">
+                android:padding="12dp">
 
                 <ImageView
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:src="@drawable/leo_happy"
-                    android:layout_marginEnd="12dp" />
+                    android:layout_marginEnd="10dp" />
 
                 <TextView
                     android:id="@+id/tvLeoHint"
@@ -279,13 +161,13 @@
                     android:fontFamily="@font/visby_bold"
                     android:text="Pick the right word!"
                     android:textColor="#2E7D32"
-                    android:textSize="15sp" />
+                    android:textSize="14sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="💡"
-                    android:textSize="20sp" />
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
@@ -303,44 +185,39 @@
                 android:id="@+id/btnContinue"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
-                android:layout_height="60dp"
+                android:layout_height="56dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/visby_bold"
                 android:text="Continue"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                app:backgroundTint="@color/success_green"
-                app:cornerRadius="24dp"
-                app:elevation="8dp"
-                app:icon="@drawable/ic_arrow_forward"
-                app:iconGravity="end"
-                app:iconSize="24dp"
-                app:iconTint="@color/white"
-                android:layout_marginEnd="8dp" />
+                android:textSize="16sp"
+                app:backgroundTint="#4ECDC4"
+                app:cornerRadius="20dp"
+                app:elevation="4dp"
+                android:layout_marginEnd="10dp" />
 
-            <!-- Retry Button (Hidden initially) -->
+            <!-- Retry Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRetry"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
-                android:layout_height="54dp"
+                android:layout_height="56dp"
                 android:fontFamily="@font/visby_medium"
                 android:text="Retry"
                 android:textAllCaps="false"
-                android:textColor="#7F8C8D"
+                android:textColor="#95A5A6"
                 android:textSize="16sp"
                 app:strokeColor="#BDC3C7"
-                app:strokeWidth="2dp"
-                app:cornerRadius="16dp"
+                app:strokeWidth="1.5dp"
+                app:cornerRadius="20dp"
                 app:icon="@drawable/ic_refresh"
                 app:iconGravity="start"
-                app:iconTint="#7F8C8D"
-                android:visibility="gone"
-                android:layout_marginStart="8dp" />
+                app:iconTint="#95A5A6"
+                android:visibility="gone" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

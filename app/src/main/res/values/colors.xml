@@ -62,6 +62,7 @@
     <color name="option_selected">#E3F2FD</color>
     <color name="option_correct">#C8E6C9</color>
     <color name="option_incorrect">#FFCDD2</color>
+    <color name="option_stroke">#E0E0E0</color>
 
     <!-- 🎤 Pronunciation Feedback Colors -->
     <color name="success_light">#E8F5E9</color>

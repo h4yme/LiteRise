@@ -41,9 +41,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     // UI Components
     private ImageView btnBack;
     private ProgressBar progressBar;
-    private TextView tvProgress;
     private TextView btnSkip;
-    private TextView tvCategoryIcon, tvCategoryName;
     private TextView tvQuestionType;
     private FrameLayout questionContainer;
     private CardView leoHintContainer;
@@ -97,10 +95,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private void initViews() {
         btnBack = findViewById(R.id.btnBack);
         progressBar = findViewById(R.id.progressBar);
-        tvProgress = findViewById(R.id.tvProgress);
         btnSkip = findViewById(R.id.btnSkip);
-        tvCategoryIcon = findViewById(R.id.tvCategoryIcon);
-        tvCategoryName = findViewById(R.id.tvCategoryName);
         tvQuestionType = findViewById(R.id.tvQuestionType);
         questionContainer = findViewById(R.id.questionContainer);
         leoHintContainer = findViewById(R.id.leoHintContainer);
@@ -179,28 +174,37 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void displayCurrentQuestion() {
-        // Update progress
-        updateProgress();
+        // Fade out current question
+        questionContainer.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction(() -> {
+                // Update progress
+                updateProgress();
 
-        // Update category badge
-        updateCategoryBadge();
+                // Load question based on type
+                loadQuestionView();
 
-        // Load question based on type
-        loadQuestionView();
+                // Show Leo hint
+                showLeoHint();
 
-        // Show Leo hint
-        showLeoHint();
+                // Reset buttons
+                btnContinue.setEnabled(false);
+                btnRetry.setVisibility(View.GONE);
+                selectedAnswer = "";
 
-        // Reset buttons
-        btnContinue.setEnabled(false);
-        btnRetry.setVisibility(View.GONE);
-        selectedAnswer = "";
+                // Fade in new question
+                questionContainer.animate()
+                    .alpha(1f)
+                    .setDuration(300)
+                    .start();
+            })
+            .start();
     }
 
     private void updateProgress() {
         int progress = (int) ((currentQuestionNumber / (float) totalQuestions) * 100);
         progressBar.setProgress(progress);
-        tvProgress.setText(currentQuestionNumber + "/" + totalQuestions);
     }
 
     private void updateCurrentCategory() {
@@ -215,33 +219,6 @@ public class PlacementTestActivity extends AppCompatActivity {
         } else {
             currentCategory = 4;
         }
-    }
-
-    private void updateCategoryBadge() {
-        String categoryIcon = "";
-        String categoryName = "";
-
-        switch (currentCategory) {
-            case 1:
-                categoryIcon = "📚";
-                categoryName = "Category 1: Oral Language";
-                break;
-            case 2:
-                categoryIcon = "🔤";
-                categoryName = "Category 2: Word Knowledge";
-                break;
-            case 3:
-                categoryIcon = "📖";
-                categoryName = "Category 3: Reading Comprehension";
-                break;
-            case 4:
-                categoryIcon = "✏️";
-                categoryName = "Category 4: Language Structure";
-                break;
-        }
-
-        tvCategoryIcon.setText(categoryIcon);
-        tvCategoryName.setText(categoryName);
     }
 
     private void loadQuestionView() {
@@ -670,6 +647,11 @@ public class PlacementTestActivity extends AppCompatActivity {
         CardView optionC = questionView.findViewById(R.id.optionC);
         CardView optionD = questionView.findViewById(R.id.optionD);
 
+        ImageView checkA = questionView.findViewById(R.id.ivCheckA);
+        ImageView checkB = questionView.findViewById(R.id.ivCheckB);
+        ImageView checkC = questionView.findViewById(R.id.ivCheckC);
+        ImageView checkD = questionView.findViewById(R.id.ivCheckD);
+
         View.OnClickListener optionClickListener = v -> {
             // Safety check: ensure options list has enough items
             List<String> options = currentQuestion.getOptions();
@@ -678,30 +660,41 @@ public class PlacementTestActivity extends AppCompatActivity {
                 return;
             }
 
-            // Play pop sound and animation
+            // Play pop sound
             soundEffectsHelper.playPop();
-            android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.option_pop);
-            v.startAnimation(popAnim);
 
-            // Clear all selections
-            optionA.setCardBackgroundColor(getColor(android.R.color.white));
-            optionB.setCardBackgroundColor(getColor(android.R.color.white));
-            optionC.setCardBackgroundColor(getColor(android.R.color.white));
-            optionD.setCardBackgroundColor(getColor(android.R.color.white));
+            // Hide all checkmarks and reset strokes
+            checkA.setVisibility(View.GONE);
+            checkB.setVisibility(View.GONE);
+            checkC.setVisibility(View.GONE);
+            checkD.setVisibility(View.GONE);
 
-            // Highlight selected with vibrant color
-            ((CardView) v).setCardBackgroundColor(getColor(R.color.option_selected));
+            optionA.setStrokeColor(getColor(R.color.option_stroke));
+            optionB.setStrokeColor(getColor(R.color.option_stroke));
+            optionC.setStrokeColor(getColor(R.color.option_stroke));
+            optionD.setStrokeColor(getColor(R.color.option_stroke));
 
-            // Store selected answer
-            if (v.getId() == R.id.optionA) selectedAnswer = options.get(0);
-            else if (v.getId() == R.id.optionB) selectedAnswer = options.get(1);
-            else if (v.getId() == R.id.optionC) selectedAnswer = options.get(2);
-            else if (v.getId() == R.id.optionD) selectedAnswer = options.get(3);
+            // Show checkmark for selected option
+            if (v.getId() == R.id.optionA) {
+                selectedAnswer = options.get(0);
+                checkA.setVisibility(View.VISIBLE);
+                optionA.setStrokeColor(getColor(R.color.success_green));
+            } else if (v.getId() == R.id.optionB) {
+                selectedAnswer = options.get(1);
+                checkB.setVisibility(View.VISIBLE);
+                optionB.setStrokeColor(getColor(R.color.success_green));
+            } else if (v.getId() == R.id.optionC) {
+                selectedAnswer = options.get(2);
+                checkC.setVisibility(View.VISIBLE);
+                optionC.setStrokeColor(getColor(R.color.success_green));
+            } else if (v.getId() == R.id.optionD) {
+                selectedAnswer = options.get(3);
+                checkD.setVisibility(View.VISIBLE);
+                optionD.setStrokeColor(getColor(R.color.success_green));
+            }
 
-            // Enable continue button with animation
+            // Enable continue button
             btnContinue.setEnabled(true);
-            android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.bounce);
-            btnContinue.startAnimation(bounceAnim);
         };
 
         optionA.setOnClickListener(optionClickListener);
