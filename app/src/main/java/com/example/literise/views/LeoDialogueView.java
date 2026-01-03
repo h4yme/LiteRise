@@ -70,8 +70,11 @@ public class LeoDialogueView extends RelativeLayout {
 
         dialogueMessages = new ArrayList<>();
 
-        // Set click listener for tap to continue
+        // Set click listener for tap to continue on the entire view
         this.setOnClickListener(v -> showNextMessage());
+
+        // Also set click listener on the speech bubble to ensure clicks work
+        cvSpeechBubble.setOnClickListener(v -> showNextMessage());
     }
 
     public void setDialogueMessages(List<DialogueMessage> messages) {
