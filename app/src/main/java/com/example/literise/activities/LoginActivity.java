@@ -18,6 +18,7 @@ import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.Students;
 import com.example.literise.utils.CustomToast;
+import com.example.literise.utils.SessionLogger;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -301,6 +302,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     CustomToast.showSuccess(LoginActivity.this, "Welcome " + s.getFullname() + "!");
 
+                    // Log successful login session
+                    SessionLogger.logLogin(LoginActivity.this, s.getStudent_id());
+
                     // Check if user has seen welcome onboarding
                     Intent intent;
                     if (!sessionManager.hasSeenWelcome()) {
@@ -349,6 +353,9 @@ public class LoginActivity extends AppCompatActivity {
 
 
         CustomToast.showSuccess(LoginActivity.this, "Welcome to LiteRise Demo!");
+
+        // Log successful login session for demo user
+        SessionLogger.logLogin(LoginActivity.this, sessionManager.getStudentId());
 
         // Check if user has seen welcome onboarding
         Intent intent;

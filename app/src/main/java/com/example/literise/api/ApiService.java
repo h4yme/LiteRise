@@ -2,16 +2,24 @@ package com.example.literise.api;
 
 import com.example.literise.models.GetNextItemRequest;
 
+import com.example.literise.models.LogSessionRequest;
+import com.example.literise.models.LogSessionResponse;
 import com.example.literise.models.NextItemResponse;
+
+import com.example.literise.models.PreAssessmentResponse;
 
 import com.example.literise.models.PronunciationRequest;
 
 import com.example.literise.models.PronunciationResponse;
 
+import com.example.literise.models.Question;
+
 import com.example.literise.models.ResponseModel;
 
 import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
+import com.example.literise.models.SavePlacementResultRequest;
+import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.models.ScrambleSentenceResponse;
 
 import com.example.literise.models.SingleResponseResult;
@@ -34,6 +42,10 @@ import com.example.literise.models.VerifyOTPRequest;
 import com.example.literise.models.VerifyOTPResponse;
 import com.example.literise.models.ResetPasswordRequest;
 import com.example.literise.models.ResetPasswordResponse;
+import java.util.List;
+
+import java.util.Map;
+
 
 
 import retrofit2.Call;
@@ -72,6 +84,10 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("reset_password.php")
     Call<ResetPasswordResponse> resetPassword(@Body ResetPasswordRequest request);
+
+    @Headers("Content-Type: application/json")
+    @POST("get_preassessment_items.php")
+    Call<PreAssessmentResponse> getPreAssessmentItems();
 
     @Headers("Content-Type: application/json")
     @POST("submit_responses.php")
@@ -151,4 +167,18 @@ public interface ApiService {
     @POST("save_nickname.php")
 
     Call<ResponseModel> saveNickname(@Body Students student);
+
+    // 📊 Save Placement Result
+    @Headers("Content-Type: application/json")
+    @POST("save_placement_result.php")
+    Call<SavePlacementResultResponse> savePlacementResult(@Body SavePlacementResultRequest request);
+
+    // 📈 Get Placement Progress
+    @GET("get_placement_progress.php")
+    Call<PlacementProgressResponse> getPlacementProgress(@Query("student_id") int studentId);
+
+    // 📝 Log Session
+    @Headers("Content-Type: application/json")
+    @POST("log_session.php")
+    Call<LogSessionResponse> logSession(@Body LogSessionRequest request);
 }
