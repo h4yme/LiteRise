@@ -1,7 +1,11 @@
 package com.example.literise.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -9,9 +13,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
@@ -66,6 +74,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private String selectedAnswer = "";
     private int questionsPerCategory = 6; // Approximate
     private static final int CATEGORY_TRANSITION_REQUEST = 1001;
+    private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,6 +294,16 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void loadPronunciationQuestion() {
+        // Check for microphone permission
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Request permission
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.RECORD_AUDIO},
+                    PERMISSION_REQUEST_RECORD_AUDIO);
+            return;
+        }
+
         // Inflate pronunciation question layout
         questionContainer.removeAllViews();
         View questionView = LayoutInflater.from(this)
@@ -763,6 +782,25 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Resume background music when activity resumes
         if (soundEffectsHelper != null) {
             soundEffectsHelper.resumeBackgroundMusic();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                          @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == PERMISSION_REQUEST_RECORD_AUDIO) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, reload pronunciation question
+                loadPronunciationQuestion();
+            } else {
+                // Permission denied, show message and move to next question
+                Toast.makeText(this, "Microphone permission is required for pronunciation questions",
+                        Toast.LENGTH_LONG).show();
+                // Auto-advance to next question after short delay
+                new Handler(Looper.getMainLooper()).postDelayed(this::loadNextQuestion, 2000);
+            }
         }
     }
 
