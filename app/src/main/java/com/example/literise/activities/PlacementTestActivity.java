@@ -18,6 +18,7 @@ import com.example.literise.database.QuestionBankHelper;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.utils.IRTEngine;
 import com.example.literise.utils.KaraokeTextHelper;
+import com.example.literise.utils.SoundEffectsHelper;
 import com.example.literise.utils.SpeechRecognitionHelper;
 import com.example.literise.utils.TextToSpeechHelper;
 import com.google.android.material.button.MaterialButton;
@@ -54,6 +55,9 @@ public class PlacementTestActivity extends AppCompatActivity {
     private KaraokeTextHelper karaokeTextHelper;
     private TextToSpeechHelper textToSpeechHelper;
 
+    // Sound Effects
+    private SoundEffectsHelper soundEffectsHelper;
+
     // Question tracking
     private int currentQuestionNumber = 1;
     private int totalQuestions = 25;
@@ -71,6 +75,10 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Initialize IRT Engine and Question Bank
         irtEngine = new IRTEngine();
         questionBankHelper = new QuestionBankHelper(this);
+
+        // Initialize Sound Effects
+        soundEffectsHelper = new SoundEffectsHelper(this);
+        soundEffectsHelper.startBackgroundMusic();
 
         initViews();
         setupListeners();
@@ -144,6 +152,9 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void showCategoryTransition() {
+        // Play transition sound
+        soundEffectsHelper.playTransition();
+
         Intent intent = new Intent(PlacementTestActivity.this, CategoryTransitionActivity.class);
         intent.putExtra("category_number", currentCategory);
         startActivityForResult(intent, CATEGORY_TRANSITION_REQUEST);
@@ -641,7 +652,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         CardView optionD = questionView.findViewById(R.id.optionD);
 
         View.OnClickListener optionClickListener = v -> {
-            // Play pop animation
+            // Play pop sound and animation
+            soundEffectsHelper.playPop();
             android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.option_pop);
             v.startAnimation(popAnim);
 
@@ -682,6 +694,13 @@ public class PlacementTestActivity extends AppCompatActivity {
             isCorrect = selectedAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
         }
 
+        // Play appropriate sound effect
+        if (isCorrect) {
+            soundEffectsHelper.playSuccess();
+        } else if (!selectedAnswer.isEmpty()) {
+            soundEffectsHelper.playError();
+        }
+
         // Update IRT engine with result
         irtEngine.updateTheta(currentQuestion, isCorrect);
 
@@ -689,9 +708,12 @@ public class PlacementTestActivity extends AppCompatActivity {
         currentQuestionNumber++;
 
         if (currentQuestionNumber > totalQuestions) {
-            // Test complete - show results
+            // Test complete - show results with celebration
+            soundEffectsHelper.playCelebration();
             showResults();
         } else {
+            // Play chime for question completion
+            soundEffectsHelper.playChime();
             loadNextQuestion();
         }
     }
@@ -727,6 +749,24 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        // Pause background music when activity is paused
+        if (soundEffectsHelper != null) {
+            soundEffectsHelper.pauseBackgroundMusic();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Resume background music when activity resumes
+        if (soundEffectsHelper != null) {
+            soundEffectsHelper.resumeBackgroundMusic();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (questionBankHelper != null) {
@@ -740,6 +780,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         }
         if (textToSpeechHelper != null) {
             textToSpeechHelper.shutdown();
+        }
+        if (soundEffectsHelper != null) {
+            soundEffectsHelper.release();
         }
     }
 }
