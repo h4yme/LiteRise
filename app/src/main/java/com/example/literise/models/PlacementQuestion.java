@@ -105,6 +105,8 @@ public class PlacementQuestion {
                 options.add(jsonArray.getString(i));
             }
         } catch (JSONException e) {
+            // Log the error for debugging
+            android.util.Log.e("PlacementQuestion", "Failed to parse options JSON: " + json, e);
             e.printStackTrace();
         }
         return options;

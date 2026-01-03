@@ -14,7 +14,7 @@ import java.util.List;
 public class QuestionBankHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "placement_questions.db";
-    private static final int DATABASE_VERSION = 2; // Incremented for schema change
+    private static final int DATABASE_VERSION = 3; // Incremented to force rebuild with all questions
 
     // Table name
     private static final String TABLE_QUESTIONS = "questions";
