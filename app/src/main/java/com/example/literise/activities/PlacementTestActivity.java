@@ -316,17 +316,25 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void showResults() {
-        // TODO: Navigate to PlacementResultActivity with IRT results
-        // For now, just show toast and finish
+        // Navigate to PlacementResultActivity with IRT results
         int placementLevel = irtEngine.calculatePlacementLevel();
         String levelName = irtEngine.getPlacementLevelName();
         double accuracy = irtEngine.getAccuracyPercentage();
+        int totalAnswered = irtEngine.getTotalAnswered();
+        int totalCorrect = irtEngine.getTotalCorrect();
+        int[] categoryScores = irtEngine.getCategoryScores();
 
-        // Log results for debugging
-        System.out.println("Placement Level: " + placementLevel + " - " + levelName);
-        System.out.println("Accuracy: " + accuracy + "%");
-        System.out.println("Theta: " + irtEngine.getTheta());
+        // Create intent with results
+        Intent intent = new Intent(PlacementTestActivity.this, PlacementResultActivity.class);
+        intent.putExtra("placement_level", placementLevel);
+        intent.putExtra("level_name", levelName);
+        intent.putExtra("accuracy", accuracy);
+        intent.putExtra("total_answered", totalAnswered);
+        intent.putExtra("total_correct", totalCorrect);
+        intent.putExtra("category_scores", categoryScores);
 
+        startActivity(intent);
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
     }
 

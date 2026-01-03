@@ -154,6 +154,16 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <!-- ✅ Placement Result Screen -->
+
+        <activity
+
+            android:name=".activities.PlacementResultActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
 
         <activity
