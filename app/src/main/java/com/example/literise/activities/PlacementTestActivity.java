@@ -38,7 +38,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private TextView tvCategoryIcon, tvCategoryName;
     private TextView tvQuestionType;
     private FrameLayout questionContainer;
-    private LinearLayout leoHintContainer;
+    private CardView leoHintContainer;
     private TextView tvLeoHint;
     private MaterialButton btnContinue, btnRetry;
 
