@@ -1,22 +1,37 @@
 package com.example.literise.activities;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.literise.BuildConfig;
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
+import com.example.literise.database.SessionManager;
+import com.example.literise.models.SavePlacementResultRequest;
+import com.example.literise.models.SavePlacementResultResponse;
+import com.example.literise.utils.SessionLogger;
 import com.example.literise.views.LeoDialogueView;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class PlacementResultActivity extends AppCompatActivity {
+
+    private static final String TAG = "PlacementResultActivity";
 
     private RelativeLayout rootLayout;
     private TextView tvLevelName, tvLevelNumber;
@@ -31,16 +46,25 @@ public class PlacementResultActivity extends AppCompatActivity {
     private int totalAnswered;
     private int totalCorrect;
     private int[] categoryScores;
+    private double finalTheta;
+    private long startTime;
+
+    // Session and API
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_placement_result);
 
+        sessionManager = new SessionManager(this);
+        startTime = System.currentTimeMillis();
+
         initViews();
         getResultsFromIntent();
         displayResults();
-        
+        savePlacementResult();
+
         // Show Leo's congratulation dialogue after a brief delay
         new Handler().postDelayed(this::showLeoCongratulation, 1000);
 
@@ -68,6 +92,11 @@ public class PlacementResultActivity extends AppCompatActivity {
         totalAnswered = intent.getIntExtra("total_answered", 0);
         totalCorrect = intent.getIntExtra("total_correct", 0);
         categoryScores = intent.getIntArrayExtra("category_scores");
+        finalTheta = intent.getDoubleExtra("final_theta", 0.0);
+        long passedStartTime = intent.getLongExtra("start_time", 0);
+        if (passedStartTime > 0) {
+            startTime = passedStartTime;
+        }
 
         // Default values if not provided
         if (levelName == null || levelName.isEmpty()) {
@@ -191,6 +220,78 @@ public class PlacementResultActivity extends AppCompatActivity {
             startActivity(intent);
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
+        });
+    }
+
+    private void savePlacementResult() {
+        int studentId = sessionManager.getStudentId();
+        if (studentId == 0) {
+            Log.w(TAG, "Cannot save placement result: No student ID found");
+            return;
+        }
+
+        // Determine assessment type based on whether student has completed assessment before
+        String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+
+        // Generate session ID based on timestamp
+        int sessionId = (int) (System.currentTimeMillis() / 1000);
+
+        // Calculate time spent in seconds
+        int timeSpentSeconds = (int) ((System.currentTimeMillis() - startTime) / 1000);
+
+        // Build device info
+        String deviceInfo = Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE;
+
+        // Create request
+        SavePlacementResultRequest request = new SavePlacementResultRequest(
+                studentId,
+                sessionId,
+                assessmentType,
+                finalTheta,
+                placementLevel,
+                levelName,
+                totalAnswered,
+                totalCorrect,
+                accuracy
+        );
+
+        // Set category scores
+        for (int i = 0; i < categoryScores.length && i < 4; i++) {
+            request.setCategoryScore(i + 1, categoryScores[i]);
+        }
+
+        // Set optional fields
+        request.setTimeSpentSeconds(timeSpentSeconds);
+        request.setDeviceInfo(deviceInfo);
+        request.setAppVersion(BuildConfig.VERSION_NAME);
+
+        // Make API call
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        Call<SavePlacementResultResponse> call = apiService.savePlacementResult(request);
+
+        call.enqueue(new Callback<SavePlacementResultResponse>() {
+            @Override
+            public void onResponse(Call<SavePlacementResultResponse> call, Response<SavePlacementResultResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    SavePlacementResultResponse result = response.body();
+                    Log.d(TAG, "Placement result saved successfully: " + result.getMessage());
+
+                    // Mark assessment as completed if this was PreAssessment
+                    if ("PreAssessment".equals(assessmentType)) {
+                        sessionManager.setAssessmentCompleted(true);
+                    }
+
+                    // Log assessment completion
+                    SessionLogger.logAssessmentComplete(PlacementResultActivity.this, studentId, assessmentType);
+                } else {
+                    Log.e(TAG, "Failed to save placement result: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SavePlacementResultResponse> call, Throwable t) {
+                Log.e(TAG, "Error saving placement result: " + t.getMessage());
+            }
         });
     }
 

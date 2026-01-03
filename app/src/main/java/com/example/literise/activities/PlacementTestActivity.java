@@ -25,9 +25,11 @@ import com.google.android.material.card.MaterialCardView;
 
 import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
+import com.example.literise.database.SessionManager;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.utils.IRTEngine;
 import com.example.literise.utils.KaraokeTextHelper;
+import com.example.literise.utils.SessionLogger;
 import com.example.literise.utils.SoundEffectsHelper;
 import com.example.literise.utils.SpeechRecognitionHelper;
 import com.example.literise.utils.TextToSpeechHelper;
@@ -66,6 +68,9 @@ public class PlacementTestActivity extends AppCompatActivity {
     // Sound Effects
     private SoundEffectsHelper soundEffectsHelper;
 
+    // Session Manager
+    private SessionManager sessionManager;
+
     // Question tracking
     private int currentQuestionNumber = 1;
     private int totalQuestions = 25;
@@ -73,12 +78,18 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int previousCategory = 0;
     private String selectedAnswer = "";
     private int questionsPerCategory = 6; // Approximate
+    private long startTime;
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_placement_test);
+
+        startTime = System.currentTimeMillis();
+
+        // Initialize Session Manager
+        sessionManager = new SessionManager(this);
 
         // Initialize IRT Engine and Question Bank
         irtEngine = new IRTEngine();
@@ -91,6 +102,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         initViews();
         setupListeners();
         loadNextQuestion();
+
+        // Log assessment start
+        logAssessmentStart();
     }
 
     private void initViews() {
@@ -806,6 +820,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         int totalAnswered = irtEngine.getTotalAnswered();
         int totalCorrect = irtEngine.getTotalCorrect();
         int[] categoryScores = irtEngine.getCategoryScores();
+        double finalTheta = irtEngine.getTheta();
 
         // Create intent with results
         Intent intent = new Intent(PlacementTestActivity.this, PlacementResultActivity.class);
@@ -815,10 +830,25 @@ public class PlacementTestActivity extends AppCompatActivity {
         intent.putExtra("total_answered", totalAnswered);
         intent.putExtra("total_correct", totalCorrect);
         intent.putExtra("category_scores", categoryScores);
+        intent.putExtra("final_theta", finalTheta);
+        intent.putExtra("start_time", startTime);
 
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
+    }
+
+    private void logAssessmentStart() {
+        int studentId = sessionManager.getStudentId();
+        if (studentId == 0) {
+            return;
+        }
+
+        // Determine assessment type based on whether student has completed assessment before
+        String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+
+        // Log assessment start
+        SessionLogger.logAssessmentStart(this, studentId, assessmentType);
     }
 
     @Override

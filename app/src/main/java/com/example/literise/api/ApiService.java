@@ -163,4 +163,18 @@ public interface ApiService {
     @POST("save_nickname.php")
 
     Call<ResponseModel> saveNickname(@Body Students student);
+
+    // 📊 Save Placement Result
+    @Headers("Content-Type: application/json")
+    @POST("save_placement_result.php")
+    Call<SavePlacementResultResponse> savePlacementResult(@Body SavePlacementResultRequest request);
+
+    // 📈 Get Placement Progress
+    @GET("get_placement_progress.php")
+    Call<PlacementProgressResponse> getPlacementProgress(@Query("student_id") int studentId);
+
+    // 📝 Log Session
+    @Headers("Content-Type: application/json")
+    @POST("log_session.php")
+    Call<LogSessionResponse> logSession(@Body LogSessionRequest request);
 }
