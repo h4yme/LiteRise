@@ -3,7 +3,7 @@
 -- Database Migration for Pre/Post Assessment Tracking
 -- ===============================================
 
-USE LiteRise;
+USE LiteRiseDB;
 GO
 
 -- ===============================================
@@ -12,19 +12,19 @@ GO
 
 -- Add placement assessment tracking columns to Students table
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-               WHERE TABLE_NAME = 'Students' AND COLUMN_NAME = 'PreAssessmentCompleted')
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'Students' AND COLUMN_NAME = 'PreAssessmentCompleted')
 BEGIN
-    ALTER TABLE Students ADD PreAssessmentCompleted BIT DEFAULT 0;
-    ALTER TABLE Students ADD PreAssessmentDate DATETIME NULL;
-    ALTER TABLE Students ADD PreAssessmentLevel INT NULL;
-    ALTER TABLE Students ADD PreAssessmentTheta FLOAT DEFAULT 0.0;
-    ALTER TABLE Students ADD PostAssessmentCompleted BIT DEFAULT 0;
-    ALTER TABLE Students ADD PostAssessmentDate DATETIME NULL;
-    ALTER TABLE Students ADD PostAssessmentLevel INT NULL;
-    ALTER TABLE Students ADD PostAssessmentTheta FLOAT DEFAULT 0.0;
-    ALTER TABLE Students ADD AssessmentStatus VARCHAR(50) DEFAULT 'Not Started'; -- 'Not Started', 'Pre-Completed', 'In Progress', 'Post-Completed'
-    ALTER TABLE Students ADD LastLoginDate DATETIME NULL;
-    ALTER TABLE Students ADD TotalLoginCount INT DEFAULT 0;
+    ALTER TABLE dbo.Students ADD PreAssessmentCompleted BIT DEFAULT 0;
+    ALTER TABLE dbo.Students ADD PreAssessmentDate DATETIME NULL;
+    ALTER TABLE dbo.Students ADD PreAssessmentLevel INT NULL;
+    ALTER TABLE dbo.Students ADD PreAssessmentTheta FLOAT DEFAULT 0.0;
+    ALTER TABLE dbo.Students ADD PostAssessmentCompleted BIT DEFAULT 0;
+    ALTER TABLE dbo.Students ADD PostAssessmentDate DATETIME NULL;
+    ALTER TABLE dbo.Students ADD PostAssessmentLevel INT NULL;
+    ALTER TABLE dbo.Students ADD PostAssessmentTheta FLOAT DEFAULT 0.0;
+    ALTER TABLE dbo.Students ADD AssessmentStatus VARCHAR(50) DEFAULT 'Not Started'; -- 'Not Started', 'Pre-Completed', 'In Progress', 'Post-Completed'
+    ALTER TABLE dbo.Students ADD LastLoginDate DATETIME NULL;
+    ALTER TABLE dbo.Students ADD TotalLoginCount INT DEFAULT 0;
 END
 GO
 
@@ -33,12 +33,12 @@ GO
 -- ===============================================
 
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES
-               WHERE TABLE_NAME = 'PlacementResults')
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'PlacementResults')
 BEGIN
-    CREATE TABLE PlacementResults (
+    CREATE TABLE dbo.PlacementResults (
         ResultID INT IDENTITY(1,1) PRIMARY KEY,
-        StudentID INT NOT NULL FOREIGN KEY REFERENCES Students(StudentID),
-        SessionID INT NOT NULL FOREIGN KEY REFERENCES TestSessions(SessionID),
+        StudentID INT NOT NULL FOREIGN KEY REFERENCES dbo.Students(StudentID),
+        SessionID INT NOT NULL, -- Timestamp-based session identifier
         AssessmentType VARCHAR(20) NOT NULL, -- 'PreAssessment' or 'PostAssessment'
         CompletedDate DATETIME NOT NULL DEFAULT GETDATE(),
 
@@ -76,9 +76,9 @@ BEGIN
         CONSTRAINT CHK_AssessmentType CHECK (AssessmentType IN ('PreAssessment', 'PostAssessment'))
     );
 
-    CREATE INDEX IDX_PlacementResults_Student ON PlacementResults(StudentID);
-    CREATE INDEX IDX_PlacementResults_Type ON PlacementResults(AssessmentType);
-    CREATE INDEX IDX_PlacementResults_Date ON PlacementResults(CompletedDate);
+    CREATE INDEX IDX_PlacementResults_Student ON dbo.PlacementResults(StudentID);
+    CREATE INDEX IDX_PlacementResults_Type ON dbo.PlacementResults(AssessmentType);
+    CREATE INDEX IDX_PlacementResults_Date ON dbo.PlacementResults(CompletedDate);
 END
 GO
 
@@ -87,11 +87,11 @@ GO
 -- ===============================================
 
 IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES
-               WHERE TABLE_NAME = 'StudentSessionLogs')
+               WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'StudentSessionLogs')
 BEGIN
-    CREATE TABLE StudentSessionLogs (
+    CREATE TABLE dbo.StudentSessionLogs (
         LogID INT IDENTITY(1,1) PRIMARY KEY,
-        StudentID INT NOT NULL FOREIGN KEY REFERENCES Students(StudentID),
+        StudentID INT NOT NULL FOREIGN KEY REFERENCES dbo.Students(StudentID),
         SessionType VARCHAR(50) NOT NULL, -- 'Login', 'Logout', 'AssessmentStart', 'AssessmentComplete', 'LessonStart', 'LessonComplete'
         SessionTag VARCHAR(100) NULL, -- Custom tags for categorizing sessions
         LoggedAt DATETIME NOT NULL DEFAULT GETDATE(),
@@ -100,10 +100,10 @@ BEGIN
         AdditionalData NVARCHAR(MAX) NULL -- JSON format for extensibility
     );
 
-    CREATE INDEX IDX_SessionLogs_Student ON StudentSessionLogs(StudentID);
-    CREATE INDEX IDX_SessionLogs_Type ON StudentSessionLogs(SessionType);
-    CREATE INDEX IDX_SessionLogs_Date ON StudentSessionLogs(LoggedAt);
-    CREATE INDEX IDX_SessionLogs_Tag ON StudentSessionLogs(SessionTag);
+    CREATE INDEX IDX_SessionLogs_Student ON dbo.StudentSessionLogs(StudentID);
+    CREATE INDEX IDX_SessionLogs_Type ON dbo.StudentSessionLogs(SessionType);
+    CREATE INDEX IDX_SessionLogs_Date ON dbo.StudentSessionLogs(LoggedAt);
+    CREATE INDEX IDX_SessionLogs_Tag ON dbo.StudentSessionLogs(SessionTag);
 END
 GO
 
@@ -111,11 +111,11 @@ GO
 -- 4. CREATE ASSESSMENT_COMPARISON_VIEW
 -- ===============================================
 
-IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_NAME = 'V_AssessmentComparison')
-    DROP VIEW V_AssessmentComparison;
+IF EXISTS (SELECT * FROM INFORMATION_SCHEMA.VIEWS WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'V_AssessmentComparison')
+    DROP VIEW dbo.V_AssessmentComparison;
 GO
 
-CREATE VIEW V_AssessmentComparison AS
+CREATE VIEW dbo.V_AssessmentComparison AS
 SELECT
     s.StudentID,
     s.FirstName,
@@ -162,9 +162,9 @@ SELECT
         ELSE 'Not Started'
     END AS ComparisonStatus
 
-FROM Students s
-LEFT JOIN PlacementResults pre ON s.StudentID = pre.StudentID AND pre.AssessmentType = 'PreAssessment'
-LEFT JOIN PlacementResults post ON s.StudentID = post.StudentID AND post.AssessmentType = 'PostAssessment';
+FROM dbo.Students s
+LEFT JOIN dbo.PlacementResults pre ON s.StudentID = pre.StudentID AND pre.AssessmentType = 'PreAssessment'
+LEFT JOIN dbo.PlacementResults post ON s.StudentID = post.StudentID AND post.AssessmentType = 'PostAssessment';
 GO
 
 -- ===============================================
@@ -172,10 +172,10 @@ GO
 -- ===============================================
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SP_SavePlacementResult')
-    DROP PROCEDURE SP_SavePlacementResult;
+    DROP PROCEDURE dbo.SP_SavePlacementResult;
 GO
 
-CREATE PROCEDURE SP_SavePlacementResult
+CREATE PROCEDURE dbo.SP_SavePlacementResult
     @StudentID INT,
     @SessionID INT,
     @AssessmentType VARCHAR(20),
@@ -204,7 +204,7 @@ BEGIN
         BEGIN TRANSACTION;
 
         -- Insert placement result
-        INSERT INTO PlacementResults (
+        INSERT INTO dbo.PlacementResults (
             StudentID, SessionID, AssessmentType, CompletedDate,
             FinalTheta, PlacementLevel, LevelName, TotalQuestions, CorrectAnswers, AccuracyPercentage,
             Category1Score, Category2Score, Category3Score, Category4Score,
@@ -222,7 +222,7 @@ BEGIN
         -- Update Students table based on assessment type
         IF @AssessmentType = 'PreAssessment'
         BEGIN
-            UPDATE Students
+            UPDATE dbo.Students
             SET PreAssessmentCompleted = 1,
                 PreAssessmentDate = GETDATE(),
                 PreAssessmentLevel = @PlacementLevel,
@@ -232,7 +232,7 @@ BEGIN
         END
         ELSE IF @AssessmentType = 'PostAssessment'
         BEGIN
-            UPDATE Students
+            UPDATE dbo.Students
             SET PostAssessmentCompleted = 1,
                 PostAssessmentDate = GETDATE(),
                 PostAssessmentLevel = @PlacementLevel,
@@ -242,13 +242,13 @@ BEGIN
         END
 
         -- Log the assessment completion
-        INSERT INTO StudentSessionLogs (StudentID, SessionType, SessionTag, LoggedAt, DeviceInfo)
+        INSERT INTO dbo.StudentSessionLogs (StudentID, SessionType, SessionTag, LoggedAt, DeviceInfo)
         VALUES (@StudentID, 'AssessmentComplete', @AssessmentType, GETDATE(), @DeviceInfo);
 
         COMMIT TRANSACTION;
 
         -- Return the saved result
-        SELECT TOP 1 * FROM PlacementResults
+        SELECT TOP 1 * FROM dbo.PlacementResults
         WHERE StudentID = @StudentID AND AssessmentType = @AssessmentType
         ORDER BY ResultID DESC;
 
@@ -265,10 +265,10 @@ GO
 -- ===============================================
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SP_LogStudentSession')
-    DROP PROCEDURE SP_LogStudentSession;
+    DROP PROCEDURE dbo.SP_LogStudentSession;
 GO
 
-CREATE PROCEDURE SP_LogStudentSession
+CREATE PROCEDURE dbo.SP_LogStudentSession
     @StudentID INT,
     @SessionType VARCHAR(50),
     @SessionTag VARCHAR(100) = NULL,
@@ -280,13 +280,13 @@ BEGIN
     SET NOCOUNT ON;
 
     -- Insert session log
-    INSERT INTO StudentSessionLogs (StudentID, SessionType, SessionTag, LoggedAt, DeviceInfo, IPAddress, AdditionalData)
+    INSERT INTO dbo.StudentSessionLogs (StudentID, SessionType, SessionTag, LoggedAt, DeviceInfo, IPAddress, AdditionalData)
     VALUES (@StudentID, @SessionType, @SessionTag, GETDATE(), @DeviceInfo, @IPAddress, @AdditionalData);
 
     -- Update last login date if it's a login event
     IF @SessionType = 'Login'
     BEGIN
-        UPDATE Students
+        UPDATE dbo.Students
         SET LastLoginDate = GETDATE(),
             TotalLoginCount = ISNULL(TotalLoginCount, 0) + 1
         WHERE StudentID = @StudentID;
@@ -301,28 +301,28 @@ GO
 -- ===============================================
 
 IF EXISTS (SELECT * FROM sys.objects WHERE type = 'P' AND name = 'SP_GetStudentProgress')
-    DROP PROCEDURE SP_GetStudentProgress;
+    DROP PROCEDURE dbo.SP_GetStudentProgress;
 GO
 
-CREATE PROCEDURE SP_GetStudentProgress
+CREATE PROCEDURE dbo.SP_GetStudentProgress
     @StudentID INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
     -- Student Info
-    SELECT * FROM Students WHERE StudentID = @StudentID;
+    SELECT * FROM dbo.Students WHERE StudentID = @StudentID;
 
     -- Assessment Results
-    SELECT * FROM PlacementResults WHERE StudentID = @StudentID ORDER BY CompletedDate DESC;
+    SELECT * FROM dbo.PlacementResults WHERE StudentID = @StudentID ORDER BY CompletedDate DESC;
 
     -- Session History (last 30 days)
-    SELECT TOP 50 * FROM StudentSessionLogs
+    SELECT TOP 50 * FROM dbo.StudentSessionLogs
     WHERE StudentID = @StudentID AND LoggedAt >= DATEADD(DAY, -30, GETDATE())
     ORDER BY LoggedAt DESC;
 
     -- Comparison View
-    SELECT * FROM V_AssessmentComparison WHERE StudentID = @StudentID;
+    SELECT * FROM dbo.V_AssessmentComparison WHERE StudentID = @StudentID;
 END
 GO
 
