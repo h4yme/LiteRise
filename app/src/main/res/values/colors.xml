@@ -62,4 +62,10 @@
     <color name="option_selected">#E3F2FD</color>
     <color name="option_correct">#C8E6C9</color>
     <color name="option_incorrect">#FFCDD2</color>
+
+    <!-- 🎤 Pronunciation Feedback Colors -->
+    <color name="success_light">#E8F5E9</color>
+    <color name="warning_light">#FFF3E0</color>
+    <color name="error_light">#FFEBEE</color>
+    <color name="error_red">#EF5350</color>
 </resources>

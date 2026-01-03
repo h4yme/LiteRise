@@ -17,9 +17,13 @@ import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.utils.IRTEngine;
+import com.example.literise.utils.KaraokeTextHelper;
 import com.example.literise.utils.SpeechRecognitionHelper;
+import com.example.literise.utils.TextToSpeechHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import android.widget.SeekBar;
 
 import java.util.List;
 
@@ -45,6 +49,10 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     // Speech Recognition
     private SpeechRecognitionHelper speechRecognitionHelper;
+
+    // Karaoke Reading
+    private KaraokeTextHelper karaokeTextHelper;
+    private TextToSpeechHelper textToSpeechHelper;
 
     // Question tracking
     private int currentQuestionNumber = 1;
@@ -224,6 +232,8 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         if ("pronunciation".equalsIgnoreCase(questionType)) {
             loadPronunciationQuestion();
+        } else if ("reading".equalsIgnoreCase(questionType)) {
+            loadReadingQuestion();
         } else {
             // Default to multiple choice
             loadMultipleChoiceQuestion();
@@ -261,6 +271,335 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         // Setup option click listeners
         setupOptionClickListeners(questionView);
+    }
+
+    private void loadPronunciationQuestion() {
+        // Inflate pronunciation question layout
+        questionContainer.removeAllViews();
+        View questionView = LayoutInflater.from(this)
+                .inflate(R.layout.fragment_question_pronunciation, questionContainer, false);
+        questionContainer.addView(questionView);
+
+        // Set question type
+        tvQuestionType.setText("🎤 Pronunciation Practice");
+
+        // Initialize speech recognition
+        if (speechRecognitionHelper == null) {
+            speechRecognitionHelper = new SpeechRecognitionHelper(this);
+        }
+
+        // Get UI elements
+        TextView tvWordToPronounce = questionView.findViewById(R.id.tvWordToPronounce);
+        TextView tvRecordingStatus = questionView.findViewById(R.id.tvRecordingStatus);
+        FloatingActionButton btnMicrophone = questionView.findViewById(R.id.btnMicrophone);
+        LinearLayout waveformContainer = questionView.findViewById(R.id.waveformContainer);
+        MaterialButton btnPlayback = questionView.findViewById(R.id.btnPlayback);
+        CardView feedbackCard = questionView.findViewById(R.id.feedbackCard);
+        TextView tvFeedbackIcon = questionView.findViewById(R.id.tvFeedbackIcon);
+        TextView tvFeedbackText = questionView.findViewById(R.id.tvFeedbackText);
+        TextView tvScore = questionView.findViewById(R.id.tvScore);
+
+        // Set the word to pronounce
+        String wordToPronounce = currentQuestion.getQuestionText();
+        tvWordToPronounce.setText(wordToPronounce);
+
+        // Microphone button click listener
+        btnMicrophone.setOnClickListener(v -> {
+            if (!speechRecognitionHelper.isListening()) {
+                // Start recording
+                tvRecordingStatus.setText("Listening... Say the word now!");
+                tvRecordingStatus.setTextColor(getColor(R.color.error_red));
+                btnMicrophone.setBackgroundTintList(getColorStateList(R.color.error_red));
+                waveformContainer.setVisibility(View.VISIBLE);
+                feedbackCard.setVisibility(View.GONE);
+
+                // Start animated waveform
+                animateWaveform(waveformContainer);
+
+                // Start speech recognition
+                speechRecognitionHelper.startListening(new SpeechRecognitionHelper.RecognitionCallback() {
+                    @Override
+                    public void onRecognitionReady() {
+                        runOnUiThread(() -> {
+                            tvRecordingStatus.setText("Listening... Speak now!");
+                        });
+                    }
+
+                    @Override
+                    public void onRecognitionStarted() {
+                        // Already handled in onRecognitionReady
+                    }
+
+                    @Override
+                    public void onRecognitionResult(String recognizedText, float confidence) {
+                        runOnUiThread(() -> {
+                            // Stop waveform animation
+                            waveformContainer.clearAnimation();
+                            waveformContainer.setVisibility(View.GONE);
+
+                            // Calculate pronunciation accuracy
+                            int accuracy = SpeechRecognitionHelper.calculatePronunciationAccuracy(
+                                    wordToPronounce, recognizedText);
+
+                            // Show feedback
+                            feedbackCard.setVisibility(View.VISIBLE);
+                            tvScore.setText(accuracy + "% Match");
+
+                            if (accuracy >= 85) {
+                                tvFeedbackIcon.setText("🎉");
+                                tvFeedbackText.setText("Excellent! You said it perfectly!");
+                                feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
+                                tvFeedbackText.setTextColor(getColor(R.color.success_green));
+                                tvScore.setTextColor(getColor(R.color.success_green));
+                                selectedAnswer = currentQuestion.getCorrectAnswer(); // Mark as correct
+                            } else if (accuracy >= 65) {
+                                tvFeedbackIcon.setText("👍");
+                                tvFeedbackText.setText("Good try! Almost there!");
+                                feedbackCard.setCardBackgroundColor(getColor(R.color.warning_light));
+                                tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
+                                tvScore.setTextColor(getColor(R.color.warning_orange));
+                                selectedAnswer = recognizedText; // Partial credit
+                            } else {
+                                tvFeedbackIcon.setText("🔄");
+                                tvFeedbackText.setText("Try again! You can do it!");
+                                feedbackCard.setCardBackgroundColor(getColor(R.color.error_light));
+                                tvFeedbackText.setTextColor(getColor(R.color.error_red));
+                                tvScore.setTextColor(getColor(R.color.error_red));
+                                selectedAnswer = recognizedText; // Incorrect
+                            }
+
+                            // Reset button
+                            tvRecordingStatus.setText("Tap to try again");
+                            tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
+                            btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
+
+                            // Enable continue button
+                            btnContinue.setEnabled(true);
+                            android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                    PlacementTestActivity.this, R.anim.bounce);
+                            btnContinue.startAnimation(bounceAnim);
+                        });
+                    }
+
+                    @Override
+                    public void onRecognitionError(String error) {
+                        runOnUiThread(() -> {
+                            waveformContainer.clearAnimation();
+                            waveformContainer.setVisibility(View.GONE);
+                            tvRecordingStatus.setText(error);
+                            tvRecordingStatus.setTextColor(getColor(R.color.error_red));
+                            btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
+                        });
+                    }
+
+                    @Override
+                    public void onRecognitionEnded() {
+                        runOnUiThread(() -> {
+                            waveformContainer.clearAnimation();
+                            waveformContainer.setVisibility(View.GONE);
+                        });
+                    }
+                });
+            }
+        });
+
+        // Hide Leo hint for pronunciation questions
+        leoHintContainer.setVisibility(View.GONE);
+    }
+
+    private void animateWaveform(LinearLayout waveformContainer) {
+        // Animate each wave bar
+        View wave1 = waveformContainer.findViewById(R.id.wave1);
+        View wave2 = waveformContainer.findViewById(R.id.wave2);
+        View wave3 = waveformContainer.findViewById(R.id.wave3);
+        View wave4 = waveformContainer.findViewById(R.id.wave4);
+        View wave5 = waveformContainer.findViewById(R.id.wave5);
+
+        animateWaveBar(wave1, 200, 0);
+        animateWaveBar(wave2, 200, 100);
+        animateWaveBar(wave3, 200, 200);
+        animateWaveBar(wave4, 200, 300);
+        animateWaveBar(wave5, 200, 400);
+    }
+
+    private void animateWaveBar(View bar, long duration, long startOffset) {
+        android.view.animation.Animation scaleAnim = new android.view.animation.ScaleAnimation(
+                1f, 1f, 0.5f, 1.5f,
+                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f,
+                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f);
+        scaleAnim.setDuration(duration);
+        scaleAnim.setStartOffset(startOffset);
+        scaleAnim.setRepeatCount(android.view.animation.Animation.INFINITE);
+        scaleAnim.setRepeatMode(android.view.animation.Animation.REVERSE);
+        bar.startAnimation(scaleAnim);
+    }
+
+    private void loadReadingQuestion() {
+        // Inflate reading question layout
+        questionContainer.removeAllViews();
+        View questionView = LayoutInflater.from(this)
+                .inflate(R.layout.fragment_question_reading, questionContainer, false);
+        questionContainer.addView(questionView);
+
+        // Set question type
+        tvQuestionType.setText("📖 Reading Comprehension");
+
+        // Initialize Text-to-Speech
+        if (textToSpeechHelper == null) {
+            textToSpeechHelper = new TextToSpeechHelper(this);
+        }
+
+        // Get UI elements
+        TextView tvReadingText = questionView.findViewById(R.id.tvReadingText);
+        TextView tvReadingStatus = questionView.findViewById(R.id.tvReadingStatus);
+        FloatingActionButton btnPlay = questionView.findViewById(R.id.btnPlay);
+        FloatingActionButton btnStop = questionView.findViewById(R.id.btnStop);
+        SeekBar seekBarSpeed = questionView.findViewById(R.id.seekBarSpeed);
+        CardView comprehensionCard = questionView.findViewById(R.id.comprehensionCard);
+        TextView tvComprehensionQuestion = questionView.findViewById(R.id.tvComprehensionQuestion);
+        MaterialButton btnAnswer1 = questionView.findViewById(R.id.btnAnswer1);
+        MaterialButton btnAnswer2 = questionView.findViewById(R.id.btnAnswer2);
+        MaterialButton btnAnswer3 = questionView.findViewById(R.id.btnAnswer3);
+
+        // Set reading text
+        String readingText = currentQuestion.getReadingPassage();
+        if (readingText == null || readingText.isEmpty()) {
+            readingText = currentQuestion.getQuestionText();
+        }
+        tvReadingText.setText(readingText);
+
+        // Initialize karaoke helper
+        karaokeTextHelper = new KaraokeTextHelper(tvReadingText);
+        karaokeTextHelper.setReadingSpeed(1); // Normal speed by default
+
+        // Play button listener
+        final String finalReadingText = readingText;
+        btnPlay.setOnClickListener(v -> {
+            if (karaokeTextHelper.isPlaying()) {
+                // Pause
+                karaokeTextHelper.pause();
+                textToSpeechHelper.stop();
+                btnPlay.setImageResource(R.drawable.ic_play);
+                tvReadingStatus.setText("Paused - Tap play to continue");
+            } else {
+                // Start or resume
+                btnPlay.setImageResource(R.drawable.ic_stop);
+                tvReadingStatus.setText("Reading... Follow along!");
+                tvReadingStatus.setTextColor(getColor(R.color.primary_blue));
+
+                karaokeTextHelper.start(new KaraokeTextHelper.KaraokeCallback() {
+                    @Override
+                    public void onWordHighlighted(int wordIndex, String word) {
+                        // Word is highlighted, TTS reads it
+                        if (wordIndex == 0) {
+                            // Start TTS for entire passage
+                            textToSpeechHelper.speak(finalReadingText, null);
+                        }
+                    }
+
+                    @Override
+                    public void onReadingComplete() {
+                        runOnUiThread(() -> {
+                            btnPlay.setImageResource(R.drawable.ic_play);
+                            tvReadingStatus.setText("Great job reading!");
+                            tvReadingStatus.setTextColor(getColor(R.color.success_green));
+
+                            // Show comprehension question
+                            if (currentQuestion.getOptions() != null && !currentQuestion.getOptions().isEmpty()) {
+                                comprehensionCard.setVisibility(View.VISIBLE);
+                                tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
+
+                                List<String> options = currentQuestion.getOptions();
+                                if (options.size() >= 3) {
+                                    btnAnswer1.setText(options.get(0));
+                                    btnAnswer2.setText(options.get(1));
+                                    btnAnswer3.setText(options.get(2));
+                                }
+
+                                // Scroll to show comprehension card
+                                questionView.postDelayed(() -> {
+                                    comprehensionCard.requestFocus();
+                                }, 300);
+                            } else {
+                                // No comprehension question, enable continue
+                                selectedAnswer = "completed";
+                                btnContinue.setEnabled(true);
+                                android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                        PlacementTestActivity.this, R.anim.bounce);
+                                btnContinue.startAnimation(bounceAnim);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+        // Stop button listener
+        btnStop.setOnClickListener(v -> {
+            karaokeTextHelper.stop();
+            textToSpeechHelper.stop();
+            btnPlay.setImageResource(R.drawable.ic_play);
+            tvReadingStatus.setText("Tap play to start reading!");
+            tvReadingStatus.setTextColor(getColor(R.color.text_secondary));
+            comprehensionCard.setVisibility(View.GONE);
+        });
+
+        // Speed slider listener
+        seekBarSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser && karaokeTextHelper != null) {
+                    karaokeTextHelper.setReadingSpeed(progress);
+
+                    // Also adjust TTS speed
+                    float ttsSpeed = 0.7f + (progress * 0.3f); // 0.7 to 1.3
+                    // Speed will be applied on next read
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+        // Comprehension answer buttons
+        View.OnClickListener answerClickListener = v -> {
+            // Reset all button colors
+            btnAnswer1.setBackgroundTintList(getColorStateList(android.R.color.white));
+            btnAnswer1.setTextColor(getColor(R.color.text_primary));
+            btnAnswer2.setBackgroundTintList(getColorStateList(android.R.color.white));
+            btnAnswer2.setTextColor(getColor(R.color.text_primary));
+            btnAnswer3.setBackgroundTintList(getColorStateList(android.R.color.white));
+            btnAnswer3.setTextColor(getColor(R.color.text_primary));
+
+            // Highlight selected
+            MaterialButton selectedBtn = (MaterialButton) v;
+            selectedBtn.setBackgroundTintList(getColorStateList(R.color.primary_blue));
+            selectedBtn.setTextColor(getColor(android.R.color.white));
+
+            // Play pop animation
+            android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(
+                    this, R.anim.option_pop);
+            v.startAnimation(popAnim);
+
+            // Store answer
+            selectedAnswer = selectedBtn.getText().toString();
+
+            // Enable continue button
+            btnContinue.setEnabled(true);
+            android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                    this, R.anim.bounce);
+            btnContinue.startAnimation(bounceAnim);
+        };
+
+        btnAnswer1.setOnClickListener(answerClickListener);
+        btnAnswer2.setOnClickListener(answerClickListener);
+        btnAnswer3.setOnClickListener(answerClickListener);
+
+        // Hide Leo hint for reading questions
+        leoHintContainer.setVisibility(View.GONE);
     }
 
     private String getQuestionTypeText(String subcategory) {
@@ -392,6 +731,15 @@ public class PlacementTestActivity extends AppCompatActivity {
         super.onDestroy();
         if (questionBankHelper != null) {
             questionBankHelper.close();
+        }
+        if (speechRecognitionHelper != null) {
+            speechRecognitionHelper.destroy();
+        }
+        if (karaokeTextHelper != null) {
+            karaokeTextHelper.destroy();
+        }
+        if (textToSpeechHelper != null) {
+            textToSpeechHelper.shutdown();
         }
     }
 }

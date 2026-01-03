@@ -15,6 +15,7 @@ public class PlacementQuestion {
     private String questionText;
     private String audioUrl;        // For listening questions
     private String imageUrl;        // For image-based questions
+    private String readingPassage;  // For reading comprehension questions
     private List<String> options;   // Answer options
     private String correctAnswer;
     private double difficulty;      // b parameter (-3 to 3)
@@ -64,6 +65,9 @@ public class PlacementQuestion {
 
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public String getReadingPassage() { return readingPassage; }
+    public void setReadingPassage(String readingPassage) { this.readingPassage = readingPassage; }
 
     public List<String> getOptions() { return options; }
     public void setOptions(List<String> options) { this.options = options; }
