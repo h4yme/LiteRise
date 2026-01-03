@@ -17,7 +17,9 @@ import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.utils.IRTEngine;
+import com.example.literise.utils.SpeechRecognitionHelper;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
@@ -40,6 +42,9 @@ public class PlacementTestActivity extends AppCompatActivity {
     private QuestionBankHelper questionBankHelper;
     private PlacementQuestion currentQuestion;
     private List<PlacementQuestion> categoryQuestions;
+
+    // Speech Recognition
+    private SpeechRecognitionHelper speechRecognitionHelper;
 
     // Question tracking
     private int currentQuestionNumber = 1;
@@ -214,9 +219,15 @@ public class PlacementTestActivity extends AppCompatActivity {
     private void loadQuestionView() {
         if (currentQuestion == null) return;
 
-        // For now, all questions are multiple choice
-        // Later: switch based on questionType
-        loadMultipleChoiceQuestion();
+        // Switch based on question type
+        String questionType = currentQuestion.getQuestionType();
+
+        if ("pronunciation".equalsIgnoreCase(questionType)) {
+            loadPronunciationQuestion();
+        } else {
+            // Default to multiple choice
+            loadMultipleChoiceQuestion();
+        }
     }
 
     private void loadMultipleChoiceQuestion() {
@@ -291,13 +302,17 @@ public class PlacementTestActivity extends AppCompatActivity {
         CardView optionD = questionView.findViewById(R.id.optionD);
 
         View.OnClickListener optionClickListener = v -> {
+            // Play pop animation
+            android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.option_pop);
+            v.startAnimation(popAnim);
+
             // Clear all selections
             optionA.setCardBackgroundColor(getColor(android.R.color.white));
             optionB.setCardBackgroundColor(getColor(android.R.color.white));
             optionC.setCardBackgroundColor(getColor(android.R.color.white));
             optionD.setCardBackgroundColor(getColor(android.R.color.white));
 
-            // Highlight selected
+            // Highlight selected with vibrant color
             ((CardView) v).setCardBackgroundColor(getColor(R.color.option_selected));
 
             // Store selected answer
@@ -306,8 +321,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             else if (v.getId() == R.id.optionC) selectedAnswer = currentQuestion.getOptions().get(2);
             else if (v.getId() == R.id.optionD) selectedAnswer = currentQuestion.getOptions().get(3);
 
-            // Enable continue button
+            // Enable continue button with animation
             btnContinue.setEnabled(true);
+            android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.bounce);
+            btnContinue.startAnimation(bounceAnim);
         };
 
         optionA.setOnClickListener(optionClickListener);

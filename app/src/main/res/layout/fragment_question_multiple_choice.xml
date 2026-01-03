@@ -10,20 +10,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="#4ECDC4"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
-        android:layout_marginBottom="24dp">
+        app:cardCornerRadius="28dp"
+        app:cardElevation="12dp"
+        android:layout_marginBottom="28dp">
 
-        <TextView
-            android:id="@+id/tvQuestion"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/visby_medium"
-            android:lineSpacingExtra="4dp"
-            android:padding="24dp"
-            android:text="He was too shy to _____ to strangers."
-            android:textColor="@color/white"
-            android:textSize="18sp" />
+            android:orientation="vertical"
+            android:padding="28dp">
+
+            <!-- Decorative Emoji Icon -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="💭"
+                android:textSize="40sp"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvQuestion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/visby_bold"
+                android:lineSpacingExtra="6dp"
+                android:text="He was too shy to _____ to strangers."
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:shadowColor="#40000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="4" />
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
@@ -39,9 +60,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -50,20 +71,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center_vertical">
 
                 <!-- Letter Badge -->
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/option_letter_badge"
                     android:fontFamily="@font/visby_bold"
                     android:gravity="center"
                     android:text="A"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="16dp" />
+                    android:textSize="20sp"
+                    android:layout_marginEnd="20dp"
+                    android:elevation="4dp" />
 
                 <!-- Answer Text -->
                 <TextView
@@ -71,16 +93,16 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/visby_medium"
+                    android:fontFamily="@font/visby_bold"
                     android:text="Talk"
                     android:textColor="#2C3E50"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
                 <!-- Check Icon (Hidden initially) -->
                 <ImageView
                     android:id="@+id/ivCheckA"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:src="@drawable/ic_check_circle"
                     android:visibility="gone"
                     app:tint="#2ECC71" />
@@ -95,9 +117,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -106,34 +128,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/option_letter_badge"
                     android:fontFamily="@font/visby_bold"
                     android:gravity="center"
                     android:text="B"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="16dp" />
+                    android:textSize="20sp"
+                    android:layout_marginEnd="20dp"
+                    android:elevation="4dp" />
 
                 <TextView
                     android:id="@+id/tvOptionB"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/visby_medium"
+                    android:fontFamily="@font/visby_bold"
                     android:text="Talking"
                     android:textColor="#2C3E50"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
                 <ImageView
                     android:id="@+id/ivCheckB"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:src="@drawable/ic_check_circle"
                     android:visibility="gone"
                     app:tint="#2ECC71" />
@@ -148,9 +171,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            android:layout_marginBottom="16dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -159,34 +182,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/option_letter_badge"
                     android:fontFamily="@font/visby_bold"
                     android:gravity="center"
                     android:text="C"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="16dp" />
+                    android:textSize="20sp"
+                    android:layout_marginEnd="20dp"
+                    android:elevation="4dp" />
 
                 <TextView
                     android:id="@+id/tvOptionC"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/visby_medium"
+                    android:fontFamily="@font/visby_bold"
                     android:text="Talked"
                     android:textColor="#2C3E50"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
                 <ImageView
                     android:id="@+id/ivCheckC"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:src="@drawable/ic_check_circle"
                     android:visibility="gone"
                     app:tint="#2ECC71" />
@@ -201,8 +225,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardBackgroundColor="@color/white"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackground">
@@ -211,34 +235,35 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="16dp"
+                android:padding="20dp"
                 android:gravity="center_vertical">
 
                 <TextView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:background="@drawable/option_letter_badge"
                     android:fontFamily="@font/visby_bold"
                     android:gravity="center"
                     android:text="D"
                     android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="16dp" />
+                    android:textSize="20sp"
+                    android:layout_marginEnd="20dp"
+                    android:elevation="4dp" />
 
                 <TextView
                     android:id="@+id/tvOptionD"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:fontFamily="@font/visby_medium"
+                    android:fontFamily="@font/visby_bold"
                     android:text="Be Talked"
                     android:textColor="#2C3E50"
-                    android:textSize="16sp" />
+                    android:textSize="18sp" />
 
                 <ImageView
                     android:id="@+id/ivCheckD"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
                     android:src="@drawable/ic_check_circle"
                     android:visibility="gone"
                     app:tint="#2ECC71" />
