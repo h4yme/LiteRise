@@ -17,9 +17,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.card.MaterialCardView;
 
 import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
@@ -44,7 +45,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private TextView btnSkip;
     private TextView tvQuestionType;
     private FrameLayout questionContainer;
-    private CardView leoHintContainer;
+    private MaterialCardView leoHintContainer;
     private TextView tvLeoHint;
     private MaterialButton btnContinue, btnRetry;
 
@@ -301,7 +302,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         FloatingActionButton btnMicrophone = questionView.findViewById(R.id.btnMicrophone);
         LinearLayout waveformContainer = questionView.findViewById(R.id.waveformContainer);
         MaterialButton btnPlayback = questionView.findViewById(R.id.btnPlayback);
-        CardView feedbackCard = questionView.findViewById(R.id.feedbackCard);
+        MaterialCardView feedbackCard = questionView.findViewById(R.id.feedbackCard);
         TextView tvFeedbackIcon = questionView.findViewById(R.id.tvFeedbackIcon);
         TextView tvFeedbackText = questionView.findViewById(R.id.tvFeedbackText);
         TextView tvScore = questionView.findViewById(R.id.tvScore);
@@ -462,7 +463,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         FloatingActionButton btnPlay = questionView.findViewById(R.id.btnPlay);
         FloatingActionButton btnStop = questionView.findViewById(R.id.btnStop);
         SeekBar seekBarSpeed = questionView.findViewById(R.id.seekBarSpeed);
-        CardView comprehensionCard = questionView.findViewById(R.id.comprehensionCard);
+        MaterialCardView comprehensionCard = questionView.findViewById(R.id.comprehensionCard);
         TextView tvComprehensionQuestion = questionView.findViewById(R.id.tvComprehensionQuestion);
         MaterialButton btnAnswer1 = questionView.findViewById(R.id.btnAnswer1);
         MaterialButton btnAnswer2 = questionView.findViewById(R.id.btnAnswer2);
@@ -642,10 +643,10 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void setupOptionClickListeners(View questionView) {
-        CardView optionA = questionView.findViewById(R.id.optionA);
-        CardView optionB = questionView.findViewById(R.id.optionB);
-        CardView optionC = questionView.findViewById(R.id.optionC);
-        CardView optionD = questionView.findViewById(R.id.optionD);
+        MaterialCardView optionA = questionView.findViewById(R.id.optionA);
+        MaterialCardView optionB = questionView.findViewById(R.id.optionB);
+        MaterialCardView optionC = questionView.findViewById(R.id.optionC);
+        MaterialCardView optionD = questionView.findViewById(R.id.optionD);
 
         ImageView checkA = questionView.findViewById(R.id.ivCheckA);
         ImageView checkB = questionView.findViewById(R.id.ivCheckB);
