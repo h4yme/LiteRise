@@ -93,6 +93,12 @@ public class PlacementQuestion {
     // Helper method to parse options from JSON string
     public static List<String> parseOptionsFromJson(String json) {
         List<String> options = new ArrayList<>();
+
+        // Return empty list if json is null or empty (for pronunciation/reading questions)
+        if (json == null || json.isEmpty()) {
+            return options;
+        }
+
         try {
             JSONArray jsonArray = new JSONArray(json);
             for (int i = 0; i < jsonArray.length(); i++) {
