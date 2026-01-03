@@ -612,23 +612,23 @@ public class PlacementTestActivity extends AppCompatActivity {
     private String getQuestionTypeText(String subcategory) {
         switch (subcategory) {
             case "Vocabulary":
-                return "✨ Choose the Correct Word";
+                return "Correct Word";
             case "Phonological":
-                return "🎵 Sound Recognition";
+                return "Sound Recognition";
             case "Phonics":
-                return "🔤 Letter Sounds";
+                return "Letter Sounds";
             case "Word Study":
-                return "📝 Word Families";
+                return "Word Families";
             case "Narrative":
-                return "📖 Story Comprehension";
+                return "Story Comprehension";
             case "Informational":
-                return "📰 Reading for Information";
+                return "Reading for Information";
             case "Grammar":
-                return "✏️ Grammar Skills";
+                return "Grammar Skills";
             case "Sentence Construction":
-                return "🔨 Build Sentences";
+                return "Build Sentences";
             default:
-                return "✨ Answer the Question";
+                return "Answer the Question";
         }
     }
 
