@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Circular background -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M60,60m-55,0a55,55 0,1 1,110 0a55,55 0,1 1,-110 0" />
+
+    <!-- Leo face -->
+    <path
+        android:fillColor="#FF8C42"
+        android:pathData="M60,20
+                          C40,20 24,36 24,56
+                          C24,76 40,92 60,92
+                          C80,92 96,76 96,56
+                          C96,36 80,20 60,20Z" />
+
+    <!-- Left eye -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M48,52
+                          m-4,0
+                          a4,4 0,1 1,8 0
+                          a4,4 0,1 1,-8 0" />
+
+    <!-- Right eye -->
+    <path
+        android:fillColor="#2C3E50"
+        android:pathData="M72,52
+                          m-4,0
+                          a4,4 0,1 1,8 0
+                          a4,4 0,1 1,-8 0" />
+
+    <!-- Smile -->
+    <path
+        android:strokeColor="#2C3E50"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:fillColor="@android:color/transparent"
+        android:pathData="M45,65 Q60,75 75,65" />
+
+</vector>

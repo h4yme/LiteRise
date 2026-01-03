@@ -74,7 +74,7 @@ public class WelcomeOnboardingActivity extends AppCompatActivity {
 
     private void updateIndicators(int position) {
         // Reset all indicators to inactive
-        indicator1.setBackgroundResource(R.drawable.tab_indicator_inactive);
+        indicator1.setBackgroundResource(R.drawable.tab_indicator_active);
         indicator2.setBackgroundResource(R.drawable.tab_indicator_inactive);
         indicator3.setBackgroundResource(R.drawable.tab_indicator_inactive);
 
@@ -97,9 +97,8 @@ public class WelcomeOnboardingActivity extends AppCompatActivity {
         SessionManager sessionManager = new SessionManager(this);
         sessionManager.setHasSeenWelcome(true);
 
-        // Navigate to Placement Intro (to be built)
-        // For now, go to Dashboard
-        Intent intent = new Intent(WelcomeOnboardingActivity.this, DashboardActivity.class);
+        // Navigate to Placement Intro
+        Intent intent = new Intent(WelcomeOnboardingActivity.this, PlacementIntroActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();

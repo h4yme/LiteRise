@@ -124,6 +124,49 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+
+        <!-- ✅ Placement Intro Screen -->
+
+        <activity
+
+            android:name=".activities.PlacementIntroActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Placement Test Screen -->
+
+        <activity
+
+            android:name=".activities.PlacementTestActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Placement Result Screen -->
+
+        <activity
+
+            android:name=".activities.PlacementResultActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Category Transition Screen -->
+
+        <activity
+
+            android:name=".activities.CategoryTransitionActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- ✅ Main Activity (optional for navigation, dashboard, etc.) -->
+
         <activity
 
             android:name=".MainActivity"

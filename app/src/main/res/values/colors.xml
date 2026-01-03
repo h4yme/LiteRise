@@ -57,4 +57,16 @@
     <color name="gradient_start">#42A5F5</color>
     <color name="gradient_middle">#AB47BC</color>
     <color name="gradient_end">#66BB6A</color>
+
+    <!-- 📝 Placement Test Colors -->
+    <color name="option_selected">#E3F2FD</color>
+    <color name="option_correct">#C8E6C9</color>
+    <color name="option_incorrect">#FFCDD2</color>
+    <color name="option_stroke">#E0E0E0</color>
+
+    <!-- 🎤 Pronunciation Feedback Colors -->
+    <color name="success_light">#E8F5E9</color>
+    <color name="warning_light">#FFF3E0</color>
+    <color name="error_light">#FFEBEE</color>
+    <color name="error_red">#EF5350</color>
 </resources>
