@@ -45,8 +45,10 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int currentQuestionNumber = 1;
     private int totalQuestions = 25;
     private int currentCategory = 1;
+    private int previousCategory = 0;
     private String selectedAnswer = "";
     private int questionsPerCategory = 6; // Approximate
+    private static final int CATEGORY_TRANSITION_REQUEST = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +105,12 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Update category based on question number
         updateCurrentCategory();
 
+        // Check if category changed - show transition screen
+        if (previousCategory != 0 && currentCategory != previousCategory) {
+            showCategoryTransition();
+            return;
+        }
+
         // Load questions for current category
         categoryQuestions = questionBankHelper.getQuestionsByCategory(currentCategory);
 
@@ -119,6 +127,21 @@ public class PlacementTestActivity extends AppCompatActivity {
             } else {
                 showResults();
             }
+        }
+    }
+
+    private void showCategoryTransition() {
+        Intent intent = new Intent(PlacementTestActivity.this, CategoryTransitionActivity.class);
+        intent.putExtra("category_number", currentCategory);
+        startActivityForResult(intent, CATEGORY_TRANSITION_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CATEGORY_TRANSITION_REQUEST) {
+            // Continue with next question after transition
+            loadNextQuestion();
         }
     }
 
@@ -148,6 +171,8 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     private void updateCurrentCategory() {
+        previousCategory = currentCategory;
+
         if (currentQuestionNumber <= questionsPerCategory) {
             currentCategory = 1;
         } else if (currentQuestionNumber <= questionsPerCategory * 2) {

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import androidx.annotation.DrawableRes;
 
 import com.example.literise.R;
+import com.example.literise.utils.TextToSpeechHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,9 @@ public class LeoDialogueView extends RelativeLayout {
     private List<DialogueMessage> dialogueMessages;
     private int currentMessageIndex = 0;
     private DialogueCompleteListener dialogueCompleteListener;
+
+    // Text-to-Speech
+    private TextToSpeechHelper ttsHelper;
 
     public interface DialogueCompleteListener {
         void onDialogueComplete();
@@ -69,6 +73,9 @@ public class LeoDialogueView extends RelativeLayout {
         flHighlightContainer = findViewById(R.id.flHighlightContainer);
 
         dialogueMessages = new ArrayList<>();
+
+        // Initialize Text-to-Speech
+        ttsHelper = new TextToSpeechHelper(context);
 
         // Set click listener for tap to continue on the entire view
         this.setOnClickListener(v -> showNextMessage());
@@ -117,9 +124,19 @@ public class LeoDialogueView extends RelativeLayout {
         } else {
             hideHighlight();
         }
+
+        // Speak Leo's dialogue with AI voice
+        if (ttsHelper != null && ttsHelper.isInitialized()) {
+            ttsHelper.speak(message.text);
+        }
     }
 
     private void showNextMessage() {
+        // Stop current speech
+        if (ttsHelper != null) {
+            ttsHelper.stop();
+        }
+
         currentMessageIndex++;
 
         if (currentMessageIndex < dialogueMessages.size()) {
@@ -155,6 +172,11 @@ public class LeoDialogueView extends RelativeLayout {
     }
 
     public void dismiss() {
+        // Stop speech before dismissing
+        if (ttsHelper != null) {
+            ttsHelper.stop();
+        }
+
         Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out);
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -165,6 +187,10 @@ public class LeoDialogueView extends RelativeLayout {
                 LeoDialogueView.this.setVisibility(View.GONE);
                 if (getParent() != null) {
                     ((ViewGroup) getParent()).removeView(LeoDialogueView.this);
+                }
+                // Cleanup TTS
+                if (ttsHelper != null) {
+                    ttsHelper.shutdown();
                 }
             }
 
