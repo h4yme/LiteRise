@@ -2,44 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical">
 
     <!-- Instruction Card -->
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="@color/primary_blue"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="12dp"
-        android:layout_marginBottom="28dp">
+        app:cardBackgroundColor="#4ECDC4"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="4dp"
+        android:layout_marginBottom="24dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="28dp">
-
-            <!-- Microphone Icon -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="🎤"
-                android:textSize="48sp"
-                android:layout_marginBottom="12dp" />
+            android:padding="20dp"
+            android:gravity="center">
 
             <!-- Instruction Text -->
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/visby_bold"
-                android:lineSpacingExtra="4dp"
                 android:text="Say this word out loud!"
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:layout_marginBottom="16dp" />
+                android:textSize="16sp"
+                android:layout_marginBottom="12dp" />
 
             <!-- Word to Pronounce -->
             <TextView
@@ -49,12 +40,8 @@
                 android:fontFamily="@font/visby_bold"
                 android:text="Beautiful"
                 android:textAlignment="center"
-                android:textColor="@color/accent_yellow"
-                android:textSize="36sp"
-                android:shadowColor="#40000000"
-                android:shadowDx="0"
-                android:shadowDy="2"
-                android:shadowRadius="4" />
+                android:textColor="#FFD93D"
+                android:textSize="32sp" />
 
         </LinearLayout>
 
@@ -65,15 +52,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="8dp"
+        app:cardCornerRadius="20dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="1.5dp"
+        app:strokeColor="#E0E0E0"
         android:layout_marginBottom="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp"
+            android:padding="20dp"
             android:gravity="center">
 
             <!-- Recording Status -->
@@ -84,70 +73,68 @@
                 android:fontFamily="@font/visby_bold"
                 android:text="Tap the microphone to start"
                 android:textColor="#7F8C8D"
-                android:textSize="16sp"
-                android:layout_marginBottom="24dp" />
+                android:textSize="14sp"
+                android:layout_marginBottom="16dp" />
 
             <!-- Microphone Button -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btnMicrophone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
                 android:src="@drawable/ic_mic"
                 app:backgroundTint="@color/success_green"
-                app:elevation="12dp"
+                app:elevation="4dp"
                 app:fabSize="normal"
                 app:tint="@color/white"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="12dp" />
 
             <!-- Waveform Animation Container -->
             <LinearLayout
                 android:id="@+id/waveformContainer"
                 android:layout_width="match_parent"
-                android:layout_height="40dp"
+                android:layout_height="32dp"
                 android:orientation="horizontal"
                 android:gravity="center"
                 android:visibility="gone"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="12dp">
 
-                <!-- Animated bars will be added programmatically -->
                 <View
                     android:id="@+id/wave1"
-                    android:layout_width="8dp"
-                    android:layout_height="20dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@color/success_green" />
 
                 <View
                     android:id="@+id/wave2"
-                    android:layout_width="8dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="6dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@color/success_green" />
 
                 <View
                     android:id="@+id/wave3"
-                    android:layout_width="8dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="6dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@color/success_green" />
 
                 <View
                     android:id="@+id/wave4"
-                    android:layout_width="8dp"
-                    android:layout_height="30dp"
-                    android:layout_marginEnd="4dp"
+                    android:layout_width="6dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="3dp"
                     android:background="@color/success_green" />
 
                 <View
                     android:id="@+id/wave5"
-                    android:layout_width="8dp"
-                    android:layout_height="20dp"
+                    android:layout_width="6dp"
+                    android:layout_height="16dp"
                     android:background="@color/success_green" />
 
             </LinearLayout>
 
-            <!-- Play Back Button -->
+            <!-- Play Back Button (Hidden initially) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPlayback"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -156,8 +143,8 @@
                 android:fontFamily="@font/visby_bold"
                 android:text="Listen to your recording"
                 android:textAllCaps="false"
-                android:textSize="14sp"
-                app:cornerRadius="20dp"
+                android:textSize="12sp"
+                app:cornerRadius="16dp"
                 app:icon="@drawable/ic_play"
                 app:iconGravity="start"
                 android:visibility="gone" />
@@ -172,16 +159,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="#E8F5E9"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="6dp"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
         android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical">
 
             <!-- Feedback Icon -->
             <TextView
@@ -189,30 +176,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="🎉"
-                android:textSize="48sp"
-                android:layout_marginBottom="12dp" />
+                android:textSize="36sp"
+                android:layout_marginEnd="12dp" />
 
-            <!-- Feedback Text -->
-            <TextView
-                android:id="@+id/tvFeedbackText"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_bold"
-                android:text="Great job! You said it perfectly!"
-                android:textAlignment="center"
-                android:textColor="#2E7D32"
-                android:textSize="18sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <!-- Score -->
-            <TextView
-                android:id="@+id/tvScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_bold"
-                android:text="95% Match"
-                android:textColor="#1B5E20"
-                android:textSize="16sp" />
+                <!-- Feedback Text -->
+                <TextView
+                    android:id="@+id/tvFeedbackText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="Great job! You said it perfectly!"
+                    android:textColor="#2E7D32"
+                    android:textSize="14sp"
+                    android:layout_marginBottom="4dp" />
+
+                <!-- Score -->
+                <TextView
+                    android:id="@+id/tvScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_medium"
+                    android:text="95% Match"
+                    android:textColor="#1B5E20"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
