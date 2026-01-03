@@ -1,8 +1,4 @@
 <?php
-require 'src/Exception.php';
-require 'src/PHPMailer.php';
-require 'src/SMTP.php';
-
 
 /**
  * LiteRise Email Utility
@@ -10,8 +6,26 @@ require 'src/SMTP.php';
  * Supports both SMTP (via PHPMailer) and basic PHP mail()
  */
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\Exception;
+// Only try to use PHPMailer if it's available
+$phpmailerAvailable = false;
+
+// Check for Composer vendor autoload
+if (file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    require_once __DIR__ . '/../vendor/autoload.php';
+    $phpmailerAvailable = class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+}
+
+// Check for PHPMailer in src folder (alternative installation)
+if (!$phpmailerAvailable && file_exists(__DIR__ . '/PHPMailer.php')) {
+    require_once __DIR__ . '/PHPMailer.php';
+    if (file_exists(__DIR__ . '/Exception.php')) {
+        require_once __DIR__ . '/Exception.php';
+    }
+    if (file_exists(__DIR__ . '/SMTP.php')) {
+        require_once __DIR__ . '/SMTP.php';
+    }
+    $phpmailerAvailable = class_exists('PHPMailer\\PHPMailer\\PHPMailer');
+}
 
 /**
  * Send email using SMTP (PHPMailer) or fallback to PHP mail()
@@ -23,16 +37,18 @@ use PHPMailer\PHPMailer\Exception;
  * @return bool True if email sent successfully
  */
 function sendEmail($to, $subject, $htmlBody, $from = null) {
+    global $phpmailerAvailable;
+
     // Default sender
     if (!$from) {
         $from = $_ENV['EMAIL_FROM'] ?? 'noreply@literise.com';
     }
     $fromName = $_ENV['EMAIL_FROM_NAME'] ?? 'LiteRise';
 
-    // Check if SMTP is enabled
+    // Check if SMTP is enabled and PHPMailer is available
     $smtpEnabled = isset($_ENV['SMTP_ENABLED']) && $_ENV['SMTP_ENABLED'] === 'true';
 
-    if ($smtpEnabled && class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    if ($smtpEnabled && $phpmailerAvailable) {
         return sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName);
     } else {
         return sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName);
@@ -44,7 +60,7 @@ function sendEmail($to, $subject, $htmlBody, $from = null) {
  */
 function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
     try {
-        $mail = new PHPMailer(true);
+        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
 
         // SMTP Configuration
         $mail->isSMTP();
@@ -77,9 +93,8 @@ function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
             return false;
         }
 
-    } catch (Exception $e) {
-        error_log("SMTP Email Error: {$mail->ErrorInfo}");
-        error_log("Exception: " . $e->getMessage());
+    } catch (\Exception $e) {
+        error_log("SMTP Email Error: " . $e->getMessage());
         return false;
     }
 }
@@ -223,10 +238,8 @@ function sendOTPEmail($email, $otpCode, $firstName = '') {
 <body>
     <div class="container">
         <div class="header">
-            <img src="https://i.ibb.co/wkkvjqF/PLACEMENT-TEST-DESIGN.png" 
-         alt="LiteRise" 
-         style="width: 100%; height: auto; display: block; border-radius: 12px 12px 0 0;">
-</div>
+            <div class="logo">📚</div>
+            <h1>LiteRise</h1>
         </div>
 
         <div class="content">
