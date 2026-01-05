@@ -231,6 +231,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     boolean hasNickname = (s.getNickname() != null && !s.getNickname().isEmpty());
 
+                    boolean preAssessmentCompleted = s.isPreAssessmentCompleted();
+
 
 
 
@@ -241,11 +243,11 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                    android.util.Log.d("LoginActivity", "Server data - Nickname: " + s.getNickname() + ", AbilityScore: " + s.getAbility_score());
+                    android.util.Log.d("LoginActivity", "Server data - Nickname: " + s.getNickname() + ", AbilityScore: " + s.getAbility_score() + ", PreAssessmentCompleted: " + preAssessmentCompleted);
 
 
 
-                    android.util.Log.d("LoginActivity", "Checks - hasNickname: " + hasNickname + ", hasAbilityScore: " + hasAbilityScore);
+                    android.util.Log.d("LoginActivity", "Checks - hasNickname: " + hasNickname + ", hasAbilityScore: " + hasAbilityScore + ", preAssessmentCompleted: " + preAssessmentCompleted);
 
 
 
@@ -253,15 +255,11 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-                    // If user has ability score, they MUST have completed onboarding
+                    // Sync assessment completion status from server
 
 
 
-                    // (Can't take assessment without completing welcome/nickname)
-
-
-
-                    if (hasAbilityScore) {
+                    if (preAssessmentCompleted) {
 
 
 
@@ -305,13 +303,16 @@ public class LoginActivity extends AppCompatActivity {
                     // Log successful login session
                     SessionLogger.logLogin(LoginActivity.this, s.getStudent_id());
 
-                    // Check if user has seen welcome onboarding
+                    // Navigate based on user's progress
                     Intent intent;
                     if (!sessionManager.hasSeenWelcome()) {
                         // First time - show welcome onboarding
                         intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                    } else if (!sessionManager.hasCompletedAssessment()) {
+                        // Seen welcome but hasn't completed placement test
+                        intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
                     } else {
-                        // Returning user - go to Dashboard
+                        // Completed everything - go to Dashboard
                         intent = new Intent(LoginActivity.this, DashboardActivity.class);
                     }
                     startActivity(intent);
@@ -357,13 +358,16 @@ public class LoginActivity extends AppCompatActivity {
         // Log successful login session for demo user
         SessionLogger.logLogin(LoginActivity.this, sessionManager.getStudentId());
 
-        // Check if user has seen welcome onboarding
+        // Navigate based on user's progress
         Intent intent;
         if (!sessionManager.hasSeenWelcome()) {
             // First time - show welcome onboarding
             intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+        } else if (!sessionManager.hasCompletedAssessment()) {
+            // Seen welcome but hasn't completed placement test
+            intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
         } else {
-            // Returning user - go to Dashboard
+            // Completed everything - go to Dashboard
             intent = new Intent(LoginActivity.this, DashboardActivity.class);
         }
         startActivity(intent);

@@ -66,8 +66,8 @@ public class PlacementResultActivity extends AppCompatActivity {
         displayResults();
         savePlacementResult();
 
-        // Show Leo's congratulation dialogue after a brief delay
-        new Handler().postDelayed(this::showLeoCongratulation, 1000);
+        // Leo's congratulation will be shown on Dashboard instead
+        // Results screen should be clean and focused on the assessment results
 
         setupListeners();
     }

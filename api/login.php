@@ -212,6 +212,10 @@ try {
 
         'LastLogin' => $student['LastLogin'] ?? null,
 
+        'PreAssessmentCompleted' => isset($student['PreAssessmentCompleted']) ? (bool)$student['PreAssessmentCompleted'] : false,
+
+        'AssessmentStatus' => $student['AssessmentStatus'] ?? 'Not Started',
+
         'token' => $token
 
     ];
