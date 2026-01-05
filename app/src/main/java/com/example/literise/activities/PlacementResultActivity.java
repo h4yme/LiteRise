@@ -243,6 +243,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         // Determine assessment type based on whether student has completed assessment before
         String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
 
+        // Skip API call in demo mode, but still update local session manager
+        if (com.example.literise.utils.AppConfig.DEMO_MODE) {
+            Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
+            if ("PreAssessment".equals(assessmentType)) {
+                sessionManager.setAssessmentCompleted(true);
+            }
+            return;
+        }
+
         // Generate session ID based on timestamp
         int sessionId = (int) (System.currentTimeMillis() / 1000);
 

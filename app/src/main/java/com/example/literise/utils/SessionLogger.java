@@ -54,6 +54,12 @@ public class SessionLogger {
     }
 
     private static void logSession(Context context, int studentId, String sessionType, String sessionTag) {
+        // Skip API call in demo mode
+        if (com.example.literise.utils.AppConfig.DEMO_MODE) {
+            Log.d(TAG, "Demo mode: Skipping session log - " + sessionType + " - " + sessionTag);
+            return;
+        }
+
         String deviceInfo = getDeviceInfo();
 
         LogSessionRequest request = new LogSessionRequest(studentId, sessionType, sessionTag, deviceInfo);
