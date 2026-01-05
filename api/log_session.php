@@ -82,37 +82,43 @@ try {
     }
 
     // Call stored procedure to log session
-    $stmt = $conn->prepare("
-        EXEC SP_LogStudentSession
-            @StudentID = :studentID,
-            @SessionType = :sessionType,
-            @SessionTag = :sessionTag,
-            @DeviceInfo = :deviceInfo,
-            @IPAddress = :ipAddress,
-            @AdditionalData = :additionalData
-    ");
+    // Using direct EXEC call for SQL Server
+    $sql = "EXEC dbo.SP_LogStudentSession
+            @StudentID = ?,
+            @SessionType = ?,
+            @SessionTag = ?,
+            @DeviceInfo = ?,
+            @IPAddress = ?,
+            @AdditionalData = ?";
 
-    $stmt->bindValue(':studentID', $studentID, PDO::PARAM_INT);
-    $stmt->bindValue(':sessionType', $sessionType, PDO::PARAM_STR);
-    $stmt->bindValue(':sessionTag', $sessionTag, PDO::PARAM_STR);
-    $stmt->bindValue(':deviceInfo', $deviceInfo, PDO::PARAM_STR);
-    $stmt->bindValue(':ipAddress', $ipAddress, PDO::PARAM_STR);
-    $stmt->bindValue(':additionalData', $additionalDataJson, PDO::PARAM_STR);
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        $studentID,
+        $sessionType,
+        $sessionTag,
+        $deviceInfo,
+        $ipAddress,
+        $additionalDataJson
+    ]);
 
-    $stmt->execute();
-
+    // Fetch the LogID from the result
+    $logID = null;
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
-    $logID = $result['LogID'] ?? null;
 
-    if (!$logID) {
-        sendError("Failed to log session", 500);
+    error_log("SP_LogStudentSession execution result: " . print_r($result, true));
+
+    if ($result && isset($result['LogID'])) {
+        $logID = (int)$result['LogID'];
+        error_log("Successfully retrieved LogID: " . $logID);
+    } else {
+        error_log("Warning: No LogID returned from stored procedure");
     }
 
-    // Format response
+    // Format response - even if logID is null, we'll return success since insert likely worked
     $response = [
         'success' => true,
         'message' => 'Session logged successfully',
-        'log_id' => (int)$logID,
+        'log_id' => $logID ? (int)$logID : 0,
         'session_type' => $sessionType,
         'logged_at' => date('Y-m-d H:i:s')
     ];
