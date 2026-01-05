@@ -231,9 +231,10 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvLeoMessage.setText(message);
 
         // Speak Leo's message
+        final String finalMessage = message;
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             if (textToSpeechHelper != null && textToSpeechHelper.isInitialized()) {
-                textToSpeechHelper.speak(message, null);
+                textToSpeechHelper.speak(finalMessage, null);
             }
         }, 500);
 
