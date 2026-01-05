@@ -1,6 +1,8 @@
 package com.example.literise.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -11,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.literise.BuildConfig;
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -223,6 +224,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         });
     }
 
+    private String getAppVersion() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "1.0";
+        }
+    }
+
     private void savePlacementResult() {
         int studentId = sessionManager.getStudentId();
         if (studentId == 0) {
@@ -263,7 +273,7 @@ public class PlacementResultActivity extends AppCompatActivity {
         // Set optional fields
         request.setTimeSpentSeconds(timeSpentSeconds);
         request.setDeviceInfo(deviceInfo);
-        request.setAppVersion(BuildConfig.VERSION_NAME);
+        request.setAppVersion(getAppVersion());
 
         // Make API call
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
