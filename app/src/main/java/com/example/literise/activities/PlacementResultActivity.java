@@ -8,10 +8,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
@@ -34,7 +34,7 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private static final String TAG = "PlacementResultActivity";
 
-    private RelativeLayout rootLayout;
+    private ConstraintLayout rootLayout;
     private TextView tvLevelName, tvLevelNumber;
     private TextView tvAccuracy, tvQuestionsAnswered;
     private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score;
