@@ -38,6 +38,11 @@ import com.example.literise.models.VerifyOTPRequest;
 import com.example.literise.models.VerifyOTPResponse;
 import com.example.literise.models.ResetPasswordRequest;
 import com.example.literise.models.ResetPasswordResponse;
+import com.example.literise.models.SavePlacementResultRequest;
+import com.example.literise.models.SavePlacementResultResponse;
+import com.example.literise.models.PlacementProgressResponse;
+import com.example.literise.models.LogSessionRequest;
+import com.example.literise.models.LogSessionResponse;
 import java.util.List;
 
 import java.util.Map;
