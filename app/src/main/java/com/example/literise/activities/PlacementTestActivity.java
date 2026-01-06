@@ -84,6 +84,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int currentCategory = 1;
     private int previousCategory = 0;
     private String selectedAnswer = "";
+    private String selectedAnswerLetter = ""; // A, B, C, or D
     private int questionsPerCategory = 6; // Approximate
     private long startTime;
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
@@ -149,6 +150,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnRetry.setOnClickListener(v -> {
             // Reload current question
             selectedAnswer = "";
+            selectedAnswerLetter = "";
             displayCurrentQuestion();
         });
     }
@@ -315,6 +317,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                 btnContinue.setEnabled(false);
                 btnRetry.setVisibility(View.GONE);
                 selectedAnswer = "";
+                selectedAnswerLetter = "";
 
                 // Fade in new question
                 questionContainer.animate()
@@ -884,21 +887,25 @@ public class PlacementTestActivity extends AppCompatActivity {
             optionC.setStrokeColor(getColor(R.color.option_stroke));
             optionD.setStrokeColor(getColor(R.color.option_stroke));
 
-            // Show checkmark for selected option
+            // Show checkmark for selected option and store both text and letter
             if (v.getId() == R.id.optionA) {
                 selectedAnswer = options.get(0);
+                selectedAnswerLetter = "A";
                 checkA.setVisibility(View.VISIBLE);
                 optionA.setStrokeColor(getColor(R.color.success_green));
             } else if (v.getId() == R.id.optionB) {
                 selectedAnswer = options.get(1);
+                selectedAnswerLetter = "B";
                 checkB.setVisibility(View.VISIBLE);
                 optionB.setStrokeColor(getColor(R.color.success_green));
             } else if (v.getId() == R.id.optionC) {
                 selectedAnswer = options.get(2);
+                selectedAnswerLetter = "C";
                 checkC.setVisibility(View.VISIBLE);
                 optionC.setStrokeColor(getColor(R.color.success_green));
             } else if (v.getId() == R.id.optionD) {
                 selectedAnswer = options.get(3);
+                selectedAnswerLetter = "D";
                 checkD.setVisibility(View.VISIBLE);
                 optionD.setStrokeColor(getColor(R.color.success_green));
             }
@@ -922,14 +929,15 @@ public class PlacementTestActivity extends AppCompatActivity {
             responseTime = (int) ((System.currentTimeMillis() - questionStartTime) / 1000);
         }
 
-        // If no answer selected, treat as incorrect
-        final String finalSelectedAnswer = selectedAnswer.isEmpty() ? "" : selectedAnswer;
+        // Send the letter (A/B/C/D) to API, not the text
+        // If skipped (empty), send empty string
+        final String finalSelectedAnswerLetter = selectedAnswerLetter.isEmpty() ? "" : selectedAnswerLetter;
 
-        // Submit answer to API
+        // Submit answer to API (send letter, not text)
         final int finalResponseTime = responseTime;
         adaptiveHelper.submitAnswer(
                 currentQuestion.getQuestionId(),
-                finalSelectedAnswer,
+                finalSelectedAnswerLetter, // Send letter (A/B/C/D)
                 false, // We don't know if correct yet - API will tell us
                 finalResponseTime,
                 new AdaptiveQuestionHelper.AnswerCallback() {
@@ -942,7 +950,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                             // Play appropriate sound effect
                             if (isCorrect) {
                                 soundEffectsHelper.playSuccess();
-                            } else if (!finalSelectedAnswer.isEmpty()) {
+                            } else if (!finalSelectedAnswerLetter.isEmpty()) {
                                 soundEffectsHelper.playError();
                             }
 
@@ -973,14 +981,14 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                             // Fallback: use local IRT engine to check answer
                             boolean isCorrect = false;
-                            if (!finalSelectedAnswer.isEmpty() && currentQuestion.getCorrectAnswer() != null) {
-                                isCorrect = finalSelectedAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
+                            if (!finalSelectedAnswerLetter.isEmpty() && currentQuestion.getCorrectAnswer() != null) {
+                                isCorrect = finalSelectedAnswerLetter.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
                             }
 
                             // Play appropriate sound effect
                             if (isCorrect) {
                                 soundEffectsHelper.playSuccess();
-                            } else if (!finalSelectedAnswer.isEmpty()) {
+                            } else if (!finalSelectedAnswerLetter.isEmpty()) {
                                 soundEffectsHelper.playError();
                             }
 
