@@ -363,6 +363,26 @@ public class PlacementTestActivity extends AppCompatActivity {
     }
 
     /**
+     * Convert category name from API to category number
+     */
+    private int getCategoryNumber(String categoryName) {
+        if (categoryName == null) return 1;
+
+        switch (categoryName) {
+            case "Oral Language":
+                return 1;
+            case "Word Knowledge":
+                return 2;
+            case "Reading Comprehension":
+                return 3;
+            case "Language Structure":
+                return 4;
+            default:
+                return 1;
+        }
+    }
+
+    /**
      * Convert API question response to PlacementQuestion format
      */
     private PlacementQuestion convertToPlacementQuestion(AdaptiveQuestionResponse.QuestionData apiQuestion) {
@@ -370,7 +390,7 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         // Set basic fields
         question.setQuestionId(apiQuestion.getItemId());
-        question.setCategory(apiQuestion.getCategory());
+        question.setCategory(getCategoryNumber(apiQuestion.getCategory())); // Convert string to int
         question.setSubcategory(apiQuestion.getSubcategory() != null ? apiQuestion.getSubcategory() : "");
         question.setQuestionText(apiQuestion.getQuestionText());
         question.setQuestionType(apiQuestion.getQuestionType());
