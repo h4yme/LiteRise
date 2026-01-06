@@ -44,12 +44,12 @@ $authUser = requireAuth();
 $data = getJsonInput();
 
 // Validate required fields (is_correct is now optional - we'll determine it server-side)
+// Note: selected_answer can be empty string for skipped questions
 validateRequired($data, [
     'student_id',
     'item_id',
     'session_id',
     'assessment_type',
-    'selected_answer',
     'student_theta',
     'question_number'
 ]);
@@ -58,7 +58,9 @@ $studentID = (int)$data['student_id'];
 $itemID = (int)$data['item_id'];
 $sessionID = (int)$data['session_id'];
 $assessmentType = sanitizeInput($data['assessment_type']);
-$selectedAnswer = sanitizeInput($data['selected_answer']);
+
+// selected_answer is optional - can be empty string for skipped questions
+$selectedAnswer = isset($data['selected_answer']) ? sanitizeInput($data['selected_answer']) : '';
 $studentTheta = (float)$data['student_theta'];
 
 // Determine correctness server-side by comparing with correct answer in database
