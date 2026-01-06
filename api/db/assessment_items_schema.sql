@@ -33,7 +33,7 @@ BEGIN
         OptionB NVARCHAR(500) NULL,
         OptionC NVARCHAR(500) NULL,
         OptionD NVARCHAR(500) NULL,
-        CorrectAnswer VARCHAR(1) NOT NULL, -- 'A', 'B', 'C', 'D', or '1'/'0' for True/False
+        CorrectAnswer NVARCHAR(200) NOT NULL, -- For MC: 'A','B','C','D'; For Pronunciation: full word like 'cat', 'elephant'
 
         -- IRT Parameters (3-Parameter Logistic Model)
         DifficultyParam FLOAT NOT NULL, -- b parameter: difficulty (-3 to +3, 0 = average)

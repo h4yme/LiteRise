@@ -11,7 +11,7 @@
 -- 4. Pronunciation sample questions
 -- =============================================
 
-USE LiteRise;
+USE LiteRiseDB;
 GO
 
 PRINT '========================================';

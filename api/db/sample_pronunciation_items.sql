@@ -5,7 +5,7 @@
 -- Covers basic to advanced phonemes and word patterns
 -- =============================================
 
-USE LiteRise;
+USE LiteRiseDB;
 GO
 
 -- =============================================

@@ -9,19 +9,11 @@
 -- Run this FIRST before any other scripts!
 -- =============================================
 
--- Create database if it doesn't exist
-IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'LiteRise')
-BEGIN
-    CREATE DATABASE LiteRise;
-    PRINT '✓ Database LiteRise created';
-END
-ELSE
-BEGIN
-    PRINT '✓ Database LiteRise already exists';
-END
+-- Use existing database (should already exist)
+USE LiteRiseDB;
 GO
 
-USE LiteRise;
+PRINT '✓ Using database: LiteRiseDB';
 GO
 
 PRINT '========================================';

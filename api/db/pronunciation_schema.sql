@@ -5,7 +5,7 @@
 -- audio-based pronunciation scoring capabilities
 -- =============================================
 
-USE LiteRise;
+USE LiteRiseDB;
 GO
 
 -- =============================================
