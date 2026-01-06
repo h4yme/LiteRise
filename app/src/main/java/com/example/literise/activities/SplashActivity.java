@@ -33,12 +33,18 @@ public class SplashActivity extends AppCompatActivity {
             Intent intent;
 
             if (session.isLoggedIn()) {
-                // Check if user has seen welcome onboarding
+                // Navigate based on user's progress - same logic as LoginActivity
                 if (!session.hasSeenWelcome()) {
-                    // Show welcome onboarding
+                    // First time - show welcome onboarding
+                    intent = new Intent(SplashActivity.this, WelcomeOnboardingActivity.class);
+                } else if (session.hasStartedAssessment() && !session.hasCompletedAssessment()) {
+                    // Assessment in progress - resume test
+                    intent = new Intent(SplashActivity.this, PlacementTestActivity.class);
+                } else if (!session.hasCompletedAssessment()) {
+                    // Seen welcome but hasn't started placement test yet
                     intent = new Intent(SplashActivity.this, WelcomeOnboardingActivity.class);
                 } else {
-                    // Go directly to Dashboard
+                    // Completed everything - go to Dashboard
                     intent = new Intent(SplashActivity.this, DashboardActivity.class);
                 }
             } else {
