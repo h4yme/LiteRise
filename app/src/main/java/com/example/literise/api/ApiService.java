@@ -43,6 +43,10 @@ import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.models.PlacementProgressResponse;
 import com.example.literise.models.LogSessionRequest;
 import com.example.literise.models.LogSessionResponse;
+import com.example.literise.models.AdaptiveQuestionRequest;
+import com.example.literise.models.AdaptiveQuestionResponse;
+import com.example.literise.models.SubmitAnswerRequest;
+import com.example.literise.models.SubmitAnswerResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -182,4 +186,14 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("log_session.php")
     Call<LogSessionResponse> logSession(@Body LogSessionRequest request);
+
+    // 🎯 Get Next Adaptive Question (IRT-based)
+    @Headers("Content-Type: application/json")
+    @POST("get_next_question.php")
+    Call<AdaptiveQuestionResponse> getNextAdaptiveQuestion(@Body AdaptiveQuestionRequest request);
+
+    // ✅ Submit Answer (IRT-based tracking)
+    @Headers("Content-Type: application/json")
+    @POST("submit_answer.php")
+    Call<SubmitAnswerResponse> submitAnswer(@Body SubmitAnswerRequest request);
 }
