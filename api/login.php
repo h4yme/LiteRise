@@ -1,4 +1,8 @@
 <?php
+// TEMPORARY: Clear OPcache to ensure latest code is used
+if (function_exists('opcache_reset')) {
+    opcache_reset();
+}
 
 /**
 
