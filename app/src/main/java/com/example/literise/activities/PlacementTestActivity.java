@@ -26,7 +26,10 @@ import com.google.android.material.card.MaterialCardView;
 import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
 import com.example.literise.database.SessionManager;
+import com.example.literise.helpers.AdaptiveQuestionHelper;
+import com.example.literise.models.AdaptiveQuestionResponse;
 import com.example.literise.models.PlacementQuestion;
+import com.example.literise.models.SubmitAnswerResponse;
 import com.example.literise.utils.IRTEngine;
 import com.example.literise.utils.KaraokeTextHelper;
 import com.example.literise.utils.SessionLogger;
@@ -38,6 +41,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import android.widget.SeekBar;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlacementTestActivity extends AppCompatActivity {
@@ -55,8 +59,11 @@ public class PlacementTestActivity extends AppCompatActivity {
     // IRT Engine and Question Bank
     private IRTEngine irtEngine;
     private QuestionBankHelper questionBankHelper;
+    private AdaptiveQuestionHelper adaptiveHelper;
     private PlacementQuestion currentQuestion;
     private List<PlacementQuestion> categoryQuestions;
+    private int currentSessionId;
+    private long questionStartTime;
 
     // Speech Recognition
     private SpeechRecognitionHelper speechRecognitionHelper;
@@ -94,6 +101,11 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Initialize IRT Engine and Question Bank
         irtEngine = new IRTEngine();
         questionBankHelper = new QuestionBankHelper(this);
+
+        // Initialize Adaptive Question Helper for API-based question selection
+        currentSessionId = (int) (System.currentTimeMillis() / 1000);
+        String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+        adaptiveHelper = new AdaptiveQuestionHelper(this, currentSessionId, assessmentType);
 
         // Initialize Sound Effects
         soundEffectsHelper = new SoundEffectsHelper(this);
@@ -151,23 +163,58 @@ public class PlacementTestActivity extends AppCompatActivity {
             return;
         }
 
-        // Load questions for current category
-        categoryQuestions = questionBankHelper.getQuestionsByCategory(currentCategory);
+        // Get category name for API request
+        String categoryName = getCategoryName(currentCategory);
 
-        // Use IRT engine to select best question
-        currentQuestion = irtEngine.selectNextQuestion(categoryQuestions);
+        // Fetch next adaptive question from API
+        adaptiveHelper.getNextQuestion(categoryName, new AdaptiveQuestionHelper.QuestionCallback() {
+            @Override
+            public void onSuccess(AdaptiveQuestionResponse response) {
+                runOnUiThread(() -> {
+                    if (response.getQuestion() != null) {
+                        // Convert API response to PlacementQuestion format
+                        currentQuestion = convertToPlacementQuestion(response.getQuestion());
 
-        if (currentQuestion != null) {
-            displayCurrentQuestion();
-        } else {
-            // No more questions in category, move to next category or finish
-            if (currentCategory < 4) {
-                currentCategory++;
-                loadNextQuestion();
-            } else {
-                showResults();
+                        // Track when question is displayed (for response time)
+                        questionStartTime = System.currentTimeMillis();
+
+                        // Display the question
+                        displayCurrentQuestion();
+                    } else {
+                        // No more questions available
+                        Toast.makeText(PlacementTestActivity.this,
+                                "No more questions available", Toast.LENGTH_SHORT).show();
+                        showResults();
+                    }
+                });
             }
-        }
+
+            @Override
+            public void onError(String error) {
+                runOnUiThread(() -> {
+                    // Log error
+                    Toast.makeText(PlacementTestActivity.this,
+                            "Error loading question: " + error, Toast.LENGTH_SHORT).show();
+
+                    // Fallback: try to use local question bank
+                    categoryQuestions = questionBankHelper.getQuestionsByCategory(currentCategory);
+                    currentQuestion = irtEngine.selectNextQuestion(categoryQuestions);
+
+                    if (currentQuestion != null) {
+                        questionStartTime = System.currentTimeMillis();
+                        displayCurrentQuestion();
+                    } else {
+                        // No fallback available either
+                        if (currentCategory < 4) {
+                            currentCategory++;
+                            loadNextQuestion();
+                        } else {
+                            showResults();
+                        }
+                    }
+                });
+            }
+        });
     }
 
     private void showCategoryTransition() {
@@ -295,6 +342,73 @@ public class PlacementTestActivity extends AppCompatActivity {
         } else {
             currentCategory = 4;
         }
+    }
+
+    /**
+     * Convert category number to category name for API
+     */
+    private String getCategoryName(int categoryNumber) {
+        switch (categoryNumber) {
+            case 1:
+                return "Oral Language";
+            case 2:
+                return "Word Knowledge";
+            case 3:
+                return "Reading Comprehension";
+            case 4:
+                return "Language Structure";
+            default:
+                return "Oral Language";
+        }
+    }
+
+    /**
+     * Convert API question response to PlacementQuestion format
+     */
+    private PlacementQuestion convertToPlacementQuestion(AdaptiveQuestionResponse.QuestionData apiQuestion) {
+        PlacementQuestion question = new PlacementQuestion();
+
+        // Set basic fields
+        question.setQuestionId(apiQuestion.getItemId());
+        question.setCategory(apiQuestion.getCategory());
+        question.setSubcategory(apiQuestion.getSubcategory() != null ? apiQuestion.getSubcategory() : "");
+        question.setQuestionText(apiQuestion.getQuestionText());
+        question.setQuestionType(apiQuestion.getQuestionType());
+        question.setDifficulty(apiQuestion.getDifficulty());
+
+        // Set answer options
+        List<String> options = new ArrayList<>();
+        if (apiQuestion.getOptionA() != null) {
+            options.add(apiQuestion.getOptionA());
+        }
+        if (apiQuestion.getOptionB() != null) {
+            options.add(apiQuestion.getOptionB());
+        }
+        if (apiQuestion.getOptionC() != null) {
+            options.add(apiQuestion.getOptionC());
+        }
+        if (apiQuestion.getOptionD() != null) {
+            options.add(apiQuestion.getOptionD());
+        }
+        question.setOptions(options);
+
+        // Note: CorrectAnswer is NOT sent by API (hidden server-side)
+        // We'll get correctness feedback when we submit the answer
+
+        // Generate a simple Leo hint based on difficulty
+        String hint;
+        if (apiQuestion.getDifficulty() < -0.5) {
+            hint = "This one is nice and easy! Take your time! 🌟";
+        } else if (apiQuestion.getDifficulty() < 0.5) {
+            hint = "You can do this! Think carefully! 💡";
+        } else if (apiQuestion.getDifficulty() < 1.5) {
+            hint = "This is a bit challenging - you've got this! 💪";
+        } else {
+            hint = "Wow, a tough one! Do your best! 🎯";
+        }
+        question.setLeoHint(hint);
+
+        return question;
     }
 
     private void loadQuestionView() {
@@ -782,35 +896,91 @@ public class PlacementTestActivity extends AppCompatActivity {
     private void checkAnswer() {
         if (currentQuestion == null) return;
 
-        boolean isCorrect = false;
-
-        if (!selectedAnswer.isEmpty()) {
-            // Check if answer is correct
-            isCorrect = selectedAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
+        // Calculate response time in seconds
+        int responseTime = 0;
+        if (questionStartTime > 0) {
+            responseTime = (int) ((System.currentTimeMillis() - questionStartTime) / 1000);
         }
 
-        // Play appropriate sound effect
-        if (isCorrect) {
-            soundEffectsHelper.playSuccess();
-        } else if (!selectedAnswer.isEmpty()) {
-            soundEffectsHelper.playError();
-        }
+        // If no answer selected, treat as incorrect
+        final String finalSelectedAnswer = selectedAnswer.isEmpty() ? "" : selectedAnswer;
 
-        // Update IRT engine with result
-        irtEngine.updateTheta(currentQuestion, isCorrect);
+        // Submit answer to API
+        final int finalResponseTime = responseTime;
+        adaptiveHelper.submitAnswer(
+                currentQuestion.getQuestionId(),
+                finalSelectedAnswer,
+                false, // We don't know if correct yet - API will tell us
+                finalResponseTime,
+                new AdaptiveQuestionHelper.AnswerCallback() {
+                    @Override
+                    public void onSuccess(SubmitAnswerResponse response) {
+                        runOnUiThread(() -> {
+                            // Get correctness from server response
+                            boolean isCorrect = response.isCorrect();
 
-        // Move to next question
-        currentQuestionNumber++;
+                            // Play appropriate sound effect
+                            if (isCorrect) {
+                                soundEffectsHelper.playSuccess();
+                            } else if (!finalSelectedAnswer.isEmpty()) {
+                                soundEffectsHelper.playError();
+                            }
 
-        if (currentQuestionNumber > totalQuestions) {
-            // Test complete - show results with celebration
-            soundEffectsHelper.playCelebration();
-            showResults();
-        } else {
-            // Play chime for question completion
-            soundEffectsHelper.playChime();
-            loadNextQuestion();
-        }
+                            // Update IRT engine with result (for local tracking)
+                            irtEngine.updateTheta(currentQuestion, isCorrect);
+
+                            // Move to next question
+                            currentQuestionNumber++;
+
+                            if (currentQuestionNumber > totalQuestions) {
+                                // Test complete - show results with celebration
+                                soundEffectsHelper.playCelebration();
+                                showResults();
+                            } else {
+                                // Play chime for question completion
+                                soundEffectsHelper.playChime();
+                                loadNextQuestion();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        runOnUiThread(() -> {
+                            // Log error but continue
+                            Toast.makeText(PlacementTestActivity.this,
+                                    "Error submitting answer: " + error, Toast.LENGTH_SHORT).show();
+
+                            // Fallback: use local IRT engine to check answer
+                            boolean isCorrect = false;
+                            if (!finalSelectedAnswer.isEmpty() && currentQuestion.getCorrectAnswer() != null) {
+                                isCorrect = finalSelectedAnswer.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
+                            }
+
+                            // Play appropriate sound effect
+                            if (isCorrect) {
+                                soundEffectsHelper.playSuccess();
+                            } else if (!finalSelectedAnswer.isEmpty()) {
+                                soundEffectsHelper.playError();
+                            }
+
+                            // Update IRT engine with result
+                            irtEngine.updateTheta(currentQuestion, isCorrect);
+
+                            // Move to next question
+                            currentQuestionNumber++;
+
+                            if (currentQuestionNumber > totalQuestions) {
+                                soundEffectsHelper.playCelebration();
+                                showResults();
+                            } else {
+                                soundEffectsHelper.playChime();
+                                loadNextQuestion();
+                            }
+                        });
+                    }
+                }
+        );
     }
 
     private void showResults() {

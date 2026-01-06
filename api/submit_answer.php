@@ -43,14 +43,13 @@ $authUser = requireAuth();
 // Get JSON input
 $data = getJsonInput();
 
-// Validate required fields
+// Validate required fields (is_correct is now optional - we'll determine it server-side)
 validateRequired($data, [
     'student_id',
     'item_id',
     'session_id',
     'assessment_type',
     'selected_answer',
-    'is_correct',
     'student_theta',
     'question_number'
 ]);
@@ -60,8 +59,23 @@ $itemID = (int)$data['item_id'];
 $sessionID = (int)$data['session_id'];
 $assessmentType = sanitizeInput($data['assessment_type']);
 $selectedAnswer = sanitizeInput($data['selected_answer']);
-$isCorrect = (bool)$data['is_correct'];
 $studentTheta = (float)$data['student_theta'];
+
+// Determine correctness server-side by comparing with correct answer in database
+$isCorrect = false;
+if (!empty($selectedAnswer)) {
+    $correctAnswerStmt = $conn->prepare("
+        SELECT CorrectAnswer FROM dbo.AssessmentItems WHERE ItemID = ?
+    ");
+    $correctAnswerStmt->execute([$itemID]);
+    $correctAnswerRow = $correctAnswerStmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($correctAnswerRow) {
+        $correctAnswer = $correctAnswerRow['CorrectAnswer'];
+        // Case-insensitive comparison
+        $isCorrect = (strcasecmp(trim($selectedAnswer), trim($correctAnswer)) === 0);
+    }
+}
 $responseTime = isset($data['response_time']) ? (int)$data['response_time'] : null;
 $questionNumber = (int)$data['question_number'];
 $deviceInfo = isset($data['device_info']) ? sanitizeInput($data['device_info']) : null;
