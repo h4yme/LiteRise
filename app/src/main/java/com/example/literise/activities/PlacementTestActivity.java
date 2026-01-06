@@ -27,6 +27,7 @@ import com.example.literise.R;
 import com.example.literise.database.QuestionBankHelper;
 import com.example.literise.database.SessionManager;
 import com.example.literise.helpers.AdaptiveQuestionHelper;
+import com.example.literise.helpers.PronunciationHelper;
 import com.example.literise.models.AdaptiveQuestionResponse;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.models.SubmitAnswerResponse;
@@ -67,6 +68,9 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     // Speech Recognition
     private SpeechRecognitionHelper speechRecognitionHelper;
+
+    // Pronunciation Assessment
+    private PronunciationHelper pronunciationHelper;
 
     // Karaoke Reading
     private KaraokeTextHelper karaokeTextHelper;
@@ -503,9 +507,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Set question type
         tvQuestionType.setText("🎤 Pronunciation Practice");
 
-        // Initialize speech recognition
-        if (speechRecognitionHelper == null) {
-            speechRecognitionHelper = new SpeechRecognitionHelper(this);
+        // Initialize pronunciation helper
+        if (pronunciationHelper == null) {
+            pronunciationHelper = new PronunciationHelper(this);
         }
 
         // Get UI elements
@@ -519,15 +523,22 @@ public class PlacementTestActivity extends AppCompatActivity {
         TextView tvFeedbackText = questionView.findViewById(R.id.tvFeedbackText);
         TextView tvScore = questionView.findViewById(R.id.tvScore);
 
-        // Set the word to pronounce
-        String wordToPronounce = currentQuestion.getQuestionText();
+        // Set the word to pronounce (extract just the word from "Say the word: CAT")
+        String questionText = currentQuestion.getQuestionText();
+        String wordToPronounce = questionText.contains(":")
+            ? questionText.substring(questionText.indexOf(":") + 1).trim()
+            : questionText;
         tvWordToPronounce.setText(wordToPronounce);
+
+        // Track if currently recording
+        final boolean[] isRecording = {false};
 
         // Microphone button click listener
         btnMicrophone.setOnClickListener(v -> {
-            if (!speechRecognitionHelper.isListening()) {
+            if (!isRecording[0]) {
                 // Start recording
-                tvRecordingStatus.setText("Listening... Say the word now!");
+                isRecording[0] = true;
+                tvRecordingStatus.setText("Recording... Say the word now!");
                 tvRecordingStatus.setTextColor(getColor(R.color.error_red));
                 btnMicrophone.setBackgroundTintList(getColorStateList(R.color.error_red));
                 waveformContainer.setVisibility(View.VISIBLE);
@@ -536,74 +547,107 @@ public class PlacementTestActivity extends AppCompatActivity {
                 // Start animated waveform
                 animateWaveform(waveformContainer);
 
-                // Start speech recognition
-                speechRecognitionHelper.startListening(new SpeechRecognitionHelper.RecognitionCallback() {
+                // Start audio recording
+                pronunciationHelper.startRecording(new PronunciationHelper.PronunciationCallback() {
                     @Override
-                    public void onRecognitionReady() {
+                    public void onRecordingStarted() {
                         runOnUiThread(() -> {
-                            tvRecordingStatus.setText("Listening... Speak now!");
+                            tvRecordingStatus.setText("Recording... Speak now!");
                         });
                     }
 
                     @Override
-                    public void onRecognitionStarted() {
-                        // Already handled in onRecognitionReady
-                    }
-
-                    @Override
-                    public void onRecognitionResult(String recognizedText, float confidence) {
+                    public void onRecordingStopped(java.io.File audioFile, int durationMs) {
                         runOnUiThread(() -> {
                             // Stop waveform animation
                             waveformContainer.clearAnimation();
                             waveformContainer.setVisibility(View.GONE);
-
-                            // Calculate pronunciation accuracy
-                            int accuracy = SpeechRecognitionHelper.calculatePronunciationAccuracy(
-                                    wordToPronounce, recognizedText);
-
-                            // Show feedback
-                            feedbackCard.setVisibility(View.VISIBLE);
-                            tvScore.setText(accuracy + "% Match");
-
-                            if (accuracy >= 85) {
-                                tvFeedbackIcon.setText("🎉");
-                                tvFeedbackText.setText("Excellent! You said it perfectly!");
-                                feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
-                                tvFeedbackText.setTextColor(getColor(R.color.success_green));
-                                tvScore.setTextColor(getColor(R.color.success_green));
-                                selectedAnswer = currentQuestion.getCorrectAnswer(); // Mark as correct
-                            } else if (accuracy >= 65) {
-                                tvFeedbackIcon.setText("👍");
-                                tvFeedbackText.setText("Good try! Almost there!");
-                                feedbackCard.setCardBackgroundColor(getColor(R.color.warning_light));
-                                tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
-                                tvScore.setTextColor(getColor(R.color.warning_orange));
-                                selectedAnswer = recognizedText; // Partial credit
-                            } else {
-                                tvFeedbackIcon.setText("🔄");
-                                tvFeedbackText.setText("Try again! You can do it!");
-                                feedbackCard.setCardBackgroundColor(getColor(R.color.error_light));
-                                tvFeedbackText.setTextColor(getColor(R.color.error_red));
-                                tvScore.setTextColor(getColor(R.color.error_red));
-                                selectedAnswer = recognizedText; // Incorrect
-                            }
-
-                            // Reset button
-                            tvRecordingStatus.setText("Tap to try again");
+                            tvRecordingStatus.setText("Evaluating...");
                             tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
-                            btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
-
-                            // Enable continue button
-                            btnContinue.setEnabled(true);
-                            android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
-                                    PlacementTestActivity.this, R.anim.bounce);
-                            btnContinue.startAnimation(bounceAnim);
+                            btnMicrophone.setBackgroundTintList(getColorStateList(R.color.text_secondary));
                         });
+
+                        // Evaluate pronunciation via API
+                        int itemId = currentQuestion.getQuestionId();
+                        int responseId = (int) (System.currentTimeMillis() / 1000); // Temporary response ID
+
+                        pronunciationHelper.evaluatePronunciation(
+                            itemId,
+                            responseId,
+                            wordToPronounce.toLowerCase(),
+                            audioFile,
+                            new PronunciationHelper.EvaluationCallback() {
+                                @Override
+                                public void onEvaluationSuccess(PronunciationHelper.PronunciationResult result) {
+                                    runOnUiThread(() -> {
+                                        isRecording[0] = false;
+
+                                        // Show feedback
+                                        feedbackCard.setVisibility(View.VISIBLE);
+                                        int accuracy = result.getOverallAccuracy();
+                                        tvScore.setText(accuracy + "% Accuracy");
+
+                                        if (result.isPassed() && accuracy >= 85) {
+                                            tvFeedbackIcon.setText("🎉");
+                                            tvFeedbackText.setText(result.getFeedback());
+                                            feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
+                                            tvFeedbackText.setTextColor(getColor(R.color.success_green));
+                                            tvScore.setTextColor(getColor(R.color.success_green));
+                                            selectedAnswer = currentQuestion.getCorrectAnswer(); // Mark as correct
+                                            selectedAnswerLetter = currentQuestion.getCorrectAnswer();
+                                        } else if (result.isPassed() && accuracy >= 65) {
+                                            tvFeedbackIcon.setText("👍");
+                                            tvFeedbackText.setText(result.getFeedback());
+                                            feedbackCard.setCardBackgroundColor(getColor(R.color.warning_light));
+                                            tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
+                                            tvScore.setTextColor(getColor(R.color.warning_orange));
+                                            selectedAnswer = result.getRecognizedText(); // Partial credit
+                                            selectedAnswerLetter = result.getRecognizedText();
+                                        } else {
+                                            tvFeedbackIcon.setText("🔄");
+                                            tvFeedbackText.setText(result.getFeedback());
+                                            feedbackCard.setCardBackgroundColor(getColor(R.color.error_light));
+                                            tvFeedbackText.setTextColor(getColor(R.color.error_red));
+                                            tvScore.setTextColor(getColor(R.color.error_red));
+                                            selectedAnswer = result.getRecognizedText(); // Incorrect
+                                            selectedAnswerLetter = result.getRecognizedText();
+                                        }
+
+                                        // Reset button
+                                        tvRecordingStatus.setText("Tap to try again");
+                                        tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
+                                        btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
+
+                                        // Enable continue button
+                                        btnContinue.setEnabled(true);
+                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                                PlacementTestActivity.this, R.anim.bounce);
+                                        btnContinue.startAnimation(bounceAnim);
+                                    });
+                                }
+
+                                @Override
+                                public void onEvaluationError(String error) {
+                                    runOnUiThread(() -> {
+                                        isRecording[0] = false;
+                                        waveformContainer.clearAnimation();
+                                        waveformContainer.setVisibility(View.GONE);
+                                        tvRecordingStatus.setText("Error: " + error);
+                                        tvRecordingStatus.setTextColor(getColor(R.color.error_red));
+                                        btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
+                                        Toast.makeText(PlacementTestActivity.this,
+                                            "Pronunciation evaluation failed: " + error,
+                                            Toast.LENGTH_LONG).show();
+                                    });
+                                }
+                            }
+                        );
                     }
 
                     @Override
-                    public void onRecognitionError(String error) {
+                    public void onRecordingError(String error) {
                         runOnUiThread(() -> {
+                            isRecording[0] = false;
                             waveformContainer.clearAnimation();
                             waveformContainer.setVisibility(View.GONE);
                             tvRecordingStatus.setText(error);
@@ -611,14 +655,32 @@ public class PlacementTestActivity extends AppCompatActivity {
                             btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
                         });
                     }
+                });
 
-                    @Override
-                    public void onRecognitionEnded() {
-                        runOnUiThread(() -> {
-                            waveformContainer.clearAnimation();
-                            waveformContainer.setVisibility(View.GONE);
+                // Auto-stop recording after 5 seconds
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (isRecording[0]) {
+                        pronunciationHelper.stopRecording(new PronunciationHelper.PronunciationCallback() {
+                            @Override
+                            public void onRecordingStarted() {}
+                            @Override
+                            public void onRecordingStopped(java.io.File audioFile, int durationMs) {}
+                            @Override
+                            public void onRecordingError(String error) {}
                         });
                     }
+                }, 5000);
+
+            } else {
+                // Stop recording manually
+                isRecording[0] = false;
+                pronunciationHelper.stopRecording(new PronunciationHelper.PronunciationCallback() {
+                    @Override
+                    public void onRecordingStarted() {}
+                    @Override
+                    public void onRecordingStopped(java.io.File audioFile, int durationMs) {}
+                    @Override
+                    public void onRecordingError(String error) {}
                 });
             }
         });
