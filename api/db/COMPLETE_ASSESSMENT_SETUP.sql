@@ -147,6 +147,13 @@ GO
 -- =============================================
 PRINT 'Creating StudentPronunciationProgress table...';
 
+-- Drop if exists
+IF EXISTS (SELECT * FROM sys.tables WHERE name = 'StudentPronunciationProgress')
+BEGIN
+    PRINT 'Dropping existing StudentPronunciationProgress table...';
+    DROP TABLE dbo.StudentPronunciationProgress;
+END
+
 CREATE TABLE dbo.StudentPronunciationProgress (
     ProgressID INT IDENTITY(1,1) PRIMARY KEY,
     StudentID INT NOT NULL,
@@ -384,7 +391,12 @@ FROM dbo.AssessmentItems
 GROUP BY QuestionType;
 
 PRINT '';
-PRINT 'Total Questions: ' + CAST((SELECT COUNT(*) FROM dbo.AssessmentItems) AS VARCHAR);
+
+-- Get total count using a variable to avoid subquery error
+DECLARE @TotalQuestions INT;
+SELECT @TotalQuestions = COUNT(*) FROM dbo.AssessmentItems;
+PRINT 'Total Questions: ' + CAST(@TotalQuestions AS VARCHAR);
+
 PRINT '';
 PRINT '✓ All tables created';
 PRINT '✓ All stored procedures created';
