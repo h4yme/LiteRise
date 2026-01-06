@@ -196,4 +196,15 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("submit_answer.php")
     Call<SubmitAnswerResponse> submitAnswer(@Body SubmitAnswerRequest request);
+
+    // 🎤 Evaluate Pronunciation (Audio-based assessment)
+    @Multipart
+    @POST("evaluate_pronunciation.php")
+    Call<okhttp3.ResponseBody> evaluatePronunciation(
+            @Part("student_id") okhttp3.RequestBody studentId,
+            @Part("item_id") okhttp3.RequestBody itemId,
+            @Part("response_id") okhttp3.RequestBody responseId,
+            @Part("target_word") okhttp3.RequestBody targetWord,
+            @Part okhttp3.MultipartBody.Part audioFile
+    );
 }
