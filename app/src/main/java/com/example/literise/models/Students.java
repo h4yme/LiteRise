@@ -30,6 +30,13 @@ public class Students {
 
     @SerializedName("Nickname")
     private String nickname;
+
+    @SerializedName("PreAssessmentCompleted")
+    private boolean preAssessmentCompleted;
+
+    @SerializedName("AssessmentStatus")
+    private String assessmentStatus;
+
     // Getters and Setters
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
@@ -58,5 +65,10 @@ public class Students {
 
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
-}
 
+    public boolean isPreAssessmentCompleted() { return preAssessmentCompleted; }
+    public void setPreAssessmentCompleted(boolean preAssessmentCompleted) { this.preAssessmentCompleted = preAssessmentCompleted; }
+
+    public String getAssessmentStatus() { return assessmentStatus; }
+    public void setAssessmentStatus(String assessmentStatus) { this.assessmentStatus = assessmentStatus; }
+}

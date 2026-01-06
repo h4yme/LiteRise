@@ -1,17 +1,18 @@
 package com.example.literise.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.example.literise.BuildConfig;
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -33,7 +34,7 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private static final String TAG = "PlacementResultActivity";
 
-    private RelativeLayout rootLayout;
+    private ConstraintLayout rootLayout;
     private TextView tvLevelName, tvLevelNumber;
     private TextView tvAccuracy, tvQuestionsAnswered;
     private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score;
@@ -65,8 +66,8 @@ public class PlacementResultActivity extends AppCompatActivity {
         displayResults();
         savePlacementResult();
 
-        // Show Leo's congratulation dialogue after a brief delay
-        new Handler().postDelayed(this::showLeoCongratulation, 1000);
+        // Leo's congratulation will be shown on Dashboard instead
+        // Results screen should be clean and focused on the assessment results
 
         setupListeners();
     }
@@ -223,6 +224,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         });
     }
 
+    private String getAppVersion() {
+        try {
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "1.0";
+        }
+    }
+
     private void savePlacementResult() {
         int studentId = sessionManager.getStudentId();
         if (studentId == 0) {
@@ -232,6 +242,15 @@ public class PlacementResultActivity extends AppCompatActivity {
 
         // Determine assessment type based on whether student has completed assessment before
         String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+
+        // Skip API call in demo mode, but still update local session manager
+        if (com.example.literise.utils.AppConfig.DEMO_MODE) {
+            Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
+            if ("PreAssessment".equals(assessmentType)) {
+                sessionManager.setAssessmentCompleted(true);
+            }
+            return;
+        }
 
         // Generate session ID based on timestamp
         int sessionId = (int) (System.currentTimeMillis() / 1000);
@@ -263,7 +282,7 @@ public class PlacementResultActivity extends AppCompatActivity {
         // Set optional fields
         request.setTimeSpentSeconds(timeSpentSeconds);
         request.setDeviceInfo(deviceInfo);
-        request.setAppVersion(BuildConfig.VERSION_NAME);
+        request.setAppVersion(getAppVersion());
 
         // Make API call
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);

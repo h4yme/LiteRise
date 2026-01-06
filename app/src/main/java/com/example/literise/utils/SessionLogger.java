@@ -1,10 +1,11 @@
 package com.example.literise.utils;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
-import com.example.literise.BuildConfig;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.models.LogSessionRequest;
@@ -56,7 +57,7 @@ public class SessionLogger {
         String deviceInfo = getDeviceInfo();
 
         LogSessionRequest request = new LogSessionRequest(studentId, sessionType, sessionTag, deviceInfo);
-        request.addAdditionalData("app_version", BuildConfig.VERSION_NAME);
+        request.addAdditionalData("app_version", getAppVersion(context));
         request.addAdditionalData("sdk_version", Build.VERSION.SDK_INT);
 
         ApiService apiService = ApiClient.getClient(context).create(ApiService.class);
@@ -81,5 +82,14 @@ public class SessionLogger {
 
     private static String getDeviceInfo() {
         return Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE;
+    }
+
+    private static String getAppVersion(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return packageInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return "1.0";
+        }
     }
 }

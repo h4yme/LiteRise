@@ -2,8 +2,6 @@ package com.example.literise.api;
 
 import com.example.literise.models.GetNextItemRequest;
 
-import com.example.literise.models.LogSessionRequest;
-import com.example.literise.models.LogSessionResponse;
 import com.example.literise.models.NextItemResponse;
 
 import com.example.literise.models.PreAssessmentResponse;
@@ -18,8 +16,6 @@ import com.example.literise.models.ResponseModel;
 
 import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
-import com.example.literise.models.SavePlacementResultRequest;
-import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.models.ScrambleSentenceResponse;
 
 import com.example.literise.models.SingleResponseResult;
@@ -42,6 +38,11 @@ import com.example.literise.models.VerifyOTPRequest;
 import com.example.literise.models.VerifyOTPResponse;
 import com.example.literise.models.ResetPasswordRequest;
 import com.example.literise.models.ResetPasswordResponse;
+import com.example.literise.models.SavePlacementResultRequest;
+import com.example.literise.models.SavePlacementResultResponse;
+import com.example.literise.models.PlacementProgressResponse;
+import com.example.literise.models.LogSessionRequest;
+import com.example.literise.models.LogSessionResponse;
 import java.util.List;
 
 import java.util.Map;
