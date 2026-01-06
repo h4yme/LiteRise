@@ -957,6 +957,12 @@ public class PlacementTestActivity extends AppCompatActivity {
                             // Update IRT engine with result (for local tracking)
                             irtEngine.updateTheta(currentQuestion, isCorrect);
 
+                            // Sync theta from API to local IRTEngine for accurate placement calculation
+                            if (response.getFeedback() != null) {
+                                double apiTheta = response.getFeedback().getNewThetaEstimate();
+                                irtEngine.setTheta(apiTheta);
+                            }
+
                             // Move to next question
                             currentQuestionNumber++;
 
@@ -1019,7 +1025,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         int totalAnswered = irtEngine.getTotalAnswered();
         int totalCorrect = irtEngine.getTotalCorrect();
         int[] categoryScores = irtEngine.getCategoryScores();
-        double finalTheta = irtEngine.getTheta();
+
+        // Get final theta from API (adaptiveHelper has the accurate theta from server)
+        double finalTheta = adaptiveHelper.getCurrentTheta();
 
         // Create intent with results
         Intent intent = new Intent(PlacementTestActivity.this, PlacementResultActivity.class);

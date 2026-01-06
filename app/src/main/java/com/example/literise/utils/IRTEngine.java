@@ -188,6 +188,13 @@ public class IRTEngine {
         return theta;
     }
 
+    /**
+     * Set theta directly (used when syncing with API's theta estimate)
+     */
+    public void setTheta(double theta) {
+        this.theta = Math.max(THETA_MIN, Math.min(THETA_MAX, theta));
+    }
+
     public int getTotalAnswered() {
         return answeredQuestions.size();
     }
