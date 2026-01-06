@@ -315,21 +315,26 @@ public class LoginActivity extends AppCompatActivity {
                     // CRITICAL DEBUG: Check navigation logic
                     android.util.Log.d("LoginActivity", "=== NAVIGATION DEBUG ===");
                     android.util.Log.d("LoginActivity", "hasSeenWelcome: " + sessionManager.hasSeenWelcome());
+                    android.util.Log.d("LoginActivity", "hasStartedAssessment: " + sessionManager.hasStartedAssessment());
                     android.util.Log.d("LoginActivity", "hasCompletedAssessment: " + sessionManager.hasCompletedAssessment());
 
                     // Navigate based on user's progress
                     Intent intent;
                     if (!sessionManager.hasSeenWelcome()) {
                         // First time - show welcome onboarding
-                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity");
+                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (not seen welcome)");
                         intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
-                    } else if (!sessionManager.hasCompletedAssessment()) {
-                        // Seen welcome but hasn't completed placement test
-                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to PlacementTestActivity");
+                    } else if (sessionManager.hasStartedAssessment() && !sessionManager.hasCompletedAssessment()) {
+                        // Assessment in progress - resume test
+                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to PlacementTestActivity (resume assessment)");
                         intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
+                    } else if (!sessionManager.hasCompletedAssessment()) {
+                        // Seen welcome but hasn't started placement test yet
+                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (assessment not started)");
+                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
                     } else {
                         // Completed everything - go to Dashboard
-                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to DashboardActivity");
+                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to DashboardActivity (assessment completed)");
                         intent = new Intent(LoginActivity.this, DashboardActivity.class);
                     }
                     startActivity(intent);
@@ -380,9 +385,12 @@ public class LoginActivity extends AppCompatActivity {
         if (!sessionManager.hasSeenWelcome()) {
             // First time - show welcome onboarding
             intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
-        } else if (!sessionManager.hasCompletedAssessment()) {
-            // Seen welcome but hasn't completed placement test
+        } else if (sessionManager.hasStartedAssessment() && !sessionManager.hasCompletedAssessment()) {
+            // Assessment in progress - resume test
             intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
+        } else if (!sessionManager.hasCompletedAssessment()) {
+            // Seen welcome but hasn't started placement test yet
+            intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
         } else {
             // Completed everything - go to Dashboard
             intent = new Intent(LoginActivity.this, DashboardActivity.class);

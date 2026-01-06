@@ -845,6 +845,9 @@ public class PlacementTestActivity extends AppCompatActivity {
             return;
         }
 
+        // Mark assessment as started (for resume tracking)
+        sessionManager.setAssessmentStarted(true);
+
         // Determine assessment type based on whether student has completed assessment before
         String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
 

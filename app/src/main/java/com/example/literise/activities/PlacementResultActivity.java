@@ -248,6 +248,7 @@ public class PlacementResultActivity extends AppCompatActivity {
             Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
             if ("PreAssessment".equals(assessmentType)) {
                 sessionManager.setAssessmentCompleted(true);
+                sessionManager.setAssessmentStarted(false); // Clear started flag
             }
             return;
         }
@@ -298,6 +299,7 @@ public class PlacementResultActivity extends AppCompatActivity {
                     // Mark assessment as completed if this was PreAssessment
                     if ("PreAssessment".equals(assessmentType)) {
                         sessionManager.setAssessmentCompleted(true);
+                        sessionManager.setAssessmentStarted(false); // Clear started flag
                     }
 
                     // Log assessment completion
