@@ -87,7 +87,7 @@ if ($audioFile['size'] > $maxFileSize) {
 
 // Get item details for pronunciation assessment
 $itemStmt = $conn->prepare("
-    SELECT TargetPronunciation, PhoneticTranscription, MinimumAccuracy
+    SELECT TargetPronunciation, PhoneticTranscription, MinimumAccuracy, DifficultyParam, Category
     FROM dbo.AssessmentItems
     WHERE ItemID = ?
 ");
@@ -100,6 +100,8 @@ if (!$item) {
 
 $targetPronunciation = $item['TargetPronunciation'] ?? $targetWord;
 $minAccuracy = $item['MinimumAccuracy'] ?? 65;
+$itemDifficulty = $item['DifficultyParam'] ?? 0.0;
+$category = $item['Category'] ?? 'Oral Language';
 
 // =============================================
 // Option 1: Use Google Cloud Speech-to-Text API
@@ -215,8 +217,9 @@ try {
     // First, create a StudentResponse record to get a valid ResponseID
     $insertResponseStmt = $conn->prepare("
         INSERT INTO dbo.StudentResponses
-        (StudentID, ItemID, SessionID, SelectedAnswer, IsCorrect, ResponseTime, StudentThetaAtTime, CreatedAt)
-        VALUES (?, ?, ?, ?, ?, 0, 0.0, GETDATE());
+        (StudentID, ItemID, SessionID, AssessmentType, SelectedAnswer, IsCorrect,
+         StudentThetaAtTime, ItemDifficulty, QuestionNumber, ResponseTime)
+        VALUES (?, ?, ?, 'Pronunciation', ?, ?, 0.0, ?, 1, 0);
         SELECT SCOPE_IDENTITY() AS ResponseID;
     ");
 
@@ -224,8 +227,9 @@ try {
         $studentID,
         $itemID,
         $responseID, // Use the temporary ID as SessionID
-        $recognizedText,
-        $passed ? 1 : 0 // IsCorrect based on pronunciation pass/fail
+        $recognizedText, // SelectedAnswer
+        $passed ? 1 : 0, // IsCorrect based on pronunciation pass/fail
+        $itemDifficulty // ItemDifficulty from AssessmentItems
     ]);
 
     $responseResult = $insertResponseStmt->fetch(PDO::FETCH_ASSOC);
