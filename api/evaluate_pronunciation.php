@@ -212,6 +212,28 @@ $apiResponseJSON = json_encode([
 
 // Record pronunciation score in database
 try {
+    // First, create a StudentResponse record to get a valid ResponseID
+    $insertResponseStmt = $conn->prepare("
+        INSERT INTO dbo.StudentResponses
+        (StudentID, ItemID, SessionID, SelectedAnswer, IsCorrect, ResponseTime, StudentThetaAtTime, CreatedAt)
+        VALUES (?, ?, ?, ?, ?, 0, 0.0, GETDATE());
+        SELECT SCOPE_IDENTITY() AS ResponseID;
+    ");
+
+    $insertResponseStmt->execute([
+        $studentID,
+        $itemID,
+        $responseID, // Use the temporary ID as SessionID
+        $recognizedText,
+        $passed ? 1 : 0 // IsCorrect based on pronunciation pass/fail
+    ]);
+
+    $responseResult = $insertResponseStmt->fetch(PDO::FETCH_ASSOC);
+    $actualResponseID = (int)$responseResult['ResponseID'];
+
+    error_log("DEBUG: Created StudentResponse with ID: " . $actualResponseID);
+
+    // Now record the pronunciation score with the valid ResponseID
     $stmt = $conn->prepare("EXEC dbo.SP_RecordPronunciationScore
         @ResponseID = ?,
         @StudentID = ?,
@@ -230,7 +252,7 @@ try {
     ");
 
     $stmt->execute([
-        $responseID,
+        $actualResponseID, // Use the actual ResponseID from StudentResponses
         $studentID,
         $itemID,
         $recognizedText,
