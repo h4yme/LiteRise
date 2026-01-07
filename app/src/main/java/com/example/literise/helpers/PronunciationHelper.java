@@ -179,9 +179,12 @@ public class PronunciationHelper {
         }
 
         if (audioFile == null || !audioFile.exists()) {
+            Log.e(TAG, "Audio file not found: " + (audioFile != null ? audioFile.getAbsolutePath() : "null"));
             callback.onEvaluationError("Audio file not found");
             return;
         }
+
+        Log.d(TAG, "Audio file exists: " + audioFile.getAbsolutePath() + ", Size: " + audioFile.length() + " bytes");
 
         // Prepare multipart request
         RequestBody studentIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(studentId));
@@ -196,7 +199,8 @@ public class PronunciationHelper {
                 audioRequestBody
         );
 
-        Log.d(TAG, "Evaluating pronunciation - Item: " + itemId + ", Target: " + targetWord);
+        Log.d(TAG, "Evaluating pronunciation - StudentID: " + studentId + ", Item: " + itemId + ", Target: " + targetWord);
+        Log.d(TAG, "Making API call to evaluate_pronunciation.php...");
 
         // Make API call
         Call<ResponseBody> call = apiService.evaluatePronunciation(
@@ -210,6 +214,8 @@ public class PronunciationHelper {
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                Log.d(TAG, "API Response received - Code: " + response.code());
+
                 if (response.isSuccessful() && response.body() != null) {
                     try {
                         String jsonResponse = response.body().string();
@@ -231,20 +237,27 @@ public class PronunciationHelper {
                             result.setPassed(resultObj.getBoolean("passed"));
                             result.setMinimumAccuracy(resultObj.getInt("minimum_accuracy"));
 
+                            Log.d(TAG, "Pronunciation evaluation successful - Accuracy: " + result.getOverallAccuracy() + "%");
                             callback.onEvaluationSuccess(result);
                         } else {
                             String error = json.optString("error", "Evaluation failed");
+                            Log.e(TAG, "API returned error: " + error);
                             callback.onEvaluationError(error);
                         }
 
                     } catch (IOException | JSONException e) {
                         Log.e(TAG, "Error parsing pronunciation response", e);
-                        callback.onEvaluationError("Failed to parse response");
+                        callback.onEvaluationError("Failed to parse response: " + e.getMessage());
                     }
                 } else {
-                    String error = "API error: " + response.code();
-                    Log.e(TAG, error);
-                    callback.onEvaluationError(error);
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "No error body";
+                        Log.e(TAG, "API error " + response.code() + ": " + errorBody);
+                        callback.onEvaluationError("API error: " + response.code() + " - " + errorBody);
+                    } catch (IOException e) {
+                        Log.e(TAG, "API error: " + response.code());
+                        callback.onEvaluationError("API error: " + response.code());
+                    }
                 }
             }
 
