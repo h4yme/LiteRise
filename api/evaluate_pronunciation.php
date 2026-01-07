@@ -247,7 +247,7 @@ try {
     $scoreID = $result['ScoreID'] ?? 0;
 
     // Return success response
-    sendSuccess([
+    sendResponse([
         'score_id' => $scoreID,
         'pronunciation_result' => [
             'recognized_text' => $recognizedText,
