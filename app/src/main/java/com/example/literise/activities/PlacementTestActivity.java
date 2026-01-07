@@ -148,6 +148,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(v -> {
             // For pronunciation questions, answer is already submitted
             if (answerAlreadySubmitted) {
+                // Increment question number
+                currentQuestionNumber++;
+                // Load next question
                 loadNextQuestion();
                 return;
             }

@@ -174,14 +174,31 @@ try {
 // Simulate speech recognition (for testing)
 // In production, replace this with actual API call above
 
-// For now, use basic text similarity matching
-// This is a simplified version - real implementation should use Google Cloud API
+// TEMPORARY: Generate realistic-looking scores for development
+// This is NOT real speech recognition - just for testing the flow
+// TODO: Replace with actual Google Cloud Speech API
 
-$recognizedText = $targetWord; // Placeholder - should come from actual speech recognition
-$confidence = 0.85; // Placeholder
+// Check if audio file has content (basic validation)
+$audioSize = filesize($audioFile['tmp_name']);
+$hasAudio = $audioSize > 1000; // At least 1KB
 
-// Calculate pronunciation accuracy using Levenshtein distance
-$pronunciationScore = calculatePronunciationScore($recognizedText, $targetPronunciation, $confidence);
+if (!$hasAudio) {
+    sendError('Audio recording is too short or empty', 400);
+}
+
+// Generate semi-random score based on audio file properties
+// This simulates variation but is NOT actual speech recognition
+$audioHash = md5_file($audioFile['tmp_name']);
+$randomFactor = (hexdec(substr($audioHash, 0, 2)) % 40) / 100; // 0.00 to 0.40
+$baseScore = 0.55; // Base 55%
+$confidence = $baseScore + $randomFactor; // 55% to 95%
+
+// Simulate recognized text (in production, this comes from speech API)
+$recognizedText = $targetWord; // Still placeholder
+error_log("DEVELOPMENT MODE: Generated random confidence: " . $confidence . " for audio file");
+
+// Calculate pronunciation accuracy
+$pronunciationScore = $confidence;
 $overallAccuracy = (int)($pronunciationScore * 100);
 
 // Fluency and completeness scores (would come from API in production)
