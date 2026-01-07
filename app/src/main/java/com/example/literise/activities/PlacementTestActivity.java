@@ -91,6 +91,7 @@ public class PlacementTestActivity extends AppCompatActivity {
     private String selectedAnswerLetter = ""; // A, B, C, or D
     private int questionsPerCategory = 6; // Approximate
     private long startTime;
+    private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
 
     @Override
@@ -145,7 +146,14 @@ public class PlacementTestActivity extends AppCompatActivity {
         });
 
         btnContinue.setOnClickListener(v -> {
-            if (!selectedAnswer.isEmpty()) {
+            // For pronunciation questions, answer is already submitted
+            if (answerAlreadySubmitted) {
+                loadNextQuestion();
+                return;
+            }
+
+            // For regular questions, check if answer selected
+            if (selectedAnswer != null && !selectedAnswer.isEmpty()) {
                 // Check answer and proceed
                 checkAnswer();
             }
@@ -322,6 +330,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                 btnRetry.setVisibility(View.GONE);
                 selectedAnswer = "";
                 selectedAnswerLetter = "";
+                answerAlreadySubmitted = false; // Reset for new question
 
                 // Fade in new question
                 questionContainer.animate()
@@ -572,6 +581,9 @@ public class PlacementTestActivity extends AppCompatActivity {
                                     runOnUiThread(() -> {
                                         isRecording[0] = false;
 
+                                        // Mark answer as already submitted (API call already made)
+                                        answerAlreadySubmitted = true;
+
                                         // Show feedback
                                         feedbackCard.setVisibility(View.VISIBLE);
                                         int accuracy = result.getOverallAccuracy();
@@ -583,8 +595,8 @@ public class PlacementTestActivity extends AppCompatActivity {
                                             feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
                                             tvFeedbackText.setTextColor(getColor(R.color.success_green));
                                             tvScore.setTextColor(getColor(R.color.success_green));
-                                            selectedAnswer = currentQuestion.getCorrectAnswer(); // Mark as correct
-                                            selectedAnswerLetter = currentQuestion.getCorrectAnswer();
+                                            selectedAnswer = result.getRecognizedText(); // Store recognized text
+                                            selectedAnswerLetter = "CORRECT";
                                         } else if (result.isPassed() && accuracy >= 65) {
                                             tvFeedbackIcon.setText("👍");
                                             tvFeedbackText.setText(result.getFeedback());
@@ -592,7 +604,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                                             tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
                                             tvScore.setTextColor(getColor(R.color.warning_orange));
                                             selectedAnswer = result.getRecognizedText(); // Partial credit
-                                            selectedAnswerLetter = result.getRecognizedText();
+                                            selectedAnswerLetter = "PARTIAL";
                                         } else {
                                             tvFeedbackIcon.setText("🔄");
                                             tvFeedbackText.setText(result.getFeedback());
@@ -600,7 +612,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                                             tvFeedbackText.setTextColor(getColor(R.color.error_red));
                                             tvScore.setTextColor(getColor(R.color.error_red));
                                             selectedAnswer = result.getRecognizedText(); // Incorrect
-                                            selectedAnswerLetter = result.getRecognizedText();
+                                            selectedAnswerLetter = "INCORRECT";
                                         }
 
                                         // Reset button
