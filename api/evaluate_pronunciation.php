@@ -104,11 +104,8 @@ $itemDifficulty = $item['DifficultyParam'] ?? 0.0;
 $category = $item['Category'] ?? 'Oral Language';
 
 // =============================================
-// Option 1: Use Google Cloud Speech-to-Text API
+// Google Cloud Speech-to-Text API
 // =============================================
-// Uncomment this section when you have Google Cloud credentials
-
-/*
 try {
     require_once __DIR__ . '/vendor/autoload.php'; // Google Cloud PHP SDK
 
@@ -117,89 +114,74 @@ try {
     use Google\Cloud\Speech\V1\RecognitionConfig;
     use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
 
+    // Check credentials file exists
+    $credentialsPath = __DIR__ . '/google-cloud-credentials.json';
+    if (!file_exists($credentialsPath)) {
+        error_log("ERROR: Google Cloud credentials file not found at: " . $credentialsPath);
+        sendError('Speech recognition service not configured. Please contact administrator.', 500);
+    }
+
     // Initialize Google Cloud Speech client
     $speech = new SpeechClient([
-        'credentials' => __DIR__ . '/google-cloud-credentials.json'
+        'credentials' => $credentialsPath
     ]);
 
     // Read audio file
     $audioContent = file_get_contents($audioFile['tmp_name']);
+    error_log("INFO: Processing audio file - Size: " . strlen($audioContent) . " bytes, Format: 3GP/AMR");
 
-    // Configure recognition with pronunciation assessment
+    // Configure recognition for 3GP (AMR-NB) audio
     $audio = (new RecognitionAudio())->setContent($audioContent);
 
     $config = (new RecognitionConfig())
-        ->setEncoding(AudioEncoding::WEBM_OPUS) // Adjust based on actual format
-        ->setSampleRateHertz(48000)
+        ->setEncoding(AudioEncoding::AMR) // 3GP uses AMR-NB encoding
+        ->setSampleRateHertz(8000) // AMR-NB sample rate
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
-        ->setPhraseHints([$targetPronunciation])
-        ->setModel('default');
+        ->setPhraseHints([$targetPronunciation]) // Help API expect this word
+        ->setModel('default')
+        ->setMaxAlternatives(1);
 
     // Perform speech recognition
+    error_log("INFO: Sending audio to Google Cloud Speech API...");
     $response = $speech->recognize($config, $audio);
 
     $recognizedText = '';
     $confidence = 0.0;
     $pronunciationScore = 0.0;
 
-    foreach ($response->getResults() as $result) {
-        $alternative = $result->getAlternatives()[0];
+    // Process results
+    $results = $response->getResults();
+    if (count($results) > 0) {
+        $alternative = $results[0]->getAlternatives()[0];
         $recognizedText = strtolower(trim($alternative->getTranscript()));
         $confidence = $alternative->getConfidence();
 
-        // Google Speech API doesn't provide direct pronunciation scoring
-        // We'll calculate it based on text match and confidence
+        error_log("INFO: Speech recognition result - Recognized: '$recognizedText', Target: '$targetPronunciation', Confidence: " . $confidence);
+
+        // Calculate pronunciation score based on text match and confidence
         $pronunciationScore = calculatePronunciationScore(
             $recognizedText,
             $targetPronunciation,
             $confidence
         );
-        break;
+    } else {
+        // No speech detected
+        error_log("WARNING: No speech detected in audio");
+        $recognizedText = '';
+        $confidence = 0.0;
+        $pronunciationScore = 0.0;
     }
 
     $speech->close();
 
+    // Calculate overall accuracy
+    $overallAccuracy = (int)($pronunciationScore * 100);
+
 } catch (Exception $e) {
+    error_log('ERROR: Speech recognition failed - ' . $e->getMessage());
     sendError('Speech recognition failed: ' . $e->getMessage(), 500);
 }
-*/
-
-// =============================================
-// Option 2: Fallback - Simple accuracy calculation
-// =============================================
-// For development/testing without Google Cloud API
-// Replace with actual Google Cloud API in production
-
-// Simulate speech recognition (for testing)
-// In production, replace this with actual API call above
-
-// TEMPORARY: Generate realistic-looking scores for development
-// This is NOT real speech recognition - just for testing the flow
-// TODO: Replace with actual Google Cloud Speech API
-
-// Check if audio file has content (basic validation)
-$audioSize = filesize($audioFile['tmp_name']);
-$hasAudio = $audioSize > 1000; // At least 1KB
-
-if (!$hasAudio) {
-    sendError('Audio recording is too short or empty', 400);
-}
-
-// Generate semi-random score based on audio file properties
-// This simulates variation but is NOT actual speech recognition
-$audioHash = md5_file($audioFile['tmp_name']);
-$randomFactor = (hexdec(substr($audioHash, 0, 2)) % 40) / 100; // 0.00 to 0.40
-$baseScore = 0.55; // Base 55%
-$confidence = $baseScore + $randomFactor; // 55% to 95%
-
-// Simulate recognized text (in production, this comes from speech API)
-$recognizedText = $targetWord; // Still placeholder
-error_log("DEVELOPMENT MODE: Generated random confidence: " . $confidence . " for audio file");
-
-// Calculate pronunciation accuracy
-$pronunciationScore = $confidence;
-$overallAccuracy = (int)($pronunciationScore * 100);
 
 // Fluency and completeness scores (would come from API in production)
 $fluencyScore = 0.90;
