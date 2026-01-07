@@ -67,13 +67,16 @@ if (!isset($_FILES['audio_file']) || $_FILES['audio_file']['error'] !== UPLOAD_E
 $audioFile = $_FILES['audio_file'];
 
 // Validate file type (accept common audio formats)
-$allowedMimeTypes = ['audio/webm', 'audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/ogg', 'audio/flac', 'audio/3gp', 'audio/3gpp', 'audio/amr'];
+$allowedMimeTypes = ['audio/webm', 'audio/wav', 'audio/mp3', 'audio/mpeg', 'audio/ogg', 'audio/flac', 'audio/3gp', 'audio/3gpp', 'audio/amr', 'video/3gpp'];
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
 $mimeType = finfo_file($finfo, $audioFile['tmp_name']);
 finfo_close($finfo);
 
+// Log the detected MIME type for debugging
+error_log("DEBUG: Detected MIME type: " . $mimeType . " for file: " . $audioFile['name']);
+
 if (!in_array($mimeType, $allowedMimeTypes)) {
-    sendError('Invalid audio file format. Supported: WAV, MP3, WebM, OGG, FLAC, 3GP', 400);
+    sendError('Invalid audio file format. Detected: ' . $mimeType . '. Supported: WAV, MP3, WebM, OGG, FLAC, 3GP', 400);
 }
 
 // Validate file size (max 10MB)
