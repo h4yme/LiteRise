@@ -216,6 +216,7 @@ $apiResponseJSON = json_encode([
 try {
     // First, create a StudentResponse record to get a valid ResponseID
     $insertResponseStmt = $conn->prepare("
+        SET NOCOUNT ON;
         INSERT INTO dbo.StudentResponses
         (StudentID, ItemID, SessionID, AssessmentType, SelectedAnswer, IsCorrect,
          StudentThetaAtTime, ItemDifficulty, QuestionNumber, ResponseTime)
@@ -232,8 +233,15 @@ try {
         $itemDifficulty // ItemDifficulty from AssessmentItems
     ]);
 
+    // Move to the next result set (the SELECT statement)
+    $insertResponseStmt->nextRowset();
+
     $responseResult = $insertResponseStmt->fetch(PDO::FETCH_ASSOC);
-    $actualResponseID = (int)$responseResult['ResponseID'];
+    $actualResponseID = (int)($responseResult['ResponseID'] ?? 0);
+
+    if ($actualResponseID === 0) {
+        throw new Exception("Failed to create StudentResponse record");
+    }
 
     error_log("DEBUG: Created StudentResponse with ID: " . $actualResponseID);
 
