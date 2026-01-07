@@ -43,6 +43,10 @@ import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.models.PlacementProgressResponse;
 import com.example.literise.models.LogSessionRequest;
 import com.example.literise.models.LogSessionResponse;
+import com.example.literise.models.AdaptiveQuestionRequest;
+import com.example.literise.models.AdaptiveQuestionResponse;
+import com.example.literise.models.SubmitAnswerRequest;
+import com.example.literise.models.SubmitAnswerResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -55,8 +59,10 @@ import retrofit2.http.Body;
 
 import retrofit2.http.Headers;
 
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 
+import retrofit2.http.Part;
 import retrofit2.http.Query;
 
 public interface ApiService {
@@ -182,4 +188,25 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("log_session.php")
     Call<LogSessionResponse> logSession(@Body LogSessionRequest request);
+
+    // 🎯 Get Next Adaptive Question (IRT-based)
+    @Headers("Content-Type: application/json")
+    @POST("get_next_question.php")
+    Call<AdaptiveQuestionResponse> getNextAdaptiveQuestion(@Body AdaptiveQuestionRequest request);
+
+    // ✅ Submit Answer (IRT-based tracking)
+    @Headers("Content-Type: application/json")
+    @POST("submit_answer.php")
+    Call<SubmitAnswerResponse> submitAnswer(@Body SubmitAnswerRequest request);
+
+    // 🎤 Evaluate Pronunciation (Audio-based assessment)
+    @Multipart
+    @POST("evaluate_pronunciation.php")
+    Call<okhttp3.ResponseBody> evaluatePronunciation(
+            @Part("student_id") okhttp3.RequestBody studentId,
+            @Part("item_id") okhttp3.RequestBody itemId,
+            @Part("response_id") okhttp3.RequestBody responseId,
+            @Part("target_word") okhttp3.RequestBody targetWord,
+            @Part okhttp3.MultipartBody.Part audioFile
+    );
 }

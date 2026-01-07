@@ -33,6 +33,7 @@ public class SessionManager {
 
     private static final String KEY_NICKNAME = "nickname";
     private static final String KEY_ASSESSMENT_COMPLETED = "assessment_completed";
+    private static final String KEY_ASSESSMENT_STARTED = "assessment_started";
 
 
     private SharedPreferences prefs;
@@ -226,5 +227,14 @@ public class SessionManager {
 
 
 
+    }
+
+    public void setAssessmentStarted(boolean started) {
+        editor.putBoolean(KEY_ASSESSMENT_STARTED, started);
+        editor.apply();
+    }
+
+    public boolean hasStartedAssessment() {
+        return prefs.getBoolean(KEY_ASSESSMENT_STARTED, false);
     }
 }
