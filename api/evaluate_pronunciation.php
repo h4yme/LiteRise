@@ -268,7 +268,8 @@ try {
 
 } catch (PDOException $e) {
     error_log('Database error in pronunciation scoring: ' . $e->getMessage());
-    sendError('Failed to record pronunciation score', 500);
+    $errorDetails = ($_ENV['DEBUG_MODE'] ?? 'false') === 'true' ? $e->getMessage() : null;
+    sendError('Failed to record pronunciation score: ' . $e->getMessage(), 500, $errorDetails);
 }
 
 // =============================================
