@@ -533,22 +533,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Track if currently recording
         final boolean[] isRecording = {false};
 
-        // Microphone button click listener
-        btnMicrophone.setOnClickListener(v -> {
-            if (!isRecording[0]) {
-                // Start recording
-                isRecording[0] = true;
-                tvRecordingStatus.setText("Recording... Say the word now!");
-                tvRecordingStatus.setTextColor(getColor(R.color.error_red));
-                btnMicrophone.setBackgroundTintList(getColorStateList(R.color.error_red));
-                waveformContainer.setVisibility(View.VISIBLE);
-                feedbackCard.setVisibility(View.GONE);
-
-                // Start animated waveform
-                animateWaveform(waveformContainer);
-
-                // Start audio recording
-                pronunciationHelper.startRecording(new PronunciationHelper.PronunciationCallback() {
+        // Define the recording callback that will handle evaluation
+        PronunciationHelper.PronunciationCallback recordingCallback = new PronunciationHelper.PronunciationCallback() {
                     @Override
                     public void onRecordingStarted() {
                         runOnUiThread(() -> {
@@ -558,6 +544,8 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                     @Override
                     public void onRecordingStopped(java.io.File audioFile, int durationMs) {
+                        android.util.Log.d("PlacementTest", "onRecordingStopped called - File: " + audioFile.getAbsolutePath() + ", Duration: " + durationMs);
+
                         runOnUiThread(() -> {
                             // Stop waveform animation
                             waveformContainer.clearAnimation();
@@ -570,6 +558,8 @@ public class PlacementTestActivity extends AppCompatActivity {
                         // Evaluate pronunciation via API
                         int itemId = currentQuestion.getQuestionId();
                         int responseId = (int) (System.currentTimeMillis() / 1000); // Temporary response ID
+
+                        android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", Word: " + wordToPronounce);
 
                         pronunciationHelper.evaluatePronunciation(
                             itemId,
@@ -655,33 +645,36 @@ public class PlacementTestActivity extends AppCompatActivity {
                             btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
                         });
                     }
-                });
+                };
+
+        // Microphone button click listener
+        btnMicrophone.setOnClickListener(v -> {
+            if (!isRecording[0]) {
+                // Start recording
+                isRecording[0] = true;
+                tvRecordingStatus.setText("Recording... Say the word now!");
+                tvRecordingStatus.setTextColor(getColor(R.color.error_red));
+                btnMicrophone.setBackgroundTintList(getColorStateList(R.color.error_red));
+                waveformContainer.setVisibility(View.VISIBLE);
+                feedbackCard.setVisibility(View.GONE);
+
+                // Start animated waveform
+                animateWaveform(waveformContainer);
+
+                // Start audio recording
+                pronunciationHelper.startRecording(recordingCallback);
 
                 // Auto-stop recording after 5 seconds
                 new Handler(Looper.getMainLooper()).postDelayed(() -> {
                     if (isRecording[0]) {
-                        pronunciationHelper.stopRecording(new PronunciationHelper.PronunciationCallback() {
-                            @Override
-                            public void onRecordingStarted() {}
-                            @Override
-                            public void onRecordingStopped(java.io.File audioFile, int durationMs) {}
-                            @Override
-                            public void onRecordingError(String error) {}
-                        });
+                        pronunciationHelper.stopRecording(recordingCallback);
                     }
                 }, 5000);
 
             } else {
                 // Stop recording manually
                 isRecording[0] = false;
-                pronunciationHelper.stopRecording(new PronunciationHelper.PronunciationCallback() {
-                    @Override
-                    public void onRecordingStarted() {}
-                    @Override
-                    public void onRecordingStopped(java.io.File audioFile, int durationMs) {}
-                    @Override
-                    public void onRecordingError(String error) {}
-                });
+                pronunciationHelper.stopRecording(recordingCallback);
             }
         });
 
