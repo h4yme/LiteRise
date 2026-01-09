@@ -8,7 +8,13 @@
 
  */
 
- 
+// Prevent multiple inclusions
+if (defined('LITERISE_DB_LOADED')) {
+    return;
+}
+define('LITERISE_DB_LOADED', true);
+
+
 
 // Set headers for all API responses
 
