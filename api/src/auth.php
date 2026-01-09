@@ -26,6 +26,7 @@
 
  */
 
+if (!function_exists('generateJWT')) {
 function generateJWT($studentID, $email, $expiryDays = 7) {
 
     $secret = $_ENV['JWT_SECRET'] ?? 'default_secret_change_this';
@@ -79,6 +80,7 @@ function generateJWT($studentID, $email, $expiryDays = 7) {
     return $jwt;
 
 }
+}
 
  
 
@@ -94,6 +96,7 @@ function generateJWT($studentID, $email, $expiryDays = 7) {
 
  */
 
+if (!function_exists('verifyJWT')) {
 function verifyJWT($jwt) {
 
     $secret = $_ENV['JWT_SECRET'] ?? 'default_secret_change_this';
@@ -161,6 +164,7 @@ function verifyJWT($jwt) {
     return $payload;
 
 }
+}
 
  
 
@@ -176,10 +180,12 @@ function verifyJWT($jwt) {
 
  */
 
+if (!function_exists('base64UrlEncode')) {
 function base64UrlEncode($data) {
 
     return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
 
+}
 }
 
  
@@ -196,10 +202,12 @@ function base64UrlEncode($data) {
 
  */
 
+if (!function_exists('base64UrlDecode')) {
 function base64UrlDecode($data) {
 
     return base64_decode(strtr($data, '-_', '+/'));
 
+}
 }
 
  
@@ -214,6 +222,7 @@ function base64UrlDecode($data) {
 
  */
 
+if (!function_exists('getTokenFromRequest')) {
 function getTokenFromRequest() {
 
     $headers = getallheaders();
@@ -259,6 +268,7 @@ function getTokenFromRequest() {
     return null;
 
 }
+}
 
  
 
@@ -274,6 +284,7 @@ function getTokenFromRequest() {
 
  */
 
+if (!function_exists('requireAuth')) {
 function requireAuth() {
 
     $token = getTokenFromRequest();
@@ -311,6 +322,7 @@ function requireAuth() {
     ];
 
 }
+}
 
  
 
@@ -326,10 +338,12 @@ function requireAuth() {
 
  */
 
+if (!function_exists('hashPassword')) {
 function hashPassword($password) {
 
     return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);
 
+}
 }
 
  
@@ -348,10 +362,12 @@ function hashPassword($password) {
 
  */
 
+if (!function_exists('verifyPassword')) {
 function verifyPassword($password, $hash) {
 
     return password_verify($password, $hash);
 
+}
 }
 
  
@@ -368,10 +384,12 @@ function verifyPassword($password, $hash) {
 
  */
 
+if (!function_exists('needsRehash')) {
 function needsRehash($hash) {
 
     return password_needs_rehash($hash, PASSWORD_BCRYPT, ['cost' => 12]);
 
+}
 }
 
 ?>
