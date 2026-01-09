@@ -45,6 +45,7 @@ use Google\Cloud\Speech\V1\SpeechClient;
 use Google\Cloud\Speech\V1\RecognitionAudio;
 use Google\Cloud\Speech\V1\RecognitionConfig;
 use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
+use Google\Cloud\Speech\V1\SpeechContext;
 
 // Require authentication
 $authUser = requireAuth();
@@ -134,12 +135,16 @@ try {
     // Configure recognition for 3GP (AMR-NB) audio
     $audio = (new RecognitionAudio())->setContent($audioContent);
 
+    // Create speech context with phrase hints to improve recognition
+    $speechContext = (new SpeechContext())
+        ->setPhrases([$targetPronunciation]);
+
     $config = (new RecognitionConfig())
         ->setEncoding(AudioEncoding::AMR) // 3GP uses AMR-NB encoding
         ->setSampleRateHertz(8000) // AMR-NB sample rate
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
-        ->setPhraseHints([$targetPronunciation]) // Help API expect this word
+        ->setSpeechContexts([$speechContext]) // Help API expect this word
         ->setModel('default')
         ->setMaxAlternatives(1);
 
