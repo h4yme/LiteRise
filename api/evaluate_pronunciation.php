@@ -219,14 +219,35 @@ $apiResponseJSON = json_encode([
 
 // Record pronunciation score in database
 try {
-    // Note: We don't create a StudentResponse here because PlacementTestActivity
-    // will call submit_answer.php which handles that. We just store the
-    // detailed pronunciation metrics with a temporary ResponseID.
-    $actualResponseID = $responseID; // Use the temporary ID passed from the app
+    // Create StudentResponse first (required by foreign key constraint)
+    // We create it here because pronunciation evaluation is complete
+    $insertResponseStmt = $conn->prepare("
+        INSERT INTO dbo.StudentResponses
+        (StudentID, ItemID, SessionID, AssessmentType, SelectedAnswer, IsCorrect,
+         StudentThetaAtTime, ItemDifficulty, QuestionNumber, ResponseTime)
+        VALUES (?, ?, ?, 'Pronunciation', ?, ?, 0.0, ?, 1, 0)
+    ");
 
-    error_log("DEBUG: Recording pronunciation score with ResponseID: " . $actualResponseID);
+    $insertResponseStmt->execute([
+        $studentID,
+        $itemID,
+        1, // SessionID = 1 for now (will be updated by submit_answer if needed)
+        $recognizedText, // SelectedAnswer = what was recognized
+        $passed ? 1 : 0, // IsCorrect based on pronunciation pass/fail
+        $itemDifficulty // ItemDifficulty from AssessmentItems
+    ]);
 
-    // Record the pronunciation score with detailed metrics
+    // Get the actual ResponseID that was created
+    $actualResponseID = (int)$conn->lastInsertId();
+
+    if ($actualResponseID === 0) {
+        error_log("ERROR: Failed to get lastInsertId after StudentResponse insert");
+        throw new Exception("Failed to create StudentResponse record");
+    }
+
+    error_log("DEBUG: Created StudentResponse with ResponseID: " . $actualResponseID);
+
+    // Now record the pronunciation score with the valid ResponseID
     $stmt = $conn->prepare("EXEC dbo.SP_RecordPronunciationScore
         @ResponseID = ?,
         @StudentID = ?,
@@ -264,9 +285,10 @@ try {
     $result = $stmt->fetch(PDO::FETCH_ASSOC);
     $scoreID = $result['ScoreID'] ?? 0;
 
-    // Return success response
+    // Return success response with response_id so app knows not to call submit_answer again
     sendResponse([
         'score_id' => $scoreID,
+        'response_id' => $actualResponseID, // StudentResponse record already created
         'pronunciation_result' => [
             'recognized_text' => $recognizedText,
             'confidence' => $confidence,

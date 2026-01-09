@@ -629,64 +629,24 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
                                         btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
 
-                                        // Submit pronunciation result to placement scoring system
+                                        // Note: evaluate_pronunciation.php already created the StudentResponse
+                                        // record and stored pronunciation metrics. We don't need to call
+                                        // submit_answer again. Just update local IRT and enable continue.
+
                                         selectedAnswer = result.getRecognizedText();
                                         selectedAnswerLetter = accuracy + "% - " + result.getRecognizedText();
 
-                                        // Submit to adaptive helper for IRT scoring
-                                        final int finalResponseTime = responseTime;
-                                        final boolean finalIsCorrect = isCorrect;
+                                        // Update IRT engine locally with result
+                                        irtEngine.updateTheta(currentQuestion, isCorrect);
 
-                                        adaptiveHelper.submitAnswer(
-                                            currentQuestion.getQuestionId(),
-                                            selectedAnswerLetter,
-                                            isCorrect,
-                                            responseTime,
-                                            new AdaptiveQuestionHelper.AnswerCallback() {
-                                                @Override
-                                                public void onSuccess(SubmitAnswerResponse response) {
-                                                    runOnUiThread(() -> {
-                                                        // Update IRT engine with result
-                                                        irtEngine.updateTheta(currentQuestion, finalIsCorrect);
+                                        // Mark that answer has been submitted
+                                        answerAlreadySubmitted = true;
 
-                                                        // Sync theta from API
-                                                        if (response.getFeedback() != null) {
-                                                            double apiTheta = response.getFeedback().getNewThetaEstimate();
-                                                            irtEngine.setTheta(apiTheta);
-                                                        }
-
-                                                        // Mark that answer has been submitted
-                                                        answerAlreadySubmitted = true;
-
-                                                        // Enable continue button
-                                                        btnContinue.setEnabled(true);
-                                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
-                                                                PlacementTestActivity.this, R.anim.bounce);
-                                                        btnContinue.startAnimation(bounceAnim);
-                                                    });
-                                                }
-
-                                                @Override
-                                                public void onError(String error) {
-                                                    runOnUiThread(() -> {
-                                                        // Log error but continue - pronunciation was already evaluated
-                                                        android.util.Log.e("PlacementTest", "Error submitting pronunciation answer: " + error);
-
-                                                        // Update IRT engine locally
-                                                        irtEngine.updateTheta(currentQuestion, finalIsCorrect);
-
-                                                        // Mark that answer has been submitted
-                                                        answerAlreadySubmitted = true;
-
-                                                        // Enable continue button
-                                                        btnContinue.setEnabled(true);
-                                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
-                                                                PlacementTestActivity.this, R.anim.bounce);
-                                                        btnContinue.startAnimation(bounceAnim);
-                                                    });
-                                                }
-                                            }
-                                        );
+                                        // Enable continue button
+                                        btnContinue.setEnabled(true);
+                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                                PlacementTestActivity.this, R.anim.bounce);
+                                        btnContinue.startAnimation(bounceAnim);
                                     });
                                 }
 
