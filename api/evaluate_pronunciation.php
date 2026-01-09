@@ -307,14 +307,28 @@ try {
 
 /**
  * Calculate pronunciation score based on text match and confidence
+ * Uses multiple metrics for accurate pronunciation assessment
  */
 function calculatePronunciationScore($recognized, $target, $confidence) {
     $recognized = strtolower(trim($recognized));
     $target = strtolower(trim($target));
 
-    // Exact match gets full score
+    // No speech detected
+    if (empty($recognized)) {
+        return 0.0;
+    }
+
+    // Exact match gets excellent score
     if ($recognized === $target) {
-        return $confidence;
+        // Return high score (at least 0.95) for exact matches
+        return max($confidence, 0.95);
+    }
+
+    // Check if target word is contained in recognized text
+    // (e.g., "the cat" contains "cat")
+    if (strpos($recognized, $target) !== false || strpos($target, $recognized) !== false) {
+        // Partial containment - good score
+        return max($confidence * 0.9, 0.85);
     }
 
     // Calculate similarity using Levenshtein distance
@@ -322,10 +336,32 @@ function calculatePronunciationScore($recognized, $target, $confidence) {
     if ($maxLen === 0) return 0.0;
 
     $distance = levenshtein($recognized, $target);
-    $similarity = 1.0 - ($distance / $maxLen);
+    $textSimilarity = 1.0 - ($distance / $maxLen);
 
-    // Combine similarity with speech confidence
-    return ($similarity * 0.7 + $confidence * 0.3);
+    // Calculate similar_text percentage for additional comparison
+    $similarTextPercent = 0;
+    similar_text($recognized, $target, $similarTextPercent);
+    $similarTextScore = $similarTextPercent / 100.0;
+
+    // Combine multiple similarity metrics with confidence
+    // - Text similarity (Levenshtein): 40%
+    // - Similar text percentage: 30%
+    // - Speech recognition confidence: 30%
+    $combinedScore = (
+        $textSimilarity * 0.4 +
+        $similarTextScore * 0.3 +
+        $confidence * 0.3
+    );
+
+    // Ensure minimum score for close attempts
+    // If confidence is high but text doesn't match, student may have mispronounced
+    if ($confidence > 0.8 && $textSimilarity < 0.5) {
+        // High confidence but wrong word - give partial credit
+        $combinedScore = max($combinedScore, 0.4);
+    }
+
+    // Ensure score is between 0 and 1
+    return max(0.0, min(1.0, $combinedScore));
 }
 
 /**

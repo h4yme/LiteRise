@@ -584,38 +584,44 @@ public class PlacementTestActivity extends AppCompatActivity {
                                     runOnUiThread(() -> {
                                         isRecording[0] = false;
 
-                                        // Mark answer as already submitted (API call already made)
-                                        answerAlreadySubmitted = true;
+                                        // Calculate response time
+                                        int responseTime = 0;
+                                        if (questionStartTime > 0) {
+                                            responseTime = (int) ((System.currentTimeMillis() - questionStartTime) / 1000);
+                                        }
 
                                         // Show feedback
                                         feedbackCard.setVisibility(View.VISIBLE);
                                         int accuracy = result.getOverallAccuracy();
                                         tvScore.setText(accuracy + "% Accuracy");
 
-                                        if (result.isPassed() && accuracy >= 85) {
+                                        // Use isPassed() from API result - it uses the item's MinimumAccuracy threshold
+                                        boolean isCorrect = result.isPassed();
+
+                                        if (accuracy >= 85) {
+                                            // Excellent pronunciation (85%+)
                                             tvFeedbackIcon.setText("🎉");
                                             tvFeedbackText.setText(result.getFeedback());
                                             feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
                                             tvFeedbackText.setTextColor(getColor(R.color.success_green));
                                             tvScore.setTextColor(getColor(R.color.success_green));
-                                            selectedAnswer = result.getRecognizedText(); // Store recognized text
-                                            selectedAnswerLetter = "CORRECT";
-                                        } else if (result.isPassed() && accuracy >= 65) {
+                                            soundEffectsHelper.playSuccess();
+                                        } else if (isCorrect) {
+                                            // Good pronunciation (passed threshold but < 85%)
                                             tvFeedbackIcon.setText("👍");
                                             tvFeedbackText.setText(result.getFeedback());
                                             feedbackCard.setCardBackgroundColor(getColor(R.color.warning_light));
                                             tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
                                             tvScore.setTextColor(getColor(R.color.warning_orange));
-                                            selectedAnswer = result.getRecognizedText(); // Partial credit
-                                            selectedAnswerLetter = "PARTIAL";
+                                            soundEffectsHelper.playSuccess();
                                         } else {
+                                            // Needs improvement (below threshold)
                                             tvFeedbackIcon.setText("🔄");
                                             tvFeedbackText.setText(result.getFeedback());
                                             feedbackCard.setCardBackgroundColor(getColor(R.color.error_light));
                                             tvFeedbackText.setTextColor(getColor(R.color.error_red));
                                             tvScore.setTextColor(getColor(R.color.error_red));
-                                            selectedAnswer = result.getRecognizedText(); // Incorrect
-                                            selectedAnswerLetter = "INCORRECT";
+                                            soundEffectsHelper.playError();
                                         }
 
                                         // Reset button
@@ -623,11 +629,64 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
                                         btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
 
-                                        // Enable continue button
-                                        btnContinue.setEnabled(true);
-                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
-                                                PlacementTestActivity.this, R.anim.bounce);
-                                        btnContinue.startAnimation(bounceAnim);
+                                        // Submit pronunciation result to placement scoring system
+                                        selectedAnswer = result.getRecognizedText();
+                                        selectedAnswerLetter = accuracy + "% - " + result.getRecognizedText();
+
+                                        // Submit to adaptive helper for IRT scoring
+                                        final int finalResponseTime = responseTime;
+                                        final boolean finalIsCorrect = isCorrect;
+
+                                        adaptiveHelper.submitAnswer(
+                                            currentQuestion.getQuestionId(),
+                                            selectedAnswerLetter,
+                                            isCorrect,
+                                            responseTime,
+                                            new AdaptiveQuestionHelper.AnswerCallback() {
+                                                @Override
+                                                public void onSuccess(SubmitAnswerResponse response) {
+                                                    runOnUiThread(() -> {
+                                                        // Update IRT engine with result
+                                                        irtEngine.updateTheta(currentQuestion, finalIsCorrect);
+
+                                                        // Sync theta from API
+                                                        if (response.getFeedback() != null) {
+                                                            double apiTheta = response.getFeedback().getNewThetaEstimate();
+                                                            irtEngine.setTheta(apiTheta);
+                                                        }
+
+                                                        // Mark that answer has been submitted
+                                                        answerAlreadySubmitted = true;
+
+                                                        // Enable continue button
+                                                        btnContinue.setEnabled(true);
+                                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                                                PlacementTestActivity.this, R.anim.bounce);
+                                                        btnContinue.startAnimation(bounceAnim);
+                                                    });
+                                                }
+
+                                                @Override
+                                                public void onError(String error) {
+                                                    runOnUiThread(() -> {
+                                                        // Log error but continue - pronunciation was already evaluated
+                                                        android.util.Log.e("PlacementTest", "Error submitting pronunciation answer: " + error);
+
+                                                        // Update IRT engine locally
+                                                        irtEngine.updateTheta(currentQuestion, finalIsCorrect);
+
+                                                        // Mark that answer has been submitted
+                                                        answerAlreadySubmitted = true;
+
+                                                        // Enable continue button
+                                                        btnContinue.setEnabled(true);
+                                                        android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                                                                PlacementTestActivity.this, R.anim.bounce);
+                                                        btnContinue.startAnimation(bounceAnim);
+                                                    });
+                                                }
+                                            }
+                                        );
                                     });
                                 }
 
