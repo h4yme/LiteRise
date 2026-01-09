@@ -219,34 +219,14 @@ $apiResponseJSON = json_encode([
 
 // Record pronunciation score in database
 try {
-    // First, create a StudentResponse record to get a valid ResponseID
-    $insertResponseStmt = $conn->prepare("
-        INSERT INTO dbo.StudentResponses
-        (StudentID, ItemID, SessionID, AssessmentType, SelectedAnswer, IsCorrect,
-         StudentThetaAtTime, ItemDifficulty, QuestionNumber, ResponseTime)
-        VALUES (?, ?, ?, 'Pronunciation', ?, ?, 0.0, ?, 1, 0)
-    ");
+    // Note: We don't create a StudentResponse here because PlacementTestActivity
+    // will call submit_answer.php which handles that. We just store the
+    // detailed pronunciation metrics with a temporary ResponseID.
+    $actualResponseID = $responseID; // Use the temporary ID passed from the app
 
-    $insertResponseStmt->execute([
-        $studentID,
-        $itemID,
-        $responseID, // Use the temporary ID as SessionID
-        $recognizedText, // SelectedAnswer
-        $passed ? 1 : 0, // IsCorrect based on pronunciation pass/fail
-        $itemDifficulty // ItemDifficulty from AssessmentItems
-    ]);
+    error_log("DEBUG: Recording pronunciation score with ResponseID: " . $actualResponseID);
 
-    // Get the last inserted ID using PDO
-    $actualResponseID = (int)$conn->lastInsertId();
-
-    if ($actualResponseID === 0) {
-        error_log("ERROR: Failed to get lastInsertId after StudentResponse insert");
-        throw new Exception("Failed to create StudentResponse record");
-    }
-
-    error_log("DEBUG: Created StudentResponse with ID: " . $actualResponseID);
-
-    // Now record the pronunciation score with the valid ResponseID
+    // Record the pronunciation score with detailed metrics
     $stmt = $conn->prepare("EXEC dbo.SP_RecordPronunciationScore
         @ResponseID = ?,
         @StudentID = ?,
