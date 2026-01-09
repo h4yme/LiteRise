@@ -40,6 +40,12 @@
 require_once __DIR__ . '/src/db.php';
 require_once __DIR__ . '/src/auth.php';
 
+// Google Cloud Speech-to-Text API imports
+use Google\Cloud\Speech\V1\SpeechClient;
+use Google\Cloud\Speech\V1\RecognitionAudio;
+use Google\Cloud\Speech\V1\RecognitionConfig;
+use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
+
 // Require authentication
 $authUser = requireAuth();
 
@@ -108,11 +114,6 @@ $category = $item['Category'] ?? 'Oral Language';
 // =============================================
 try {
     require_once __DIR__ . '/vendor/autoload.php'; // Google Cloud PHP SDK
-
-    use Google\Cloud\Speech\V1\SpeechClient;
-    use Google\Cloud\Speech\V1\RecognitionAudio;
-    use Google\Cloud\Speech\V1\RecognitionConfig;
-    use Google\Cloud\Speech\V1\RecognitionConfig\AudioEncoding;
 
     // Check credentials file exists
     $credentialsPath = __DIR__ . '/google-cloud-credentials.json';
