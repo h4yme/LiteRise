@@ -194,6 +194,7 @@ try {
 
  */
 
+if (!function_exists('sendResponse')) {
 function sendResponse($data, $statusCode = 200) {
 
     http_response_code($statusCode);
@@ -215,6 +216,7 @@ function sendResponse($data, $statusCode = 200) {
     exit;
 
 }
+}
 
  
 
@@ -232,6 +234,7 @@ function sendResponse($data, $statusCode = 200) {
 
  */
 
+if (!function_exists('sendError')) {
 function sendError($message, $statusCode = 400, $details = null) {
 
     http_response_code($statusCode);
@@ -263,6 +266,7 @@ function sendError($message, $statusCode = 400, $details = null) {
     exit;
 
 }
+}
 
  
 
@@ -280,6 +284,7 @@ function sendError($message, $statusCode = 400, $details = null) {
 
  */
 
+if (!function_exists('validateRequired')) {
 function validateRequired($data, $requiredFields) {
 
     $missing = [];
@@ -309,6 +314,7 @@ function validateRequired($data, $requiredFields) {
     return true;
 
 }
+}
 
  
 
@@ -322,6 +328,7 @@ function validateRequired($data, $requiredFields) {
 
  */
 
+if (!function_exists('getJsonInput')) {
 function getJsonInput() {
 
     $input = file_get_contents("php://input");
@@ -341,6 +348,7 @@ function getJsonInput() {
     return $data ?? [];
 
 }
+}
 
  
 
@@ -356,10 +364,12 @@ function getJsonInput() {
 
  */
 
+if (!function_exists('sanitizeInput')) {
 function sanitizeInput($input) {
 
     return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
 
+}
 }
 
  
@@ -376,10 +386,12 @@ function sanitizeInput($input) {
 
  */
 
+if (!function_exists('isValidEmail')) {
 function isValidEmail($email) {
 
     return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
 
+}
 }
 
  
@@ -398,6 +410,7 @@ function isValidEmail($email) {
 
  */
 
+if (!function_exists('logActivity')) {
 function logActivity($studentID, $activityType, $activityDetails = '') {
 
     global $conn;
@@ -425,6 +438,7 @@ function logActivity($studentID, $activityType, $activityDetails = '') {
     }
 
 }
+}
 
  
 
@@ -438,6 +452,7 @@ function logActivity($studentID, $activityType, $activityDetails = '') {
 
  */
 
+if (!function_exists('isDatabaseConnected')) {
 function isDatabaseConnected() {
 
     global $conn;
@@ -456,6 +471,7 @@ function isDatabaseConnected() {
 
     }
 
+}
 }
 
 ?>
