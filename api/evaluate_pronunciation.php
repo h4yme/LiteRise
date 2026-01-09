@@ -136,8 +136,23 @@ try {
     $audio = (new RecognitionAudio())->setContent($audioContent);
 
     // Create speech context with phrase hints to improve recognition
+    // Add phonetic variations to help with difficult words like "knife"
+    $phraseHints = [$targetPronunciation];
+
+    // Add common phonetic variations for better recognition
+    // For "knife" add "nife", for "write" add "rite", etc.
+    $phonetic = preg_replace('/^kn/', 'n', $targetPronunciation); // knife -> nife
+    $phonetic2 = preg_replace('/^wr/', 'r', $targetPronunciation); // write -> rite
+    if ($phonetic !== $targetPronunciation) {
+        $phraseHints[] = $phonetic;
+    }
+    if ($phonetic2 !== $targetPronunciation) {
+        $phraseHints[] = $phonetic2;
+    }
+
     $speechContext = (new SpeechContext())
-        ->setPhrases([$targetPronunciation]);
+        ->setPhrases($phraseHints)
+        ->setBoost(20.0); // Strong boost for expected words
 
     $config = (new RecognitionConfig())
         ->setEncoding(AudioEncoding::AMR) // 3GP uses AMR-NB encoding
@@ -145,8 +160,9 @@ try {
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
         ->setSpeechContexts([$speechContext]) // Help API expect this word
-        ->setModel('default')
-        ->setMaxAlternatives(1);
+        ->setModel('phone_call') // Optimized for low-quality audio like phone calls
+        ->setUseEnhanced(true) // Use enhanced model for better accuracy
+        ->setMaxAlternatives(3); // Get top 3 alternatives to check against target
 
     // Perform speech recognition
     error_log("INFO: Sending audio to Google Cloud Speech API...");
@@ -155,22 +171,48 @@ try {
     $recognizedText = '';
     $confidence = 0.0;
     $pronunciationScore = 0.0;
+    $bestMatch = null;
+    $bestScore = 0.0;
 
-    // Process results
+    // Process results - check all alternatives for best match
     $results = $response->getResults();
     if (count($results) > 0) {
-        $alternative = $results[0]->getAlternatives()[0];
-        $recognizedText = strtolower(trim($alternative->getTranscript()));
-        $confidence = $alternative->getConfidence();
+        $alternatives = $results[0]->getAlternatives();
 
-        error_log("INFO: Speech recognition result - Recognized: '$recognizedText', Target: '$targetPronunciation', Confidence: " . $confidence);
+        error_log("INFO: Checking " . count($alternatives) . " speech alternatives");
 
-        // Calculate pronunciation score based on text match and confidence
-        $pronunciationScore = calculatePronunciationScore(
-            $recognizedText,
-            $targetPronunciation,
-            $confidence
-        );
+        // Check each alternative to find the best match to target word
+        foreach ($alternatives as $idx => $alternative) {
+            $altText = strtolower(trim($alternative->getTranscript()));
+            $altConfidence = $alternative->getConfidence();
+
+            error_log("INFO: Alternative " . ($idx + 1) . ": '$altText' (confidence: " . $altConfidence . ")");
+
+            // Calculate score for this alternative
+            $altScore = calculatePronunciationScore(
+                $altText,
+                $targetPronunciation,
+                $altConfidence
+            );
+
+            // Keep the best matching alternative
+            if ($altScore > $bestScore || $bestMatch === null) {
+                $bestScore = $altScore;
+                $bestMatch = [
+                    'text' => $altText,
+                    'confidence' => $altConfidence,
+                    'score' => $altScore
+                ];
+            }
+        }
+
+        if ($bestMatch !== null) {
+            $recognizedText = $bestMatch['text'];
+            $confidence = $bestMatch['confidence'];
+            $pronunciationScore = $bestMatch['score'];
+
+            error_log("INFO: Best match selected - Recognized: '$recognizedText', Target: '$targetPronunciation', Score: " . $pronunciationScore);
+        }
     } else {
         // No speech detected
         error_log("WARNING: No speech detected in audio");
