@@ -42,15 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 
 // Load environment variables from .env file
 
-function loadEnv($path) {
+if (!function_exists('loadEnv')) {
+    function loadEnv($path) {
 
-    if (!file_exists($path)) {
+        if (!file_exists($path)) {
 
-        error_log("Warning: .env file not found at $path");
+            error_log("Warning: .env file not found at $path");
 
-        return;
+            return;
 
-    }
+        }
 
  
 
@@ -98,9 +99,10 @@ function loadEnv($path) {
 
     }
 
+    }
 }
 
- 
+
 
 // Load environment variables
 
