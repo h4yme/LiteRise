@@ -1,0 +1,49 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="100dp"
+    android:viewportWidth="120"
+    android:viewportHeight="100">
+
+    <!-- Sky/Background -->
+    <path
+        android:pathData="M0,0 L120,0 L120,100 L0,100 Z"
+        android:fillColor="#00000000"/>
+
+    <!-- Tree 1 -->
+    <path
+        android:pathData="M20,70 L25,50 L30,70 Z"
+        android:fillColor="#22C55E"/>
+    <path
+        android:pathData="M23,70 L23,80 L27,80 L27,70 Z"
+        android:fillColor="#92400E"/>
+
+    <!-- Tree 2 -->
+    <path
+        android:pathData="M40,65 L46,45 L52,65 Z"
+        android:fillColor="#10B981"/>
+    <path
+        android:pathData="M44,65 L44,78 L48,78 L48,65 Z"
+        android:fillColor="#92400E"/>
+
+    <!-- Tree 3 -->
+    <path
+        android:pathData="M70,68 L76,48 L82,68 Z"
+        android:fillColor="#34D399"/>
+    <path
+        android:pathData="M74,68 L74,80 L78,80 L78,68 Z"
+        android:fillColor="#92400E"/>
+
+    <!-- House -->
+    <path
+        android:pathData="M90,60 L100,50 L110,60 L110,80 L90,80 Z"
+        android:fillColor="#F59E0B"/>
+    <path
+        android:pathData="M88,60 L100,48 L112,60 Z"
+        android:fillColor="#DC2626"/>
+
+    <!-- Road/Path -->
+    <path
+        android:pathData="M0,90 Q60,85 120,90 L120,100 L0,100 Z"
+        android:fillColor="#A3A3A3"/>
+
+</vector>
