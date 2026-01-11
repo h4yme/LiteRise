@@ -204,6 +204,7 @@ public interface ApiService {
             @Part("student_id") okhttp3.RequestBody studentId,
             @Part("item_id") okhttp3.RequestBody itemId,
             @Part("response_id") okhttp3.RequestBody responseId,
+            @Part("session_id") okhttp3.RequestBody sessionId,
             @Part("target_word") okhttp3.RequestBody targetWord,
             @Part okhttp3.MultipartBody.Part audioFile
     );

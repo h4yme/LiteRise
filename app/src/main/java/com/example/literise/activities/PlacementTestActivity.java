@@ -571,11 +571,12 @@ public class PlacementTestActivity extends AppCompatActivity {
                         int itemId = currentQuestion.getQuestionId();
                         int responseId = (int) (System.currentTimeMillis() / 1000); // Temporary response ID
 
-                        android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", Word: " + wordToPronounce);
+                        android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", SessionID: " + currentSessionId + ", Word: " + wordToPronounce);
 
                         pronunciationHelper.evaluatePronunciation(
                             itemId,
                             responseId,
+                            currentSessionId, // Pass the actual placement test session ID
                             wordToPronounce.toLowerCase(),
                             audioFile,
                             new PronunciationHelper.EvaluationCallback() {

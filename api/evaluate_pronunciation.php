@@ -54,10 +54,11 @@ $authUser = requireAuth();
 $studentID = isset($_POST['student_id']) ? (int)$_POST['student_id'] : 0;
 $itemID = isset($_POST['item_id']) ? (int)$_POST['item_id'] : 0;
 $responseID = isset($_POST['response_id']) ? (int)$_POST['response_id'] : 0;
+$sessionID = isset($_POST['session_id']) ? (int)$_POST['session_id'] : 0;
 $targetWord = isset($_POST['target_word']) ? sanitizeInput($_POST['target_word']) : '';
 
 // Validate required fields
-if (!$studentID || !$itemID || !$responseID || !$targetWord) {
+if (!$studentID || !$itemID || !$targetWord) {
     sendError('Missing required fields', 400);
 }
 
@@ -273,7 +274,7 @@ try {
     $insertResponseStmt->execute([
         $studentID,
         $itemID,
-        1, // SessionID = 1 for now (will be updated by submit_answer if needed)
+        $sessionID, // SessionID from placement test
         $recognizedText, // SelectedAnswer = what was recognized
         $passed ? 1 : 0, // IsCorrect based on pronunciation pass/fail
         $itemDifficulty // ItemDifficulty from AssessmentItems
