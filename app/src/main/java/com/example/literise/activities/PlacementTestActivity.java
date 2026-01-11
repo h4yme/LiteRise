@@ -822,16 +822,30 @@ public class PlacementTestActivity extends AppCompatActivity {
                                 tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
 
                                 List<String> options = currentQuestion.getOptions();
+                                android.util.Log.d("PlacementTest", "Reading question has " + options.size() + " options");
                                 if (options.size() >= 4) {
                                     btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
                                     btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
                                     btnAnswer3.setText(options.get(2));
+                                    btnAnswer3.setVisibility(View.VISIBLE);
                                     btnAnswer4.setText(options.get(3));
                                     btnAnswer4.setVisibility(View.VISIBLE);
                                 } else if (options.size() >= 3) {
                                     btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
                                     btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
                                     btnAnswer3.setText(options.get(2));
+                                    btnAnswer3.setVisibility(View.VISIBLE);
+                                    btnAnswer4.setVisibility(View.GONE);
+                                } else if (options.size() >= 2) {
+                                    btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
+                                    btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
+                                    btnAnswer3.setVisibility(View.GONE);
                                     btnAnswer4.setVisibility(View.GONE);
                                 }
 
