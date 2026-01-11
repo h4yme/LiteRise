@@ -169,7 +169,7 @@ public class PronunciationHelper {
     /**
      * Evaluate pronunciation by sending audio to API
      */
-    public void evaluatePronunciation(int itemId, int responseId, String targetWord,
+    public void evaluatePronunciation(int itemId, int responseId, int sessionId, String targetWord,
                                       File audioFile, EvaluationCallback callback) {
         int studentId = sessionManager.getStudentId();
 
@@ -190,6 +190,7 @@ public class PronunciationHelper {
         RequestBody studentIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(studentId));
         RequestBody itemIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(itemId));
         RequestBody responseIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(responseId));
+        RequestBody sessionIdBody = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(sessionId));
         RequestBody targetWordBody = RequestBody.create(MediaType.parse("text/plain"), targetWord);
 
         RequestBody audioRequestBody = RequestBody.create(MediaType.parse("audio/3gp"), audioFile);
@@ -199,7 +200,7 @@ public class PronunciationHelper {
                 audioRequestBody
         );
 
-        Log.d(TAG, "Evaluating pronunciation - StudentID: " + studentId + ", Item: " + itemId + ", Target: " + targetWord);
+        Log.d(TAG, "Evaluating pronunciation - StudentID: " + studentId + ", Item: " + itemId + ", Session: " + sessionId + ", Target: " + targetWord);
         Log.d(TAG, "Making API call to evaluate_pronunciation.php...");
 
         // Make API call
@@ -207,6 +208,7 @@ public class PronunciationHelper {
                 studentIdBody,
                 itemIdBody,
                 responseIdBody,
+                sessionIdBody,
                 targetWordBody,
                 audioPart
         );

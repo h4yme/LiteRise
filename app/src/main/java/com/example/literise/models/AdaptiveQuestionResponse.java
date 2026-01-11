@@ -60,6 +60,9 @@ public class AdaptiveQuestionResponse {
         @SerializedName("question_type")
         private String questionType;
 
+        @SerializedName("reading_passage")
+        private String readingPassage;
+
         @SerializedName("option_a")
         private String optionA;
 
@@ -104,6 +107,10 @@ public class AdaptiveQuestionResponse {
 
         public String getQuestionType() {
             return questionType;
+        }
+
+        public String getReadingPassage() {
+            return readingPassage;
         }
 
         public String getOptionA() {

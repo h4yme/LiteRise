@@ -84,12 +84,12 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     // Question tracking
     private int currentQuestionNumber = 1;
-    private int totalQuestions = 25;
+    private int totalQuestions = 28;
     private int currentCategory = 1;
     private int previousCategory = 0;
     private String selectedAnswer = "";
     private String selectedAnswerLetter = ""; // A, B, C, or D
-    private int questionsPerCategory = 6; // Approximate
+    private int questionsPerCategory = 7; // 7 questions per category
     private long startTime;
     private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
@@ -413,6 +413,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         question.setSubcategory(apiQuestion.getSubcategory() != null ? apiQuestion.getSubcategory() : "");
         question.setQuestionText(apiQuestion.getQuestionText());
         question.setQuestionType(apiQuestion.getQuestionType());
+        question.setReadingPassage(apiQuestion.getReadingPassage()); // Set reading passage for comprehension questions
         question.setDifficulty(apiQuestion.getDifficulty());
 
         // Set answer options
@@ -571,11 +572,12 @@ public class PlacementTestActivity extends AppCompatActivity {
                 int itemId = currentQuestion.getQuestionId();
                 int responseId = (int) (System.currentTimeMillis() / 1000); // Temporary response ID
 
-                android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", Word: " + wordToPronounce);
+                android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", SessionID: " + currentSessionId + ", Word: " + wordToPronounce);
 
                 pronunciationHelper.evaluatePronunciation(
                         itemId,
                         responseId,
+                        currentSessionId, // Pass the actual placement test session ID
                         wordToPronounce.toLowerCase(),
                         audioFile,
                         new PronunciationHelper.EvaluationCallback() {
@@ -584,44 +586,63 @@ public class PlacementTestActivity extends AppCompatActivity {
                                 runOnUiThread(() -> {
                                     isRecording[0] = false;
 
-                                    // Mark answer as already submitted (API call already made)
-                                    answerAlreadySubmitted = true;
+                                    // Calculate response time
+                                    int responseTime = 0;
+                                    if (questionStartTime > 0) {
+                                        responseTime = (int) ((System.currentTimeMillis() - questionStartTime) / 1000);
+                                    }
 
                                     // Show feedback
                                     feedbackCard.setVisibility(View.VISIBLE);
                                     int accuracy = result.getOverallAccuracy();
                                     tvScore.setText(accuracy + "% Accuracy");
 
-                                    if (result.isPassed() && accuracy >= 85) {
+                                    // Use isPassed() from API result - it uses the item's MinimumAccuracy threshold
+                                    boolean isCorrect = result.isPassed();
+
+                                    if (accuracy >= 85) {
+                                        // Excellent pronunciation (85%+)
                                         tvFeedbackIcon.setText("🎉");
                                         tvFeedbackText.setText(result.getFeedback());
                                         feedbackCard.setCardBackgroundColor(getColor(R.color.success_light));
                                         tvFeedbackText.setTextColor(getColor(R.color.success_green));
                                         tvScore.setTextColor(getColor(R.color.success_green));
-                                        selectedAnswer = result.getRecognizedText(); // Store recognized text
-                                        selectedAnswerLetter = "CORRECT";
-                                    } else if (result.isPassed() && accuracy >= 65) {
+                                        soundEffectsHelper.playSuccess();
+                                    } else if (isCorrect) {
+                                        // Good pronunciation (passed threshold but < 85%)
                                         tvFeedbackIcon.setText("👍");
                                         tvFeedbackText.setText(result.getFeedback());
                                         feedbackCard.setCardBackgroundColor(getColor(R.color.warning_light));
                                         tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
                                         tvScore.setTextColor(getColor(R.color.warning_orange));
-                                        selectedAnswer = result.getRecognizedText(); // Partial credit
-                                        selectedAnswerLetter = "PARTIAL";
+                                        soundEffectsHelper.playSuccess();
                                     } else {
+                                        // Needs improvement (below threshold)
                                         tvFeedbackIcon.setText("🔄");
                                         tvFeedbackText.setText(result.getFeedback());
                                         feedbackCard.setCardBackgroundColor(getColor(R.color.error_light));
                                         tvFeedbackText.setTextColor(getColor(R.color.error_red));
                                         tvScore.setTextColor(getColor(R.color.error_red));
-                                        selectedAnswer = result.getRecognizedText(); // Incorrect
-                                        selectedAnswerLetter = "INCORRECT";
+                                        soundEffectsHelper.playError();
                                     }
 
                                     // Reset button
                                     tvRecordingStatus.setText("Tap to try again");
                                     tvRecordingStatus.setTextColor(getColor(R.color.text_secondary));
                                     btnMicrophone.setBackgroundTintList(getColorStateList(R.color.success_green));
+
+                                    // Note: evaluate_pronunciation.php already created the StudentResponse
+                                    // record and stored pronunciation metrics. We don't need to call
+                                    // submit_answer again. Just update local IRT and enable continue.
+
+                                    selectedAnswer = result.getRecognizedText();
+                                    selectedAnswerLetter = accuracy + "% - " + result.getRecognizedText();
+
+                                    // Update IRT engine locally with result
+                                    irtEngine.updateTheta(currentQuestion, isCorrect);
+
+                                    // Mark that answer has been submitted
+                                    answerAlreadySubmitted = true;
 
                                     // Enable continue button
                                     btnContinue.setEnabled(true);
