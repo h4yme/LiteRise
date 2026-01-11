@@ -905,8 +905,19 @@ public class PlacementTestActivity extends AppCompatActivity {
                     this, R.anim.option_pop);
             v.startAnimation(popAnim);
 
-            // Store answer
+            // Store answer text and letter
             selectedAnswer = selectedBtn.getText().toString();
+
+            // Determine which button was clicked and set the letter
+            if (v.getId() == R.id.btnAnswer1) {
+                selectedAnswerLetter = "A";
+            } else if (v.getId() == R.id.btnAnswer2) {
+                selectedAnswerLetter = "B";
+            } else if (v.getId() == R.id.btnAnswer3) {
+                selectedAnswerLetter = "C";
+            } else if (v.getId() == R.id.btnAnswer4) {
+                selectedAnswerLetter = "D";
+            }
 
             // Enable continue button
             btnContinue.setEnabled(true);
