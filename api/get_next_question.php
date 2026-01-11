@@ -112,6 +112,7 @@ try {
             'skill_area' => $question['SkillArea'] ?? null,
             'question_text' => $question['QuestionText'],
             'question_type' => $question['QuestionType'],
+            'reading_passage' => $question['ReadingPassage'] ?? null,
             'option_a' => $question['OptionA'],
             'option_b' => $question['OptionB'],
             'option_c' => $question['OptionC'],

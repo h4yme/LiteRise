@@ -84,12 +84,12 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     // Question tracking
     private int currentQuestionNumber = 1;
-    private int totalQuestions = 25;
+    private int totalQuestions = 28;
     private int currentCategory = 1;
     private int previousCategory = 0;
     private String selectedAnswer = "";
     private String selectedAnswerLetter = ""; // A, B, C, or D
-    private int questionsPerCategory = 6; // Approximate
+    private int questionsPerCategory = 7; // 7 questions per category
     private long startTime;
     private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
@@ -413,6 +413,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         question.setSubcategory(apiQuestion.getSubcategory() != null ? apiQuestion.getSubcategory() : "");
         question.setQuestionText(apiQuestion.getQuestionText());
         question.setQuestionType(apiQuestion.getQuestionType());
+        question.setReadingPassage(apiQuestion.getReadingPassage()); // Set reading passage for comprehension questions
         question.setDifficulty(apiQuestion.getDifficulty());
 
         // Set answer options
