@@ -771,6 +771,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         MaterialButton btnAnswer1 = questionView.findViewById(R.id.btnAnswer1);
         MaterialButton btnAnswer2 = questionView.findViewById(R.id.btnAnswer2);
         MaterialButton btnAnswer3 = questionView.findViewById(R.id.btnAnswer3);
+        MaterialButton btnAnswer4 = questionView.findViewById(R.id.btnAnswer4);
 
         // Set reading text
         String readingText = currentQuestion.getReadingPassage();
@@ -821,10 +822,17 @@ public class PlacementTestActivity extends AppCompatActivity {
                                 tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
 
                                 List<String> options = currentQuestion.getOptions();
-                                if (options.size() >= 3) {
+                                if (options.size() >= 4) {
                                     btnAnswer1.setText(options.get(0));
                                     btnAnswer2.setText(options.get(1));
                                     btnAnswer3.setText(options.get(2));
+                                    btnAnswer4.setText(options.get(3));
+                                    btnAnswer4.setVisibility(View.VISIBLE);
+                                } else if (options.size() >= 3) {
+                                    btnAnswer1.setText(options.get(0));
+                                    btnAnswer2.setText(options.get(1));
+                                    btnAnswer3.setText(options.get(2));
+                                    btnAnswer4.setVisibility(View.GONE);
                                 }
 
                                 // Scroll to show comprehension card
@@ -884,6 +892,8 @@ public class PlacementTestActivity extends AppCompatActivity {
             btnAnswer2.setTextColor(getColor(R.color.text_primary));
             btnAnswer3.setBackgroundTintList(getColorStateList(android.R.color.white));
             btnAnswer3.setTextColor(getColor(R.color.text_primary));
+            btnAnswer4.setBackgroundTintList(getColorStateList(android.R.color.white));
+            btnAnswer4.setTextColor(getColor(R.color.text_primary));
 
             // Highlight selected
             MaterialButton selectedBtn = (MaterialButton) v;
@@ -908,6 +918,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnAnswer1.setOnClickListener(answerClickListener);
         btnAnswer2.setOnClickListener(answerClickListener);
         btnAnswer3.setOnClickListener(answerClickListener);
+        btnAnswer4.setOnClickListener(answerClickListener);
 
         // Hide Leo hint for reading questions
         leoHintContainer.setVisibility(View.GONE);

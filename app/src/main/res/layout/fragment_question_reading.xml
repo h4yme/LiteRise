@@ -207,6 +207,20 @@
                     android:textColor="#2C3E50"
                     android:textSize="14sp"
                     app:strokeColor="#2C3E50"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAnswer4"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="A box"
+                    android:textAllCaps="false"
+                    android:textColor="#2C3E50"
+                    android:textSize="14sp"
+                    app:strokeColor="#2C3E50"
                     app:cornerRadius="12dp" />
 
             </LinearLayout>
