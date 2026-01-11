@@ -1,115 +1,75 @@
 # LiteRise ML Training Pipeline
 
-This directory contains Python scripts to train machine learning models for the LiteRise placement test using real-world educational assessment data.
+This directory contains the machine learning training pipeline for the LiteRise placement test.
 
 ## Overview
 
-The pipeline downloads public educational datasets, trains placement prediction models, and exports them to TensorFlow Lite format for Android integration.
+**Goal:** Train a neural network to predict student grade level placement based on assessment responses.
 
-## Setup
-
-```bash
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
+**Data Source:** Educational assessment data from multiple public sources
+**Model Type:** TensorFlow neural network exported to TensorFlow Lite
+**Deployment:** Android app (.tflite model)
 
 ## Pipeline Steps
 
-### 1. Data Collection (`collect_data.py`)
-Downloads and combines multiple educational assessment datasets:
-- NAEP (National Assessment of Educational Progress) data
-- TIMSS (Trends in International Mathematics and Science Study)
-- Synthetic data based on IRT parameters
+1. **Data Collection** (`collect_data.py`)
+   - Fetches educational assessment data from web sources
+   - Combines multiple datasets
+   - Saves to `data/training_data.csv`
 
-### 2. Data Preprocessing (`preprocess_data.py`)
-Cleans and prepares data:
-- Feature engineering
-- Normalization
-- Train/validation/test split
+2. **Training** (`train_model.py`)
+   - Loads and preprocesses data
+   - Trains neural network model
+   - Evaluates performance
+   - Saves model checkpoints
 
-### 3. Model Training (`train_model.py`)
-Trains multiple models:
-- Neural network for placement prediction
-- Random forest for skill gap analysis
-- Ensemble model combining both
+3. **Export** (`export_to_tflite.py`)
+   - Converts TensorFlow model to TensorFlow Lite
+   - Optimizes for mobile deployment
+   - Saves as `placement_model.tflite`
 
-### 4. Model Evaluation (`evaluate_model.py`)
-Tests model performance:
-- Accuracy, precision, recall
-- Confusion matrix
-- ROC curves
+4. **Deployment** (`../app/src/main/ml/`)
+   - Copy .tflite file to Android assets
+   - Use TensorFlow Lite interpreter in app
 
-### 5. Export to TFLite (`export_tflite.py`)
-Converts trained model to TensorFlow Lite:
-- Quantization for mobile optimization
-- Model compression
-- Generates `.tflite` file for Android
-
-## Usage
+## Requirements
 
 ```bash
-# Run complete pipeline
-python train_pipeline.py
+pip install -r requirements.txt
+```
 
-# Or run individual steps
+## Quick Start
+
+```bash
+# Step 1: Collect data from web
 python collect_data.py
-python preprocess_data.py
+
+# Step 2: Train model
 python train_model.py
-python export_tflite.py
+
+# Step 3: Export to TensorFlow Lite
+python export_to_tflite.py
+
+# Step 4: Copy to Android
+cp placement_model.tflite ../app/src/main/assets/
 ```
 
-## Output
+## Model Features
 
-- `models/placement_model.h5` - Trained Keras model
-- `models/placement_model.tflite` - TensorFlow Lite model for Android
-- `models/model_metrics.json` - Performance metrics
-- `data/training_data.csv` - Collected training data
+**Input Features:**
+- Current theta estimate
+- Accuracy rate
+- Category-specific performance (4 categories)
+- Response time statistics
+- Question difficulty progression
+- Number of questions answered
 
-## Integration with Android
-
-Copy the `.tflite` file to:
-```
-app/src/main/assets/placement_model.tflite
-```
-
-The Android app will use both:
-1. Custom Java ML (PlacementMLPredictor.java) - immediate predictions
-2. TFLite model (trained here) - enhanced accuracy
+**Output:**
+- Grade level prediction (Grade 2, Low 3, Mid 3, High 3, Grade 4)
+- Confidence score (0-1)
 
 ## Data Sources
 
-- **NAEP Public Data**: https://nces.ed.gov/nationsreportcard/data/
-- **TIMSS**: https://timssandpirls.bc.edu/timss-landing.html
-- **Synthetic IRT Data**: Generated using research-validated parameters
-
-## Model Architecture
-
-```
-Input Features (12):
-- Current theta
-- Accuracy per category (4)
-- Response times
-- Difficulty progression
-- Category consistency
-- Question count
-
-Hidden Layers:
-- Dense(64, relu)
-- Dropout(0.3)
-- Dense(32, relu)
-- Dropout(0.2)
-
-Output:
-- Dense(5, softmax) - [Grade 2, Low 3, Mid 3, High 3, Grade 4]
-```
-
-## Performance Targets
-
-- Accuracy: >85%
-- Early prediction (after 15 questions): >80% accuracy
-- Model size: <5MB
-- Inference time: <50ms on mobile
+1. **NAEP Data Explorer** - National Assessment of Educational Progress
+2. **TIMSS Dataset** - Trends in International Mathematics and Science Study
+3. **Synthetic Data Generator** - For initial training when real data is limited
