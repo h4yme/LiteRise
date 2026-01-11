@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res/auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
-
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:orientation="vertical">
 
     <!-- Reading Card -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/readingPassageCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="#4ECDC4"
@@ -42,6 +38,7 @@
 
     <!-- Control Panel -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/controlPanelCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/white"
@@ -235,5 +232,3 @@
     </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>
-
-</ScrollView>

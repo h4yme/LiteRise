@@ -761,6 +761,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         }
 
         // Get UI elements
+        MaterialCardView readingPassageCard = questionView.findViewById(R.id.readingPassageCard);
+        MaterialCardView controlPanelCard = questionView.findViewById(R.id.controlPanelCard);
         TextView tvReadingText = questionView.findViewById(R.id.tvReadingText);
         TextView tvReadingStatus = questionView.findViewById(R.id.tvReadingStatus);
         FloatingActionButton btnPlay = questionView.findViewById(R.id.btnPlay);
@@ -818,6 +820,10 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                             // Show comprehension question
                             if (currentQuestion.getOptions() != null && !currentQuestion.getOptions().isEmpty()) {
+                                // Hide reading passage and controls to make room for all 4 answer buttons
+                                readingPassageCard.setVisibility(View.GONE);
+                                controlPanelCard.setVisibility(View.GONE);
+
                                 comprehensionCard.setVisibility(View.VISIBLE);
                                 tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
 
@@ -874,6 +880,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             btnPlay.setImageResource(R.drawable.ic_play);
             tvReadingStatus.setText("Tap play to start reading!");
             tvReadingStatus.setTextColor(getColor(R.color.text_secondary));
+
+            // Show reading passage and controls again
+            readingPassageCard.setVisibility(View.VISIBLE);
+            controlPanelCard.setVisibility(View.VISIBLE);
             comprehensionCard.setVisibility(View.GONE);
         });
 
