@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Selected state - Dark purple pill background -->
+    <!-- Selected state - Light purple pill background -->
     <item android:state_checked="true">
         <shape android:shape="rectangle">
-            <solid android:color="#5B21B6"/>
+            <solid android:color="#DDD6FE"/>
             <corners android:radius="20dp"/>
         </shape>
     </item>
