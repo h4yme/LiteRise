@@ -25,7 +25,6 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.LearningModule;
 import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -45,7 +44,10 @@ public class DashboardActivity extends BaseActivity {
     private ModuleAdapter moduleAdapter;
     private List<LearningModule> modules;
 
-    private BottomNavigationView bottomNavigation;
+    // Custom Bottom Navigation Views
+    private LinearLayout navHome, navModules, navProgress, navProfile;
+    private ImageView iconHome, iconModules, iconProgress, iconProfile;
+    private TextView labelHome, labelModules, labelProgress, labelProfile;
 
     // Tutorial views
 
@@ -128,11 +130,21 @@ public class DashboardActivity extends BaseActivity {
         // Setup RecyclerView
         rvModules.setLayoutManager(new LinearLayoutManager(this));
 
-        // Bottom Navigation
-        bottomNavigation = findViewById(R.id.bottomNavigation);
+        // Custom Bottom Navigation
+        navHome = findViewById(R.id.navHome);
+        navModules = findViewById(R.id.navModules);
+        navProgress = findViewById(R.id.navProgress);
+        navProfile = findViewById(R.id.navProfile);
 
-        // Set Visby font for bottom navigation
-        setBottomNavigationFont();
+        iconHome = findViewById(R.id.iconHome);
+        iconModules = findViewById(R.id.iconModules);
+        iconProgress = findViewById(R.id.iconProgress);
+        iconProfile = findViewById(R.id.iconProfile);
+
+        labelHome = findViewById(R.id.labelHome);
+        labelModules = findViewById(R.id.labelModules);
+        labelProgress = findViewById(R.id.labelProgress);
+        labelProfile = findViewById(R.id.labelProfile);
 
         // Tutorial views
 
@@ -168,29 +180,11 @@ public class DashboardActivity extends BaseActivity {
 
         btnSkip.setOnClickListener(v -> dismissTutorial());
 
-        // Bottom Navigation Listener
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                // Already on home, refresh
-                loadModulesFromPlacementResults();
-                return true;
-            } else if (itemId == R.id.nav_modules) {
-                // Navigate to modules list (future implementation)
-                Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
-                return false;
-            } else if (itemId == R.id.nav_progress) {
-                // Navigate to progress screen (future implementation)
-                Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
-                return false;
-            } else if (itemId == R.id.nav_profile) {
-                // Navigate to profile screen
-                openSettings();
-                return false;
-            }
-            return false;
-        });
+        // Custom Bottom Navigation Listeners
+        navHome.setOnClickListener(v -> selectNavItem(0));
+        navModules.setOnClickListener(v -> selectNavItem(1));
+        navProgress.setOnClickListener(v -> selectNavItem(2));
+        navProfile.setOnClickListener(v -> selectNavItem(3));
 
         // Show tutorial on first visit
 
@@ -199,25 +193,66 @@ public class DashboardActivity extends BaseActivity {
     }
 
     /**
-     * Set Visby font and smaller size for bottom navigation labels
+     * Handle navigation item selection
      */
-    private void setBottomNavigationFont() {
-        android.graphics.Typeface visby = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.visby_bold);
-        android.view.ViewGroup bottomNavView = (android.view.ViewGroup) bottomNavigation.getChildAt(0);
-        for (int i = 0; i < bottomNavView.getChildCount(); i++) {
-            android.view.View item = bottomNavView.getChildAt(i);
-            if (item instanceof android.view.ViewGroup) {
-                android.view.ViewGroup itemGroup = (android.view.ViewGroup) item;
-                for (int j = 0; j < itemGroup.getChildCount(); j++) {
-                    android.view.View child = itemGroup.getChildAt(j);
-                    if (child instanceof TextView) {
-                        TextView textView = (TextView) child;
-                        textView.setTypeface(visby);
-                        textView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12);
-                    }
-                }
-            }
+    private void selectNavItem(int position) {
+        // Reset all items
+        resetNavItems();
+
+        // Set selected item
+        switch (position) {
+            case 0: // Home
+                navHome.setBackgroundResource(R.drawable.nav_item_selected_bg);
+                iconHome.setColorFilter(getResources().getColor(R.color.purple_600));
+                labelHome.setVisibility(View.VISIBLE);
+                loadModulesFromPlacementResults();
+                break;
+
+            case 1: // Modules
+                navModules.setBackgroundResource(R.drawable.nav_item_selected_bg);
+                iconModules.setColorFilter(getResources().getColor(R.color.purple_600));
+                labelModules.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case 2: // Progress
+                navProgress.setBackgroundResource(R.drawable.nav_item_selected_bg);
+                iconProgress.setColorFilter(getResources().getColor(R.color.purple_600));
+                labelProgress.setVisibility(View.VISIBLE);
+                Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case 3: // Profile
+                navProfile.setBackgroundResource(R.drawable.nav_item_selected_bg);
+                iconProfile.setColorFilter(getResources().getColor(R.color.purple_600));
+                labelProfile.setVisibility(View.VISIBLE);
+                openSettings();
+                break;
         }
+    }
+
+    /**
+     * Reset all navigation items to unselected state
+     */
+    private void resetNavItems() {
+        // Reset backgrounds
+        navHome.setBackgroundResource(android.R.color.transparent);
+        navModules.setBackgroundResource(android.R.color.transparent);
+        navProgress.setBackgroundResource(android.R.color.transparent);
+        navProfile.setBackgroundResource(android.R.color.transparent);
+
+        // Reset icon colors to gray
+        int grayColor = getResources().getColor(R.color.gray_400);
+        iconHome.setColorFilter(grayColor);
+        iconModules.setColorFilter(grayColor);
+        iconProgress.setColorFilter(grayColor);
+        iconProfile.setColorFilter(grayColor);
+
+        // Hide all labels
+        labelHome.setVisibility(View.GONE);
+        labelModules.setVisibility(View.GONE);
+        labelProgress.setVisibility(View.GONE);
+        labelProfile.setVisibility(View.GONE);
     }
 
     private void loadUserData() {

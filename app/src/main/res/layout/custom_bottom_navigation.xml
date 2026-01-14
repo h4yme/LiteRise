@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/bg_bottom_nav"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:gravity="center"
+    android:weightSum="4">
+
+    <!-- Home -->
+    <LinearLayout
+        android:id="@+id/navHome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@drawable/nav_item_selected_bg"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/iconHome"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_home"
+            app:tint="#7C3AED"
+            android:contentDescription="Home"/>
+
+        <TextView
+            android:id="@+id/labelHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Home"
+            android:textSize="12sp"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/visby_bold"
+            android:layout_marginStart="6dp"
+            android:visibility="visible"/>
+    </LinearLayout>
+
+    <!-- Modules -->
+    <LinearLayout
+        android:id="@+id/navModules"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/iconModules"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_book"
+            app:tint="#9CA3AF"
+            android:contentDescription="Modules"/>
+
+        <TextView
+            android:id="@+id/labelModules"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Modules"
+            android:textSize="12sp"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/visby_bold"
+            android:layout_marginStart="6dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- Progress -->
+    <LinearLayout
+        android:id="@+id/navProgress"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/iconProgress"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_chart"
+            app:tint="#9CA3AF"
+            android:contentDescription="Progress"/>
+
+        <TextView
+            android:id="@+id/labelProgress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Progress"
+            android:textSize="12sp"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/visby_bold"
+            android:layout_marginStart="6dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+    <!-- Profile -->
+    <LinearLayout
+        android:id="@+id/navProfile"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp">
+
+        <ImageView
+            android:id="@+id/iconProfile"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/ic_user"
+            app:tint="#9CA3AF"
+            android:contentDescription="Profile"/>
+
+        <TextView
+            android:id="@+id/labelProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textSize="12sp"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/visby_bold"
+            android:layout_marginStart="6dp"
+            android:visibility="gone"/>
+    </LinearLayout>
+
+</LinearLayout>

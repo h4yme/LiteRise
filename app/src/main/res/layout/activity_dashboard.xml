@@ -13,7 +13,7 @@
         android:layout_height="0dp"
         android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -254,26 +254,11 @@
     </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <include
+        android:id="@+id/customBottomNav"
+        layout="@layout/custom_bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/bg_bottom_nav"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        app:elevation="8dp"
-        app:labelVisibilityMode="selected"
-        app:itemIconTint="@color/bottom_nav_color"
-        app:itemTextColor="@color/bottom_nav_color"
-        app:itemBackground="@drawable/bottom_nav_item_background"
-        app:itemPaddingTop="0dp"
-        app:itemPaddingBottom="0dp"
-        app:itemIconSize="22dp"
-        app:itemActiveIndicatorHeight="0dp"
-        app:itemActiveIndicatorWidth="0dp"
-        app:menu="@menu/bottom_navigation_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
