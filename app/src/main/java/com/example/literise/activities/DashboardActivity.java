@@ -14,19 +14,18 @@ import android.widget.ImageView;
 
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.literise.R;
-
+import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.database.SessionManager;
-
+import com.example.literise.models.LearningModule;
+import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
-
 import com.google.android.material.button.MaterialButton;
-
-import android.widget.LinearLayout;
-
 
 import java.util.List;
 
@@ -35,13 +34,21 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation;
+    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation, tvModuleSummary;
 
     private ImageView ivLeoMascot, ivSettings;
 
     private MaterialButton btnContinueLesson;
 
-    private android.widget.GridLayout gridModules;
+    private RecyclerView rvModules;
+    private ModuleAdapter moduleAdapter;
+    private List<LearningModule> modules;
+
+    // Custom Bottom Navigation Views
+    private LinearLayout navHome, navModules, navProgress, navProfile;
+    private ImageView iconHome, iconModules, iconProgress, iconProfile;
+    private TextView labelHome, labelModules, labelProgress, labelProfile;
+
     // Tutorial views
 
     private View tutorialOverlay;
@@ -90,7 +97,7 @@ public class DashboardActivity extends BaseActivity {
 
         loadUserData();
 
-        displayModules();
+        loadModulesFromPlacementResults();
 
         setupListeners();
 
@@ -110,13 +117,35 @@ public class DashboardActivity extends BaseActivity {
 
         tvMotivation = findViewById(R.id.tvMotivation);
 
+        tvModuleSummary = findViewById(R.id.tvModuleSummary);
+
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
 
         ivSettings = findViewById(R.id.ivSettings);
 
-        btnContinueLesson = findViewById(R.id.btnContinueLesson);
+       //btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
-        gridModules = findViewById(R.id.gridModules);
+        rvModules = findViewById(R.id.rvModules);
+
+        // Setup RecyclerView
+        rvModules.setLayoutManager(new LinearLayoutManager(this));
+
+        // Custom Bottom Navigation
+        navHome = findViewById(R.id.navHome);
+        navModules = findViewById(R.id.navModules);
+        navProgress = findViewById(R.id.navProgress);
+        navProfile = findViewById(R.id.navProfile);
+
+        iconHome = findViewById(R.id.iconHome);
+        iconModules = findViewById(R.id.iconModules);
+        iconProgress = findViewById(R.id.iconProgress);
+        iconProfile = findViewById(R.id.iconProfile);
+
+        labelHome = findViewById(R.id.labelHome);
+        labelModules = findViewById(R.id.labelModules);
+        labelProgress = findViewById(R.id.labelProgress);
+        labelProfile = findViewById(R.id.labelProfile);
+
         // Tutorial views
 
         tutorialOverlay = findViewById(R.id.tutorialOverlay);
@@ -139,7 +168,10 @@ public class DashboardActivity extends BaseActivity {
 
     private void setupListeners() {
 
-        btnContinueLesson.setOnClickListener(v -> continueLesson());
+        // Continue lesson button (optional, may not be in layout)
+        if (btnContinueLesson != null) {
+            btnContinueLesson.setOnClickListener(v -> continueLesson());
+        }
 
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
 
@@ -148,7 +180,11 @@ public class DashboardActivity extends BaseActivity {
 
         btnSkip.setOnClickListener(v -> dismissTutorial());
 
-
+        // Custom Bottom Navigation Listeners
+        navHome.setOnClickListener(v -> selectNavItem(0));
+        navModules.setOnClickListener(v -> selectNavItem(1));
+        navProgress.setOnClickListener(v -> selectNavItem(2));
+        navProfile.setOnClickListener(v -> selectNavItem(3));
 
         // Show tutorial on first visit
 
@@ -156,7 +192,108 @@ public class DashboardActivity extends BaseActivity {
 
     }
 
+    /**
+     * Handle navigation item selection with animation
+     */
+    private void selectNavItem(int position) {
+        // Reset all items with animation
+        resetNavItems();
 
+        // Set selected item with expanding animation
+        switch (position) {
+            case 0: // Home
+                animateNavSelection(navHome, iconHome, labelHome);
+                loadModulesFromPlacementResults();
+                break;
+
+            case 1: // Modules
+                animateNavSelection(navModules, iconModules, labelModules);
+                Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case 2: // Progress
+                animateNavSelection(navProgress, iconProgress, labelProgress);
+                Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case 3: // Profile
+                animateNavSelection(navProfile, iconProfile, labelProfile);
+                openSettings();
+                break;
+        }
+    }
+
+    /**
+     * Animate navigation item selection with expand effect
+     */
+    private void animateNavSelection(LinearLayout navItem, ImageView icon, TextView label) {
+        // Set background
+        navItem.setBackgroundResource(R.drawable.nav_item_selected_bg);
+
+        // Change icon color
+        icon.setColorFilter(getResources().getColor(R.color.purple_600));
+
+        // Show and animate label with scale and fade
+        label.setVisibility(View.VISIBLE);
+        label.setAlpha(0f);
+        label.setScaleX(0.8f);
+        label.setScaleY(0.8f);
+
+        label.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start();
+
+        // Animate pill background with scale
+        navItem.setScaleX(0.95f);
+        navItem.setScaleY(0.95f);
+        navItem.animate()
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(200)
+                .start();
+    }
+
+    /**
+     * Reset all navigation items to unselected state with fade out animation
+     */
+    private void resetNavItems() {
+        // Animate hide all labels
+        animateHideLabel(labelHome);
+        animateHideLabel(labelModules);
+        animateHideLabel(labelProgress);
+        animateHideLabel(labelProfile);
+
+        // Reset backgrounds
+        navHome.setBackgroundResource(android.R.color.transparent);
+        navModules.setBackgroundResource(android.R.color.transparent);
+        navProgress.setBackgroundResource(android.R.color.transparent);
+        navProfile.setBackgroundResource(android.R.color.transparent);
+
+        // Reset icon colors to gray
+        int grayColor = getResources().getColor(R.color.gray_400);
+        iconHome.setColorFilter(grayColor);
+        iconModules.setColorFilter(grayColor);
+        iconProgress.setColorFilter(grayColor);
+        iconProfile.setColorFilter(grayColor);
+    }
+
+    /**
+     * Animate hiding label with fade and scale
+     */
+    private void animateHideLabel(TextView label) {
+        if (label.getVisibility() == View.VISIBLE) {
+            label.animate()
+                    .alpha(0f)
+                    .scaleX(0.8f)
+                    .scaleY(0.8f)
+                    .setDuration(150)
+                    .withEndAction(() -> label.setVisibility(View.GONE))
+                    .start();
+        }
+    }
 
     private void loadUserData() {
 
@@ -180,178 +317,114 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d-Day Streak", currentStreak));
+        tvStreak.setText(String.format("%d Day", currentStreak));
 
-        tvBadges.setText(String.format("%d Badges", totalBadges));
-
-    }
-
-
-
-        /**
-
-     * Display 6 module cards ordered by priority (weakest to strongest)
-
-     * Simple frosted white cards matching DASHBOARD DESIGN.png
-
-     */
-
-    private void displayModules() {
-
-        gridModules.removeAllViews();
-
-
-
-        // Get modules ordered from weakest to strongest
-
-        List<String> orderedModules = priorityManager.getOrderedModules();
-
-
-
-        for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
-
-            String moduleName = orderedModules.get(i);
-
-
-
-            View moduleCard = LayoutInflater.from(this).inflate(
-
-                    R.layout.item_dashboard_module,
-
-                    gridModules,
-
-                    false
-
-            );
-
-
-
-            // Set module icon based on module type
-
-            ImageView ivModuleIcon = moduleCard.findViewById(R.id.ivModuleIcon);
-
-            ivModuleIcon.setImageResource(getModuleIcon(moduleName));
-
-
-
-            // Set module name
-
-            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
-
-            tvModuleName.setText(moduleName);
-
-
-
-            // Click listener to open module
-
-            final int moduleIndex = i;
-
-            moduleCard.setOnClickListener(v -> openModule(moduleName, moduleIndex));
-
-
-
-            gridModules.addView(moduleCard);
-
-        }
+        tvBadges.setText(String.format("%d Badges Earned", totalBadges));
 
     }
 
 
 
     /**
-
-     * Get the appropriate icon for each module
-
+     * Load modules based on placement test results
+     * Creates 8 Key Stage 1 modules ordered by priority (weakest first)
      */
+    private void loadModulesFromPlacementResults() {
+        // Get placement test results from session
+        double oralLanguageScore = session.getCategoryAccuracy("Oral Language");
+        double wordKnowledgeScore = session.getCategoryAccuracy("Word Knowledge");
+        double readingCompScore = session.getCategoryAccuracy("Reading Comprehension");
+        double languageStructScore = session.getCategoryAccuracy("Language Structure");
+        String placementLevel = session.getPlacementLevel();
 
-    private int getModuleIcon(String moduleName) {
-
-        switch (moduleName) {
-
-            case "Reading Comprehension":
-
-                return R.drawable.ic_book_reading;
-
-            case "Phonics & Pronunciation":
-
-                return R.drawable.ic_mic;
-
-            case "Vocabulary Building":
-
-                return R.drawable.ic_lightbulb;
-
-            case "Grammar & Syntax":
-
-                return R.drawable.ic_edit;
-
-            case "Reading Fluency":
-
-                return R.drawable.ic_timer;
-
-            case "Spelling & Writing":
-
-                return R.drawable.ic_pen;
-
-            default:
-
-                return R.drawable.ic_star; // Fallback icon
-
+        // If no placement test taken yet, use default values
+        if (oralLanguageScore == 0 && wordKnowledgeScore == 0 &&
+                readingCompScore == 0 && languageStructScore == 0) {
+            // Default values for new students
+            oralLanguageScore = 0.60;
+            wordKnowledgeScore = 0.55;
+            readingCompScore = 0.50;
+            languageStructScore = 0.65;
+            placementLevel = "Mid Grade 3";
         }
 
+        // Create modules using ModuleOrderingHelper
+        modules = ModuleOrderingHelper.createModulesFromPlacementResults(
+                oralLanguageScore,
+                wordKnowledgeScore,
+                readingCompScore,
+                languageStructScore
+        );
+
+        // Apply locking based on placement level
+        ModuleOrderingHelper.applyModuleLocking(modules, placementLevel);
+
+        // Debug: Log module count
+        android.util.Log.d("DashboardActivity", "Total modules created: " + modules.size());
+        for (int i = 0; i < modules.size(); i++) {
+            android.util.Log.d("DashboardActivity", "Module " + (i+1) + ": " + modules.get(i).getTitle());
+        }
+
+        // Update summary text
+        String summary = ModuleOrderingHelper.getModuleSummary(modules);
+        tvModuleSummary.setText("Modules prioritized by your needs • " + summary);
+
+        // Setup adapter with click listener
+        moduleAdapter = new ModuleAdapter(this, modules, module -> {
+            openModule(module);
+        });
+        rvModules.setAdapter(moduleAdapter);
+
+        // Force RecyclerView to recalculate height
+        rvModules.post(() -> rvModules.requestLayout());
     }
 
 
 
-    private void showLeoEncouragement() {
-
-        String[] encouragements = {
-
-                "You're doing great! Keep it up! 🌟",
-
-                "Learning is an adventure! Let's go! 🚀",
-
-                "Every step counts! You've got this! 💪",
-
-                "I believe in you! 🦁"
-
-        };
-
-        int randomIndex = (int) (Math.random() * encouragements.length);
-
-        android.widget.Toast.makeText(this, encouragements[randomIndex], android.widget.Toast.LENGTH_SHORT).show();
-
-    }
 
 
 
-    private void openModule(String moduleName, int priority) {
+    /**
+     * Open a learning module
+     */
+    private void openModule(LearningModule module) {
+        if (module.isLocked()) {
+            Toast.makeText(this,
+                    "Complete previous modules to unlock " + module.getTitle(),
+                    Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Intent intent = new Intent(this, ModuleLadderActivity.class);
-
-        intent.putExtra("module_name", moduleName);
-
-        intent.putExtra("priority", priority + 1);
-
+        intent.putExtra("module_id", module.getModuleId());
+        intent.putExtra("module_name", module.getTitle());
+        intent.putExtra("module_domain", module.getDomain());
+        intent.putExtra("module_level", module.getLevel());
+        intent.putExtra("priority", module.getPriorityOrder());
         startActivity(intent);
+    }
 
+    private void showLeoEncouragement() {
+        String[] encouragements = {
+                "You're doing great! Keep it up! 🌟",
+                "Learning is an adventure! Let's go! 🚀",
+                "Every step counts! You've got this! 💪",
+                "I believe in you! 🦁"
+        };
+        int randomIndex = (int) (Math.random() * encouragements.length);
+        Toast.makeText(this, encouragements[randomIndex], Toast.LENGTH_SHORT).show();
     }
 
 
 
     private void continueLesson() {
-
-        // TODO: Navigate to last incomplete lesson/module
-
-        android.widget.Toast.makeText(
-
-                this,
-
-                "Continue lesson feature coming soon!",
-
-                android.widget.Toast.LENGTH_SHORT
-
-        ).show();
-
+        // Get the highest priority unlocked module
+        LearningModule recommended = ModuleOrderingHelper.getRecommendedModule(modules);
+        if (recommended != null) {
+            openModule(recommended);
+        } else {
+            Toast.makeText(this, "No lessons available yet", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openSettings() {
@@ -562,7 +635,10 @@ public class DashboardActivity extends BaseActivity {
 
         loadUserData();
 
-        displayModules();
+        loadModulesFromPlacementResults();
+
+        // Always reset to Home tab when returning
+        selectNavItem(0);
 
     }
 
@@ -581,4 +657,3 @@ public class DashboardActivity extends BaseActivity {
     }
 
 }
-

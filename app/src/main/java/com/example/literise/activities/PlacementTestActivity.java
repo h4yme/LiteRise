@@ -761,6 +761,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         }
 
         // Get UI elements
+        MaterialCardView readingPassageCard = questionView.findViewById(R.id.readingPassageCard);
+        MaterialCardView controlPanelCard = questionView.findViewById(R.id.controlPanelCard);
         TextView tvReadingText = questionView.findViewById(R.id.tvReadingText);
         TextView tvReadingStatus = questionView.findViewById(R.id.tvReadingStatus);
         FloatingActionButton btnPlay = questionView.findViewById(R.id.btnPlay);
@@ -771,6 +773,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         MaterialButton btnAnswer1 = questionView.findViewById(R.id.btnAnswer1);
         MaterialButton btnAnswer2 = questionView.findViewById(R.id.btnAnswer2);
         MaterialButton btnAnswer3 = questionView.findViewById(R.id.btnAnswer3);
+        MaterialButton btnAnswer4 = questionView.findViewById(R.id.btnAnswer4);
 
         // Set reading text
         String readingText = currentQuestion.getReadingPassage();
@@ -817,14 +820,39 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                             // Show comprehension question
                             if (currentQuestion.getOptions() != null && !currentQuestion.getOptions().isEmpty()) {
+                                // Hide reading passage and controls to make room for all 4 answer buttons
+                                readingPassageCard.setVisibility(View.GONE);
+                                controlPanelCard.setVisibility(View.GONE);
+
                                 comprehensionCard.setVisibility(View.VISIBLE);
                                 tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
 
                                 List<String> options = currentQuestion.getOptions();
-                                if (options.size() >= 3) {
+                                android.util.Log.d("PlacementTest", "Reading question has " + options.size() + " options");
+                                if (options.size() >= 4) {
                                     btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
                                     btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
                                     btnAnswer3.setText(options.get(2));
+                                    btnAnswer3.setVisibility(View.VISIBLE);
+                                    btnAnswer4.setText(options.get(3));
+                                    btnAnswer4.setVisibility(View.VISIBLE);
+                                } else if (options.size() >= 3) {
+                                    btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
+                                    btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
+                                    btnAnswer3.setText(options.get(2));
+                                    btnAnswer3.setVisibility(View.VISIBLE);
+                                    btnAnswer4.setVisibility(View.GONE);
+                                } else if (options.size() >= 2) {
+                                    btnAnswer1.setText(options.get(0));
+                                    btnAnswer1.setVisibility(View.VISIBLE);
+                                    btnAnswer2.setText(options.get(1));
+                                    btnAnswer2.setVisibility(View.VISIBLE);
+                                    btnAnswer3.setVisibility(View.GONE);
+                                    btnAnswer4.setVisibility(View.GONE);
                                 }
 
                                 // Scroll to show comprehension card
@@ -852,6 +880,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             btnPlay.setImageResource(R.drawable.ic_play);
             tvReadingStatus.setText("Tap play to start reading!");
             tvReadingStatus.setTextColor(getColor(R.color.text_secondary));
+
+            // Show reading passage and controls again
+            readingPassageCard.setVisibility(View.VISIBLE);
+            controlPanelCard.setVisibility(View.VISIBLE);
             comprehensionCard.setVisibility(View.GONE);
         });
 
@@ -884,6 +916,8 @@ public class PlacementTestActivity extends AppCompatActivity {
             btnAnswer2.setTextColor(getColor(R.color.text_primary));
             btnAnswer3.setBackgroundTintList(getColorStateList(android.R.color.white));
             btnAnswer3.setTextColor(getColor(R.color.text_primary));
+            btnAnswer4.setBackgroundTintList(getColorStateList(android.R.color.white));
+            btnAnswer4.setTextColor(getColor(R.color.text_primary));
 
             // Highlight selected
             MaterialButton selectedBtn = (MaterialButton) v;
@@ -895,8 +929,19 @@ public class PlacementTestActivity extends AppCompatActivity {
                     this, R.anim.option_pop);
             v.startAnimation(popAnim);
 
-            // Store answer
+            // Store answer text and letter
             selectedAnswer = selectedBtn.getText().toString();
+
+            // Determine which button was clicked and set the letter
+            if (v.getId() == R.id.btnAnswer1) {
+                selectedAnswerLetter = "A";
+            } else if (v.getId() == R.id.btnAnswer2) {
+                selectedAnswerLetter = "B";
+            } else if (v.getId() == R.id.btnAnswer3) {
+                selectedAnswerLetter = "C";
+            } else if (v.getId() == R.id.btnAnswer4) {
+                selectedAnswerLetter = "D";
+            }
 
             // Enable continue button
             btnContinue.setEnabled(true);
@@ -908,6 +953,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnAnswer1.setOnClickListener(answerClickListener);
         btnAnswer2.setOnClickListener(answerClickListener);
         btnAnswer3.setOnClickListener(answerClickListener);
+        btnAnswer4.setOnClickListener(answerClickListener);
 
         // Hide Leo hint for reading questions
         leoHintContainer.setVisibility(View.GONE);
@@ -1119,6 +1165,17 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         // Get final theta from API (adaptiveHelper has the accurate theta from server)
         double finalTheta = adaptiveHelper.getCurrentTheta();
+
+        // Save placement results to SessionManager for dashboard
+        sessionManager.savePlacementLevel(levelName);
+
+        // Save category accuracies (convert from percentage 0-100 to 0-1)
+        if (categoryScores.length >= 4) {
+            sessionManager.saveCategoryAccuracy("Oral Language", categoryScores[0] / 100.0);
+            sessionManager.saveCategoryAccuracy("Word Knowledge", categoryScores[1] / 100.0);
+            sessionManager.saveCategoryAccuracy("Reading Comprehension", categoryScores[2] / 100.0);
+            sessionManager.saveCategoryAccuracy("Language Structure", categoryScores[3] / 100.0);
+        }
 
         // Create intent with results
         Intent intent = new Intent(PlacementTestActivity.this, PlacementResultActivity.class);

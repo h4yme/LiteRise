@@ -1,537 +1,269 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     xmlns:tools="http://schemas.android.com/tools"
-
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_dashboard">
 
-    android:layout_height="match_parent">
-
-
-
-    <!-- Background Image -->
-
-    <ImageView
-
+    <!-- Main Content ScrollView -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
-
-        android:layout_height="match_parent"
-
-        android:src="@drawable/bg_dashboard"
-
-        android:scaleType="centerCrop"
-
-        android:contentDescription="Dashboard Background"/>
-
-
-
-    <!-- Main Content -->
-
-    <ScrollView
-
-        android:layout_width="match_parent"
-
-        android:layout_height="match_parent"
-
-        android:fillViewport="true">
-
-
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             android:orientation="vertical"
+            android:padding="20dp"
+            android:paddingBottom="20dp">
 
-            android:padding="20dp">
-
-
-
-            <!-- Header Section -->
-
+            <!-- Header Section with Settings -->
             <LinearLayout
-
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
-                android:orientation="vertical">
-
-
-
-                <!-- Top Row: Home Title and Badges -->
-
-                <LinearLayout
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    android:orientation="horizontal"
-
-                    android:gravity="center_vertical"
-
-                    android:layout_marginBottom="12dp">
-
-
-
-                    <!-- Home Title -->
-
-                    <TextView
-
-                        android:layout_width="0dp"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_weight="1"
-
-                        android:text="Home"
-
-                        android:textSize="25sp"
-
-                        android:textStyle="bold"
-
-                        android:textColor="#2D3436"
-
-                        android:fontFamily="@font/visby_bold"/>
-
-
-
-                    <!-- XP Badge -->
-
-                    <LinearLayout
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:orientation="horizontal"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:paddingStart="12dp"
-
-                        android:paddingEnd="12dp"
-
-                        android:paddingTop="6dp"
-
-                        android:paddingBottom="6dp"
-
-                        android:layout_marginEnd="8dp"
-
-                        android:gravity="center">
-
-
-
-                        <ImageView
-
-                            android:layout_width="18dp"
-
-                            android:layout_height="18dp"
-
-                            android:src="@drawable/ic_star"
-
-                            android:layout_marginEnd="4dp"
-
-                            app:tint="#FFD700"
-
-                            android:contentDescription="XP Icon"/>
-
-
-
-                        <TextView
-
-                            android:id="@+id/tvHeaderXP"
-
-                            android:layout_width="wrap_content"
-
-                            android:layout_height="wrap_content"
-
-                            android:text="2500 XP"
-
-                            android:textSize="11sp"
-
-                            android:textStyle="bold"
-
-                            android:textColor="#2D3436"
-
-                            android:fontFamily="@font/poppins_semibold"/>
-
-                    </LinearLayout>
-
-
-
-                    <!-- Shield Badge -->
-
-                    <ImageView
-
-                        android:layout_width="32dp"
-
-                        android:layout_height="32dp"
-
-                        android:src="@drawable/ic_star"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:padding="6dp"
-
-                        android:layout_marginEnd="8dp"
-
-                        app:tint="#FF6B35"
-
-                        android:contentDescription="Shield Badge"/>
-
-
-
-                    <!-- Settings Icon -->
-
-                    <ImageView
-
-                        android:id="@+id/ivSettings"
-
-                        android:layout_width="32dp"
-
-                        android:layout_height="32dp"
-
-                        android:src="@drawable/ic_settings"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:padding="6dp"
-
-                        app:tint="#636E72"
-
-                        android:contentDescription="Settings"/>
-
-                </LinearLayout>
-
-
-
-                <!-- Pills Row: Streak and Badges -->
-
-                <LinearLayout
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:orientation="horizontal">
-
-
-
-                    <!-- Streak Pill -->
-
-                    <LinearLayout
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:orientation="horizontal"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:paddingStart="12dp"
-
-                        android:paddingEnd="12dp"
-
-                        android:paddingTop="6dp"
-
-                        android:paddingBottom="6dp"
-
-                        android:layout_marginEnd="8dp"
-
-                        android:gravity="center">
-
-
-
-                        <ImageView
-
-                            android:layout_width="14dp"
-
-                            android:layout_height="14dp"
-
-                            android:src="@drawable/ic_fire"
-
-                            android:layout_marginEnd="4dp"
-
-                            app:tint="#FF6B35"
-
-                            android:contentDescription="Streak Icon"/>
-
-
-
-                        <TextView
-
-                            android:id="@+id/tvStreak"
-
-                            android:layout_width="wrap_content"
-
-                            android:layout_height="wrap_content"
-
-                            android:text="10-Day Streak"
-
-                            android:textSize="10sp"
-
-                            android:textColor="#636E72"
-
-                            android:fontFamily="@font/poppins"/>
-
-                    </LinearLayout>
-
-
-
-                    <!-- Badges Pill -->
-
-                    <LinearLayout
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:orientation="horizontal"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:paddingStart="12dp"
-
-                        android:paddingEnd="12dp"
-
-                        android:paddingTop="6dp"
-
-                        android:paddingBottom="6dp"
-
-                        android:gravity="center">
-
-
-
-                        <TextView
-
-                            android:id="@+id/tvBadges"
-
-                            android:layout_width="wrap_content"
-
-                            android:layout_height="wrap_content"
-
-                            android:text="7 Badges"
-
-                            android:textSize="10sp"
-
-                            android:textColor="#636E72"
-
-                            android:fontFamily="@font/poppins"/>
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-
-
-            <!-- Welcome Section -->
-
-            <LinearLayout
-
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-
                 android:orientation="horizontal"
-
                 android:gravity="center_vertical"
-
-                >
-
-
-
-                <!-- Welcome Text Container -->
+                android:layout_marginBottom="8dp">
 
                 <LinearLayout
-
                     android:layout_width="0dp"
-
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
-
                     android:orientation="vertical">
 
-
-
+                    <!-- Greeting -->
                     <TextView
-
                         android:id="@+id/tvWelcome"
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
-                        android:text="Hello, Jaimes"
-
-                        android:textSize="30sp"
-
+                        android:text="Hello, Student!"
+                        android:textSize="28sp"
                         android:textStyle="bold"
-
                         android:textColor="#7C3AED"
-
                         android:fontFamily="@font/visby_bold"/>
 
-
-
+                    <!-- Subtitle -->
                     <TextView
-
                         android:id="@+id/tvMotivation"
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
-                        android:text="Ready to learn something new today? Let’s make your reading adventure awesome!"
-
-                        android:textSize="12sp"
-
+                        android:text="Ready to learn something new today?"
+                        android:textSize="14sp"
                         android:textColor="#636E72"
-
                         android:fontFamily="@font/visby_regular"
-
-                        android:layout_marginTop="4dp"
-
-                        android:maxLines="2"
-
-                        android:ellipsize="end"/>
-
+                        android:layout_marginTop="4dp"/>
                 </LinearLayout>
 
-
-
-                <!-- Leo Mascot -->
-
+                <!-- Settings Icon -->
                 <ImageView
-
-                    android:id="@+id/ivLeoMascot"
-
-                    android:layout_width="140dp"
-
-                    android:layout_height="140dp"
-
-                    android:src="@drawable/leo_placement_test"
-
-                    android:scaleType="fitCenter"
-
-                    android:contentDescription="Leo Mascot"/>
-
+                    android:id="@+id/ivSettings"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_settings"
+                    android:background="@drawable/bg_rounded_white"
+                    android:padding="10dp"
+                    app:tint="#636E72"
+                    android:contentDescription="Settings"/>
             </LinearLayout>
 
-
-
-            <!-- Continue Last Lesson Button -->
-
-            <com.google.android.material.button.MaterialButton
-
-                android:id="@+id/btnContinueLesson"
-
+            <!-- Gamification Stats Card -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-
-                android:layout_height="56dp"
-
-                android:text="Continue last lesson"
-
-                android:textSize="16sp"
-
-                android:textStyle="bold"
-
-                android:textColor="#2D3436"
-
-                app:cornerRadius="28dp"
-
-                app:backgroundTint="#FFD93D"
-
-                android:fontFamily="@font/poppins_semibold"
-
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
                 android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp"
+                app:strokeWidth="0dp">
 
-                app:icon="@drawable/ic_play_circle"
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:background="@android:color/white"
+                    android:padding="16dp"
+                    android:gravity="center_vertical">
 
-                app:iconTint="#2D3436"
+                    <!-- Leo Mascot -->
+                    <ImageView
+                        android:id="@+id/ivLeoMascot"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/leo_placement_test"
+                        android:scaleType="fitCenter"
+                        android:layout_marginEnd="16dp"
+                        android:contentDescription="Leo Mascot"/>
 
-                app:iconSize="24dp"
+                    <!-- Stats Grid -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
 
-                android:visibility="gone"/>
+                        <!-- Top Row: XP and Streak -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:layout_marginBottom="8dp">
 
+                            <!-- XP -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:background="@drawable/bg_light_purple"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:layout_marginEnd="6dp">
 
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_star"
+                                    android:layout_marginEnd="6dp"
+                                    app:tint="#FFD700"
+                                    android:contentDescription="XP"/>
 
-            <!-- Categories Section -->
+                                <TextView
+                                    android:id="@+id/tvHeaderXP"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 XP"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#2D3436"
+                                    android:fontFamily="@font/poppins_semibold"/>
+                            </LinearLayout>
+
+                            <!-- Streak -->
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:background="@drawable/bg_light_orange"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="8dp"
+                                android:paddingBottom="8dp"
+                                android:layout_marginStart="6dp">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="18dp"
+                                    android:src="@drawable/ic_fire"
+                                    android:layout_marginEnd="6dp"
+                                    app:tint="#FF6B35"
+                                    android:contentDescription="Streak"/>
+
+                                <TextView
+                                    android:id="@+id/tvStreak"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 Day"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#2D3436"
+                                    android:fontFamily="@font/poppins_semibold"/>
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Bottom Row: Badges -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_light_blue"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="12dp"
+                            android:paddingTop="8dp"
+                            android:paddingBottom="8dp">
+
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_star"
+                                android:layout_marginEnd="6dp"
+                                app:tint="#60A5FA"
+                                android:contentDescription="Badges"/>
+
+                            <TextView
+                                android:id="@+id/tvBadges"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0 Badges Earned"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#2D3436"
+                                android:fontFamily="@font/poppins_semibold"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Your Learning Path Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Your Learning Path"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#2D3436"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginBottom="4dp"/>
 
             <TextView
-
+                android:id="@+id/tvModuleSummary"
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
-
-                android:text="Categories"
-
-                android:textSize="18sp"
-
-                android:textStyle="bold"
-
-                android:textColor="#2D3436"
-
-                android:fontFamily="@font/poppins_semibold"
-
+                android:text="Modules prioritized by your needs"
+                android:textSize="13sp"
+                android:textColor="#636E72"
+                android:fontFamily="@font/visby_regular"
                 android:layout_marginBottom="16dp"/>
 
-
-
-            <!-- Module Cards Grid (2x3) -->
-
-            <GridLayout
-
-                android:id="@+id/gridModules"
-
+            <!-- Modules RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvModules"
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:nestedScrollingEnabled="false"/>
 
-                android:columnCount="2"
-
-                android:rowCount="3"
-
-                android:alignmentMode="alignBounds"
-
-                android:columnOrderPreserved="false">
-
-
-
-                <!-- Module cards will be added programmatically -->
-
-
-
-            </GridLayout>
-
-
-
-            <!-- Bottom Spacing -->
-
+            <!-- Bottom Spacing for Bottom Nav -->
             <View
-
                 android:layout_width="match_parent"
-
-                android:layout_height="40dp"/>
-
-
+                android:layout_height="80dp"/>
 
         </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
-    </ScrollView>
+    <!-- Bottom Navigation -->
+    <include
+        android:id="@+id/customBottomNav"
+        layout="@layout/custom_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- Tutorial Overlay -->
-
     <include layout="@layout/tutorial_dashboard_overlay"/>
 
-</FrameLayout>
-
+</androidx.constraintlayout.widget.ConstraintLayout>

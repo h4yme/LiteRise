@@ -35,6 +35,13 @@ public class SessionManager {
     private static final String KEY_ASSESSMENT_COMPLETED = "assessment_completed";
     private static final String KEY_ASSESSMENT_STARTED = "assessment_started";
 
+    // Placement test results
+    private static final String KEY_PLACEMENT_LEVEL = "placement_level";
+    private static final String KEY_CATEGORY_ORAL_LANGUAGE = "category_oral_language";
+    private static final String KEY_CATEGORY_WORD_KNOWLEDGE = "category_word_knowledge";
+    private static final String KEY_CATEGORY_READING_COMP = "category_reading_comp";
+    private static final String KEY_CATEGORY_LANGUAGE_STRUCT = "category_language_struct";
+
 
     private SharedPreferences prefs;
 
@@ -236,5 +243,61 @@ public class SessionManager {
 
     public boolean hasStartedAssessment() {
         return prefs.getBoolean(KEY_ASSESSMENT_STARTED, false);
+    }
+
+    /**
+     * Save placement test results
+     */
+    public void savePlacementLevel(String level) {
+        editor.putString(KEY_PLACEMENT_LEVEL, level);
+        editor.apply();
+    }
+
+    public String getPlacementLevel() {
+        return prefs.getString(KEY_PLACEMENT_LEVEL, "Grade 3");
+    }
+
+    /**
+     * Save category accuracy scores from placement test
+     * @param category Category name (e.g., "Oral Language", "Word Knowledge")
+     * @param accuracy Score from 0.0 to 1.0
+     */
+    public void saveCategoryAccuracy(String category, double accuracy) {
+        String key = getCategoryKey(category);
+        if (key != null) {
+            editor.putFloat(key, (float) accuracy);
+            editor.apply();
+        }
+    }
+
+    /**
+     * Get category accuracy score
+     * @param category Category name
+     * @return Accuracy score from 0.0 to 1.0, or 0.0 if not found
+     */
+    public double getCategoryAccuracy(String category) {
+        String key = getCategoryKey(category);
+        if (key != null) {
+            return prefs.getFloat(key, 0.0f);
+        }
+        return 0.0;
+    }
+
+    /**
+     * Map category names to SharedPreferences keys
+     */
+    private String getCategoryKey(String category) {
+        switch (category) {
+            case "Oral Language":
+                return KEY_CATEGORY_ORAL_LANGUAGE;
+            case "Word Knowledge":
+                return KEY_CATEGORY_WORD_KNOWLEDGE;
+            case "Reading Comprehension":
+                return KEY_CATEGORY_READING_COMP;
+            case "Language Structure":
+                return KEY_CATEGORY_LANGUAGE_STRUCT;
+            default:
+                return null;
+        }
     }
 }

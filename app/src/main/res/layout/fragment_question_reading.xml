@@ -7,6 +7,7 @@
 
     <!-- Reading Card -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/readingPassageCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="#4ECDC4"
@@ -37,6 +38,7 @@
 
     <!-- Control Panel -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/controlPanelCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardBackgroundColor="@color/white"
@@ -203,6 +205,20 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/visby_bold"
                     android:text="A table"
+                    android:textAllCaps="false"
+                    android:textColor="#2C3E50"
+                    android:textSize="14sp"
+                    app:strokeColor="#2C3E50"
+                    app:cornerRadius="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAnswer4"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="A box"
                     android:textAllCaps="false"
                     android:textColor="#2C3E50"
                     android:textSize="14sp"

@@ -17,6 +17,8 @@
     <color name="gray_light">#F3F4F6</color>
     <color name="gray_medium">#9CA3AF</color>
     <color name="gray_dark">#4B5563</color>
+    <color name="gray_400">#9CA3AF</color>
+    <color name="purple_600">#7C3AED</color>
 
     <!-- 🧠 Text Colors -->
     <color name="text_primary">#123C50</color>
