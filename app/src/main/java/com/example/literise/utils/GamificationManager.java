@@ -53,6 +53,13 @@ public class GamificationManager {
     }
 
     /**
+     * Get current XP (alias for getTotalXP for compatibility)
+     */
+    public int getCurrentXP() {
+        return getTotalXP();
+    }
+
+    /**
      * Add XP and return if level up occurred
      */
     public boolean addXP(int xp) {
@@ -121,6 +128,37 @@ public class GamificationManager {
     }
 
     // ==================== BADGE SYSTEM ====================
+
+    /**
+     * Check all badges and return list of newly earned badges
+     */
+    public List<Badge> checkAndAwardBadges() {
+        List<Badge> newlyEarnedBadges = new ArrayList<>();
+
+        // Check all possible badges
+        String[] allBadgeIds = {
+            Badge.BADGE_FIRST_STEPS,
+            Badge.BADGE_MODULE_MASTER,
+            Badge.BADGE_PERFECT_SCORE,
+            Badge.BADGE_STORY_STAR,
+            Badge.BADGE_WORD_WIZARD,
+            Badge.BADGE_DEDICATED_LEARNER,
+            Badge.BADGE_CHAMPION
+        };
+
+        for (String badgeId : allBadgeIds) {
+            if (checkAndAwardBadge(badgeId)) {
+                // Badge was newly earned
+                Badge badge = Badge.getBadgeById(badgeId);
+                if (badge != null) {
+                    badge.setEarned(true);
+                    newlyEarnedBadges.add(badge);
+                }
+            }
+        }
+
+        return newlyEarnedBadges;
+    }
 
     /**
      * Check and award badge if earned

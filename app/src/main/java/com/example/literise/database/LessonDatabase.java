@@ -142,7 +142,7 @@ public class LessonDatabase extends SQLiteOpenHelper {
     /**
      * Unlock next lesson
      */
-    private void unlockNextLesson(int currentLessonId, int moduleId) {
+    public void unlockNextLesson(int currentLessonId, int moduleId) {
         int nextLessonId = currentLessonId + 1;
         int maxLessonId = (moduleId * 100) + 15; // 15 lessons per module
 

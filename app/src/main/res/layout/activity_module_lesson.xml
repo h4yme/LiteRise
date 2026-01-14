@@ -149,7 +149,7 @@
                     android:layout_width="24dp"
                     android:layout_height="3dp"
                     android:layout_marginTop="6dp"
-                    android:background="@color/purple_700"
+                    android:background="@color/purple_600"
                     android:visibility="invisible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -185,7 +185,7 @@
                     android:layout_width="24dp"
                     android:layout_height="3dp"
                     android:layout_marginTop="6dp"
-                    android:background="@color/purple_700"
+                    android:background="@color/purple_600"
                     android:visibility="invisible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -221,7 +221,7 @@
                     android:layout_width="24dp"
                     android:layout_height="3dp"
                     android:layout_marginTop="6dp"
-                    android:background="@color/purple_700"
+                    android:background="@color/purple_600"
                     android:visibility="invisible"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -306,7 +306,7 @@
                     android:textStyle="bold"
                     android:layout_marginTop="24dp"
                     app:cornerRadius="12dp"
-                    app:backgroundTint="@color/purple_500"
+                    app:backgroundTint="@color/purple_600"
                     android:textColor="@android:color/white"/>
             </LinearLayout>
         </ScrollView>
