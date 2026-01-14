@@ -199,7 +199,7 @@ public class DashboardActivity extends BaseActivity {
     }
 
     /**
-     * Set Visby font for bottom navigation labels
+     * Set Visby font and smaller size for bottom navigation labels
      */
     private void setBottomNavigationFont() {
         android.graphics.Typeface visby = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.visby_bold);
@@ -211,7 +211,9 @@ public class DashboardActivity extends BaseActivity {
                 for (int j = 0; j < itemGroup.getChildCount(); j++) {
                     android.view.View child = itemGroup.getChildAt(j);
                     if (child instanceof TextView) {
-                        ((TextView) child).setTypeface(visby);
+                        TextView textView = (TextView) child;
+                        textView.setTypeface(visby);
+                        textView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, 12);
                     }
                 }
             }
