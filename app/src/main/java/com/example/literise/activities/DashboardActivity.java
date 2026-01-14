@@ -327,7 +327,8 @@ public class DashboardActivity extends BaseActivity {
 
     /**
      * Load modules based on placement test results
-     * Creates 8 Key Stage 1 modules ordered by priority (weakest first)
+     * Creates 5 Grade 3 English modules ordered by priority (weakest first)
+     * Aligned with MATATAG English Curriculum Guide 2023
      */
     private void loadModulesFromPlacementResults() {
         // Get placement test results from session

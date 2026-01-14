@@ -11,36 +11,32 @@ import java.util.Map;
 
 /**
  * Helper class to create and order learning modules based on placement test results
- * Creates 8 modules aligned with MATATAG Reading and Literacy Curriculum (Key Stage 1)
+ * Creates 5 modules aligned with MATATAG English Curriculum Grade 3 (Official)
  * Orders modules by performance: weakest areas first (highest priority)
  *
- * MATATAG KS1 Subdomains:
- * 1. Oral Language
- * 2. Phonological Awareness
- * 3. Phonics
- * 4. Word Study
- * 5. Grammar Awareness
- * 6. Vocabulary
- * 7. Comprehending and Analyzing Texts
- * 8. Creating and Composing Texts
+ * MATATAG Grade 3 English Subdomains (Official):
+ * 1. Phonics and Word Study (sounds to words)
+ * 2. Vocabulary and Word Knowledge (words)
+ * 3. Grammar Awareness and Grammatical Structures (sentences)
+ * 4. Comprehending and Analyzing Text (discourse)
+ * 5. Creating and Composing Text (discourse)
+ *
+ * Reference: FINAL MATATAG English CG 2023 Grades 2-10, Pages 61-76
  */
 public class ModuleOrderingHelper {
 
-    // Color gradients for modules (inspired by design)
+    // Color gradients for 5 modules (inspired by design)
     private static final String[][] MODULE_GRADIENTS = {
-        {"#A78BFA", "#DDD6FE"}, // Purple
-        {"#FB7185", "#FECDD3"}, // Pink
-        {"#60A5FA", "#DBEAFE"}, // Blue
-        {"#34D399", "#D1FAE5"}, // Green
-        {"#FBBF24", "#FEF3C7"}, // Yellow
-        {"#F472B6", "#FCE7F3"}, // Magenta
-        {"#818CF8", "#E0E7FF"}, // Indigo
-        {"#FB923C", "#FED7AA"}  // Orange
+        {"#A78BFA", "#DDD6FE"}, // Purple - Phonics and Word Study
+        {"#FB7185", "#FECDD3"}, // Pink - Vocabulary and Word Knowledge
+        {"#60A5FA", "#DBEAFE"}, // Blue - Grammar Awareness
+        {"#34D399", "#D1FAE5"}, // Green - Comprehending and Analyzing Text
+        {"#FBBF24", "#FEF3C7"}  // Yellow - Creating and Composing Text
     };
 
     /**
-     * Create 8 MATATAG Key Stage 1 modules with performance scores from placement test
-     * Maps 4 placement test categories to 8 curriculum subdomains using weighted formulas
+     * Create 5 MATATAG Grade 3 English modules with performance scores from placement test
+     * Maps 4 placement test categories to 5 official curriculum subdomains using weighted formulas
      * @return List of modules ordered by priority (weakest first)
      */
     public static List<LearningModule> createModulesFromPlacementResults(
@@ -51,101 +47,71 @@ public class ModuleOrderingHelper {
     ) {
         List<LearningModule> modules = new ArrayList<>();
 
-        // Module 1: Oral Language (directly from placement test)
+        // Module 1: Phonics and Word Study (EN3PWS)
+        // Derived from word knowledge (primary) + reading comp (secondary)
+        double phonicsWordStudyScore = (wordKnowledgeScore * 0.7 + readingCompScore * 0.3);
         modules.add(new LearningModule(
             1,
-            "Oral Language",
-            "Speaking and listening skills",
-            "Oral Language",
-            oralLanguageScore,
+            "Phonics and Word Study",
+            "Sight words and word patterns",
+            "Phonics and Word Study",
+            phonicsWordStudyScore,
             MODULE_GRADIENTS[0][0],
             MODULE_GRADIENTS[0][1]
         ));
 
-        // Module 2: Phonological Awareness (derived from word knowledge + oral language)
-        double phonologicalScore = (wordKnowledgeScore * 0.6 + oralLanguageScore * 0.4);
+        // Module 2: Vocabulary and Word Knowledge (EN3VWK)
+        // Directly from word knowledge score
         modules.add(new LearningModule(
             2,
-            "Phonological Awareness",
-            "Sound recognition and manipulation",
-            "Phonological Awareness",
-            phonologicalScore,
+            "Vocabulary and Word Knowledge",
+            "High-frequency words and meanings",
+            "Vocabulary and Word Knowledge",
+            wordKnowledgeScore,
             MODULE_GRADIENTS[1][0],
             MODULE_GRADIENTS[1][1]
         ));
 
-        // Module 3: Phonics (derived from word knowledge)
-        double phonicsScore = (wordKnowledgeScore * 0.8 + readingCompScore * 0.2);
+        // Module 3: Grammar Awareness and Grammatical Structures (EN3GAGS)
+        // Directly from language structure score
         modules.add(new LearningModule(
             3,
-            "Phonics",
-            "Letter-sound relationships",
-            "Phonics",
-            phonicsScore,
+            "Grammar Awareness and Grammatical Structures",
+            "Simple and compound sentences",
+            "Grammar Awareness and Grammatical Structures",
+            languageStructScore,
             MODULE_GRADIENTS[2][0],
             MODULE_GRADIENTS[2][1]
         ));
 
-        // Module 4: Word Study (derived from word knowledge + reading comprehension)
-        double wordStudyScore = (wordKnowledgeScore * 0.7 + readingCompScore * 0.3);
+        // Module 4: Comprehending and Analyzing Text (EN3CAT)
+        // Directly from reading comprehension score
         modules.add(new LearningModule(
             4,
-            "Word Study",
-            "Understanding word patterns and meanings",
-            "Word Study",
-            wordStudyScore,
+            "Comprehending and Analyzing Text",
+            "Understanding stories and informational texts",
+            "Comprehending and Analyzing Text",
+            readingCompScore,
             MODULE_GRADIENTS[3][0],
             MODULE_GRADIENTS[3][1]
         ));
 
-        // Module 5: Grammar Awareness (directly from language structure)
-        modules.add(new LearningModule(
-            5,
-            "Grammar Awareness",
-            "Sentence structure and rules",
-            "Grammar Awareness",
-            languageStructScore,
-            MODULE_GRADIENTS[4][0],
-            MODULE_GRADIENTS[4][1]
-        ));
-
-        // Module 6: Vocabulary (directly from word knowledge)
-        modules.add(new LearningModule(
-            6,
-            "Vocabulary",
-            "Word meanings and usage",
-            "Vocabulary",
-            wordKnowledgeScore,
-            MODULE_GRADIENTS[5][0],
-            MODULE_GRADIENTS[5][1]
-        ));
-
-        // Module 7: Comprehending and Analyzing Texts (directly from reading comp)
-        modules.add(new LearningModule(
-            7,
-            "Comprehending and Analyzing Texts",
-            "Understanding what you read",
-            "Comprehending and Analyzing Texts",
-            readingCompScore,
-            MODULE_GRADIENTS[6][0],
-            MODULE_GRADIENTS[6][1]
-        ));
-
-        // Module 8: Creating and Composing Texts (derived from all categories)
-        double composingScore = (
-            oralLanguageScore * 0.2 +
-            wordKnowledgeScore * 0.3 +
-            readingCompScore * 0.3 +
-            languageStructScore * 0.2
+        // Module 5: Creating and Composing Text (EN3CCT)
+        // Derived from all categories (composite score)
+        double creatingComposingScore = (
+            oralLanguageScore * 0.15 +
+            wordKnowledgeScore * 0.30 +
+            readingCompScore * 0.30 +
+            languageStructScore * 0.25
         );
         modules.add(new LearningModule(
-            8,
-            "Creating and Composing Texts",
-            "Writing stories and compositions",
-            "Creating and Composing Texts",
-            composingScore,
-            MODULE_GRADIENTS[7][0],
-            MODULE_GRADIENTS[7][1]
+            5,
+            "Creating and Composing Text",
+            "Writing stories and expressing ideas",
+            "Creating and Composing Text",
+            creatingComposingScore,
+            MODULE_GRADIENTS[4][0],
+            MODULE_GRADIENTS[4][1]
         ));
 
         // Order modules by priority (lowest score = highest priority)
@@ -176,6 +142,7 @@ public class ModuleOrderingHelper {
     /**
      * Apply locking logic based on placement level
      * Lower grade students have more locked modules
+     * Total of 5 modules in Grade 3
      */
     public static void applyModuleLocking(List<LearningModule> modules, String placementLevel) {
         // Determine how many modules to unlock based on placement
@@ -184,17 +151,19 @@ public class ModuleOrderingHelper {
         switch (placementLevel) {
             case "Grade 2":
             case "Low Grade 3":
-                unlockedCount = 3; // Only top 3 priority modules unlocked
+                unlockedCount = 2; // Only top 2 priority modules unlocked
                 break;
             case "Mid Grade 3":
-                unlockedCount = 5; // Top 5 modules unlocked
+                unlockedCount = 3; // Top 3 modules unlocked
                 break;
             case "High Grade 3":
+                unlockedCount = 4; // Top 4 modules unlocked
+                break;
             case "Grade 4":
-                unlockedCount = 8; // All modules unlocked
+                unlockedCount = 5; // All 5 modules unlocked
                 break;
             default:
-                unlockedCount = 4; // Default: top 4 modules
+                unlockedCount = 3; // Default: top 3 modules
         }
 
         // Lock modules beyond the unlock count
