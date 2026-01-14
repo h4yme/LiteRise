@@ -25,6 +25,7 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.LearningModule;
 import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.List;
@@ -43,6 +44,8 @@ public class DashboardActivity extends BaseActivity {
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
     private List<LearningModule> modules;
+
+    private BottomNavigationView bottomNavigation;
 
     // Tutorial views
 
@@ -125,6 +128,9 @@ public class DashboardActivity extends BaseActivity {
         // Setup RecyclerView
         rvModules.setLayoutManager(new LinearLayoutManager(this));
 
+        // Bottom Navigation
+        bottomNavigation = findViewById(R.id.bottomNavigation);
+
         // Tutorial views
 
         tutorialOverlay = findViewById(R.id.tutorialOverlay);
@@ -156,7 +162,29 @@ public class DashboardActivity extends BaseActivity {
 
         btnSkip.setOnClickListener(v -> dismissTutorial());
 
-
+        // Bottom Navigation Listener
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                // Already on home, refresh
+                loadModulesFromPlacementResults();
+                return true;
+            } else if (itemId == R.id.nav_modules) {
+                // Navigate to modules list (future implementation)
+                Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
+                return false;
+            } else if (itemId == R.id.nav_progress) {
+                // Navigate to progress screen (future implementation)
+                Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
+                return false;
+            } else if (itemId == R.id.nav_profile) {
+                // Navigate to profile screen
+                openSettings();
+                return false;
+            }
+            return false;
+        });
 
         // Show tutorial on first visit
 
@@ -188,9 +216,9 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d-Day Streak", currentStreak));
+        tvStreak.setText(String.format("%d Day", currentStreak));
 
-        tvBadges.setText(String.format("%d Badges", totalBadges));
+        tvBadges.setText(String.format("%d Badges Earned", totalBadges));
 
     }
 
