@@ -1166,6 +1166,17 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Get final theta from API (adaptiveHelper has the accurate theta from server)
         double finalTheta = adaptiveHelper.getCurrentTheta();
 
+        // Save placement results to SessionManager for dashboard
+        sessionManager.savePlacementLevel(levelName);
+
+        // Save category accuracies (convert from percentage 0-100 to 0-1)
+        if (categoryScores.length >= 4) {
+            sessionManager.saveCategoryAccuracy("Oral Language", categoryScores[0] / 100.0);
+            sessionManager.saveCategoryAccuracy("Word Knowledge", categoryScores[1] / 100.0);
+            sessionManager.saveCategoryAccuracy("Reading Comprehension", categoryScores[2] / 100.0);
+            sessionManager.saveCategoryAccuracy("Language Structure", categoryScores[3] / 100.0);
+        }
+
         // Create intent with results
         Intent intent = new Intent(PlacementTestActivity.this, PlacementResultActivity.class);
         intent.putExtra("placement_level", placementLevel);
