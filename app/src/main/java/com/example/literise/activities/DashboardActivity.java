@@ -14,19 +14,18 @@ import android.widget.ImageView;
 
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
-
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.literise.R;
-
+import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.database.SessionManager;
-
+import com.example.literise.models.LearningModule;
+import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
-
 import com.google.android.material.button.MaterialButton;
-
-import android.widget.LinearLayout;
-
 
 import java.util.List;
 
@@ -35,13 +34,16 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation;
+    private TextView tvHeaderXP, tvStreak, tvBadges, tvWelcome, tvMotivation, tvModuleSummary;
 
     private ImageView ivLeoMascot, ivSettings;
 
     private MaterialButton btnContinueLesson;
 
-    private android.widget.GridLayout gridModules;
+    private RecyclerView rvModules;
+    private ModuleAdapter moduleAdapter;
+    private List<LearningModule> modules;
+
     // Tutorial views
 
     private View tutorialOverlay;
@@ -90,7 +92,7 @@ public class DashboardActivity extends BaseActivity {
 
         loadUserData();
 
-        displayModules();
+        loadModulesFromPlacementResults();
 
         setupListeners();
 
@@ -110,13 +112,19 @@ public class DashboardActivity extends BaseActivity {
 
         tvMotivation = findViewById(R.id.tvMotivation);
 
+        tvModuleSummary = findViewById(R.id.tvModuleSummary);
+
         ivLeoMascot = findViewById(R.id.ivLeoMascot);
 
         ivSettings = findViewById(R.id.ivSettings);
 
         btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
-        gridModules = findViewById(R.id.gridModules);
+        rvModules = findViewById(R.id.rvModules);
+
+        // Setup RecyclerView
+        rvModules.setLayoutManager(new LinearLayoutManager(this));
+
         // Tutorial views
 
         tutorialOverlay = findViewById(R.id.tutorialOverlay);
@@ -188,170 +196,97 @@ public class DashboardActivity extends BaseActivity {
 
 
 
-        /**
-
-     * Display 6 module cards ordered by priority (weakest to strongest)
-
-     * Simple frosted white cards matching DASHBOARD DESIGN.png
-
+    /**
+     * Load modules based on placement test results
+     * Creates 8 Key Stage 1 modules ordered by priority (weakest first)
      */
+    private void loadModulesFromPlacementResults() {
+        // Get placement test results from session
+        double oralLanguageScore = session.getCategoryAccuracy("Oral Language");
+        double wordKnowledgeScore = session.getCategoryAccuracy("Word Knowledge");
+        double readingCompScore = session.getCategoryAccuracy("Reading Comprehension");
+        double languageStructScore = session.getCategoryAccuracy("Language Structure");
+        String placementLevel = session.getPlacementLevel();
 
-    private void displayModules() {
-
-        gridModules.removeAllViews();
-
-
-
-        // Get modules ordered from weakest to strongest
-
-        List<String> orderedModules = priorityManager.getOrderedModules();
-
-
-
-        for (int i = 0; i < Math.min(6, orderedModules.size()); i++) {
-
-            String moduleName = orderedModules.get(i);
-
-
-
-            View moduleCard = LayoutInflater.from(this).inflate(
-
-                    R.layout.item_dashboard_module,
-
-                    gridModules,
-
-                    false
-
-            );
-
-
-
-            // Set module icon based on module type
-
-            ImageView ivModuleIcon = moduleCard.findViewById(R.id.ivModuleIcon);
-
-            ivModuleIcon.setImageResource(getModuleIcon(moduleName));
-
-
-
-            // Set module name
-
-            TextView tvModuleName = moduleCard.findViewById(R.id.tvModuleName);
-
-            tvModuleName.setText(moduleName);
-
-
-
-            // Click listener to open module
-
-            final int moduleIndex = i;
-
-            moduleCard.setOnClickListener(v -> openModule(moduleName, moduleIndex));
-
-
-
-            gridModules.addView(moduleCard);
-
+        // If no placement test taken yet, use default values
+        if (oralLanguageScore == 0 && wordKnowledgeScore == 0 &&
+            readingCompScore == 0 && languageStructScore == 0) {
+            // Default values for new students
+            oralLanguageScore = 0.60;
+            wordKnowledgeScore = 0.55;
+            readingCompScore = 0.50;
+            languageStructScore = 0.65;
+            placementLevel = "Mid Grade 3";
         }
 
+        // Create modules using ModuleOrderingHelper
+        modules = ModuleOrderingHelper.createModulesFromPlacementResults(
+            oralLanguageScore,
+            wordKnowledgeScore,
+            readingCompScore,
+            languageStructScore
+        );
+
+        // Apply locking based on placement level
+        ModuleOrderingHelper.applyModuleLocking(modules, placementLevel);
+
+        // Update summary text
+        String summary = ModuleOrderingHelper.getModuleSummary(modules);
+        tvModuleSummary.setText("Modules prioritized by your needs • " + summary);
+
+        // Setup adapter with click listener
+        moduleAdapter = new ModuleAdapter(this, modules, module -> {
+            openModule(module);
+        });
+        rvModules.setAdapter(moduleAdapter);
     }
+
+
+
 
 
 
     /**
-
-     * Get the appropriate icon for each module
-
+     * Open a learning module
      */
-
-    private int getModuleIcon(String moduleName) {
-
-        switch (moduleName) {
-
-            case "Reading Comprehension":
-
-                return R.drawable.ic_book_reading;
-
-            case "Phonics & Pronunciation":
-
-                return R.drawable.ic_mic;
-
-            case "Vocabulary Building":
-
-                return R.drawable.ic_lightbulb;
-
-            case "Grammar & Syntax":
-
-                return R.drawable.ic_edit;
-
-            case "Reading Fluency":
-
-                return R.drawable.ic_timer;
-
-            case "Spelling & Writing":
-
-                return R.drawable.ic_pen;
-
-            default:
-
-                return R.drawable.ic_star; // Fallback icon
-
+    private void openModule(LearningModule module) {
+        if (module.isLocked()) {
+            Toast.makeText(this,
+                "Complete previous modules to unlock " + module.getTitle(),
+                Toast.LENGTH_SHORT).show();
+            return;
         }
 
+        Intent intent = new Intent(this, ModuleLadderActivity.class);
+        intent.putExtra("module_id", module.getModuleId());
+        intent.putExtra("module_name", module.getTitle());
+        intent.putExtra("module_domain", module.getDomain());
+        intent.putExtra("module_level", module.getLevel());
+        intent.putExtra("priority", module.getPriorityOrder());
+        startActivity(intent);
     }
-
-
 
     private void showLeoEncouragement() {
-
         String[] encouragements = {
-
                 "You're doing great! Keep it up! 🌟",
-
                 "Learning is an adventure! Let's go! 🚀",
-
                 "Every step counts! You've got this! 💪",
-
                 "I believe in you! 🦁"
-
         };
-
         int randomIndex = (int) (Math.random() * encouragements.length);
-
-        android.widget.Toast.makeText(this, encouragements[randomIndex], android.widget.Toast.LENGTH_SHORT).show();
-
-    }
-
-
-
-    private void openModule(String moduleName, int priority) {
-
-        Intent intent = new Intent(this, ModuleLadderActivity.class);
-
-        intent.putExtra("module_name", moduleName);
-
-        intent.putExtra("priority", priority + 1);
-
-        startActivity(intent);
-
+        Toast.makeText(this, encouragements[randomIndex], Toast.LENGTH_SHORT).show();
     }
 
 
 
     private void continueLesson() {
-
-        // TODO: Navigate to last incomplete lesson/module
-
-        android.widget.Toast.makeText(
-
-                this,
-
-                "Continue lesson feature coming soon!",
-
-                android.widget.Toast.LENGTH_SHORT
-
-        ).show();
-
+        // Get the highest priority unlocked module
+        LearningModule recommended = ModuleOrderingHelper.getRecommendedModule(modules);
+        if (recommended != null) {
+            openModule(recommended);
+        } else {
+            Toast.makeText(this, "No lessons available yet", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openSettings() {

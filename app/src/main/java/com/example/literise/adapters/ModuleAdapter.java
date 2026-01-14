@@ -57,10 +57,10 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
 
         // Set level indicator
         if (module.isLocked()) {
-            holder.tvLevel.setText("Segera dimulai");
+            holder.tvLevel.setText("Coming Soon");
             holder.ivIcon.setImageResource(R.drawable.ic_lock);
         } else {
-            holder.tvLevel.setText("level " + module.getLevel());
+            holder.tvLevel.setText("Level " + module.getLevel());
             holder.ivIcon.setImageResource(R.drawable.ic_play);
         }
 
