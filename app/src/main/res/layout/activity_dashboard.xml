@@ -7,7 +7,7 @@
     android:background="@drawable/bg_dashboard">
 
     <!-- Main Content ScrollView -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -251,7 +251,7 @@
                 android:layout_height="80dp"/>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
     <!-- Bottom Navigation -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -259,10 +259,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@android:color/white"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         app:elevation="8dp"
         app:labelVisibilityMode="labeled"
         app:itemIconTint="@color/bottom_nav_color"
         app:itemTextColor="@color/bottom_nav_color"
+        app:itemBackground="@drawable/bottom_nav_item_background"
+        app:itemPaddingTop="8dp"
+        app:itemPaddingBottom="8dp"
         app:menu="@menu/bottom_navigation_menu"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

@@ -261,6 +261,12 @@ public class DashboardActivity extends BaseActivity {
         // Apply locking based on placement level
         ModuleOrderingHelper.applyModuleLocking(modules, placementLevel);
 
+        // Debug: Log module count
+        android.util.Log.d("DashboardActivity", "Total modules created: " + modules.size());
+        for (int i = 0; i < modules.size(); i++) {
+            android.util.Log.d("DashboardActivity", "Module " + (i+1) + ": " + modules.get(i).getTitle());
+        }
+
         // Update summary text
         String summary = ModuleOrderingHelper.getModuleSummary(modules);
         tvModuleSummary.setText("Modules prioritized by your needs • " + summary);
@@ -270,6 +276,9 @@ public class DashboardActivity extends BaseActivity {
             openModule(module);
         });
         rvModules.setAdapter(moduleAdapter);
+
+        // Force RecyclerView to recalculate height
+        rvModules.post(() -> rvModules.requestLayout());
     }
 
 
