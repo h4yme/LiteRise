@@ -46,8 +46,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
 
     private String moduleName;
+    private int moduleId;
 
-    private int totalLessons = 10; // Total lessons per module
+    private int totalLessons = 15; // Total lessons per module (15 for Module 1)
 
     private int currentLesson = 1; // Current unlocked lesson
 
@@ -63,9 +64,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
 
 
-        // Get module name from intent
+        // Get module info from intent
 
         moduleName = getIntent().getStringExtra("module_name");
+        moduleId = getIntent().getIntExtra("module_id", 1);
 
         if (moduleName == null) {
 
@@ -116,13 +118,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         btnStart.setOnClickListener(v -> {
 
-            // TODO: Start first unlocked lesson
-
-            android.widget.Toast.makeText(this,
-
-                    "Starting Lesson " + currentLesson,
-
-                    android.widget.Toast.LENGTH_SHORT).show();
+            // Start first unlocked lesson
+            openLesson(currentLesson);
 
         });
 
@@ -300,32 +297,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 if (lessonNumber <= currentLesson) {
 
                     // Can play this lesson
-
-                    android.widget.Toast.makeText(this,
-
-                            "Opening Lesson " + lessonNumber,
-
-                            android.widget.Toast.LENGTH_SHORT).show();
-
-
-
-                    // Launch game based on module type
-
-                    Intent intent = getGameIntentForModule(moduleName);
-
-                    if (intent != null) {
-
-                        startActivity(intent);
-
-                    } else {
-
-                        android.widget.Toast.makeText(this,
-
-                                "Game coming soon for this module!",
-
-                                android.widget.Toast.LENGTH_SHORT).show();
-
-                    }
+                    openLesson(lessonNumber);
 
                 } else {
 
@@ -350,95 +322,20 @@ public class ModuleLadderActivity extends AppCompatActivity {
     }
     /**
 
-     * Maps each module to its specific game activity
+     * Opens a lesson in ModuleLessonActivity
+
+     * Calculates lesson ID based on module ID and lesson number
 
      */
 
-    private Intent getGameIntentForModule(String module) {
+    private void openLesson(int lessonNumber) {
+        // Calculate lesson ID: Module 1 = 101-115, Module 2 = 201-215, etc.
+        int lessonId = (moduleId * 100) + lessonNumber;
 
-        Intent intent = null;
-
-
-
-        switch (module) {
-
-            case "Reading Comprehension":
-
-                // Story Sequencing game
-
-                intent = new Intent(this, com.example.literise.activities.games.StorySequencingActivity.class);
-
-                break;
-
-
-
-            case "Reading Fluency":
-
-                // Fill in the Blanks game
-
-                intent = new Intent(this, com.example.literise.activities.games.FillInTheBlanksActivity.class);
-
-                break;
-
-
-
-            case "Spelling & Writing":
-
-                // Picture Match game
-
-                intent = new Intent(this, com.example.literise.activities.games.PictureMatchActivity.class);
-
-                break;
-
-
-
-            case "Phonics & Pronunciation":
-
-                // Dialogue Reading with Voice Recording
-
-                intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
-
-                break;
-
-
-
-            case "Vocabulary Building":
-
-                // Word Hunt game (if exists)
-
-                intent = new Intent(this, com.example.literise.activities.games.WordHuntActivity.class); // Placeholder
-
-                break;
-
-
-
-            case "Grammar & Syntax":
-
-                // Sentence Scramble game (if exists)
-
-                intent = new Intent(this, com.example.literise.activities.games.SentenceScrambleActivity.class); // Placeholder
-
-                break;
-
-
-
-            default:
-
-                // Unknown module - show toast
-
-                android.widget.Toast.makeText(this,
-
-                        "Module not yet configured: " + module,
-
-                        android.widget.Toast.LENGTH_SHORT).show();
-
-                break;
-
-        }
-
-
-
-        return intent;
+        Intent intent = new Intent(this, ModuleLessonActivity.class);
+        intent.putExtra(ModuleLessonActivity.EXTRA_LESSON_ID, lessonId);
+        intent.putExtra(ModuleLessonActivity.EXTRA_MODULE_ID, moduleId);
+        startActivity(intent);
 
     }
 
