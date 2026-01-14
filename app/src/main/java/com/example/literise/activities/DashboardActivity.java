@@ -131,6 +131,9 @@ public class DashboardActivity extends BaseActivity {
         // Bottom Navigation
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
+        // Set Visby font for bottom navigation
+        setBottomNavigationFont();
+
         // Tutorial views
 
         tutorialOverlay = findViewById(R.id.tutorialOverlay);
@@ -195,7 +198,25 @@ public class DashboardActivity extends BaseActivity {
 
     }
 
-
+    /**
+     * Set Visby font for bottom navigation labels
+     */
+    private void setBottomNavigationFont() {
+        android.graphics.Typeface visby = androidx.core.content.res.ResourcesCompat.getFont(this, R.font.visby_bold);
+        android.view.ViewGroup bottomNavView = (android.view.ViewGroup) bottomNavigation.getChildAt(0);
+        for (int i = 0; i < bottomNavView.getChildCount(); i++) {
+            android.view.View item = bottomNavView.getChildAt(i);
+            if (item instanceof android.view.ViewGroup) {
+                android.view.ViewGroup itemGroup = (android.view.ViewGroup) item;
+                for (int j = 0; j < itemGroup.getChildCount(); j++) {
+                    android.view.View child = itemGroup.getChildAt(j);
+                    if (child instanceof TextView) {
+                        ((TextView) child).setTypeface(visby);
+                    }
+                }
+            }
+        }
+    }
 
     private void loadUserData() {
 
