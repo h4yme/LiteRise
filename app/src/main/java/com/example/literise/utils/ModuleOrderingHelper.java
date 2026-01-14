@@ -11,7 +11,18 @@ import java.util.Map;
 
 /**
  * Helper class to create and order learning modules based on placement test results
+ * Creates 8 modules aligned with MATATAG Reading and Literacy Curriculum (Key Stage 1)
  * Orders modules by performance: weakest areas first (highest priority)
+ *
+ * MATATAG KS1 Subdomains:
+ * 1. Oral Language
+ * 2. Phonological Awareness
+ * 3. Phonics
+ * 4. Word Study
+ * 5. Grammar Awareness
+ * 6. Vocabulary
+ * 7. Comprehending and Analyzing Texts
+ * 8. Creating and Composing Texts
  */
 public class ModuleOrderingHelper {
 
@@ -28,7 +39,9 @@ public class ModuleOrderingHelper {
     };
 
     /**
-     * Create 8 Key Stage 1 modules with performance scores from placement test
+     * Create 8 MATATAG Key Stage 1 modules with performance scores from placement test
+     * Maps 4 placement test categories to 8 curriculum subdomains using weighted formulas
+     * @return List of modules ordered by priority (weakest first)
      */
     public static List<LearningModule> createModulesFromPlacementResults(
             double oralLanguageScore,
@@ -73,14 +86,14 @@ public class ModuleOrderingHelper {
             MODULE_GRADIENTS[2][1]
         ));
 
-        // Module 4: Book and Print Knowledge (derived from reading comprehension)
-        double bookKnowledgeScore = readingCompScore * 0.9;
+        // Module 4: Word Study (derived from word knowledge + reading comprehension)
+        double wordStudyScore = (wordKnowledgeScore * 0.7 + readingCompScore * 0.3);
         modules.add(new LearningModule(
             4,
-            "Book and Print Knowledge",
-            "Understanding how books work",
-            "Book and Print Knowledge",
-            bookKnowledgeScore,
+            "Word Study",
+            "Understanding word patterns and meanings",
+            "Word Study",
+            wordStudyScore,
             MODULE_GRADIENTS[3][0],
             MODULE_GRADIENTS[3][1]
         ));
@@ -110,7 +123,7 @@ public class ModuleOrderingHelper {
         // Module 7: Comprehending and Analyzing Texts (directly from reading comp)
         modules.add(new LearningModule(
             7,
-            "Comprehending Texts",
+            "Comprehending and Analyzing Texts",
             "Understanding what you read",
             "Comprehending and Analyzing Texts",
             readingCompScore,
@@ -127,7 +140,7 @@ public class ModuleOrderingHelper {
         );
         modules.add(new LearningModule(
             8,
-            "Creating Texts",
+            "Creating and Composing Texts",
             "Writing stories and compositions",
             "Creating and Composing Texts",
             composingScore,

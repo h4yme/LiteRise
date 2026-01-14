@@ -497,7 +497,7 @@ public class DashboardActivity extends BaseActivity {
 
         loadUserData();
 
-        displayModules();
+        loadModulesFromPlacementResults();
 
     }
 
