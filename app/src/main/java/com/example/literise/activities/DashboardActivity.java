@@ -193,48 +193,79 @@ public class DashboardActivity extends BaseActivity {
     }
 
     /**
-     * Handle navigation item selection
+     * Handle navigation item selection with animation
      */
     private void selectNavItem(int position) {
-        // Reset all items
+        // Reset all items with animation
         resetNavItems();
 
-        // Set selected item
+        // Set selected item with expanding animation
         switch (position) {
             case 0: // Home
-                navHome.setBackgroundResource(R.drawable.nav_item_selected_bg);
-                iconHome.setColorFilter(getResources().getColor(R.color.purple_600));
-                labelHome.setVisibility(View.VISIBLE);
+                animateNavSelection(navHome, iconHome, labelHome);
                 loadModulesFromPlacementResults();
                 break;
 
             case 1: // Modules
-                navModules.setBackgroundResource(R.drawable.nav_item_selected_bg);
-                iconModules.setColorFilter(getResources().getColor(R.color.purple_600));
-                labelModules.setVisibility(View.VISIBLE);
+                animateNavSelection(navModules, iconModules, labelModules);
                 Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
                 break;
 
             case 2: // Progress
-                navProgress.setBackgroundResource(R.drawable.nav_item_selected_bg);
-                iconProgress.setColorFilter(getResources().getColor(R.color.purple_600));
-                labelProgress.setVisibility(View.VISIBLE);
+                animateNavSelection(navProgress, iconProgress, labelProgress);
                 Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
                 break;
 
             case 3: // Profile
-                navProfile.setBackgroundResource(R.drawable.nav_item_selected_bg);
-                iconProfile.setColorFilter(getResources().getColor(R.color.purple_600));
-                labelProfile.setVisibility(View.VISIBLE);
+                animateNavSelection(navProfile, iconProfile, labelProfile);
                 openSettings();
                 break;
         }
     }
 
     /**
-     * Reset all navigation items to unselected state
+     * Animate navigation item selection with expand effect
+     */
+    private void animateNavSelection(LinearLayout navItem, ImageView icon, TextView label) {
+        // Set background
+        navItem.setBackgroundResource(R.drawable.nav_item_selected_bg);
+
+        // Change icon color
+        icon.setColorFilter(getResources().getColor(R.color.purple_600));
+
+        // Show and animate label with scale and fade
+        label.setVisibility(View.VISIBLE);
+        label.setAlpha(0f);
+        label.setScaleX(0.8f);
+        label.setScaleY(0.8f);
+
+        label.animate()
+            .alpha(1f)
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(200)
+            .start();
+
+        // Animate pill background with scale
+        navItem.setScaleX(0.95f);
+        navItem.setScaleY(0.95f);
+        navItem.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(200)
+            .start();
+    }
+
+    /**
+     * Reset all navigation items to unselected state with fade out animation
      */
     private void resetNavItems() {
+        // Animate hide all labels
+        animateHideLabel(labelHome);
+        animateHideLabel(labelModules);
+        animateHideLabel(labelProgress);
+        animateHideLabel(labelProfile);
+
         // Reset backgrounds
         navHome.setBackgroundResource(android.R.color.transparent);
         navModules.setBackgroundResource(android.R.color.transparent);
@@ -247,12 +278,21 @@ public class DashboardActivity extends BaseActivity {
         iconModules.setColorFilter(grayColor);
         iconProgress.setColorFilter(grayColor);
         iconProfile.setColorFilter(grayColor);
+    }
 
-        // Hide all labels
-        labelHome.setVisibility(View.GONE);
-        labelModules.setVisibility(View.GONE);
-        labelProgress.setVisibility(View.GONE);
-        labelProfile.setVisibility(View.GONE);
+    /**
+     * Animate hiding label with fade and scale
+     */
+    private void animateHideLabel(TextView label) {
+        if (label.getVisibility() == View.VISIBLE) {
+            label.animate()
+                .alpha(0f)
+                .scaleX(0.8f)
+                .scaleY(0.8f)
+                .setDuration(150)
+                .withEndAction(() -> label.setVisibility(View.GONE))
+                .start();
+        }
     }
 
     private void loadUserData() {
@@ -596,6 +636,9 @@ public class DashboardActivity extends BaseActivity {
         loadUserData();
 
         loadModulesFromPlacementResults();
+
+        // Always reset to Home tab when returning
+        selectNavItem(0);
 
     }
 

@@ -21,15 +21,15 @@
         android:orientation="horizontal"
         android:gravity="center"
         android:background="@drawable/nav_item_selected_bg"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/iconHome"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_home"
             app:tint="#7C3AED"
             android:contentDescription="Home"/>
@@ -39,10 +39,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Home"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textColor="#7C3AED"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:visibility="visible"/>
     </LinearLayout>
 
@@ -54,15 +54,15 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/iconModules"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_book"
             app:tint="#9CA3AF"
             android:contentDescription="Modules"/>
@@ -72,10 +72,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Modules"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textColor="#7C3AED"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:visibility="gone"/>
     </LinearLayout>
 
@@ -87,15 +87,15 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/iconProgress"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_chart"
             app:tint="#9CA3AF"
             android:contentDescription="Progress"/>
@@ -105,10 +105,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Progress"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textColor="#7C3AED"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:visibility="gone"/>
     </LinearLayout>
 
@@ -120,15 +120,15 @@
         android:layout_weight="1"
         android:orientation="horizontal"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp">
 
         <ImageView
             android:id="@+id/iconProfile"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
             android:src="@drawable/ic_user"
             app:tint="#9CA3AF"
             android:contentDescription="Profile"/>
@@ -138,10 +138,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Profile"
-            android:textSize="12sp"
+            android:textSize="13sp"
             android:textColor="#7C3AED"
             android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
+            android:layout_marginStart="8dp"
             android:visibility="gone"/>
     </LinearLayout>
 
