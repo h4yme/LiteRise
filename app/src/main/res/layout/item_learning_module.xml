@@ -6,7 +6,8 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="16dp"
     app:cardCornerRadius="20dp"
-    app:cardElevation="4dp">
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
 
     <!-- Gradient Background will be set programmatically -->
     <FrameLayout
@@ -76,7 +77,7 @@
 
             </LinearLayout>
 
-            <!-- Landscape Illustration (Right Side) -->
+            <!-- Landscape Illustration (Removed for cleaner design) -->
             <ImageView
                 android:id="@+id/ivLandscape"
                 android:layout_width="120dp"
@@ -85,7 +86,8 @@
                 android:scaleType="fitEnd"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                android:contentDescription="Module Illustration" />
+                android:contentDescription="Module Illustration"
+                android:visibility="gone" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
