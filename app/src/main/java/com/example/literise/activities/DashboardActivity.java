@@ -153,7 +153,10 @@ public class DashboardActivity extends BaseActivity {
 
     private void setupListeners() {
 
-        btnContinueLesson.setOnClickListener(v -> continueLesson());
+        // Continue lesson button (optional, may not be in layout)
+        if (btnContinueLesson != null) {
+            btnContinueLesson.setOnClickListener(v -> continueLesson());
+        }
 
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
 
