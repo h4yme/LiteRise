@@ -343,6 +343,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         Intent intent = null;
         String gameType = getLessonGameType(lessonId);
 
+        // DEBUG: Show what game type was detected
+        android.widget.Toast.makeText(this, "Lesson " + lessonNumber + " - Game: " + gameType, android.widget.Toast.LENGTH_SHORT).show();
+
         // Route to the appropriate fun game activity!
         switch (gameType) {
             case "sentence_scramble":
@@ -387,13 +390,19 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     .getDeclaredMethod("getAllLessons");
                 java.util.List<?> lessons = (java.util.List<?>) method.invoke(null);
 
+                android.util.Log.d("ModuleLadder", "Got " + lessons.size() + " lessons from provider");
+
                 for (Object lessonObj : lessons) {
                     com.example.literise.models.Lesson lesson = (com.example.literise.models.Lesson) lessonObj;
                     if (lesson.getLessonId() == lessonId) {
-                        return lesson.getGameType();
+                        String gameType = lesson.getGameType();
+                        android.util.Log.d("ModuleLadder", "Lesson " + lessonId + " has game type: " + gameType);
+                        return gameType != null ? gameType : "traditional";
                     }
                 }
+                android.util.Log.w("ModuleLadder", "Lesson " + lessonId + " not found in provider");
             } catch (Exception e) {
+                android.util.Log.e("ModuleLadder", "Error getting game type: " + e.getMessage());
                 e.printStackTrace();
             }
         }
