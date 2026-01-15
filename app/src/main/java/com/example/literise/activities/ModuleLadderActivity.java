@@ -347,19 +347,16 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 break;
 
             case "timed_trail":
-                // TODO: Create TimedTrailActivity
-                android.widget.Toast.makeText(this, "Timed Trail coming soon!", android.widget.Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(this, com.example.literise.activities.games.TimedTrailActivity.class);
+                break;
 
             case "shadow_read":
-                // TODO: Create ShadowReadActivity
-                android.widget.Toast.makeText(this, "Shadow Read coming soon!", android.widget.Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
+                break;
 
             case "minimal_pairs":
-                // TODO: Create MinimalPairsActivity
-                android.widget.Toast.makeText(this, "Minimal Pairs coming soon!", android.widget.Toast.LENGTH_SHORT).show();
-                return;
+                intent = new Intent(this, com.example.literise.activities.games.MinimalPairsActivity.class);
+                break;
 
             case "traditional":
             default:

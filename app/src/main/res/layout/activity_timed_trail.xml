@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".activities.games.TimedTrailActivity">
+
+    <!-- Header -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/primary">
+
+        <ImageView
+            android:id="@+id/btn_back"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_arrow_back"
+            android:contentDescription="Back"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Timed Trail Race"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:gravity="center"
+            android:layout_marginStart="16dp" />
+
+        <TextView
+            android:id="@+id/tv_timer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="30 s"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/white"
+            android:background="@drawable/bg_timer"
+            android:padding="8dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp" />
+    </LinearLayout>
+
+    <!-- Race Track Section -->
+    <LinearLayout
+        android:id="@+id/track_section"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/header"
+        android:orientation="vertical"
+        android:padding="20dp"
+        android:background="@drawable/bg_gradient_blue">
+
+        <!-- Stats Row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="16dp">
+
+            <TextView
+                android:id="@+id/tv_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0m"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:drawableStart="@drawable/ic_star"
+                android:drawablePadding="8dp"
+                android:layout_marginEnd="24dp" />
+
+            <TextView
+                android:id="@+id/tv_streak"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Streak: 0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:drawableStart="@drawable/ic_fire"
+                android:drawablePadding="8dp" />
+        </LinearLayout>
+
+        <!-- Avatar -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginBottom="8dp">
+
+            <ImageView
+                android:id="@+id/iv_avatar"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_avatar_running"
+                android:layout_gravity="start|center_vertical"
+                android:contentDescription="Running Avatar" />
+        </FrameLayout>
+
+        <!-- Progress Track -->
+        <ProgressBar
+            android:id="@+id/progress_track"
+            android:layout_width="match_parent"
+            android:layout_height="24dp"
+            android:max="100"
+            android:progress="0"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:progressTint="@color/color_success"
+            android:progressBackgroundTint="@color/white"
+            android:background="@drawable/bg_track" />
+
+        <!-- Progress Text -->
+        <TextView
+            android:id="@+id/tv_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0 / 100m"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+    <!-- Question Card -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/track_section"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="8dp"
+                android:layout_marginBottom="20dp">
+
+                <TextView
+                    android:id="@+id/tv_question"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="What is a sight word?"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_primary"
+                    android:padding="24dp"
+                    android:gravity="center"
+                    android:minHeight="120dp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Options -->
+            <LinearLayout
+                android:id="@+id/options_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_option_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Option 1"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp"
+                    app:cornerRadius="12dp"
+                    android:backgroundTint="@color/purple_600"
+                    android:textAlignment="textStart"
+                    android:gravity="start|center_vertical"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_option_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Option 2"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp"
+                    app:cornerRadius="12dp"
+                    android:backgroundTint="@color/purple_600"
+                    android:textAlignment="textStart"
+                    android:gravity="start|center_vertical"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_option_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Option 3"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:padding="16dp"
+                    android:layout_marginBottom="12dp"
+                    app:cornerRadius="12dp"
+                    android:backgroundTint="@color/purple_600"
+                    android:textAlignment="textStart"
+                    android:gravity="start|center_vertical"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_option_4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Option 4"
+                    android:textSize="16sp"
+                    android:textColor="@color/white"
+                    android:padding="16dp"
+                    app:cornerRadius="12dp"
+                    android:backgroundTint="@color/purple_600"
+                    android:textAlignment="textStart"
+                    android:gravity="start|center_vertical"
+                    style="@style/Widget.MaterialComponents.Button" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

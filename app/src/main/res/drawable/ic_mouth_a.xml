@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Mouth for 'a' sound - open wide -->
+    <ellipse
+        android:fillColor="#FF6B9D"
+        cx="60"
+        cy="60"
+        rx="25"
+        ry="30"/>
+    <ellipse
+        android:strokeColor="#E91E63"
+        android:strokeWidth="3"
+        cx="60"
+        cy="60"
+        rx="25"
+        ry="30"/>
+</vector>

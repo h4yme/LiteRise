@@ -254,6 +254,18 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".activities.games.TimedTrailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.games.MinimalPairsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".activities.AssessmentResultsActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
