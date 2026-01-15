@@ -66,7 +66,15 @@ public class Module1ContentProvider {
             "Sight Words: The Basics",
             "Foundation",
             "Learn to recognize and read common sight words instantly");
+
+        // DEBUG: Log before setting game type
+        android.util.Log.d("Module1Provider", "Creating Lesson 1 - Before setGameType: " + lesson.getGameType());
+
         lesson.setGameType(Lesson.GAME_WORD_HUNT); // Fun word search game!
+
+        // DEBUG: Log after setting game type
+        android.util.Log.d("Module1Provider", "Creating Lesson 1 - After setGameType: " + lesson.getGameType());
+
         lesson.setXpReward(20);
 
         String content = "# Sight Words: The Basics\n\n" +
