@@ -180,6 +180,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
 
+            ImageView ivGameBadge = nodeView.findViewById(R.id.ivGameBadge);
+
             TextView tvLessonNumber = nodeView.findViewById(R.id.tvLessonNumber);
 
 
@@ -219,6 +221,11 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
 
             }
+
+            // Set game type badge
+            int lessonId = (moduleId * 100) + i;
+            String gameType = getLessonGameType(lessonId);
+            setGameBadge(ivGameBadge, gameType);
 
 
 
@@ -391,6 +398,43 @@ public class ModuleLadderActivity extends AppCompatActivity {
             }
         }
         return "traditional";
+    }
+
+    /**
+     * Sets the game badge icon based on the game type
+     */
+    private void setGameBadge(android.widget.ImageView gameBadge, String gameType) {
+        if (gameBadge == null) return;
+
+        int iconResource;
+        switch (gameType) {
+            case "word_hunt":
+                iconResource = R.drawable.ic_game_word_hunt;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "sentence_scramble":
+                iconResource = R.drawable.ic_game_sentence_scramble;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "timed_trail":
+                iconResource = R.drawable.ic_game_timed_trail;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "shadow_read":
+                iconResource = R.drawable.ic_game_shadow_read;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "minimal_pairs":
+                iconResource = R.drawable.ic_game_minimal_pairs;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "traditional":
+            default:
+                // No badge for traditional lessons
+                gameBadge.setVisibility(android.view.View.GONE);
+                return;
+        }
+        gameBadge.setImageResource(iconResource);
     }
 
 }
