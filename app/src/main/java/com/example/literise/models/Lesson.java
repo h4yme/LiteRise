@@ -7,12 +7,21 @@ import java.util.List;
  * Each lesson has content, practice exercises, and a quiz
  */
 public class Lesson {
+    // Game types
+    public static final String GAME_SENTENCE_SCRAMBLE = "sentence_scramble";
+    public static final String GAME_TIMED_TRAIL = "timed_trail";
+    public static final String GAME_WORD_HUNT = "word_hunt";
+    public static final String GAME_SHADOW_READ = "shadow_read";
+    public static final String GAME_MINIMAL_PAIRS = "minimal_pairs";
+    public static final String GAME_TRADITIONAL = "traditional";
+
     private int lessonId;
     private int moduleId;
     private int lessonNumber; // 1-15
     private String title;
     private String tier; // "Foundation", "Intermediate", "Advanced"
     private String description;
+    private String gameType; // Type of game for this lesson
     private String content; // Main teaching content (can be HTML formatted)
     private List<String> learningObjectives;
     private List<Question> practiceQuestions; // 10 practice questions
@@ -36,6 +45,7 @@ public class Lesson {
         this.title = title;
         this.tier = tier;
         this.description = description;
+        this.gameType = GAME_TRADITIONAL; // Default
         this.xpReward = 10; // Default
         this.isUnlocked = false;
         this.isCompleted = false;
@@ -49,6 +59,7 @@ public class Lesson {
     public String getTitle() { return title; }
     public String getTier() { return tier; }
     public String getDescription() { return description; }
+    public String getGameType() { return gameType; }
     public String getContent() { return content; }
     public List<String> getLearningObjectives() { return learningObjectives; }
     public List<Question> getPracticeQuestions() { return practiceQuestions; }
@@ -63,6 +74,7 @@ public class Lesson {
     public long getCompletedTimestamp() { return completedTimestamp; }
 
     // Setters
+    public void setGameType(String gameType) { this.gameType = gameType; }
     public void setContent(String content) { this.content = content; }
     public void setLearningObjectives(List<String> objectives) { this.learningObjectives = objectives; }
     public void setPracticeQuestions(List<Question> questions) { this.practiceQuestions = questions; }
