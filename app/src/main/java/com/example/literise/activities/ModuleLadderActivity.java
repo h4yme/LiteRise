@@ -322,7 +322,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     }
     /**
 
-     * Opens a lesson in ModuleLessonActivity
+     * Opens a lesson - routes to fun game activity based on game type!
 
      * Calculates lesson ID based on module ID and lesson number
 
@@ -332,11 +332,68 @@ public class ModuleLadderActivity extends AppCompatActivity {
         // Calculate lesson ID: Module 1 = 101-115, Module 2 = 201-215, etc.
         int lessonId = (moduleId * 100) + lessonNumber;
 
-        Intent intent = new Intent(this, ModuleLessonActivity.class);
-        intent.putExtra(ModuleLessonActivity.EXTRA_LESSON_ID, lessonId);
-        intent.putExtra(ModuleLessonActivity.EXTRA_MODULE_ID, moduleId);
-        startActivity(intent);
+        // Get the lesson to check its game type
+        Intent intent = null;
+        String gameType = getLessonGameType(lessonId);
 
+        // Route to the appropriate fun game activity!
+        switch (gameType) {
+            case "sentence_scramble":
+                intent = new Intent(this, com.example.literise.activities.games.SentenceScrambleActivity.class);
+                break;
+
+            case "word_hunt":
+                intent = new Intent(this, com.example.literise.activities.games.WordHuntActivity.class);
+                break;
+
+            case "timed_trail":
+                // TODO: Create TimedTrailActivity
+                android.widget.Toast.makeText(this, "Timed Trail coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+
+            case "shadow_read":
+                // TODO: Create ShadowReadActivity
+                android.widget.Toast.makeText(this, "Shadow Read coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+
+            case "minimal_pairs":
+                // TODO: Create MinimalPairsActivity
+                android.widget.Toast.makeText(this, "Minimal Pairs coming soon!", android.widget.Toast.LENGTH_SHORT).show();
+                return;
+
+            case "traditional":
+            default:
+                // Fall back to traditional lesson activity
+                intent = new Intent(this, ModuleLessonActivity.class);
+                break;
+        }
+
+        if (intent != null) {
+            intent.putExtra("lesson_id", lessonId);
+            intent.putExtra("module_id", moduleId);
+            startActivity(intent);
+        }
+    }
+
+    private String getLessonGameType(int lessonId) {
+        // For Module 1, get game type from content provider
+        if (moduleId == 1) {
+            try {
+                java.lang.reflect.Method method = com.example.literise.content.Module1ContentProvider.class
+                    .getDeclaredMethod("getAllLessons");
+                java.util.List<?> lessons = (java.util.List<?>) method.invoke(null);
+
+                for (Object lessonObj : lessons) {
+                    com.example.literise.models.Lesson lesson = (com.example.literise.models.Lesson) lessonObj;
+                    if (lesson.getLessonId() == lessonId) {
+                        return lesson.getGameType();
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "traditional";
     }
 
 }
