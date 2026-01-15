@@ -62,13 +62,10 @@ public class Module1ContentProvider {
      * Lesson 1: High-Frequency Sight Words (Set 1)
      */
     private static Lesson createLesson1() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(101);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(1);
-        lesson.setTitle("Sight Words: The Basics");
-        lesson.setTier("Foundation");
-        lesson.setDescription("Learn to recognize and read common sight words instantly");
+        Lesson lesson = new Lesson(101, MODULE_ID, 1,
+            "Sight Words: The Basics",
+            "Foundation",
+            "Learn to recognize and read common sight words instantly");
         lesson.setXpReward(20);
 
         String content = "# Sight Words: The Basics\n\n" +
@@ -295,13 +292,10 @@ public class Module1ContentProvider {
      * Lesson 2: High-Frequency Sight Words (Set 2)
      */
     private static Lesson createLesson2() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(102);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(2);
-        lesson.setTitle("More Sight Words");
-        lesson.setTier("Foundation");
-        lesson.setDescription("Expand your sight word vocabulary with new common words");
+        Lesson lesson = new Lesson(102, MODULE_ID, 2,
+            "More Sight Words",
+            "Foundation",
+            "Expand your sight word vocabulary with new common words");
         lesson.setXpReward(20);
 
         String content = "# More Sight Words\n\n" +
@@ -511,13 +505,10 @@ public class Module1ContentProvider {
      * Lesson 3: Simple CVC Word Patterns (Consonant-Vowel-Consonant)
      */
     private static Lesson createLesson3() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(103);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(3);
-        lesson.setTitle("CVC Words: Cat, Bat, Mat");
-        lesson.setTier("Foundation");
-        lesson.setDescription("Learn to decode simple three-letter words");
+        Lesson lesson = new Lesson(103, MODULE_ID, 3,
+            "CVC Words: Cat, Bat, Mat",
+            "Foundation",
+            "Learn to decode simple three-letter words");
         lesson.setXpReward(20);
 
         String content = "# CVC Words: Simple Three-Letter Words\n\n" +
@@ -732,13 +723,10 @@ public class Module1ContentProvider {
      * Lesson 4: Word Families and Rhyming
      */
     private static Lesson createLesson4() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(104);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(4);
-        lesson.setTitle("Word Families and Rhymes");
-        lesson.setTier("Foundation");
-        lesson.setDescription("Identify rhyming words and word families");
+        Lesson lesson = new Lesson(104, MODULE_ID, 4,
+            "Word Families and Rhymes",
+            "Foundation",
+            "Identify rhyming words and word families");
         lesson.setXpReward(20);
 
         String content = "# Word Families and Rhyming\n\n" +
@@ -950,13 +938,10 @@ public class Module1ContentProvider {
      * Lesson 5: Beginning and Ending Sounds
      */
     private static Lesson createLesson5() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(105);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(5);
-        lesson.setTitle("Beginning and Ending Sounds");
-        lesson.setTier("Foundation");
-        lesson.setDescription("Master initial and final consonant sounds");
+        Lesson lesson = new Lesson(105, MODULE_ID, 5,
+            "Beginning and Ending Sounds",
+            "Foundation",
+            "Master initial and final consonant sounds");
         lesson.setXpReward(25);
 
         String content = "# Beginning and Ending Sounds\n\n" +
@@ -1173,13 +1158,10 @@ public class Module1ContentProvider {
      * Lesson 6: Consonant Blends (bl, cr, st, etc.)
      */
     private static Lesson createLesson6() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(106);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(6);
-        lesson.setTitle("Consonant Blends");
-        lesson.setTier("Intermediate");
-        lesson.setDescription("Learn to blend two consonants at the start of words");
+        Lesson lesson = new Lesson(106, MODULE_ID, 6,
+            "Consonant Blends",
+            "Intermediate",
+            "Learn to blend two consonants at the start of words");
         lesson.setXpReward(25);
 
         String content = "# Consonant Blends\n\n" +
@@ -1403,13 +1385,10 @@ public class Module1ContentProvider {
      * Lesson 7: Digraphs (sh, ch, th, wh)
      */
     private static Lesson createLesson7() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(107);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(7);
-        lesson.setTitle("Digraphs: sh, ch, th, wh");
-        lesson.setTier("Intermediate");
-        lesson.setDescription("Learn consonant combinations that make one sound");
+        Lesson lesson = new Lesson(107, MODULE_ID, 7,
+            "Digraphs: sh, ch, th, wh",
+            "Intermediate",
+            "Learn consonant combinations that make one sound");
         lesson.setXpReward(25);
 
         String content = "# Consonant Digraphs\n\n" +
@@ -1621,13 +1600,10 @@ public class Module1ContentProvider {
      * Lesson 8: Long Vowel Patterns (Magic E)
      */
     private static Lesson createLesson8() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(108);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(8);
-        lesson.setTitle("Long Vowel Patterns");
-        lesson.setTier("Intermediate");
-        lesson.setDescription("Understand long vowel sounds with silent e");
+        Lesson lesson = new Lesson(108, MODULE_ID, 8,
+            "Long Vowel Patterns",
+            "Intermediate",
+            "Understand long vowel sounds with silent e");
         lesson.setXpReward(25);
 
         String content = "# Long Vowel Sounds: The Magic E!\n\n" +
@@ -1848,13 +1824,10 @@ public class Module1ContentProvider {
      * Lesson 9: Two-Syllable Words
      */
     private static Lesson createLesson9() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(109);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(9);
-        lesson.setTitle("Two-Syllable Words");
-        lesson.setTier("Intermediate");
-        lesson.setDescription("Break words into syllables for easier reading");
+        Lesson lesson = new Lesson(109, MODULE_ID, 9,
+            "Two-Syllable Words",
+            "Intermediate",
+            "Break words into syllables for easier reading");
         lesson.setXpReward(30);
 
         String content = "# Two-Syllable Words\n\n" +
@@ -2074,13 +2047,10 @@ public class Module1ContentProvider {
      * Lesson 10: Compound Words
      */
     private static Lesson createLesson10() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(110);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(10);
-        lesson.setTitle("Compound Words");
-        lesson.setTier("Intermediate");
-        lesson.setDescription("Combine two words to make a new word");
+        Lesson lesson = new Lesson(110, MODULE_ID, 10,
+            "Compound Words",
+            "Intermediate",
+            "Combine two words to make a new word");
         lesson.setXpReward(30);
 
         String content = "# Compound Words\n\n" +
@@ -2298,13 +2268,10 @@ public class Module1ContentProvider {
     }
 
     private static Lesson createLesson11() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(111);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(11);
-        lesson.setTitle("Reading Fluency Practice");
-        lesson.setTier("Advanced");
-        lesson.setDescription("Read sentences smoothly and with expression");
+        Lesson lesson = new Lesson(111, MODULE_ID, 11,
+            "Reading Fluency Practice",
+            "Advanced",
+            "Read sentences smoothly and with expression");
         lesson.setXpReward(30);
         lesson.setContent("# Reading Fluency\n\nRead smoothly, not word by word!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2313,13 +2280,10 @@ public class Module1ContentProvider {
     }
 
     private static Lesson createLesson12() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(112);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(12);
-        lesson.setTitle("Prefixes and Suffixes");
-        lesson.setTier("Advanced");
-        lesson.setDescription("Learn word parts that change meaning");
+        Lesson lesson = new Lesson(112, MODULE_ID, 12,
+            "Prefixes and Suffixes",
+            "Advanced",
+            "Learn word parts that change meaning");
         lesson.setXpReward(30);
         lesson.setContent("# Prefixes and Suffixes\n\nAdd parts to words to change their meaning!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2328,13 +2292,10 @@ public class Module1ContentProvider {
     }
 
     private static Lesson createLesson13() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(113);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(13);
-        lesson.setTitle("Multi-Syllable Word Decoding");
-        lesson.setTier("Advanced");
-        lesson.setDescription("Read longer words with confidence");
+        Lesson lesson = new Lesson(113, MODULE_ID, 13,
+            "Multi-Syllable Word Decoding",
+            "Advanced",
+            "Read longer words with confidence");
         lesson.setXpReward(35);
         lesson.setContent("# Multi-Syllable Words\n\nBreak big words into chunks!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2343,13 +2304,10 @@ public class Module1ContentProvider {
     }
 
     private static Lesson createLesson14() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(114);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(14);
-        lesson.setTitle("Context Clues for Unknown Words");
-        lesson.setTier("Advanced");
-        lesson.setDescription("Use surrounding words to figure out meaning");
+        Lesson lesson = new Lesson(114, MODULE_ID, 14,
+            "Context Clues for Unknown Words",
+            "Advanced",
+            "Use surrounding words to figure out meaning");
         lesson.setXpReward(35);
         lesson.setContent("# Context Clues\n\nUse the story to figure out new words!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2358,13 +2316,10 @@ public class Module1ContentProvider {
     }
 
     private static Lesson createLesson15() {
-        Lesson lesson = new Lesson();
-        lesson.setLessonId(115);
-        lesson.setModuleId(MODULE_ID);
-        lesson.setLessonNumber(15);
-        lesson.setTitle("Reading with Expression");
-        lesson.setTier("Advanced");
-        lesson.setDescription("Bring stories to life with your voice");
+        Lesson lesson = new Lesson(115, MODULE_ID, 15,
+            "Reading with Expression",
+            "Advanced",
+            "Bring stories to life with your voice");
         lesson.setXpReward(40);
         lesson.setContent("# Reading with Expression\n\nMake your reading sound like talking!");
         lesson.setPracticeQuestions(new ArrayList<>());
