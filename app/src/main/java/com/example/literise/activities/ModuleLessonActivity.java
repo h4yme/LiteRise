@@ -344,8 +344,8 @@ public class ModuleLessonActivity extends BaseActivity {
     }
 
     private void setActiveTabStyle(CardView card, TextView text, View indicator) {
-        card.setCardBackgroundColor(getResources().getColor(R.color.purple_200));
-        text.setTextColor(getResources().getColor(R.color.purple_700));
+        card.setCardBackgroundColor(getResources().getColor(R.color.purple_600));
+        text.setTextColor(getResources().getColor(R.color.text_primary));
         indicator.setVisibility(View.VISIBLE);
     }
 
@@ -463,7 +463,7 @@ public class ModuleLessonActivity extends BaseActivity {
 
     private void showPracticeResults(int correct, int total, int percentage) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Practice Complete! =Ý");
+        builder.setTitle("Practice Complete!");
         builder.setMessage("You got " + correct + " out of " + total + " correct!\n\n" +
                 "Score: " + percentage + "%\n\n" +
                 "Great practice! Now let's try the quiz to earn XP.");
@@ -478,7 +478,7 @@ public class ModuleLessonActivity extends BaseActivity {
         boolean passed = percentage >= 70;
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(passed ? "Quiz Passed! <‰" : "Keep Trying! =ª");
+        builder.setTitle(passed ? "Quiz Passed!" : "Keep Trying!");
 
         StringBuilder message = new StringBuilder();
         message.append("You got ").append(correct).append(" out of ").append(total).append(" correct!\n\n");
@@ -490,29 +490,29 @@ public class ModuleLessonActivity extends BaseActivity {
             int currentLevel = gamificationManager.getCurrentLevel();
             int currentXP = gamificationManager.getCurrentXP();
 
-            message.append("( +").append(currentLesson.getXpReward()).append(" XP earned!\n");
-            message.append("=Ê Current XP: ").append(currentXP).append("\n");
-            message.append("<– Level: ").append(currentLevel).append("\n");
+            message.append("+").append(currentLesson.getXpReward()).append(" XP earned!\n");
+            message.append("Current XP: ").append(currentXP).append("\n");
+            message.append("Level: ").append(currentLevel).append("\n");
 
             if (leveledUp) {
-                message.append("\n<Š LEVEL UP! You reached Level ").append(currentLevel).append("!\n");
+                message.append("\nLEVEL UP! You reached Level ").append(currentLevel).append("!\n");
             }
 
             // Check for badges
             List<Badge> newBadges = gamificationManager.checkAndAwardBadges();
             if (!newBadges.isEmpty()) {
-                message.append("\n<Æ New Badge");
+                message.append("\nNew Badge");
                 if (newBadges.size() > 1) message.append("s");
                 message.append(" Earned:\n");
                 for (Badge badge : newBadges) {
-                    message.append("" ").append(badge.getName()).append("\n");
+                    message.append("â€¢ ").append(badge.getTitle()).append("\n");
                 }
             }
 
             // Update streak
             gamificationManager.updateStreak();
 
-            message.append("\n Next lesson unlocked!");
+            message.append("\nNext lesson unlocked!");
         } else {
             message.append("You need 70% to pass.\n\n");
             message.append("Don't worry! Review the content and try again.");
