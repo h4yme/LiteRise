@@ -5,17 +5,12 @@
     android:viewportWidth="120"
     android:viewportHeight="120">
     <!-- Mouth for 'a' sound - open wide -->
-    <ellipse
+    <path
         android:fillColor="#FF6B9D"
-        cx="60"
-        cy="60"
-        rx="25"
-        ry="30"/>
-    <ellipse
+        android:pathData="M35,30 Q60,60 85,30 Q60,90 35,30 Z"/>
+    <path
         android:strokeColor="#E91E63"
         android:strokeWidth="3"
-        cx="60"
-        cy="60"
-        rx="25"
-        ry="30"/>
+        android:fillColor="#00000000"
+        android:pathData="M35,30 Q60,60 85,30 Q60,90 35,30 Z"/>
 </vector>

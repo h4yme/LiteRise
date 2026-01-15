@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/background_light"
     tools:context=".activities.games.MinimalPairsActivity">
 
     <!-- Header -->
@@ -15,7 +15,7 @@
         android:orientation="horizontal"
         android:padding="16dp"
         android:gravity="center_vertical"
-        android:background="@color/primary">
+        android:background="@color/primary_blue">
 
         <ImageView
             android:id="@+id/btn_back"
@@ -133,7 +133,7 @@
                         android:text="SHIP"
                         android:textSize="48sp"
                         android:textStyle="bold"
-                        android:textColor="@color/primary"
+                        android:textColor="@color/primary_blue"
                         android:layout_marginBottom="16dp" />
 
                     <!-- Listen Icon Animation -->
@@ -242,7 +242,7 @@
                     app:icon="@drawable/ic_arrow_forward"
                     app:iconGravity="end"
                     app:cornerRadius="12dp"
-                    android:backgroundTint="@color/primary"
+                    android:backgroundTint="@color/primary_blue"
                     android:visibility="gone"
                     style="@style/Widget.MaterialComponents.Button" />
             </LinearLayout>
