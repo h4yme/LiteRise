@@ -50,6 +50,19 @@ public class Badge {
     public void setEarnedTimestamp(long timestamp) { this.earnedTimestamp = timestamp; }
 
     /**
+     * Get badge by ID
+     */
+    public static Badge getBadgeById(String badgeId) {
+        Badge[] allBadges = getAllBadges();
+        for (Badge badge : allBadges) {
+            if (badge.getBadgeId().equals(badgeId)) {
+                return badge;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Get all available badges
      */
     public static Badge[] getAllBadges() {

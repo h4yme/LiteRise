@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Mouth for 'e' sound - slight smile -->
+    <path
+        android:fillColor="#FF6B9D"
+        android:pathData="M35,60 Q60,70 85,60 Q60,65 35,60 Z"/>
+    <path
+        android:strokeColor="#E91E63"
+        android:strokeWidth="3"
+        android:pathData="M35,60 Q60,70 85,60"/>
+</vector>

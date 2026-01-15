@@ -192,6 +192,14 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <activity
+
+            android:name=".activities.ModuleLessonActivity"
+
+            android:exported="false"
+
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
         <!-- 🎮 Game Activities -->
 
         <activity
@@ -234,6 +242,18 @@
 
             android:theme="@style/Theme.LiteRise.NoActionBar"
 
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.games.TimedTrailActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".activities.games.MinimalPairsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar"
             android:screenOrientation="portrait" />
 
 
