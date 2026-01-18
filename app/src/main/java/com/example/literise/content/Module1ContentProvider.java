@@ -66,6 +66,15 @@ public class Module1ContentProvider {
                 "Sight Words: The Basics",
                 "Foundation",
                 "Learn to recognize and read common sight words instantly");
+
+        // DEBUG: Log before setting game type
+        android.util.Log.d("Module1Provider", "Creating Lesson 1 - Before setGameType: " + lesson.getGameType());
+
+        lesson.setGameType(Lesson.GAME_WORD_HUNT); // Fun word search game!
+
+        // DEBUG: Log after setting game type
+        android.util.Log.d("Module1Provider", "Creating Lesson 1 - After setGameType: " + lesson.getGameType());
+
         lesson.setXpReward(20);
 
         String content = "# Sight Words: The Basics\n\n" +
@@ -296,6 +305,7 @@ public class Module1ContentProvider {
                 "More Sight Words",
                 "Foundation",
                 "Expand your sight word vocabulary with new common words");
+        lesson.setGameType(Lesson.GAME_WORD_HUNT);
         lesson.setXpReward(20);
 
         String content = "# More Sight Words\n\n" +
@@ -509,6 +519,7 @@ public class Module1ContentProvider {
                 "CVC Words: Cat, Bat, Mat",
                 "Foundation",
                 "Learn to decode simple three-letter words");
+        lesson.setGameType(Lesson.GAME_SENTENCE_SCRAMBLE);
         lesson.setXpReward(20);
 
         String content = "# CVC Words: Simple Three-Letter Words\n\n" +
@@ -727,6 +738,7 @@ public class Module1ContentProvider {
                 "Word Families and Rhymes",
                 "Foundation",
                 "Identify rhyming words and word families");
+        lesson.setGameType(Lesson.GAME_SENTENCE_SCRAMBLE);
         lesson.setXpReward(20);
 
         String content = "# Word Families and Rhyming\n\n" +
@@ -942,6 +954,7 @@ public class Module1ContentProvider {
                 "Beginning and Ending Sounds",
                 "Foundation",
                 "Master initial and final consonant sounds");
+        lesson.setGameType(Lesson.GAME_WORD_HUNT);
         lesson.setXpReward(25);
 
         String content = "# Beginning and Ending Sounds\n\n" +
@@ -1162,6 +1175,7 @@ public class Module1ContentProvider {
                 "Consonant Blends",
                 "Intermediate",
                 "Learn to blend two consonants at the start of words");
+        lesson.setGameType(Lesson.GAME_SENTENCE_SCRAMBLE);
         lesson.setXpReward(25);
 
         String content = "# Consonant Blends\n\n" +
@@ -1389,6 +1403,7 @@ public class Module1ContentProvider {
                 "Digraphs: sh, ch, th, wh",
                 "Intermediate",
                 "Learn consonant combinations that make one sound");
+        lesson.setGameType(Lesson.GAME_WORD_HUNT);
         lesson.setXpReward(25);
 
         String content = "# Consonant Digraphs\n\n" +
@@ -1604,6 +1619,7 @@ public class Module1ContentProvider {
                 "Long Vowel Patterns",
                 "Intermediate",
                 "Understand long vowel sounds with silent e");
+        lesson.setGameType(Lesson.GAME_SENTENCE_SCRAMBLE);
         lesson.setXpReward(25);
 
         String content = "# Long Vowel Sounds: The Magic E!\n\n" +
@@ -1828,6 +1844,7 @@ public class Module1ContentProvider {
                 "Two-Syllable Words",
                 "Intermediate",
                 "Break words into syllables for easier reading");
+        lesson.setGameType(Lesson.GAME_WORD_HUNT);
         lesson.setXpReward(30);
 
         String content = "# Two-Syllable Words\n\n" +
@@ -2051,6 +2068,7 @@ public class Module1ContentProvider {
                 "Compound Words",
                 "Intermediate",
                 "Combine two words to make a new word");
+        lesson.setGameType(Lesson.GAME_SENTENCE_SCRAMBLE);
         lesson.setXpReward(30);
 
         String content = "# Compound Words\n\n" +
@@ -2272,6 +2290,7 @@ public class Module1ContentProvider {
                 "Reading Fluency Practice",
                 "Advanced",
                 "Read sentences smoothly and with expression");
+        lesson.setGameType(Lesson.GAME_TRADITIONAL);
         lesson.setXpReward(30);
         lesson.setContent("# Reading Fluency\n\nRead smoothly, not word by word!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2284,6 +2303,7 @@ public class Module1ContentProvider {
                 "Prefixes and Suffixes",
                 "Advanced",
                 "Learn word parts that change meaning");
+        lesson.setGameType(Lesson.GAME_TRADITIONAL);
         lesson.setXpReward(30);
         lesson.setContent("# Prefixes and Suffixes\n\nAdd parts to words to change their meaning!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2296,6 +2316,7 @@ public class Module1ContentProvider {
                 "Multi-Syllable Word Decoding",
                 "Advanced",
                 "Read longer words with confidence");
+        lesson.setGameType(Lesson.GAME_TRADITIONAL);
         lesson.setXpReward(35);
         lesson.setContent("# Multi-Syllable Words\n\nBreak big words into chunks!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2308,6 +2329,7 @@ public class Module1ContentProvider {
                 "Context Clues for Unknown Words",
                 "Advanced",
                 "Use surrounding words to figure out meaning");
+        lesson.setGameType(Lesson.GAME_TRADITIONAL);
         lesson.setXpReward(35);
         lesson.setContent("# Context Clues\n\nUse the story to figure out new words!");
         lesson.setPracticeQuestions(new ArrayList<>());
@@ -2320,6 +2342,7 @@ public class Module1ContentProvider {
                 "Reading with Expression",
                 "Advanced",
                 "Bring stories to life with your voice");
+        lesson.setGameType(Lesson.GAME_TRADITIONAL);
         lesson.setXpReward(40);
         lesson.setContent("# Reading with Expression\n\nMake your reading sound like talking!");
         lesson.setPracticeQuestions(new ArrayList<>());

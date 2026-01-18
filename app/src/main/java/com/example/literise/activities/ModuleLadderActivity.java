@@ -180,6 +180,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
 
+            ImageView ivGameBadge = nodeView.findViewById(R.id.ivGameBadge);
+
             TextView tvLessonNumber = nodeView.findViewById(R.id.tvLessonNumber);
 
 
@@ -219,6 +221,11 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
 
             }
+
+            // Set game type badge
+            int lessonId = (moduleId * 100) + i;
+            String gameType = getLessonGameType(lessonId);
+            setGameBadge(ivGameBadge, gameType);
 
 
 
@@ -336,6 +343,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         Intent intent = null;
         String gameType = getLessonGameType(lessonId);
 
+        // DEBUG: Show what game type was detected
+        android.widget.Toast.makeText(this, "Lesson " + lessonNumber + " - Game: " + gameType, android.widget.Toast.LENGTH_SHORT).show();
+
         // Route to the appropriate fun game activity!
         switch (gameType) {
             case "sentence_scramble":
@@ -380,17 +390,60 @@ public class ModuleLadderActivity extends AppCompatActivity {
                         .getDeclaredMethod("getAllLessons");
                 java.util.List<?> lessons = (java.util.List<?>) method.invoke(null);
 
+                android.util.Log.d("ModuleLadder", "Got " + lessons.size() + " lessons from provider");
+
                 for (Object lessonObj : lessons) {
                     com.example.literise.models.Lesson lesson = (com.example.literise.models.Lesson) lessonObj;
                     if (lesson.getLessonId() == lessonId) {
-                        return lesson.getGameType();
+                        String gameType = lesson.getGameType();
+                        android.util.Log.d("ModuleLadder", "Lesson " + lessonId + " has game type: " + gameType);
+                        return gameType != null ? gameType : "traditional";
                     }
                 }
+                android.util.Log.w("ModuleLadder", "Lesson " + lessonId + " not found in provider");
             } catch (Exception e) {
+                android.util.Log.e("ModuleLadder", "Error getting game type: " + e.getMessage());
                 e.printStackTrace();
             }
         }
         return "traditional";
+    }
+
+    /**
+     * Sets the game badge icon based on the game type
+     */
+    private void setGameBadge(android.widget.ImageView gameBadge, String gameType) {
+        if (gameBadge == null) return;
+
+        int iconResource;
+        switch (gameType) {
+            case "word_hunt":
+                iconResource = R.drawable.ic_game_word_hunt;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "sentence_scramble":
+                iconResource = R.drawable.ic_game_sentence_scramble;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "timed_trail":
+                iconResource = R.drawable.ic_game_timed_trail;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "shadow_read":
+                iconResource = R.drawable.ic_game_shadow_read;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "minimal_pairs":
+                iconResource = R.drawable.ic_game_minimal_pairs;
+                gameBadge.setVisibility(android.view.View.VISIBLE);
+                break;
+            case "traditional":
+            default:
+                // No badge for traditional lessons
+                gameBadge.setVisibility(android.view.View.GONE);
+                return;
+        }
+        gameBadge.setImageResource(iconResource);
     }
 
 }

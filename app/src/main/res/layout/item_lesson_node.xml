@@ -16,7 +16,6 @@
 
 
 
-    android:layout_marginBottom="40dp">
 
 
 
@@ -61,6 +60,21 @@
             app:tint="#FFFFFF"
 
             android:contentDescription="Node Status"/>
+
+        <!-- Game Type Badge -->
+        <ImageView
+            android:id="@+id/ivGameBadge"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="4dp"
+            android:src="@drawable/ic_game_controller"
+            android:background="@drawable/bg_game_badge"
+            android:padding="4dp"
+            android:elevation="6dp"
+            android:visibility="gone"
+            android:contentDescription="Game Type"/>
 
     </FrameLayout>
 
