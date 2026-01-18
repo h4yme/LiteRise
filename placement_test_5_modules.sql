@@ -3,9 +3,10 @@
 -- ============================================================================
 -- Changes:
 -- 1. Update placement test from 4 categories to 5 module-based categories
--- 2. Clear old assessment items
--- 3. Insert new items for 5 modules (6 items each = 30 total)
--- 4. Update module ordering logic based on weakest performance
+-- 2. Map ItemType values to 5 modules
+-- 3. Update SP_GetPreAssessmentItems to return 30 items (6 per module)
+-- 4. Clear old placement items and insert new categorized items
+-- 5. Add module ordering stored procedure based on weakest performance
 -- ============================================================================
 
 USE LiteRiseDB;
@@ -15,7 +16,7 @@ GO
 -- PHASE 1: Update Modules Table with All 5 Modules
 -- ============================================================================
 
--- Clear existing modules if needed
+-- Clear existing modules if needed (safe for development, review for production)
 DELETE FROM Modules WHERE ModuleID BETWEEN 1 AND 5;
 GO
 
@@ -51,418 +52,462 @@ VALUES
 SET IDENTITY_INSERT Modules OFF;
 GO
 
--- ============================================================================
--- PHASE 2: Update Items Table Category Field
--- ============================================================================
-
--- Add ModuleCategory field if not exists
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-               WHERE TABLE_NAME = 'Items' AND COLUMN_NAME = 'ModuleCategory')
-BEGIN
-    ALTER TABLE Items ADD ModuleCategory NVARCHAR(100) NULL;
-END
-GO
-
--- Add IsPlacementItem field to distinguish placement test items
-IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS
-               WHERE TABLE_NAME = 'Items' AND COLUMN_NAME = 'IsPlacementItem')
-BEGIN
-    ALTER TABLE Items ADD IsPlacementItem BIT DEFAULT 0;
-END
+PRINT '5 Modules created successfully.';
 GO
 
 -- ============================================================================
--- PHASE 3: Clear Old Placement Test Items
+-- PHASE 2: Clear Old Placement Test Items
 -- ============================================================================
+-- NOTE: We'll mark old items as inactive instead of deleting to preserve data integrity
 
--- Delete old placement test items (be careful with this in production!)
-DELETE FROM Responses WHERE ItemID IN (SELECT ItemID FROM Items WHERE IsPlacementItem = 1);
-DELETE FROM Items WHERE IsPlacementItem = 1;
+UPDATE Items
+SET IsActive = 0
+WHERE GradeLevel = 3
+  AND DifficultyParam BETWEEN -2.0 AND 2.0;
 GO
 
-PRINT 'Old placement test items cleared.';
+PRINT 'Old placement test items marked as inactive.';
 GO
 
 -- ============================================================================
--- PHASE 4: Insert New Placement Test Items (5 Modules x 6 Items = 30 Items)
+-- PHASE 3: Insert New Placement Test Items (5 Modules x 6 Items = 30 Items)
+-- ============================================================================
+-- ItemType mapping to Modules:
+-- Module 1: Phonics, Phonological, Word Recognition
+-- Module 2: Vocabulary, Word Meaning
+-- Module 3: Grammar, Syntax
+-- Module 4: Reading Comprehension, Inference
+-- Module 5: Writing, Composition
 -- ============================================================================
 
 -- ============================================================================
 -- MODULE 1: Phonics and Word Study (Items 1-6)
+-- ItemType: Phonics, Phonological
 -- ============================================================================
 
 INSERT INTO Items (ItemText, ItemType, DifficultyLevel, DifficultyParam, DiscriminationParam, GuessingParam,
-                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, IsPlacementItem, ModuleCategory, CreatedAt)
+                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, Phonetic, CreatedAt)
 VALUES
 -- Item 1: Easy - Beginning sounds
 ('Which word starts with the same sound as "cat"?',
- 'multiple_choice', 'Easy', -1.5, 1.2, 0.25,
+ 'Phonics', 'Easy', -1.5, 1.2, 0.25,
  'can', '["can", "dog", "sun", "pen"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE()),
+ 3, 1, '/k/', GETDATE()),
 
 -- Item 2: Easy - Rhyming words
-('Which word rhymes with "hat"?',
- 'multiple_choice', 'Easy', -1.2, 1.3, 0.25,
- 'bat', '["bat", "hop", "run", "big"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE()),
+('Which word rhymes with "bat"?',
+ 'Phonological', 'Easy', -1.2, 1.3, 0.25,
+ 'hat', '["hat", "ball", "car", "dog"]',
+ 3, 1, NULL, GETDATE()),
 
--- Item 3: Medium - Sight words
-('Complete the sentence: I ____ to school every day.',
- 'multiple_choice', 'Medium', 0.0, 1.5, 0.25,
- 'go', '["go", "going", "went", "goes"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE()),
+-- Item 3: Medium - Vowel sounds
+('Which word has the long "a" sound?',
+ 'Phonics', 'Medium', -0.3, 1.4, 0.25,
+ 'cake', '["cake", "cat", "cap", "can"]',
+ 3, 1, '/eɪ/', GETDATE()),
 
--- Item 4: Medium - Blending sounds
-('Which word can you make with these sounds: /c/ /a/ /t/?',
- 'multiple_choice', 'Medium', 0.3, 1.4, 0.25,
- 'cat', '["cat", "cut", "cot", "cart"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE()),
+-- Item 4: Medium - Consonant blends
+('Which word starts with a consonant blend?',
+ 'Phonics', 'Medium', 0.1, 1.3, 0.25,
+ 'blue', '["blue", "dog", "cat", "hat"]',
+ 3, 1, '/bl/', GETDATE()),
 
--- Item 5: Hard - Complex phonics patterns
-('Which word has the same vowel sound as "cake"?',
- 'multiple_choice', 'Hard', 1.0, 1.6, 0.25,
- 'rain', '["rain", "can", "car", "ran"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE()),
+-- Item 5: Hard - Silent letters
+('Which word has a silent letter?',
+ 'Phonics', 'Hard', 1.0, 1.5, 0.25,
+ 'knife', '["knife", "cake", "jump", "flag"]',
+ 3, 1, '/naɪf/', GETDATE()),
 
--- Item 6: Hard - Advanced word patterns
-('Choose the word that follows the CVCe pattern (consonant-vowel-consonant-e):',
- 'multiple_choice', 'Hard', 1.2, 1.5, 0.25,
- 'bike', '["bike", "brick", "back", "black"]',
- 3, 1, 1, 'Phonics and Word Study', GETDATE());
+-- Item 6: Hard - Syllable counting
+('How many syllables are in "butterfly"?',
+ 'Phonological', 'Hard', 1.3, 1.4, 0.25,
+ 'three', '["two", "three", "four", "five"]',
+ 3, 1, NULL, GETDATE());
+GO
+
+PRINT 'Module 1: Phonics and Word Study items inserted (6 items).';
 GO
 
 -- ============================================================================
 -- MODULE 2: Vocabulary and Word Knowledge (Items 7-12)
+-- ItemType: Vocabulary
 -- ============================================================================
 
 INSERT INTO Items (ItemText, ItemType, DifficultyLevel, DifficultyParam, DiscriminationParam, GuessingParam,
-                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, IsPlacementItem, ModuleCategory, CreatedAt)
+                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, Definition, CreatedAt)
 VALUES
 -- Item 7: Easy - Basic synonyms
 ('Which word means the same as "happy"?',
- 'multiple_choice', 'Easy', -1.3, 1.2, 0.25,
+ 'Vocabulary', 'Easy', -1.4, 1.2, 0.25,
  'glad', '["glad", "sad", "angry", "tired"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE()),
+ 3, 1, 'feeling pleasure or contentment', GETDATE()),
 
--- Item 8: Easy - Basic antonyms
-('What is the opposite of "hot"?',
- 'multiple_choice', 'Easy', -1.0, 1.3, 0.25,
- 'cold', '["cold", "warm", "cool", "fire"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE()),
+-- Item 8: Easy - Common words
+('What does "enormous" mean?',
+ 'Vocabulary', 'Easy', -1.0, 1.3, 0.25,
+ 'very big', '["very big", "very small", "very fast", "very slow"]',
+ 3, 1, 'extremely large in size', GETDATE()),
 
 -- Item 9: Medium - Context clues
-('The dog was very THIRSTY after running. Thirsty means:',
- 'multiple_choice', 'Medium', 0.2, 1.4, 0.25,
- 'needing water', '["needing water", "very tired", "very fast", "very happy"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE()),
+('The desert was so arid that no plants could grow. What does "arid" mean?',
+ 'Vocabulary', 'Medium', 0.0, 1.4, 0.25,
+ 'dry', '["dry", "wet", "cold", "hot"]',
+ 3, 1, 'having little or no rain; very dry', GETDATE()),
 
--- Item 10: Medium - Word categories
-('Which word does NOT belong in this group: apple, banana, chair, mango?',
- 'multiple_choice', 'Medium', 0.4, 1.5, 0.25,
- 'chair', '["chair", "apple", "banana", "mango"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE()),
+-- Item 10: Medium - Antonyms
+('Which word is the opposite of "rough"?',
+ 'Vocabulary', 'Medium', 0.3, 1.3, 0.25,
+ 'smooth', '["smooth", "bumpy", "hard", "soft"]',
+ 3, 1, 'having an even surface', GETDATE()),
 
 -- Item 11: Hard - Multiple meanings
-('The word "bat" can mean a flying animal OR:',
- 'multiple_choice', 'Hard', 1.1, 1.6, 0.25,
- 'something used to hit a ball', '["something used to hit a ball", "a type of bird", "a kind of fish", "a small insect"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE()),
+('She will present the present to her mom. What does the second "present" mean?',
+ 'Vocabulary', 'Hard', 0.9, 1.5, 0.25,
+ 'gift', '["gift", "show", "give", "time"]',
+ 3, 1, 'something given; a gift', GETDATE()),
 
--- Item 12: Hard - Advanced vocabulary
-('A "journey" is best described as:',
- 'multiple_choice', 'Hard', 1.3, 1.5, 0.25,
- 'a trip from one place to another', '["a trip from one place to another", "a type of vehicle", "a map", "a destination"]',
- 3, 1, 1, 'Vocabulary and Word Knowledge', GETDATE());
+-- Item 12: Hard - Academic vocabulary
+('What does "analyze" mean?',
+ 'Vocabulary', 'Hard', 1.2, 1.4, 0.25,
+ 'examine carefully', '["examine carefully", "read quickly", "write down", "count numbers"]',
+ 3, 1, 'to study something closely', GETDATE());
+GO
+
+PRINT 'Module 2: Vocabulary and Word Knowledge items inserted (6 items).';
 GO
 
 -- ============================================================================
 -- MODULE 3: Grammar Awareness and Grammatical Structures (Items 13-18)
+-- ItemType: Grammar, Syntax
 -- ============================================================================
 
 INSERT INTO Items (ItemText, ItemType, DifficultyLevel, DifficultyParam, DiscriminationParam, GuessingParam,
-                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, IsPlacementItem, ModuleCategory, CreatedAt)
+                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, CreatedAt)
 VALUES
--- Item 13: Easy - Basic sentence structure
+-- Item 13: Easy - Basic punctuation
+('Which sentence uses correct punctuation?',
+ 'Grammar', 'Easy', -1.3, 1.2, 0.25,
+ 'I like pizza.', '["I like pizza.", "I like pizza", "i like pizza.", "I Like Pizza."]',
+ 3, 1, GETDATE()),
+
+-- Item 14: Easy - Sentence scramble (Syntax)
+('the / cat / is / sleeping',
+ 'Syntax', 'Easy', -1.1, 1.3, 0.25,
+ 'The cat is sleeping.', NULL,
+ 3, 1, GETDATE()),
+
+-- Item 15: Medium - Subject-verb agreement
 ('Which sentence is correct?',
- 'multiple_choice', 'Easy', -1.4, 1.2, 0.25,
- 'The cat is sleeping.', '["The cat is sleeping.", "Cat the sleeping is.", "Is sleeping cat the.", "Sleeping is the cat."]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE()),
+ 'Grammar', 'Medium', 0.2, 1.4, 0.25,
+ 'The dogs are running.', '["The dogs are running.", "The dogs is running.", "The dog are running.", "The dogs am running."]',
+ 3, 1, GETDATE()),
 
--- Item 14: Easy - Capitalization
-('Which word should start with a capital letter? I like to play in the ____.',
- 'multiple_choice', 'Easy', -1.1, 1.3, 0.25,
- 'park', '["park", "Park", "PARK", "pArk"]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE()),
+-- Item 16: Medium - Parts of speech
+('In the sentence "The quick brown fox jumps," what is "quick"?',
+ 'Grammar', 'Medium', 0.4, 1.3, 0.25,
+ 'adjective', '["adjective", "noun", "verb", "adverb"]',
+ 3, 1, GETDATE()),
 
--- Item 15: Medium - Verb tense
-('Choose the correct verb: Yesterday, I ____ to the store.',
- 'multiple_choice', 'Medium', 0.1, 1.4, 0.25,
- 'went', '["went", "go", "going", "will go"]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE()),
+-- Item 17: Hard - Complex sentence structure
+('Which sentence is a compound sentence?',
+ 'Grammar', 'Hard', 1.1, 1.5, 0.25,
+ 'I went to the store, and I bought milk.', '["I went to the store, and I bought milk.", "I went to the store.", "When I went to the store.", "Going to the store."]',
+ 3, 1, GETDATE()),
 
--- Item 16: Medium - Plural forms
-('What is the plural of "child"?',
- 'multiple_choice', 'Medium', 0.5, 1.5, 0.25,
- 'children', '["children", "childs", "childes", "child"]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE()),
+-- Item 18: Hard - Advanced syntax
+('yesterday / the / park / we / to / went',
+ 'Syntax', 'Hard', 1.4, 1.4, 0.25,
+ 'Yesterday we went to the park.', NULL,
+ 3, 1, GETDATE());
+GO
 
--- Item 17: Hard - Subject-verb agreement
-('Which sentence has correct grammar?',
- 'multiple_choice', 'Hard', 1.0, 1.6, 0.25,
- 'The dogs are playing in the yard.', '["The dogs are playing in the yard.", "The dogs is playing in the yard.", "The dog are playing in the yard.", "The dogs playing in the yard."]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE()),
-
--- Item 18: Hard - Complex sentences
-('Choose the sentence with correct punctuation:',
- 'multiple_choice', 'Hard', 1.2, 1.5, 0.25,
- 'My favorite foods are pizza, ice cream, and cookies.', '["My favorite foods are pizza, ice cream, and cookies.", "My favorite foods are pizza ice cream and cookies.", "My favorite foods are, pizza, ice cream, and cookies.", "My favorite foods are pizza ice cream, and cookies."]',
- 3, 1, 1, 'Grammar Awareness and Grammatical Structures', GETDATE());
+PRINT 'Module 3: Grammar Awareness items inserted (6 items).';
 GO
 
 -- ============================================================================
 -- MODULE 4: Comprehending and Analyzing Text (Items 19-24)
+-- ItemType: Reading Comprehension
 -- ============================================================================
 
 INSERT INTO Items (ItemText, ItemType, DifficultyLevel, DifficultyParam, DiscriminationParam, GuessingParam,
-                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, IsPlacementItem, ModuleCategory, CreatedAt)
+                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, CreatedAt)
 VALUES
 -- Item 19: Easy - Literal comprehension
-('Read: "The sun was shining. Birds were singing." What was the weather like?',
- 'multiple_choice', 'Easy', -1.2, 1.2, 0.25,
+('The sun was shining brightly in the sky. What was the weather like?',
+ 'Reading Comprehension', 'Easy', -1.4, 1.2, 0.25,
  'sunny', '["sunny", "rainy", "cloudy", "snowy"]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE()),
+ 3, 1, GETDATE()),
 
--- Item 20: Easy - Sequencing
-('Read: "First, I woke up. Then, I ate breakfast. Finally, I went to school." What happened second?',
- 'multiple_choice', 'Easy', -0.9, 1.3, 0.25,
- 'ate breakfast', '["ate breakfast", "woke up", "went to school", "came home"]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE()),
+-- Item 20: Easy - Main idea
+('Tom loves to read books. He reads every night before bed. What is Tom''s hobby?',
+ 'Reading Comprehension', 'Easy', -1.0, 1.3, 0.25,
+ 'reading', '["reading", "sleeping", "eating", "running"]',
+ 3, 1, GETDATE()),
 
--- Item 21: Medium - Inference
-('Read: "Maria saw dark clouds and grabbed her umbrella." Why did Maria take her umbrella?',
- 'multiple_choice', 'Medium', 0.3, 1.4, 0.25,
- 'She thought it might rain.', '["She thought it might rain.", "It was sunny outside.", "She liked umbrellas.", "Her mom told her to."]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE()),
+-- Item 21: Medium - Making inferences
+('Sarah put on her coat and grabbed her umbrella before leaving the house. What can you infer?',
+ 'Reading Comprehension', 'Medium', 0.1, 1.4, 0.25,
+ 'It might rain.', '["It might rain.", "It is sunny.", "She is going to bed.", "She forgot something."]',
+ 3, 1, GETDATE()),
 
--- Item 22: Medium - Main idea
-('Read: "Dogs make great pets. They are loyal and friendly. They love to play and protect their families." What is the main idea?',
- 'multiple_choice', 'Medium', 0.6, 1.5, 0.25,
- 'Dogs are good pets.', '["Dogs are good pets.", "Dogs like to play.", "Families need protection.", "All animals are friendly."]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE()),
+-- Item 22: Medium - Cause and effect
+('Because it was raining, the game was canceled. Why was the game canceled?',
+ 'Reading Comprehension', 'Medium', 0.5, 1.3, 0.25,
+ 'because of rain', '["because of rain", "because of sun", "no one came", "the field was dirty"]',
+ 3, 1, GETDATE()),
 
--- Item 23: Hard - Making predictions
-('Read: "The egg began to crack. A tiny beak poked through the shell." What will most likely happen next?',
- 'multiple_choice', 'Hard', 1.1, 1.6, 0.25,
- 'A baby bird will come out.', '["A baby bird will come out.", "The egg will disappear.", "A snake will appear.", "The shell will fix itself."]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE()),
+-- Item 23: Hard - Drawing conclusions
+('The flowers were wilting, and the soil was dry and cracked. What should be done?',
+ 'Reading Comprehension', 'Hard', 1.0, 1.5, 0.25,
+ 'water the plants', '["water the plants", "pick the flowers", "add more soil", "move them to shade"]',
+ 3, 1, GETDATE()),
 
--- Item 24: Hard - Author's purpose
-('Read: "Visit Sunny Beach Resort! We have pools, games, and delicious food!" Why was this written?',
- 'multiple_choice', 'Hard', 1.3, 1.5, 0.25,
- 'to convince people to visit the resort', '["to convince people to visit the resort", "to teach about beaches", "to tell a story", "to give directions"]',
- 3, 1, 1, 'Comprehending and Analyzing Text', GETDATE());
+-- Item 24: Hard - Analyzing author''s purpose
+('A poster says "Join the library today! Read hundreds of books for free!" What is the purpose?',
+ 'Reading Comprehension', 'Hard', 1.3, 1.4, 0.25,
+ 'to persuade people to join', '["to persuade people to join", "to inform about book prices", "to entertain readers", "to describe the library"]',
+ 3, 1, GETDATE());
+GO
+
+PRINT 'Module 4: Comprehending and Analyzing Text items inserted (6 items).';
 GO
 
 -- ============================================================================
 -- MODULE 5: Creating and Composing Text (Items 25-30)
+-- ItemType: Writing
 -- ============================================================================
 
 INSERT INTO Items (ItemText, ItemType, DifficultyLevel, DifficultyParam, DiscriminationParam, GuessingParam,
-                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, IsPlacementItem, ModuleCategory, CreatedAt)
+                   CorrectAnswer, AnswerChoices, GradeLevel, IsActive, CreatedAt)
 VALUES
--- Item 25: Easy - Basic sentence writing
-('Which is a complete sentence?',
- 'multiple_choice', 'Easy', -1.3, 1.2, 0.25,
- 'I like to read books.', '["I like to read books.", "Like to read.", "Books and reading.", "To read books like."]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE()),
+-- Item 25: Easy - Complete the sentence
+('Complete the sentence: I went to the park ____ I saw my friend.',
+ 'Writing', 'Easy', -1.2, 1.2, 0.25,
+ 'and', '["and", "but", "or", "because"]',
+ 3, 1, GETDATE()),
 
--- Item 26: Easy - Organizing ideas
-('What should come first in a story about a birthday party?',
- 'multiple_choice', 'Easy', -1.0, 1.3, 0.25,
- 'Getting ready for the party', '["Getting ready for the party", "Eating the cake", "Opening presents", "Saying goodbye to friends"]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE()),
+-- Item 26: Easy - Capitalize correctly
+('Which sentence has correct capitalization?',
+ 'Writing', 'Easy', -0.9, 1.3, 0.25,
+ 'My name is Maria.', '["My name is Maria.", "my name is maria.", "My Name Is Maria.", "my name is Maria."]',
+ 3, 1, GETDATE()),
 
--- Item 27: Medium - Descriptive writing
-('Which sentence uses better describing words?',
- 'multiple_choice', 'Medium', 0.2, 1.4, 0.25,
- 'The fluffy, white puppy played happily in the green grass.', '["The fluffy, white puppy played happily in the green grass.", "The puppy played in the grass.", "A dog was outside.", "The animal moved."]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE()),
+-- Item 27: Medium - Best opening sentence
+('You are writing a story about a dog. Which is the best opening sentence?',
+ 'Writing', 'Medium', 0.2, 1.4, 0.25,
+ 'Max was a brave little dog who loved adventures.', '["Max was a brave little dog who loved adventures.", "This is about a dog.", "Dogs are nice.", "I have a dog."]',
+ 3, 1, GETDATE()),
 
--- Item 28: Medium - Story elements
-('Every good story needs:',
- 'multiple_choice', 'Medium', 0.5, 1.5, 0.25,
- 'a beginning, middle, and end', '["a beginning, middle, and end", "just a title", "only characters", "many pages"]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE()),
+-- Item 28: Medium - Adding details
+('Which sentence has more details? "The cat sat." or:',
+ 'Writing', 'Medium', 0.4, 1.3, 0.25,
+ 'The fluffy orange cat sat on the soft pillow.', '["The fluffy orange cat sat on the soft pillow.", "The cat sat there.", "A cat sat.", "The cat was sitting."]',
+ 3, 1, GETDATE()),
 
--- Item 29: Hard - Voice and style
-('Which sentence shows the character is excited?',
- 'multiple_choice', 'Hard', 1.0, 1.6, 0.25,
- '"I can''t wait to go to the park!" shouted Maya.', '["\\"I can''t wait to go to the park!\\" shouted Maya.", "Maya went to the park.", "The park is fun.", "She walked slowly."]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE()),
+-- Item 29: Hard - Organizing ideas
+('You want to write about your weekend. What should you write about FIRST?',
+ 'Writing', 'Hard', 1.0, 1.5, 0.25,
+ 'What you did on Saturday morning', '["What you did on Saturday morning", "What you learned from your weekend", "What you did on Sunday night", "How you felt about Monday"]',
+ 3, 1, GETDATE()),
 
--- Item 30: Hard - Revision and editing
-('Which sentence needs to be fixed?',
- 'multiple_choice', 'Hard', 1.2, 1.5, 0.25,
- 'me and my friend went to the mall', '["me and my friend went to the mall", "My friend and I went to the mall.", "We enjoyed our trip to the mall.", "The mall was very crowded."]',
- 3, 1, 1, 'Creating and Composing Text', GETDATE());
+-- Item 30: Hard - Revision/editing
+('Which sentence needs to be fixed? "The boy run to the store yesterday."',
+ 'Writing', 'Hard', 1.2, 1.4, 0.25,
+ 'Change "run" to "ran"', '["Change \"run\" to \"ran\"", "Change \"boy\" to \"boys\"", "Change \"yesterday\" to \"tomorrow\"", "The sentence is correct"]',
+ 3, 1, GETDATE());
 GO
 
-PRINT '✅ 30 new placement test items inserted successfully!';
-PRINT 'Items per module:';
-PRINT '  - Phonics and Word Study: 6 items';
-PRINT '  - Vocabulary and Word Knowledge: 6 items';
-PRINT '  - Grammar Awareness and Grammatical Structures: 6 items';
-PRINT '  - Comprehending and Analyzing Text: 6 items';
-PRINT '  - Creating and Composing Text: 6 items';
+PRINT 'Module 5: Creating and Composing Text items inserted (6 items).';
+GO
+
+PRINT '======================================';
+PRINT 'All 30 placement test items inserted!';
+PRINT '======================================';
 GO
 
 -- ============================================================================
--- PHASE 5: Update Stored Procedure for Module Ordering
+-- PHASE 4: Update SP_GetPreAssessmentItems to Return Items by Module Category
 -- ============================================================================
 
-CREATE OR ALTER PROCEDURE SP_GetModuleOrderByPlacementScore
+-- Drop existing procedure
+DROP PROCEDURE IF EXISTS SP_GetPreAssessmentItems;
+GO
+
+CREATE PROCEDURE SP_GetPreAssessmentItems
+    @StudentID INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Return 30 items (6 per module) grouped by ItemType/Module
+    -- Module order: Phonics → Vocabulary → Grammar → Comprehension → Writing
+
+    SELECT * FROM (
+        -- Module 1: Phonics and Word Study (6 items)
+        SELECT TOP 6 *,
+               'Phonics and Word Study' as Category,
+               1 as ModuleID,
+               1 as CategoryOrder
+        FROM Items
+        WHERE ItemType IN ('Phonics', 'Phonological')
+          AND IsActive = 1
+          AND GradeLevel = 3
+        ORDER BY DifficultyParam ASC
+
+        UNION ALL
+
+        -- Module 2: Vocabulary and Word Knowledge (6 items)
+        SELECT TOP 6 *,
+               'Vocabulary and Word Knowledge' as Category,
+               2 as ModuleID,
+               2 as CategoryOrder
+        FROM Items
+        WHERE ItemType IN ('Vocabulary')
+          AND IsActive = 1
+          AND GradeLevel = 3
+        ORDER BY DifficultyParam ASC
+
+        UNION ALL
+
+        -- Module 3: Grammar Awareness (6 items)
+        SELECT TOP 6 *,
+               'Grammar Awareness and Grammatical Structures' as Category,
+               3 as ModuleID,
+               3 as CategoryOrder
+        FROM Items
+        WHERE ItemType IN ('Grammar', 'Syntax')
+          AND IsActive = 1
+          AND GradeLevel = 3
+        ORDER BY DifficultyParam ASC
+
+        UNION ALL
+
+        -- Module 4: Comprehending and Analyzing Text (6 items)
+        SELECT TOP 6 *,
+               'Comprehending and Analyzing Text' as Category,
+               4 as ModuleID,
+               4 as CategoryOrder
+        FROM Items
+        WHERE ItemType IN ('Reading Comprehension')
+          AND IsActive = 1
+          AND GradeLevel = 3
+        ORDER BY DifficultyParam ASC
+
+        UNION ALL
+
+        -- Module 5: Creating and Composing Text (6 items)
+        SELECT TOP 6 *,
+               'Creating and Composing Text' as Category,
+               5 as ModuleID,
+               5 as CategoryOrder
+        FROM Items
+        WHERE ItemType IN ('Writing')
+          AND IsActive = 1
+          AND GradeLevel = 3
+        ORDER BY DifficultyParam ASC
+    ) AS CategorizedItems
+    ORDER BY CategoryOrder, DifficultyParam;
+END
+GO
+
+PRINT 'SP_GetPreAssessmentItems updated to return 30 items across 5 modules.';
+GO
+
+-- ============================================================================
+-- PHASE 5: Create Stored Procedure for Module Ordering Based on Performance
+-- ============================================================================
+
+-- This SP returns modules ordered by weakest performance first
+DROP PROCEDURE IF EXISTS SP_GetModuleOrderByPlacementScore;
+GO
+
+CREATE PROCEDURE SP_GetModuleOrderByPlacementScore
     @StudentID INT
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    -- Calculate performance score for each module based on placement test
-    WITH ModuleScores AS (
+    -- Get the most recent PreAssessment session for this student
+    DECLARE @SessionID INT;
+
+    SELECT TOP 1 @SessionID = SessionID
+    FROM Sessions
+    WHERE StudentID = @StudentID
+      AND SessionType = 'PreAssessment'
+    ORDER BY SessionDate DESC;
+
+    -- If no session found, return default order
+    IF @SessionID IS NULL
+    BEGIN
         SELECT
-            i.ModuleCategory,
-            COUNT(*) as TotalQuestions,
-            SUM(CASE WHEN r.IsCorrect = 1 THEN 1 ELSE 0 END) as CorrectAnswers,
+            ModuleID,
+            ModuleName,
+            Description,
+            1 as PriorityOrder,
+            0.0 as PerformanceScore,
+            IconName,
+            ColorCode
+        FROM Modules
+        WHERE ModuleID BETWEEN 1 AND 5
+        ORDER BY ModuleID;
+        RETURN;
+    END
+
+    -- Calculate performance score per module category based on responses
+    WITH ModulePerformance AS (
+        SELECT
+            CASE
+                WHEN i.ItemType IN ('Phonics', 'Phonological') THEN 1
+                WHEN i.ItemType IN ('Vocabulary') THEN 2
+                WHEN i.ItemType IN ('Grammar', 'Syntax') THEN 3
+                WHEN i.ItemType IN ('Reading Comprehension') THEN 4
+                WHEN i.ItemType IN ('Writing') THEN 5
+                ELSE 1
+            END as ModuleID,
+            COUNT(*) as TotalItems,
+            SUM(CASE WHEN r.IsCorrect = 1 THEN 1 ELSE 0 END) as CorrectItems,
             CAST(SUM(CASE WHEN r.IsCorrect = 1 THEN 1 ELSE 0 END) AS FLOAT) / COUNT(*) as PerformanceScore
         FROM Responses r
-        JOIN Items i ON r.ItemID = i.ItemID
-        WHERE r.SessionID IN (
-            SELECT SessionID
-            FROM TestSessions
-            WHERE StudentID = @StudentID
-            AND SessionType = 'Placement'
-        )
-        AND i.IsPlacementItem = 1
-        GROUP BY i.ModuleCategory
+        INNER JOIN Items i ON r.ItemID = i.ItemID
+        WHERE r.SessionID = @SessionID
+          AND i.ItemType IN ('Phonics', 'Phonological', 'Vocabulary', 'Grammar', 'Syntax', 'Reading Comprehension', 'Writing')
+        GROUP BY
+            CASE
+                WHEN i.ItemType IN ('Phonics', 'Phonological') THEN 1
+                WHEN i.ItemType IN ('Vocabulary') THEN 2
+                WHEN i.ItemType IN ('Grammar', 'Syntax') THEN 3
+                WHEN i.ItemType IN ('Reading Comprehension') THEN 4
+                WHEN i.ItemType IN ('Writing') THEN 5
+                ELSE 1
+            END
     )
     SELECT
         m.ModuleID,
         m.ModuleName,
         m.Description,
+        ROW_NUMBER() OVER (ORDER BY ISNULL(mp.PerformanceScore, 0) ASC) as PriorityOrder,
+        ISNULL(mp.PerformanceScore, 0) as PerformanceScore,
+        ISNULL(mp.TotalItems, 0) as ItemsAnswered,
+        ISNULL(mp.CorrectItems, 0) as ItemsCorrect,
         m.IconName,
-        m.ColorCode,
-        ISNULL(ms.PerformanceScore, 0.0) as PerformanceScore,
-        ISNULL(ms.TotalQuestions, 0) as QuestionsAnswered,
-        ISNULL(ms.CorrectAnswers, 0) as CorrectAnswers,
-        -- Lower score = higher priority (appears first)
-        ROW_NUMBER() OVER (ORDER BY ISNULL(ms.PerformanceScore, 0.0) ASC) as PriorityOrder,
-        -- Proficiency level
-        CASE
-            WHEN ms.PerformanceScore IS NULL THEN 'Not Assessed'
-            WHEN ms.PerformanceScore < 0.50 THEN 'Needs Improvement'
-            WHEN ms.PerformanceScore < 0.70 THEN 'Developing'
-            WHEN ms.PerformanceScore < 0.85 THEN 'Proficient'
-            ELSE 'Advanced'
-        END as ProficiencyLevel
+        m.ColorCode
     FROM Modules m
-    LEFT JOIN ModuleScores ms ON m.ModuleName = ms.ModuleCategory
-    ORDER BY PriorityOrder;
+    LEFT JOIN ModulePerformance mp ON m.ModuleID = mp.ModuleID
+    WHERE m.ModuleID BETWEEN 1 AND 5
+    ORDER BY PriorityOrder; -- Weakest performance appears first
 END
 GO
 
--- ============================================================================
--- PHASE 6: Update Placement Test Completion Procedure
--- ============================================================================
-
-CREATE OR ALTER PROCEDURE SP_CompletePlacementTest
-    @StudentID INT,
-    @SessionID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    -- Calculate overall ability from all 5 module categories
-    DECLARE @OverallAbility FLOAT;
-    DECLARE @TotalCorrect INT;
-    DECLARE @TotalQuestions INT;
-
-    SELECT
-        @TotalCorrect = SUM(CASE WHEN r.IsCorrect = 1 THEN 1 ELSE 0 END),
-        @TotalQuestions = COUNT(*)
-    FROM Responses r
-    JOIN Items i ON r.ItemID = i.ItemID
-    WHERE r.SessionID = @SessionID
-    AND i.IsPlacementItem = 1;
-
-    -- Calculate ability using simple percentage for now
-    -- (Can be replaced with full IRT estimation later)
-    SET @OverallAbility = (CAST(@TotalCorrect AS FLOAT) / @TotalQuestions) * 2.0 - 1.0; -- Scale to -1 to 1
-
-    -- Update student's initial and current ability
-    UPDATE Students
-    SET InitialAbility = @OverallAbility,
-        CurrentAbility = @OverallAbility,
-        LastLogin = GETDATE()
-    WHERE StudentID = @StudentID;
-
-    -- Mark session as completed
-    UPDATE TestSessions
-    SET IsCompleted = 1,
-        EndTime = GETDATE(),
-        FinalTheta = @OverallAbility,
-        AccuracyPercentage = (CAST(@TotalCorrect AS FLOAT) / @TotalQuestions) * 100
-    WHERE SessionID = @SessionID;
-
-    -- Return results
-    SELECT
-        @StudentID as StudentID,
-        @OverallAbility as OverallAbility,
-        @TotalCorrect as CorrectAnswers,
-        @TotalQuestions as TotalQuestions,
-        (CAST(@TotalCorrect AS FLOAT) / @TotalQuestions) * 100 as PercentageScore,
-        CASE
-            WHEN @OverallAbility < -0.5 THEN 'Beginner'
-            WHEN @OverallAbility > 0.5 THEN 'Advanced'
-            ELSE 'Intermediate'
-        END as OverallProficiency;
-END
-GO
-
--- ============================================================================
--- PHASE 7: Verification Queries
--- ============================================================================
-
--- Check all items inserted
-SELECT
-    ModuleCategory,
-    COUNT(*) as ItemCount,
-    AVG(DifficultyParam) as AvgDifficulty,
-    MIN(DifficultyParam) as MinDifficulty,
-    MAX(DifficultyParam) as MaxDifficulty
-FROM Items
-WHERE IsPlacementItem = 1
-GROUP BY ModuleCategory
-ORDER BY ModuleCategory;
-GO
-
--- Check modules
-SELECT * FROM Modules ORDER BY ModuleID;
-GO
-
--- Sample module ordering query (for student who hasn't taken placement yet)
-EXEC SP_GetModuleOrderByPlacementScore @StudentID = 1;
+PRINT 'SP_GetModuleOrderByPlacementScore created successfully.';
 GO
 
 PRINT '';
-PRINT '✅ Placement test restructure complete!';
-PRINT '';
-PRINT 'Summary:';
-PRINT '  - 5 modules created';
-PRINT '  - 30 placement test items (6 per module)';
-PRINT '  - Module ordering based on weakest performance';
-PRINT '  - Stored procedures updated';
-PRINT '';
-PRINT 'Next steps:';
-PRINT '1. Update Android app to use 5 module categories';
-PRINT '2. Test placement test flow';
-PRINT '3. Verify module ordering in dashboard';
+PRINT '============================================================================';
+PRINT 'Placement Test Restructure Complete!';
+PRINT '============================================================================';
+PRINT '- 5 Modules created';
+PRINT '- 30 placement test items inserted (6 per module)';
+PRINT '- SP_GetPreAssessmentItems updated to return categorized items';
+PRINT '- SP_GetModuleOrderByPlacementScore created for adaptive ordering';
+PRINT '============================================================================';
 GO

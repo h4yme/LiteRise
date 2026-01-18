@@ -159,22 +159,22 @@ public class IRTEngine {
      * Get category performance breakdown
      */
     public int[] getCategoryScores() {
-        int[] scores = new int[4]; // 4 categories
-        int[] counts = new int[4];
-        
+        int[] scores = new int[5]; // 5 categories
+        int[] counts = new int[5];
+
         for (int i = 0; i < answeredQuestions.size(); i++) {
             PlacementQuestion q = answeredQuestions.get(i);
             boolean correct = answerResults.get(i);
             int category = q.getCategory() - 1; // 0-indexed
-            
-            if (category >= 0 && category < 4) {
+
+            if (category >= 0 && category < 5) {
                 if (correct) scores[category]++;
                 counts[category]++;
             }
         }
-        
+
         // Convert to percentages
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             if (counts[i] > 0) {
                 scores[i] = (scores[i] * 100) / counts[i];
             }

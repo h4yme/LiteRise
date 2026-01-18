@@ -9,7 +9,7 @@ import java.util.List;
 
 public class PlacementQuestion {
     private int questionId;
-    private int category;           // 1-4 (Oral, Word, Reading, Grammar)
+    private int category;           // 1-5 (Phonics, Vocabulary, Grammar, Comprehension, Writing)
     private String subcategory;     // e.g., "Listening", "Vocabulary"
     private String questionType;    // "multiple_choice", "listening", "recording", "image_selection"
     private String questionText;

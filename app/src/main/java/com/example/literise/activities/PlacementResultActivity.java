@@ -104,7 +104,7 @@ public class PlacementResultActivity extends AppCompatActivity {
             levelName = getLevelNameFromLevel(placementLevel);
         }
         if (categoryScores == null) {
-            categoryScores = new int[]{0, 0, 0, 0};
+            categoryScores = new int[]{0, 0, 0, 0, 0};
         }
     }
 
@@ -127,13 +127,14 @@ public class PlacementResultActivity extends AppCompatActivity {
         tvAccuracy.setText(String.format("%.0f%%", accuracy));
 
         // Display questions answered
-        tvQuestionsAnswered.setText(totalAnswered + "/" + 25);
+        tvQuestionsAnswered.setText(totalAnswered + "/" + 30);
 
-        // Display category scores
-        tvCategory1Score.setText(categoryScores[0] + "%");
-        tvCategory2Score.setText(categoryScores[1] + "%");
-        tvCategory3Score.setText(categoryScores[2] + "%");
-        tvCategory4Score.setText(categoryScores[3] + "%");
+        // Display category scores (handle both 4 and 5 categories for compatibility)
+        if (categoryScores.length >= 1) tvCategory1Score.setText(categoryScores[0] + "%");
+        if (categoryScores.length >= 2) tvCategory2Score.setText(categoryScores[1] + "%");
+        if (categoryScores.length >= 3) tvCategory3Score.setText(categoryScores[2] + "%");
+        if (categoryScores.length >= 4) tvCategory4Score.setText(categoryScores[3] + "%");
+        if (categoryScores.length >= 5 && tvCategory5Score != null) tvCategory5Score.setText(categoryScores[4] + "%");
     }
 
     private void showLeoCongratulation() {
