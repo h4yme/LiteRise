@@ -469,9 +469,9 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Switch based on question type
         String questionType = currentQuestion.getQuestionType();
 
-        if ("pronunciation".equalsIgnoreCase(questionType)) {
+        if ("pronunciation".equalsIgnoreCase(questionType) || "pronunciation_reading".equalsIgnoreCase(questionType)) {
             loadPronunciationQuestion();
-        } else if ("reading".equalsIgnoreCase(questionType)) {
+        } else if ("reading".equalsIgnoreCase(questionType) || "reading_comprehension".equalsIgnoreCase(questionType)) {
             loadReadingQuestion();
         } else {
             // Default to multiple choice
@@ -1082,6 +1082,11 @@ public class PlacementTestActivity extends AppCompatActivity {
         // If skipped (empty), send empty string
         final String finalSelectedAnswerLetter = selectedAnswerLetter.isEmpty() ? "" : selectedAnswerLetter;
 
+        // Debug logging
+        android.util.Log.d("PlacementTest", "Submitting answer - QuestionID: " + currentQuestion.getQuestionId() +
+                           ", Selected: " + finalSelectedAnswerLetter +
+                           ", Text: " + selectedAnswer);
+
         // Submit answer to API (send letter, not text)
         final int finalResponseTime = responseTime;
         adaptiveHelper.submitAnswer(
@@ -1095,6 +1100,10 @@ public class PlacementTestActivity extends AppCompatActivity {
                         runOnUiThread(() -> {
                             // Get correctness from server response
                             boolean isCorrect = response.isCorrect();
+
+                            // Debug logging
+                            android.util.Log.d("PlacementTest", "API Response - isCorrect: " + isCorrect +
+                                               ", Message: " + response.getMessage());
 
                             // Play appropriate sound effect
                             if (isCorrect) {
