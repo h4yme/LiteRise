@@ -186,7 +186,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Category 1 -->
+                <!-- Category 1: Phonics and Word Study -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -199,7 +199,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/visby_medium"
-                        android:text="📚 Oral Language"
+                        android:text="🔤 Phonics"
                         android:textColor="#2C3E50"
                         android:textSize="12sp" />
 
@@ -208,13 +208,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/visby_bold"
-                        android:text="83%"
+                        android:text="0%"
                         android:textColor="#4ECDC4"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
-                <!-- Category 2 -->
+                <!-- Category 2: Vocabulary -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -227,7 +227,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/visby_medium"
-                        android:text="🔤 Word Knowledge"
+                        android:text="📚 Vocabulary"
                         android:textColor="#2C3E50"
                         android:textSize="12sp" />
 
@@ -236,13 +236,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/visby_bold"
-                        android:text="86%"
+                        android:text="0%"
                         android:textColor="#4ECDC4"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
-                <!-- Category 3 -->
+                <!-- Category 3: Grammar -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -255,7 +255,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/visby_medium"
-                        android:text="📖 Reading Comprehension"
+                        android:text="✏️ Grammar"
                         android:textColor="#2C3E50"
                         android:textSize="12sp" />
 
@@ -264,13 +264,41 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/visby_bold"
-                        android:text="80%"
+                        android:text="0%"
                         android:textColor="#4ECDC4"
                         android:textSize="13sp" />
 
                 </LinearLayout>
 
-                <!-- Category 4 -->
+                <!-- Category 4: Comprehending -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="6dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/visby_medium"
+                        android:text="📖 Comprehending"
+                        android:textColor="#2C3E50"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvCategory4Score"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/visby_bold"
+                        android:text="0%"
+                        android:textColor="#4ECDC4"
+                        android:textSize="13sp" />
+
+                </LinearLayout>
+
+                <!-- Category 5: Creating & Composing -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -282,16 +310,16 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:fontFamily="@font/visby_medium"
-                        android:text="✏️ Language Structure"
+                        android:text="✍️ Composing"
                         android:textColor="#2C3E50"
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/tvCategory4Score"
+                        android:id="@+id/tvCategory5Score"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/visby_bold"
-                        android:text="100%"
+                        android:text="0%"
                         android:textColor="#4ECDC4"
                         android:textSize="13sp" />
 

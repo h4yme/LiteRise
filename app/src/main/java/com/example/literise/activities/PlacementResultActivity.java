@@ -37,7 +37,7 @@ public class PlacementResultActivity extends AppCompatActivity {
     private ConstraintLayout rootLayout;
     private TextView tvLevelName, tvLevelNumber;
     private TextView tvAccuracy, tvQuestionsAnswered;
-    private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score;
+    private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score, tvCategory5Score;
     private MaterialButton btnContinueToDashboard;
 
     // Placement results data
@@ -82,6 +82,7 @@ public class PlacementResultActivity extends AppCompatActivity {
         tvCategory2Score = findViewById(R.id.tvCategory2Score);
         tvCategory3Score = findViewById(R.id.tvCategory3Score);
         tvCategory4Score = findViewById(R.id.tvCategory4Score);
+        tvCategory5Score = findViewById(R.id.tvCategory5Score);
         btnContinueToDashboard = findViewById(R.id.btnContinueToDashboard);
     }
 
@@ -104,7 +105,7 @@ public class PlacementResultActivity extends AppCompatActivity {
             levelName = getLevelNameFromLevel(placementLevel);
         }
         if (categoryScores == null) {
-            categoryScores = new int[]{0, 0, 0, 0};
+            categoryScores = new int[]{0, 0, 0, 0, 0};
         }
     }
 
@@ -130,10 +131,13 @@ public class PlacementResultActivity extends AppCompatActivity {
         tvQuestionsAnswered.setText(totalAnswered + "/" + 25);
 
         // Display category scores
-        tvCategory1Score.setText(categoryScores[0] + "%");
-        tvCategory2Score.setText(categoryScores[1] + "%");
-        tvCategory3Score.setText(categoryScores[2] + "%");
-        tvCategory4Score.setText(categoryScores[3] + "%");
+        if (categoryScores.length >= 5) {
+            tvCategory1Score.setText(categoryScores[0] + "%");
+            tvCategory2Score.setText(categoryScores[1] + "%");
+            tvCategory3Score.setText(categoryScores[2] + "%");
+            tvCategory4Score.setText(categoryScores[3] + "%");
+            tvCategory5Score.setText(categoryScores[4] + "%");
+        }
     }
 
     private void showLeoCongratulation() {
@@ -276,7 +280,7 @@ public class PlacementResultActivity extends AppCompatActivity {
         );
 
         // Set category scores
-        for (int i = 0; i < categoryScores.length && i < 4; i++) {
+        for (int i = 0; i < categoryScores.length && i < 5; i++) {
             request.setCategoryScore(i + 1, categoryScores[i]);
         }
 

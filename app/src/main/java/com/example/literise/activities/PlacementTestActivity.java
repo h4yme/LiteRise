@@ -84,12 +84,12 @@ public class PlacementTestActivity extends AppCompatActivity {
 
     // Question tracking
     private int currentQuestionNumber = 1;
-    private int totalQuestions = 28;
+    private int totalQuestions = 25;
     private int currentCategory = 1;
     private int previousCategory = 0;
     private String selectedAnswer = "";
     private String selectedAnswerLetter = ""; // A, B, C, or D
-    private int questionsPerCategory = 7; // 7 questions per category
+    private int questionsPerCategory = 5; // 5 questions per category (5 categories × 5 = 25)
     private long startTime;
     private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
@@ -222,7 +222,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                         displayCurrentQuestion();
                     } else {
                         // No fallback available either
-                        if (currentCategory < 4) {
+                        if (currentCategory < 5) {
                             currentCategory++;
                             loadNextQuestion();
                         } else {
@@ -264,28 +264,34 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         switch (currentCategory) {
             case 1:
-                icon = "📚";
+                icon = "🔤";
                 title = "Ready?";
-                name = "Category 1: Oral Language";
-                message = "Let's start with some fun questions about listening and speaking! You've got this! 🌟";
+                name = "Category 1: Phonics and Word Study";
+                message = "Let's start with letter sounds and words! You've got this! 🌟";
                 break;
             case 2:
-                icon = "🔤";
+                icon = "📚";
                 title = "Great Job!";
-                name = "Category 2: Word Knowledge";
-                message = "Now let's test your word knowledge! You're doing amazing! 🌟";
+                name = "Category 2: Vocabulary and Word Knowledge";
+                message = "Now let's explore word meanings! You're doing amazing! 🌟";
                 break;
             case 3:
-                icon = "📖";
+                icon = "✏️";
                 title = "Awesome Work!";
-                name = "Category 3: Reading Comprehension";
-                message = "Time for some fun stories! Let's see how well you understand what you read! 📚";
+                name = "Category 3: Grammar Awareness";
+                message = "Time to learn about grammar and sentence structure! 💪";
                 break;
             case 4:
-                icon = "✏️";
-                title = "Almost There!";
-                name = "Category 4: Language Structure";
-                message = "Last category! Let's work on grammar and sentences! You're doing wonderfully! 💪";
+                icon = "📖";
+                title = "Keep Going!";
+                name = "Category 4: Comprehending Text";
+                message = "Let's read and understand stories together! 📚";
+                break;
+            case 5:
+                icon = "✍️";
+                title = "Final Round!";
+                name = "Category 5: Creating and Composing";
+                message = "Last category! Show me your writing skills! You're almost done! 🎉";
                 break;
         }
 
@@ -358,8 +364,10 @@ public class PlacementTestActivity extends AppCompatActivity {
             currentCategory = 2;
         } else if (currentQuestionNumber <= questionsPerCategory * 3) {
             currentCategory = 3;
-        } else {
+        } else if (currentQuestionNumber <= questionsPerCategory * 4) {
             currentCategory = 4;
+        } else {
+            currentCategory = 5;
         }
     }
 
@@ -369,15 +377,17 @@ public class PlacementTestActivity extends AppCompatActivity {
     private String getCategoryName(int categoryNumber) {
         switch (categoryNumber) {
             case 1:
-                return "Oral Language";
+                return "Phonics and Word Study";
             case 2:
-                return "Word Knowledge";
+                return "Vocabulary and Word Knowledge";
             case 3:
-                return "Reading Comprehension";
+                return "Grammar Awareness and Grammatical Structures";
             case 4:
-                return "Language Structure";
+                return "Comprehending and Analyzing Text";
+            case 5:
+                return "Creating and Composing Text";
             default:
-                return "Oral Language";
+                return "Phonics and Word Study";
         }
     }
 
@@ -388,14 +398,16 @@ public class PlacementTestActivity extends AppCompatActivity {
         if (categoryName == null) return 1;
 
         switch (categoryName) {
-            case "Oral Language":
+            case "Phonics and Word Study":
                 return 1;
-            case "Word Knowledge":
+            case "Vocabulary and Word Knowledge":
                 return 2;
-            case "Reading Comprehension":
+            case "Grammar Awareness and Grammatical Structures":
                 return 3;
-            case "Language Structure":
+            case "Comprehending and Analyzing Text":
                 return 4;
+            case "Creating and Composing Text":
+                return 5;
             default:
                 return 1;
         }
@@ -1169,12 +1181,13 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Save placement results to SessionManager for dashboard
         sessionManager.savePlacementLevel(levelName);
 
-        // Save category accuracies (convert from percentage 0-100 to 0-1)
-        if (categoryScores.length >= 4) {
-            sessionManager.saveCategoryAccuracy("Oral Language", categoryScores[0] / 100.0);
-            sessionManager.saveCategoryAccuracy("Word Knowledge", categoryScores[1] / 100.0);
-            sessionManager.saveCategoryAccuracy("Reading Comprehension", categoryScores[2] / 100.0);
-            sessionManager.saveCategoryAccuracy("Language Structure", categoryScores[3] / 100.0);
+        // Save category scores to session manager (as percentages)
+        if (categoryScores.length >= 5) {
+            sessionManager.saveCategoryScore("Cat1_PhonicsWordStudy", categoryScores[0]);
+            sessionManager.saveCategoryScore("Cat2_VocabularyWordKnowledge", categoryScores[1]);
+            sessionManager.saveCategoryScore("Cat3_GrammarAwareness", categoryScores[2]);
+            sessionManager.saveCategoryScore("Cat4_ComprehendingText", categoryScores[3]);
+            sessionManager.saveCategoryScore("Cat5_CreatingComposing", categoryScores[4]);
         }
 
         // Create intent with results

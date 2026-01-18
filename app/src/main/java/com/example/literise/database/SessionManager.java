@@ -35,12 +35,13 @@ public class SessionManager {
     private static final String KEY_ASSESSMENT_COMPLETED = "assessment_completed";
     private static final String KEY_ASSESSMENT_STARTED = "assessment_started";
 
-    // Placement test results
+    // Placement test results (5 categories)
     private static final String KEY_PLACEMENT_LEVEL = "placement_level";
-    private static final String KEY_CATEGORY_ORAL_LANGUAGE = "category_oral_language";
-    private static final String KEY_CATEGORY_WORD_KNOWLEDGE = "category_word_knowledge";
-    private static final String KEY_CATEGORY_READING_COMP = "category_reading_comp";
-    private static final String KEY_CATEGORY_LANGUAGE_STRUCT = "category_language_struct";
+    private static final String KEY_CAT1_PHONICS_WORD_STUDY = "cat1_phonics_word_study";
+    private static final String KEY_CAT2_VOCABULARY_WORD_KNOWLEDGE = "cat2_vocabulary_word_knowledge";
+    private static final String KEY_CAT3_GRAMMAR_AWARENESS = "cat3_grammar_awareness";
+    private static final String KEY_CAT4_COMPREHENDING_TEXT = "cat4_comprehending_text";
+    private static final String KEY_CAT5_CREATING_COMPOSING = "cat5_creating_composing";
 
 
     private SharedPreferences prefs;
@@ -258,44 +259,46 @@ public class SessionManager {
     }
 
     /**
-     * Save category accuracy scores from placement test
-     * @param category Category name (e.g., "Oral Language", "Word Knowledge")
-     * @param accuracy Score from 0.0 to 1.0
+     * Save category score from placement test (as percentage 0-100)
+     * @param categoryKey Category key (e.g., "Cat1_PhonicsWordStudy")
+     * @param score Score as percentage (0-100)
      */
-    public void saveCategoryAccuracy(String category, double accuracy) {
-        String key = getCategoryKey(category);
+    public void saveCategoryScore(String categoryKey, int score) {
+        String key = getCategoryKey(categoryKey);
         if (key != null) {
-            editor.putFloat(key, (float) accuracy);
+            editor.putInt(key, score);
             editor.apply();
         }
     }
 
     /**
-     * Get category accuracy score
-     * @param category Category name
-     * @return Accuracy score from 0.0 to 1.0, or 0.0 if not found
+     * Get category score
+     * @param categoryKey Category key
+     * @return Score as percentage (0-100), or 0 if not found
      */
-    public double getCategoryAccuracy(String category) {
-        String key = getCategoryKey(category);
+    public int getCategoryScore(String categoryKey) {
+        String key = getCategoryKey(categoryKey);
         if (key != null) {
-            return prefs.getFloat(key, 0.0f);
+            return prefs.getInt(key, 0);
         }
-        return 0.0;
+        return 0;
     }
 
     /**
-     * Map category names to SharedPreferences keys
+     * Map category keys to SharedPreferences keys
      */
-    private String getCategoryKey(String category) {
-        switch (category) {
-            case "Oral Language":
-                return KEY_CATEGORY_ORAL_LANGUAGE;
-            case "Word Knowledge":
-                return KEY_CATEGORY_WORD_KNOWLEDGE;
-            case "Reading Comprehension":
-                return KEY_CATEGORY_READING_COMP;
-            case "Language Structure":
-                return KEY_CATEGORY_LANGUAGE_STRUCT;
+    private String getCategoryKey(String categoryKey) {
+        switch (categoryKey) {
+            case "Cat1_PhonicsWordStudy":
+                return KEY_CAT1_PHONICS_WORD_STUDY;
+            case "Cat2_VocabularyWordKnowledge":
+                return KEY_CAT2_VOCABULARY_WORD_KNOWLEDGE;
+            case "Cat3_GrammarAwareness":
+                return KEY_CAT3_GRAMMAR_AWARENESS;
+            case "Cat4_ComprehendingText":
+                return KEY_CAT4_COMPREHENDING_TEXT;
+            case "Cat5_CreatingComposing":
+                return KEY_CAT5_CREATING_COMPOSING;
             default:
                 return null;
         }
