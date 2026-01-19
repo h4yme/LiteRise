@@ -111,11 +111,10 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private String getLevelNameFromLevel(int level) {
         switch (level) {
-            case 1: return "Beginner Reader";
-            case 2: return "Early Reader";
-            case 3: return "Developing Reader";
-            case 4: return "Fluent Reader";
-            default: return "Developing Reader";
+            case 1: return "Beginner";
+            case 2: return "Intermediate";
+            case 3: return "Advanced";
+            default: return "Intermediate";
         }
     }
 

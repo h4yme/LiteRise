@@ -43,6 +43,19 @@
                 android:textColor="#FFD93D"
                 android:textSize="32sp" />
 
+            <!-- Passage to Read (for pronunciation_reading questions) -->
+            <TextView
+                android:id="@+id/tvPassageToRead"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/visby_medium"
+                android:text="Tom has a red ball. He plays with it every day."
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:visibility="gone"
+                android:lineSpacingExtra="4dp" />
+
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>

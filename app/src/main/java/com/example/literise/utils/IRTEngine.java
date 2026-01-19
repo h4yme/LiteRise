@@ -112,18 +112,16 @@ public class IRTEngine {
     }
 
     /**
-     * Calculate final placement level based on theta
+     * Calculate final placement level based on theta (3 levels)
      */
     public int calculatePlacementLevel() {
-        // Map theta to reading levels 1-4
-        if (theta < -1.0) {
+        // Map theta to reading levels 1-3
+        if (theta < -0.5) {
             return 1; // Beginner
-        } else if (theta < 0.0) {
-            return 2; // Early Reader
-        } else if (theta < 1.0) {
-            return 3; // Developing Reader
+        } else if (theta < 0.5) {
+            return 2; // Intermediate
         } else {
-            return 4; // Fluent Reader
+            return 3; // Advanced
         }
     }
 
@@ -133,11 +131,10 @@ public class IRTEngine {
     public String getPlacementLevelName() {
         int level = calculatePlacementLevel();
         switch (level) {
-            case 1: return "Beginner Reader";
-            case 2: return "Early Reader";
-            case 3: return "Developing Reader";
-            case 4: return "Fluent Reader";
-            default: return "Unknown";
+            case 1: return "Beginner";
+            case 2: return "Intermediate";
+            case 3: return "Advanced";
+            default: return "Intermediate";
         }
     }
 

@@ -539,6 +539,7 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         // Get UI elements
         TextView tvWordToPronounce = questionView.findViewById(R.id.tvWordToPronounce);
+        TextView tvPassageToRead = questionView.findViewById(R.id.tvPassageToRead);
         TextView tvRecordingStatus = questionView.findViewById(R.id.tvRecordingStatus);
         FloatingActionButton btnMicrophone = questionView.findViewById(R.id.btnMicrophone);
         LinearLayout waveformContainer = questionView.findViewById(R.id.waveformContainer);
@@ -548,12 +549,26 @@ public class PlacementTestActivity extends AppCompatActivity {
         TextView tvFeedbackText = questionView.findViewById(R.id.tvFeedbackText);
         TextView tvScore = questionView.findViewById(R.id.tvScore);
 
-        // Set the word to pronounce (extract just the word from "Say the word: CAT")
-        String questionText = currentQuestion.getQuestionText();
-        String wordToPronounce = questionText.contains(":")
-                ? questionText.substring(questionText.indexOf(":") + 1).trim()
-                : questionText;
-        tvWordToPronounce.setText(wordToPronounce);
+        // Check if this is a reading passage question or single word
+        String readingPassage = currentQuestion.getReadingPassage();
+        String wordToPronounce;
+
+        if (readingPassage != null && !readingPassage.isEmpty()) {
+            // This is a pronunciation_reading question - show passage
+            tvPassageToRead.setText(readingPassage);
+            tvPassageToRead.setVisibility(View.VISIBLE);
+            tvWordToPronounce.setVisibility(View.GONE);
+            wordToPronounce = readingPassage;
+        } else {
+            // Single word pronunciation - extract word from question text
+            String questionText = currentQuestion.getQuestionText();
+            wordToPronounce = questionText.contains(":")
+                    ? questionText.substring(questionText.indexOf(":") + 1).trim()
+                    : questionText;
+            tvWordToPronounce.setText(wordToPronounce);
+            tvWordToPronounce.setVisibility(View.VISIBLE);
+            tvPassageToRead.setVisibility(View.GONE);
+        }
 
         // Track if currently recording
         final boolean[] isRecording = {false};
