@@ -659,7 +659,11 @@ public class PlacementTestActivity extends AppCompatActivity {
                                     Log.d(TAG, "║ - Recognized Text: " + result.getRecognizedText());
                                     Log.d(TAG, "║ - Passed Threshold: " + result.isPassed());
                                     Log.d(TAG, "║ - Feedback: " + result.getFeedback());
-                                    Log.d(TAG, "║ - Response ID: " + result.getResponseId());
+                                    Log.d(TAG, "║ - Confidence: " + result.getConfidence());
+                                    Log.d(TAG, "║ - Pronunciation Score: " + result.getPronunciationScore());
+                                    Log.d(TAG, "║ - Fluency Score: " + result.getFluencyScore());
+                                    Log.d(TAG, "║ - Completeness Score: " + result.getCompletenessScore());
+                                    Log.d(TAG, "║ - Minimum Accuracy Required: " + result.getMinimumAccuracy() + "%");
                                     Log.d(TAG, "╠════════════════════════════════════════════════════════════");
 
                                     // Show feedback
