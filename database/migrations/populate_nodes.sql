@@ -184,7 +184,7 @@ VALUES
  'Grammar', 15, 20),
 
 (3, 'CORE_LESSON', 11, 4, 'Common Grammar Errors',
- 'Identify and correct common mistakes (its/it\'s, their/there/they\'re)',
+ 'Identify and correct common mistakes (its/it''s, their/there/they''re)',
  'Grammar', 12, 20),
 
 (3, 'CORE_LESSON', 12, 4, 'Grammar in Writing',
@@ -235,7 +235,7 @@ VALUES
  'Use clues from text and pictures to figure out unstated information',
  'Comprehension', 10, 20),
 
-(4, 'CORE_LESSON', 8, 3, 'Author\'s Purpose',
+(4, 'CORE_LESSON', 8, 3, 'Author''s Purpose',
  'Determine why author wrote text (to inform, entertain, or persuade)',
  'Comprehension', 15, 20),
 
