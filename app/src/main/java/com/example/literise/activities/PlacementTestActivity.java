@@ -148,6 +148,16 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnContinue.setOnClickListener(v -> {
             // For pronunciation questions, answer is already submitted
             if (answerAlreadySubmitted) {
+                Log.d(TAG, "=== CONTINUE CLICKED - PRONUNCIATION ANSWER ===");
+                Log.d(TAG, "Answer already submitted via pronunciation API");
+                Log.d(TAG, "QuestionID: " + (currentQuestion != null ? currentQuestion.getQuestionId() : "null"));
+                Log.d(TAG, "QuestionNumber: " + currentQuestionNumber);
+                Log.d(TAG, "SelectedAnswer: " + selectedAnswer);
+                Log.d(TAG, "SelectedAnswerLetter: " + selectedAnswerLetter);
+                Log.d(TAG, "Current Theta: " + irtEngine.getTheta());
+                Log.d(TAG, "Skipping checkAnswer() - moving to next question");
+                Log.d(TAG, "===========================================");
+
                 // Increment question number
                 currentQuestionNumber++;
                 // Load next question
@@ -157,6 +167,9 @@ public class PlacementTestActivity extends AppCompatActivity {
 
             // For regular questions, check if answer selected
             if (selectedAnswer != null && !selectedAnswer.isEmpty()) {
+                Log.d(TAG, "=== CONTINUE CLICKED - REGULAR ANSWER ===");
+                Log.d(TAG, "Calling checkAnswer() to submit via submit_answer API");
+                Log.d(TAG, "========================================");
                 // Check answer and proceed
                 checkAnswer();
             }
@@ -599,7 +612,17 @@ public class PlacementTestActivity extends AppCompatActivity {
                 int itemId = currentQuestion.getQuestionId();
                 int responseId = (int) (System.currentTimeMillis() / 1000); // Temporary response ID
 
-                android.util.Log.d("PlacementTest", "About to call evaluatePronunciation - ItemID: " + itemId + ", SessionID: " + currentSessionId + ", Word: " + wordToPronounce);
+                Log.d(TAG, "╔════════════════════════════════════════════════════════════");
+                Log.d(TAG, "║ CALLING PRONUNCIATION EVALUATION API");
+                Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                Log.d(TAG, "║ ItemID: " + itemId);
+                Log.d(TAG, "║ SessionID: " + currentSessionId);
+                Log.d(TAG, "║ ResponseID (temp): " + responseId);
+                Log.d(TAG, "║ QuestionNumber: " + currentQuestionNumber);
+                Log.d(TAG, "║ Expected Word: " + wordToPronounce);
+                Log.d(TAG, "║ Audio File: " + audioFile.getAbsolutePath());
+                Log.d(TAG, "║ Audio Duration: " + durationMs + "ms");
+                Log.d(TAG, "╚════════════════════════════════════════════════════════════");
 
                 pronunciationHelper.evaluatePronunciation(
                         itemId,
@@ -619,6 +642,23 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         responseTime = (int) ((System.currentTimeMillis() - questionStartTime) / 1000);
                                     }
 
+                                    Log.d(TAG, "╔════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ PRONUNCIATION EVALUATION SUCCESS");
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ QuestionID: " + currentQuestion.getQuestionId());
+                                    Log.d(TAG, "║ SessionID: " + currentSessionId);
+                                    Log.d(TAG, "║ QuestionNumber: " + currentQuestionNumber);
+                                    Log.d(TAG, "║ Expected Word: " + wordToPronounce);
+                                    Log.d(TAG, "║ Response Time: " + responseTime + "s");
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ API RESPONSE DATA:");
+                                    Log.d(TAG, "║ - Overall Accuracy: " + result.getOverallAccuracy() + "%");
+                                    Log.d(TAG, "║ - Recognized Text: " + result.getRecognizedText());
+                                    Log.d(TAG, "║ - Passed Threshold: " + result.isPassed());
+                                    Log.d(TAG, "║ - Feedback: " + result.getFeedback());
+                                    Log.d(TAG, "║ - Response ID: " + result.getResponseId());
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+
                                     // Show feedback
                                     feedbackCard.setVisibility(View.VISIBLE);
                                     int accuracy = result.getOverallAccuracy();
@@ -626,6 +666,10 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                                     // Use isPassed() from API result - it uses the item's MinimumAccuracy threshold
                                     boolean isCorrect = result.isPassed();
+
+                                    Log.d(TAG, "║ EVALUATION RESULT:");
+                                    Log.d(TAG, "║ - isCorrect (passed): " + isCorrect);
+                                    Log.d(TAG, "║ - Accuracy: " + accuracy + "%");
 
                                     if (accuracy >= 85) {
                                         // Excellent pronunciation (85%+)
@@ -635,6 +679,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         tvFeedbackText.setTextColor(getColor(R.color.success_green));
                                         tvScore.setTextColor(getColor(R.color.success_green));
                                         soundEffectsHelper.playSuccess();
+                                        Log.d(TAG, "║ - Feedback Level: EXCELLENT (85%+)");
                                     } else if (isCorrect) {
                                         // Good pronunciation (passed threshold but < 85%)
                                         tvFeedbackIcon.setText("👍");
@@ -643,6 +688,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         tvFeedbackText.setTextColor(getColor(R.color.warning_orange));
                                         tvScore.setTextColor(getColor(R.color.warning_orange));
                                         soundEffectsHelper.playSuccess();
+                                        Log.d(TAG, "║ - Feedback Level: GOOD (passed but < 85%)");
                                     } else {
                                         // Needs improvement (below threshold)
                                         tvFeedbackIcon.setText("🔄");
@@ -651,6 +697,7 @@ public class PlacementTestActivity extends AppCompatActivity {
                                         tvFeedbackText.setTextColor(getColor(R.color.error_red));
                                         tvScore.setTextColor(getColor(R.color.error_red));
                                         soundEffectsHelper.playError();
+                                        Log.d(TAG, "║ - Feedback Level: NEEDS IMPROVEMENT");
                                     }
 
                                     // Reset button
@@ -665,11 +712,32 @@ public class PlacementTestActivity extends AppCompatActivity {
                                     selectedAnswer = result.getRecognizedText();
                                     selectedAnswerLetter = accuracy + "% - " + result.getRecognizedText();
 
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ STORING ANSWER DATA:");
+                                    Log.d(TAG, "║ - selectedAnswer: " + selectedAnswer);
+                                    Log.d(TAG, "║ - selectedAnswerLetter: " + selectedAnswerLetter);
+
                                     // Update IRT engine locally with result
+                                    double thetaBefore = irtEngine.getTheta();
                                     irtEngine.updateTheta(currentQuestion, isCorrect);
+                                    double thetaAfter = irtEngine.getTheta();
+
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ IRT ENGINE UPDATE:");
+                                    Log.d(TAG, "║ - Theta BEFORE: " + thetaBefore);
+                                    Log.d(TAG, "║ - Theta AFTER: " + thetaAfter);
+                                    Log.d(TAG, "║ - Delta: " + (thetaAfter - thetaBefore));
 
                                     // Mark that answer has been submitted
                                     answerAlreadySubmitted = true;
+
+                                    Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.d(TAG, "║ SUBMISSION STATUS:");
+                                    Log.d(TAG, "║ - answerAlreadySubmitted: " + answerAlreadySubmitted);
+                                    Log.d(TAG, "║ - StudentResponse record created by evaluate_pronunciation.php");
+                                    Log.d(TAG, "║ - No additional submit_answer API call needed");
+                                    Log.d(TAG, "║ - Continue button enabled");
+                                    Log.d(TAG, "╚════════════════════════════════════════════════════════════");
 
                                     // Enable continue button
                                     btnContinue.setEnabled(true);
@@ -682,6 +750,17 @@ public class PlacementTestActivity extends AppCompatActivity {
                             @Override
                             public void onEvaluationError(String error) {
                                 runOnUiThread(() -> {
+                                    Log.e(TAG, "╔════════════════════════════════════════════════════════════");
+                                    Log.e(TAG, "║ PRONUNCIATION EVALUATION ERROR");
+                                    Log.e(TAG, "╠════════════════════════════════════════════════════════════");
+                                    Log.e(TAG, "║ QuestionID: " + currentQuestion.getQuestionId());
+                                    Log.e(TAG, "║ SessionID: " + currentSessionId);
+                                    Log.e(TAG, "║ QuestionNumber: " + currentQuestionNumber);
+                                    Log.e(TAG, "║ Error: " + error);
+                                    Log.e(TAG, "║ IMPORTANT: StudentResponse NOT created - pronunciation failed!");
+                                    Log.e(TAG, "║ User can retry recording by tapping microphone again");
+                                    Log.e(TAG, "╚════════════════════════════════════════════════════════════");
+
                                     isRecording[0] = false;
                                     waveformContainer.clearAnimation();
                                     waveformContainer.setVisibility(View.GONE);
