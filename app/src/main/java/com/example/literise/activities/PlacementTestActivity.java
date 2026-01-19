@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -46,6 +47,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlacementTestActivity extends AppCompatActivity {
+
+    private static final String TAG = "PlacementTest";
 
     // UI Components
     private ImageView btnBack;
@@ -1176,10 +1179,28 @@ public class PlacementTestActivity extends AppCompatActivity {
         // If skipped (empty), send empty string
         final String finalSelectedAnswerLetter = selectedAnswerLetter.isEmpty() ? "" : selectedAnswerLetter;
 
-        // Debug logging
-        android.util.Log.d("PlacementTest", "Submitting answer - QuestionID: " + currentQuestion.getQuestionId() +
-                           ", Selected: " + finalSelectedAnswerLetter +
-                           ", Text: " + selectedAnswer);
+        Log.d(TAG, "╔════════════════════════════════════════════════════════════");
+        Log.d(TAG, "║ SUBMITTING REGULAR ANSWER TO API");
+        Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+        Log.d(TAG, "║ QuestionID: " + currentQuestion.getQuestionId());
+        Log.d(TAG, "║ SessionID: " + currentSessionId);
+        Log.d(TAG, "║ QuestionNumber: " + currentQuestionNumber + " of " + totalQuestions);
+        Log.d(TAG, "║ QuestionType: " + currentQuestion.getQuestionType());
+        Log.d(TAG, "║ Category: " + currentQuestion.getCategory());
+        Log.d(TAG, "║ Subcategory: " + currentQuestion.getSubcategory());
+        Log.d(TAG, "║ Response Time: " + responseTime + "s");
+        Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+        Log.d(TAG, "║ ANSWER DATA:");
+        Log.d(TAG, "║ - Selected Letter: " + finalSelectedAnswerLetter);
+        Log.d(TAG, "║ - Selected Text: " + selectedAnswer);
+        Log.d(TAG, "║ - Correct Answer: " + currentQuestion.getCorrectAnswer());
+        Log.d(TAG, "║ - Skipped: " + finalSelectedAnswerLetter.isEmpty());
+        Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+        Log.d(TAG, "║ CURRENT IRT STATE:");
+        Log.d(TAG, "║ - Current Theta: " + irtEngine.getTheta());
+        Log.d(TAG, "║ - Question Difficulty: " + currentQuestion.getDifficulty());
+        Log.d(TAG, "║ - Question Discrimination: " + currentQuestion.getDiscrimination());
+        Log.d(TAG, "╚════════════════════════════════════════════════════════════");
 
         // Submit answer to API (send letter, not text)
         final int finalResponseTime = responseTime;
@@ -1195,24 +1216,55 @@ public class PlacementTestActivity extends AppCompatActivity {
                             // Get correctness from server response
                             boolean isCorrect = response.isCorrect();
 
-                            // Debug logging
-                            android.util.Log.d("PlacementTest", "API Response - isCorrect: " + isCorrect +
-                                               ", Message: " + response.getMessage());
-
-                            // Play appropriate sound effect
-                            if (isCorrect) {
-                                soundEffectsHelper.playSuccess();
-                            } else if (!finalSelectedAnswerLetter.isEmpty()) {
-                                soundEffectsHelper.playError();
-                            }
+                            Log.d(TAG, "╔════════════════════════════════════════════════════════════");
+                            Log.d(TAG, "║ SUBMIT ANSWER API - SUCCESS");
+                            Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.d(TAG, "║ API RESPONSE:");
+                            Log.d(TAG, "║ - isCorrect: " + isCorrect);
+                            Log.d(TAG, "║ - Message: " + response.getMessage());
 
                             // Update IRT engine with result (for local tracking)
+                            double thetaBefore = irtEngine.getTheta();
                             irtEngine.updateTheta(currentQuestion, isCorrect);
+                            double thetaAfterLocal = irtEngine.getTheta();
 
                             // Sync theta from API to local IRTEngine for accurate placement calculation
                             if (response.getFeedback() != null) {
                                 double apiTheta = response.getFeedback().getNewThetaEstimate();
+                                Log.d(TAG, "║ - API Theta: " + apiTheta);
                                 irtEngine.setTheta(apiTheta);
+                            }
+
+                            double thetaFinal = irtEngine.getTheta();
+
+                            Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.d(TAG, "║ IRT ENGINE UPDATE:");
+                            Log.d(TAG, "║ - Theta BEFORE: " + thetaBefore);
+                            Log.d(TAG, "║ - Theta AFTER (local): " + thetaAfterLocal);
+                            Log.d(TAG, "║ - Theta FINAL (from API): " + thetaFinal);
+                            Log.d(TAG, "║ - Delta: " + (thetaFinal - thetaBefore));
+                            Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.d(TAG, "║ CATEGORY PROGRESS:");
+                            int[] categoryScores = irtEngine.getCategoryScores();
+                            Log.d(TAG, "║ - Category 1 (Phonics): " + categoryScores[0] + "%");
+                            Log.d(TAG, "║ - Category 2 (Vocabulary): " + categoryScores[1] + "%");
+                            Log.d(TAG, "║ - Category 3 (Grammar): " + categoryScores[2] + "%");
+                            Log.d(TAG, "║ - Category 4 (Comprehending): " + categoryScores[3] + "%");
+                            Log.d(TAG, "║ - Category 5 (Creating): " + categoryScores[4] + "%");
+                            Log.d(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.d(TAG, "║ PROGRESS:");
+                            Log.d(TAG, "║ - Completed: " + currentQuestionNumber + " of " + totalQuestions);
+                            Log.d(TAG, "║ - Next Question: " + (currentQuestionNumber + 1));
+
+                            // Play appropriate sound effect
+                            if (isCorrect) {
+                                soundEffectsHelper.playSuccess();
+                                Log.d(TAG, "║ - Sound: SUCCESS");
+                            } else if (!finalSelectedAnswerLetter.isEmpty()) {
+                                soundEffectsHelper.playError();
+                                Log.d(TAG, "║ - Sound: ERROR");
+                            } else {
+                                Log.d(TAG, "║ - Sound: NONE (skipped)");
                             }
 
                             // Move to next question
@@ -1220,10 +1272,14 @@ public class PlacementTestActivity extends AppCompatActivity {
 
                             if (currentQuestionNumber > totalQuestions) {
                                 // Test complete - show results with celebration
+                                Log.d(TAG, "║ - Status: TEST COMPLETE! 🎉");
+                                Log.d(TAG, "╚════════════════════════════════════════════════════════════");
                                 soundEffectsHelper.playCelebration();
                                 showResults();
                             } else {
                                 // Play chime for question completion
+                                Log.d(TAG, "║ - Status: Moving to next question");
+                                Log.d(TAG, "╚════════════════════════════════════════════════════════════");
                                 soundEffectsHelper.playChime();
                                 loadNextQuestion();
                             }
@@ -1233,6 +1289,16 @@ public class PlacementTestActivity extends AppCompatActivity {
                     @Override
                     public void onError(String error) {
                         runOnUiThread(() -> {
+                            Log.e(TAG, "╔════════════════════════════════════════════════════════════");
+                            Log.e(TAG, "║ SUBMIT ANSWER API - ERROR");
+                            Log.e(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.e(TAG, "║ QuestionID: " + currentQuestion.getQuestionId());
+                            Log.e(TAG, "║ SessionID: " + currentSessionId);
+                            Log.e(TAG, "║ QuestionNumber: " + currentQuestionNumber + " of " + totalQuestions);
+                            Log.e(TAG, "║ Error: " + error);
+                            Log.e(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.e(TAG, "║ FALLBACK: Using local IRT engine to check answer");
+
                             // Log error but continue
                             Toast.makeText(PlacementTestActivity.this,
                                     "Error submitting answer: " + error, Toast.LENGTH_SHORT).show();
@@ -1243,23 +1309,46 @@ public class PlacementTestActivity extends AppCompatActivity {
                                 isCorrect = finalSelectedAnswerLetter.equalsIgnoreCase(currentQuestion.getCorrectAnswer());
                             }
 
+                            Log.e(TAG, "║ - Local Check Result: " + (isCorrect ? "CORRECT" : "INCORRECT"));
+                            Log.e(TAG, "║ - Selected: " + finalSelectedAnswerLetter);
+                            Log.e(TAG, "║ - Correct Answer: " + currentQuestion.getCorrectAnswer());
+
+                            // Update IRT engine with result
+                            double thetaBefore = irtEngine.getTheta();
+                            irtEngine.updateTheta(currentQuestion, isCorrect);
+                            double thetaAfter = irtEngine.getTheta();
+
+                            Log.e(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.e(TAG, "║ IRT ENGINE UPDATE (LOCAL ONLY):");
+                            Log.e(TAG, "║ - Theta BEFORE: " + thetaBefore);
+                            Log.e(TAG, "║ - Theta AFTER: " + thetaAfter);
+                            Log.e(TAG, "║ - Delta: " + (thetaAfter - thetaBefore));
+                            Log.e(TAG, "╠════════════════════════════════════════════════════════════");
+                            Log.e(TAG, "║ WARNING: Answer NOT recorded in database!");
+                            Log.e(TAG, "║ StudentResponse record NOT created due to API error.");
+
                             // Play appropriate sound effect
                             if (isCorrect) {
                                 soundEffectsHelper.playSuccess();
+                                Log.e(TAG, "║ - Sound: SUCCESS");
                             } else if (!finalSelectedAnswerLetter.isEmpty()) {
                                 soundEffectsHelper.playError();
+                                Log.e(TAG, "║ - Sound: ERROR");
+                            } else {
+                                Log.e(TAG, "║ - Sound: NONE (skipped)");
                             }
-
-                            // Update IRT engine with result
-                            irtEngine.updateTheta(currentQuestion, isCorrect);
 
                             // Move to next question
                             currentQuestionNumber++;
 
                             if (currentQuestionNumber > totalQuestions) {
+                                Log.e(TAG, "║ - Status: TEST COMPLETE (with errors)");
+                                Log.e(TAG, "╚════════════════════════════════════════════════════════════");
                                 soundEffectsHelper.playCelebration();
                                 showResults();
                             } else {
+                                Log.e(TAG, "║ - Status: Moving to next question");
+                                Log.e(TAG, "╚════════════════════════════════════════════════════════════");
                                 soundEffectsHelper.playChime();
                                 loadNextQuestion();
                             }
