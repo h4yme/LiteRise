@@ -6,6 +6,8 @@ import android.content.Context;
 
 import android.content.SharedPreferences;
 
+import com.example.literise.database.SessionManager;
+
 
 
 import com.google.gson.Gson;
@@ -56,6 +58,8 @@ public class ModulePriorityManager {
 
     private Gson gson;
 
+    private Context context;
+
 
 
     // Map item types to module categories
@@ -90,27 +94,27 @@ public class ModulePriorityManager {
 
 
 
-    // All 6 module categories in default pedagogical order
+    // All 5 module categories matching placement test categories
 
     public static final String[] ALL_MODULES = {
 
-            "Phonics & Pronunciation",      // Foundation
+            "Phonics and Word Study",                      // Cat1
 
-            "Vocabulary Building",           // Building blocks
+            "Vocabulary and Word Knowledge",               // Cat2
 
-            "Reading Comprehension",         // Core skill
+            "Grammar Awareness and Grammatical Structures", // Cat3
 
-            "Grammar & Syntax",              // Structure
+            "Comprehending and Analyzing Text",            // Cat4
 
-            "Reading Fluency",               // Application
-
-            "Spelling & Writing"             // Advanced
+            "Creating and Composing Text"                  // Cat5
 
     };
 
 
 
     public ModulePriorityManager(Context context) {
+
+        this.context = context;
 
         prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
@@ -227,6 +231,66 @@ public class ModulePriorityManager {
                 orderedModules.add(module);
 
             }
+
+        }
+
+
+
+        saveOrderedModules(orderedModules);
+
+    }
+
+
+
+    /**
+
+     * Calculate module priorities from placement test category scores
+
+     * Orders modules from lowest score (highest priority) to highest score
+
+     */
+
+    public void calculateModulePrioritiesFromPlacementTest() {
+
+        SessionManager session = new SessionManager(context);
+
+
+
+        // Map of module names to their category scores
+
+        Map<String, Integer> moduleScores = new LinkedHashMap<>();
+
+        moduleScores.put("Phonics and Word Study", session.getCategoryScore("Cat1_PhonicsWordStudy"));
+
+        moduleScores.put("Vocabulary and Word Knowledge", session.getCategoryScore("Cat2_VocabularyWordKnowledge"));
+
+        moduleScores.put("Grammar Awareness and Grammatical Structures", session.getCategoryScore("Cat3_GrammarAwareness"));
+
+        moduleScores.put("Comprehending and Analyzing Text", session.getCategoryScore("Cat4_ComprehendingText"));
+
+        moduleScores.put("Creating and Composing Text", session.getCategoryScore("Cat5_CreatingComposing"));
+
+
+
+        // Convert to list for sorting
+
+        List<Map.Entry<String, Integer>> moduleList = new ArrayList<>(moduleScores.entrySet());
+
+
+
+        // Sort by score (lowest first = highest priority)
+
+        Collections.sort(moduleList, (a, b) -> Integer.compare(a.getValue(), b.getValue()));
+
+
+
+        // Extract ordered module names
+
+        List<String> orderedModules = new ArrayList<>();
+
+        for (Map.Entry<String, Integer> entry : moduleList) {
+
+            orderedModules.add(entry.getKey());
 
         }
 

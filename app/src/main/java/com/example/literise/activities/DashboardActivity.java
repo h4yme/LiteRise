@@ -27,6 +27,7 @@ import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -331,44 +332,46 @@ public class DashboardActivity extends BaseActivity {
      * Aligned with MATATAG English Curriculum Guide 2023
      */
     private void loadModulesFromPlacementResults() {
-        // Get placement test results from session
-        double oralLanguageScore = session.getCategoryAccuracy("Oral Language");
-        double wordKnowledgeScore = session.getCategoryAccuracy("Word Knowledge");
-        double readingCompScore = session.getCategoryAccuracy("Reading Comprehension");
-        double languageStructScore = session.getCategoryAccuracy("Language Structure");
+        // Calculate module priorities from placement test scores
+        priorityManager.calculateModulePrioritiesFromPlacementTest();
+
+        // Get ordered module names (lowest score = highest priority)
+        List<String> orderedModuleNames = priorityManager.getOrderedModules();
+
+        // Get placement level
         String placementLevel = session.getPlacementLevel();
 
-        // If no placement test taken yet, use default values
-        if (oralLanguageScore == 0 && wordKnowledgeScore == 0 &&
-                readingCompScore == 0 && languageStructScore == 0) {
-            // Default values for new students
-            oralLanguageScore = 0.60;
-            wordKnowledgeScore = 0.55;
-            readingCompScore = 0.50;
-            languageStructScore = 0.65;
-            placementLevel = "Mid Grade 3";
+        // Create LearningModule objects from ordered names
+        modules = new ArrayList<>();
+        String[] gradients = getModuleGradients();
+
+        for (int i = 0; i < orderedModuleNames.size(); i++) {
+            String moduleName = orderedModuleNames.get(i);
+            int score = getScoreForModule(moduleName);
+            double performanceScore = score / 100.0; // Convert 0-100 to 0-1
+
+            LearningModule module = new LearningModule(
+                    i + 1,                        // moduleId
+                    moduleName,                   // title
+                    getModuleSubtitle(i),         // subtitle
+                    getModuleDomain(i),           // domain
+                    performanceScore,             // performanceScore (0-1)
+                    gradients[i * 2],             // gradientStart
+                    gradients[i * 2 + 1]          // gradientEnd
+            );
+            module.setPriorityOrder(i + 1);
+            module.setLocked(i != 0); // Only first module unlocked
+            modules.add(module);
         }
 
-        // Create modules using ModuleOrderingHelper
-        modules = ModuleOrderingHelper.createModulesFromPlacementResults(
-                oralLanguageScore,
-                wordKnowledgeScore,
-                readingCompScore,
-                languageStructScore
-        );
-
-        // Apply locking based on placement level
-        ModuleOrderingHelper.applyModuleLocking(modules, placementLevel);
-
-        // Debug: Log module count
-        android.util.Log.d("DashboardActivity", "Total modules created: " + modules.size());
+        // Debug: Log module order
+        android.util.Log.d("DashboardActivity", "Modules ordered by priority (weakest first):");
         for (int i = 0; i < modules.size(); i++) {
-            android.util.Log.d("DashboardActivity", "Module " + (i+1) + ": " + modules.get(i).getTitle());
+            android.util.Log.d("DashboardActivity", (i+1) + ". " + modules.get(i).getTitle() + " - Score: " + (int)(modules.get(i).getPerformanceScore() * 100) + "%");
         }
 
         // Update summary text
-        String summary = ModuleOrderingHelper.getModuleSummary(modules);
-        tvModuleSummary.setText("Modules prioritized by your needs • " + summary);
+        tvModuleSummary.setText("Modules prioritized by your needs • Focus on areas where you need the most practice");
 
         // Setup adapter with click listener
         moduleAdapter = new ModuleAdapter(this, modules, module -> {
@@ -378,6 +381,49 @@ public class DashboardActivity extends BaseActivity {
 
         // Force RecyclerView to recalculate height
         rvModules.post(() -> rvModules.requestLayout());
+    }
+
+    private int getScoreForModule(String moduleName) {
+        switch (moduleName) {
+            case "Phonics and Word Study":
+                return session.getCategoryScore("Cat1_PhonicsWordStudy");
+            case "Vocabulary and Word Knowledge":
+                return session.getCategoryScore("Cat2_VocabularyWordKnowledge");
+            case "Grammar Awareness and Grammatical Structures":
+                return session.getCategoryScore("Cat3_GrammarAwareness");
+            case "Comprehending and Analyzing Text":
+                return session.getCategoryScore("Cat4_ComprehendingText");
+            case "Creating and Composing Text":
+                return session.getCategoryScore("Cat5_CreatingComposing");
+            default:
+                return 50; // default score
+        }
+    }
+
+    private String getModuleDomain(int index) {
+        String[] domains = {"Phonics", "Vocabulary", "Grammar", "Comprehension", "Writing"};
+        return index < domains.length ? domains[index] : "General";
+    }
+
+    private String getModuleSubtitle(int index) {
+        String[] subtitles = {
+                "Letter sounds and word patterns",
+                "Building your word bank",
+                "Sentence structure and rules",
+                "Understanding what you read",
+                "Express your ideas in writing"
+        };
+        return index < subtitles.length ? subtitles[index] : "English Module";
+    }
+
+    private String[] getModuleGradients() {
+        return new String[]{
+                "#FF6B6B", "#FF8E53", // Phonics - Red to Orange
+                "#4ECDC4", "#44A08D", // Vocabulary - Teal to Green
+                "#A770EF", "#CF57A3", // Grammar - Purple to Pink
+                "#FFD93D", "#FFA93D", // Comprehension - Yellow to Orange
+                "#667EEA", "#764BA2"  // Writing - Blue to Purple
+        };
     }
 
 

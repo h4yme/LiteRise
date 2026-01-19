@@ -112,18 +112,16 @@ public class IRTEngine {
     }
 
     /**
-     * Calculate final placement level based on theta
+     * Calculate final placement level based on theta (3 levels)
      */
     public int calculatePlacementLevel() {
-        // Map theta to reading levels 1-4
-        if (theta < -1.0) {
+        // Map theta to reading levels 1-3
+        if (theta < -0.5) {
             return 1; // Beginner
-        } else if (theta < 0.0) {
-            return 2; // Early Reader
-        } else if (theta < 1.0) {
-            return 3; // Developing Reader
+        } else if (theta < 0.5) {
+            return 2; // Intermediate
         } else {
-            return 4; // Fluent Reader
+            return 3; // Advanced
         }
     }
 
@@ -133,11 +131,10 @@ public class IRTEngine {
     public String getPlacementLevelName() {
         int level = calculatePlacementLevel();
         switch (level) {
-            case 1: return "Beginner Reader";
-            case 2: return "Early Reader";
-            case 3: return "Developing Reader";
-            case 4: return "Fluent Reader";
-            default: return "Unknown";
+            case 1: return "Beginner";
+            case 2: return "Intermediate";
+            case 3: return "Advanced";
+            default: return "Intermediate";
         }
     }
 
@@ -156,25 +153,25 @@ public class IRTEngine {
     }
 
     /**
-     * Get category performance breakdown
+     * Get category performance breakdown (5 categories)
      */
     public int[] getCategoryScores() {
-        int[] scores = new int[4]; // 4 categories
-        int[] counts = new int[4];
+        int[] scores = new int[5]; // 5 categories
+        int[] counts = new int[5];
 
         for (int i = 0; i < answeredQuestions.size(); i++) {
             PlacementQuestion q = answeredQuestions.get(i);
             boolean correct = answerResults.get(i);
             int category = q.getCategory() - 1; // 0-indexed
 
-            if (category >= 0 && category < 4) {
+            if (category >= 0 && category < 5) {
                 if (correct) scores[category]++;
                 counts[category]++;
             }
         }
 
         // Convert to percentages
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             if (counts[i] > 0) {
                 scores[i] = (scores[i] * 100) / counts[i];
             }

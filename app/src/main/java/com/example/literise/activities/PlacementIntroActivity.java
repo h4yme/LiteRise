@@ -53,12 +53,12 @@ public class PlacementIntroActivity extends AppCompatActivity {
 
         // Message 4: How it works
         messages.add(new LeoDialogueView.DialogueMessage(
-                "Here's how it works:\n\n1️⃣ I'll show you 20-25 questions\n2️⃣ Questions get easier or harder based on your answers\n3️⃣ Take your time - no rushing!\n4️⃣ You can skip if you're not sure\n\nIt takes about 15 minutes!"
+                "Here's how it works:\n\n1️⃣ I'll show you 25 questions\n2️⃣ Questions get easier or harder based on your answers\n3️⃣ Take your time - no rushing!\n4️⃣ You can skip if you're not sure\n\nIt takes about 10-15 minutes!"
         ));
 
         // Message 5: Question types
         messages.add(new LeoDialogueView.DialogueMessage(
-                "You'll see 4 types of questions:\n\n🎧 Listening - Hear a story\n🔤 Words - Read and match words\n📖 Reading - Read short stories\n✏️ Grammar - Fix sentences\n\nAll questions are FUN and COLORFUL!"
+                "You'll see 5 types of questions:\n\n🔤 Phonics - Letter sounds\n📚 Vocabulary - Word meanings\n✏️ Grammar - Sentence structure\n📖 Reading - Story comprehension\n✍️ Writing - Creating sentences\n\nAll questions are FUN!"
         ));
 
         // Message 6: Encouragement
