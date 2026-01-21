@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Module Path Coordinates (x, y as percentage of screen width/height) -->
+    <!-- Creates a winding trail like the image -->
+    <integer-array name="module_path_x">
+        <item>50</item>  <!-- Node 1: Center bottom -->
+        <item>30</item>  <!-- Node 2: Left -->
+        <item>20</item>  <!-- Node 3: Far left (Q1 end) -->
+        <item>35</item>  <!-- Node 4: Moving right -->
+        <item>50</item>  <!-- Node 5: Center -->
+        <item>65</item>  <!-- Node 6: Right (Q2 end) -->
+        <item>75</item>  <!-- Node 7: Far right -->
+        <item>60</item>  <!-- Node 8: Moving left -->
+        <item>45</item>  <!-- Node 9: Center-left (Q3 end) -->
+        <item>30</item>  <!-- Node 10: Left -->
+        <item>40</item>  <!-- Node 11: Center -->
+        <item>50</item>  <!-- Node 12: Center (Q4 end) -->
+        <item>50</item>  <!-- Node 13: Final - Top center -->
+    </integer-array>
+
+    <integer-array name="module_path_y">
+        <item>85</item>  <!-- Node 1: Bottom -->
+        <item>75</item>  <!-- Node 2 -->
+        <item>65</item>  <!-- Node 3: Q1 end -->
+        <item>55</item>  <!-- Node 4 -->
+        <item>48</item>  <!-- Node 5 -->
+        <item>41</item>  <!-- Node 6: Q2 end -->
+        <item>34</item>  <!-- Node 7 -->
+        <item>28</item>  <!-- Node 8 -->
+        <item>22</item>  <!-- Node 9: Q3 end -->
+        <item>16</item>  <!-- Node 10 -->
+        <item>11</item>  <!-- Node 11 -->
+        <item>6</item>   <!-- Node 12: Q4 end -->
+        <item>2</item>   <!-- Node 13: Final - Top -->
+    </integer-array>
+</resources>

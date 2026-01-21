@@ -1,9 +1,12 @@
 package com.example.literise.api;
 
+import com.example.literise.models.AdaptiveDecisionResponse;
 import com.example.literise.models.GetNextItemRequest;
 
+import com.example.literise.models.ModuleLadderResponse;
 import com.example.literise.models.NextItemResponse;
 
+import com.example.literise.models.PacingStrategyResponse;
 import com.example.literise.models.PreAssessmentResponse;
 
 import com.example.literise.models.PronunciationRequest;
@@ -12,6 +15,7 @@ import com.example.literise.models.PronunciationResponse;
 
 import com.example.literise.models.Question;
 
+import com.example.literise.models.QuizSubmitRequest;
 import com.example.literise.models.ResponseModel;
 
 import com.example.literise.models.SaveGameResultRequest;
@@ -210,4 +214,24 @@ public interface ApiService {
             @Part("target_word") okhttp3.RequestBody targetWord,
             @Part okhttp3.MultipartBody.Part audioFile
     );
+
+    // Add these methods to app/src/main/java/com/example/literise/api/ApiService.java
+
+    @GET("get_module_ladder.php")
+    Call<ModuleLadderResponse> getModuleLadder(
+            @Query("student_id") int studentId,
+            @Query("module_id") int moduleId
+    );
+
+    @POST("submit_quiz.php")
+    Call<AdaptiveDecisionResponse> submitQuiz(
+            @Body QuizSubmitRequest request
+    );
+
+    @GET("get_pacing_strategy.php")
+    Call<PacingStrategyResponse> getPacingStrategy(
+            @Query("student_id") int studentId,
+            @Query("node_id") int nodeId
+    );
+
 }
