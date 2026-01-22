@@ -1,226 +1,382 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white">
+    android:layout_height="match_parent">
 
-    <!-- Top Bar -->
-    <LinearLayout
-        android:id="@+id/topBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp"
-        android:background="@color/purple_500"
-        android:gravity="center_vertical">
-
-        <ImageView
-            android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_arrow_back"
-            android:tint="@color/white"
-            android:padding="8dp"
-            android:background="?attr/selectableItemBackgroundBorderless" />
-
-        <TextView
-            android:id="@+id/tvQuizTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Quiz 1"
-            android:textColor="@color/white"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:gravity="center" />
-
-        <TextView
-            android:id="@+id/tvProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1/5"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:padding="8dp" />
-
-    </LinearLayout>
-
-    <!-- Main Content -->
-    <ScrollView
+    <!-- Fun Background -->
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:layout_above="@id/bottomBar"
-        android:fillViewport="true">
+        android:src="@drawable/bg_module"
+        android:scaleType="centerCrop"
+        android:alpha="0.12" />
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Colorful Top Bar -->
         <LinearLayout
+            android:id="@+id/topBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@drawable/bg_gradient_green_blue"
+            android:gravity="center_vertical"
+            android:elevation="8dp">
 
-            <!-- Question Number -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_arrow_back"
+                android:tint="@color/white"
+                android:padding="8dp"
+                android:background="@drawable/bg_circle_white_ripple" />
+
             <TextView
-                android:id="@+id/tvQuestionNumber"
-                android:layout_width="match_parent"
+                android:id="@+id/tvQuizTitle"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Question 1 of 5"
-                android:textColor="@color/purple_500"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="12dp" />
+                android:layout_weight="1"
+                android:text="🎯 Quiz Time!"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:fontFamily="@font/visby_bold"
+                android:gravity="center" />
 
-            <!-- Question Text -->
             <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
+                app:cardCornerRadius="16dp"
                 app:cardElevation="4dp"
-                app:cardBackgroundColor="@color/purple_50">
+                app:cardBackgroundColor="@color/white">
 
                 <TextView
-                    android:id="@+id/tvQuestionText"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tvProgress"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="What is the main idea of the passage?"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    android:padding="20dp"
-                    android:lineSpacingMultiplier="1.4" />
+                    android:text="1/5"
+                    android:textColor="@color/color_charcoal"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp" />
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Answer Options -->
-            <RadioGroup
-                android:id="@+id/radioGroupOptions"
+        </LinearLayout>
+
+        <!-- Main Content -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/topBar"
+            android:layout_above="@id/bottomBar"
+            android:fillViewport="true"
+            android:padding="16dp">
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
+                <!-- Question Number Badge -->
                 <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:cardBackgroundColor="@color/pink_500">
 
-                    <RadioButton
-                        android:id="@+id/rbOption1"
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvQuestionNumber"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Option A"
+                        android:text="🤔 Question 1 of 5"
+                        android:textColor="@color/white"
                         android:textSize="16sp"
-                        android:padding="16dp"
-                        android:button="@null"
-                        android:drawableRight="@drawable/ic_radio_button"
-                        android:background="?attr/selectableItemBackground" />
+                        android:fontFamily="@font/visby_bold"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp" />
 
                 </androidx.cardview.widget.CardView>
 
+                <!-- Question Card -->
                 <androidx.cardview.widget.CardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
+                    android:layout_marginBottom="24dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="8dp"
                     app:cardBackgroundColor="@color/white">
 
-                    <RadioButton
-                        android:id="@+id/rbOption2"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Option B"
-                        android:textSize="16sp"
-                        android:padding="16dp"
-                        android:button="@null"
-                        android:drawableRight="@drawable/ic_radio_button"
-                        android:background="?attr/selectableItemBackground" />
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <!-- Question Icon -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="❓"
+                            android:textSize="40sp"
+                            android:layout_gravity="center"
+                            android:layout_marginBottom="12dp" />
+
+                        <TextView
+                            android:id="@+id/tvQuestionText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="What is the main idea of the story?"
+                            android:textColor="@color/color_charcoal"
+                            android:textSize="20sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:gravity="center"
+                            android:lineSpacingMultiplier="1.4" />
+
+                    </LinearLayout>
 
                 </androidx.cardview.widget.CardView>
 
-                <androidx.cardview.widget.CardView
+                <!-- Answer Options with Fun Colors -->
+                <RadioGroup
+                    android:id="@+id/radioGroupOptions"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    android:orientation="vertical">
 
-                    <RadioButton
-                        android:id="@+id/rbOption3"
+                    <!-- Option 1 - Blue -->
+                    <androidx.cardview.widget.CardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Option C"
-                        android:textSize="16sp"
-                        android:padding="16dp"
-                        android:button="@null"
-                        android:drawableRight="@drawable/ic_radio_button"
-                        android:background="?attr/selectableItemBackground" />
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/white">
 
-                </androidx.cardview.widget.CardView>
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground">
 
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:text="A"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/visby_bold"
+                                android:textColor="@color/white"
+                                android:background="@drawable/bg_circle_blue"
+                                android:gravity="center"
+                                android:layout_margin="12dp" />
+
+                            <RadioButton
+                                android:id="@+id/rbOption1"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="The story is about friendship"
+                                android:textSize="16sp"
+                                android:fontFamily="@font/visby_medium"
+                                android:textColor="@color/color_charcoal"
+                                android:paddingEnd="16dp"
+                                android:button="@null"
+                                android:drawableEnd="@drawable/ic_radio_button" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Option 2 - Green -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/white">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:text="B"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/visby_bold"
+                                android:textColor="@color/white"
+                                android:background="@drawable/bg_circle_green"
+                                android:gravity="center"
+                                android:layout_margin="12dp" />
+
+                            <RadioButton
+                                android:id="@+id/rbOption2"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="The story is about adventure"
+                                android:textSize="16sp"
+                                android:fontFamily="@font/visby_medium"
+                                android:textColor="@color/color_charcoal"
+                                android:paddingEnd="16dp"
+                                android:button="@null"
+                                android:drawableEnd="@drawable/ic_radio_button" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Option 3 - Purple -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/white">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:text="C"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/visby_bold"
+                                android:textColor="@color/white"
+                                android:background="@drawable/bg_circle_purple"
+                                android:gravity="center"
+                                android:layout_margin="12dp" />
+
+                            <RadioButton
+                                android:id="@+id/rbOption3"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="The story is about learning"
+                                android:textSize="16sp"
+                                android:fontFamily="@font/visby_medium"
+                                android:textColor="@color/color_charcoal"
+                                android:paddingEnd="16dp"
+                                android:button="@null"
+                                android:drawableEnd="@drawable/ic_radio_button" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                    <!-- Option 4 - Orange -->
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="@color/white">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="?attr/selectableItemBackground">
+
+                            <TextView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:text="D"
+                                android:textSize="20sp"
+                                android:fontFamily="@font/visby_bold"
+                                android:textColor="@color/white"
+                                android:background="@drawable/bg_circle_orange"
+                                android:gravity="center"
+                                android:layout_margin="12dp" />
+
+                            <RadioButton
+                                android:id="@+id/rbOption4"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="The story is about nature"
+                                android:textSize="16sp"
+                                android:fontFamily="@font/visby_medium"
+                                android:textColor="@color/color_charcoal"
+                                android:paddingEnd="16dp"
+                                android:button="@null"
+                                android:drawableEnd="@drawable/ic_radio_button" />
+
+                        </LinearLayout>
+
+                    </androidx.cardview.widget.CardView>
+
+                </RadioGroup>
+
+                <!-- Loading Indicator -->
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    app:cardCornerRadius="8dp"
-                    app:cardElevation="2dp"
-                    app:cardBackgroundColor="@color/white">
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"
+                    android:visibility="gone" />
 
-                    <RadioButton
-                        android:id="@+id/rbOption4"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="Option D"
-                        android:textSize="16sp"
-                        android:padding="16dp"
-                        android:button="@null"
-                        android:drawableRight="@drawable/ic_radio_button"
-                        android:background="?attr/selectableItemBackground" />
+            </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+        </ScrollView>
 
-            </RadioGroup>
+        <!-- Bottom Bar with Next Button -->
+        <LinearLayout
+            android:id="@+id/bottomBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/white"
+            android:elevation="12dp">
 
-            <!-- Progress Bar -->
-            <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNext"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:text="Next Question ➡️"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:fontFamily="@font/visby_bold"
+                android:textAllCaps="false"
+                app:backgroundTint="@color/cyan_500"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_arrow_right"
+                app:iconGravity="end"
+                app:iconTint="@color/white"
+                android:enabled="false" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </RelativeLayout>
 
-    <!-- Bottom Bar with Next Button -->
-    <LinearLayout
-        android:id="@+id/bottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical"
-        android:padding="16dp"
-        android:background="@color/white"
-        android:elevation="8dp">
-
-        <Button
-            android:id="@+id/btnNext"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Next Question →"
-            android:textColor="@color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="@drawable/bg_button_primary"
-            android:enabled="false" />
-
-    </LinearLayout>
-
-</RelativeLayout>
+</FrameLayout>

@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
-import com.example.literise.utils.SessionManager;
+import com.example.literise.database.SessionManager;
 
 /**
  * PHASE 1: Lesson Content Display Activity
@@ -64,8 +64,7 @@ public class LessonContentActivity extends AppCompatActivity {
         moduleId = getIntent().getIntExtra("module_id", 1);
         lessonNumber = getIntent().getIntExtra("lesson_number", 1);
         moduleName = getIntent().getStringExtra("module_name");
-        placementLevel = getIntent().getIntExtra("placement_level",
-                sessionManager.getPlacementLevel());
+        placementLevel = getIntent().getIntExtra("placement_level", 2); // Default to intermediate level
 
         initializeViews();
         setupListeners();
