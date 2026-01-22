@@ -1,13 +1,14 @@
 package com.example.literise.views;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.RadialGradient;
 import android.graphics.RectF;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -28,6 +29,7 @@ public class ModulePathView extends View {
     private Paint labelPaint;
     private Paint framePaint;
     private Paint bgPaint;
+    private Paint shadowPaint;
     private Path trailPath;
     private OnNodeClickListener nodeClickListener;
 
@@ -53,40 +55,49 @@ public class ModulePathView extends View {
     private void init() {
         nodes = new ArrayList<>();
 
-        // Trail path paint
+        // Trail path paint with gradient
         pathPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        pathPaint.setColor(Color.parseColor("#E8C59C")); // Sandy trail color
+        pathPaint.setColor(Color.parseColor("#E8C59C"));
         pathPaint.setStyle(Paint.Style.STROKE);
-        pathPaint.setStrokeWidth(50);
+        pathPaint.setStrokeWidth(65);
         pathPaint.setStrokeCap(Paint.Cap.ROUND);
+        pathPaint.setShadowLayer(8, 0, 4, Color.parseColor("#80000000"));
 
         // Node paint
         nodePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
+        // Shadow paint for nodes
+        shadowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        shadowPaint.setColor(Color.parseColor("#40000000"));
+        shadowPaint.setStyle(Paint.Style.FILL);
+
         // Text paint for node numbers
         textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(48);
+        textPaint.setTextSize(64);
         textPaint.setTextAlign(Paint.Align.CENTER);
         textPaint.setFakeBoldText(true);
+        textPaint.setShadowLayer(4, 0, 2, Color.parseColor("#80000000"));
 
         // Label paint for quarters
         labelPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         labelPaint.setColor(Color.WHITE);
-        labelPaint.setTextSize(36);
-        labelPaint.setAlpha(180);
-        labelPaint.setShadowLayer(4, 2, 2, Color.parseColor("#80000000"));
+        labelPaint.setTextSize(44);
+        labelPaint.setAlpha(220);
+        labelPaint.setShadowLayer(8, 2, 2, Color.parseColor("#80000000"));
+        labelPaint.setFakeBoldText(true);
 
         // Frame paint for "YOU ARE HERE"
         framePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        framePaint.setColor(Color.parseColor("#FF1493")); // Pink frame
+        framePaint.setColor(Color.parseColor("#FF1493"));
         framePaint.setStyle(Paint.Style.STROKE);
-        framePaint.setStrokeWidth(10);
+        framePaint.setStrokeWidth(14);
+        framePaint.setShadowLayer(6, 0, 3, Color.parseColor("#80000000"));
 
         // Background paint for "YOU ARE HERE"
         bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        bgPaint.setColor(Color.parseColor("#333333"));
-        bgPaint.setAlpha(220);
+        bgPaint.setColor(Color.parseColor("#2D2D2D"));
+        bgPaint.setAlpha(240);
 
         Log.d(TAG, "ModulePathView initialized");
     }
@@ -100,12 +111,12 @@ public class ModulePathView extends View {
 
         if (nodes == null || nodes.isEmpty()) {
             Log.w(TAG, "No nodes to draw!");
-            // Draw a message
             Paint msgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            msgPaint.setColor(Color.RED);
-            msgPaint.setTextSize(40);
+            msgPaint.setColor(Color.parseColor("#FF5252"));
+            msgPaint.setTextSize(44);
             msgPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("No nodes loaded", getWidth() / 2f, getHeight() / 2f, msgPaint);
+            msgPaint.setFakeBoldText(true);
+            canvas.drawText("Loading lessons...", getWidth() / 2f, getHeight() / 2f, msgPaint);
             return;
         }
 
@@ -137,7 +148,6 @@ public class ModulePathView extends View {
             if (i == 0) {
                 trailPath.moveTo(x, y);
             } else {
-                // Create curved path between nodes
                 NodeView prevNode = nodes.get(i - 1);
                 float prevX = prevNode.getX() * getWidth() / 100f;
                 float prevY = prevNode.getY() * getHeight() / 100f;
@@ -156,54 +166,102 @@ public class ModulePathView extends View {
         float x = node.getX() * getWidth() / 100f;
         float y = node.getY() * getHeight() / 100f;
 
-        int size = node.isFinalAssessment() ? 140 : 100;
+        int size = node.isFinalAssessment() ? 200 : 140; // Even bigger!
 
-        // Draw circle background based on state
+        // Draw shadow first
+        canvas.drawCircle(x + 4, y + 6, size / 2f, shadowPaint);
+
+        // Draw gradient circle based on state
         Paint circlePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         circlePaint.setStyle(Paint.Style.FILL);
 
+        RadialGradient gradient;
+
         switch (node.getState()) {
             case LOCKED:
-                circlePaint.setColor(Color.parseColor("#999999"));
+                // Gray gradient
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#9E9E9E"),
+                        Color.parseColor("#757575"),
+                        Shader.TileMode.CLAMP);
                 break;
             case UNLOCKED:
-                circlePaint.setColor(Color.parseColor("#4CAF50"));
+                // Green gradient - Ready to start!
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#66BB6A"),
+                        Color.parseColor("#43A047"),
+                        Shader.TileMode.CLAMP);
                 break;
             case CURRENT:
-                circlePaint.setColor(Color.parseColor("#FF9800"));
+                // Orange gradient - Active!
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#FFA726"),
+                        Color.parseColor("#FB8C00"),
+                        Shader.TileMode.CLAMP);
                 break;
             case COMPLETED:
-                circlePaint.setColor(Color.parseColor("#2196F3"));
+                // Blue gradient - Completed!
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#42A5F5"),
+                        Color.parseColor("#1E88E5"),
+                        Shader.TileMode.CLAMP);
                 break;
             case MASTERED:
-                circlePaint.setColor(Color.parseColor("#FFD700"));
+                // Gold gradient - Mastered!
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#FFD54F"),
+                        Color.parseColor("#FFA000"),
+                        Shader.TileMode.CLAMP);
                 break;
+            default:
+                gradient = new RadialGradient(x, y - size/4, size / 2f,
+                        Color.parseColor("#9E9E9E"),
+                        Color.parseColor("#757575"),
+                        Shader.TileMode.CLAMP);
         }
 
+        circlePaint.setShader(gradient);
         canvas.drawCircle(x, y, size / 2f, circlePaint);
 
-        // Draw border
+        // Draw white border with glow effect
         Paint borderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         borderPaint.setStyle(Paint.Style.STROKE);
-        borderPaint.setStrokeWidth(6);
+        borderPaint.setStrokeWidth(10);
         borderPaint.setColor(Color.WHITE);
+        borderPaint.setShadowLayer(8, 0, 0, Color.WHITE);
         canvas.drawCircle(x, y, size / 2f, borderPaint);
 
-        // Draw node number
+        // Draw inner circle for depth effect
+        Paint innerBorderPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        innerBorderPaint.setStyle(Paint.Style.STROKE);
+        innerBorderPaint.setStrokeWidth(6);
+        innerBorderPaint.setColor(Color.parseColor("#40FFFFFF"));
+        canvas.drawCircle(x, y, (size / 2f) - 8, innerBorderPaint);
+
+        // Draw node number or lock icon
         if (node.getState() != NodeView.NodeState.LOCKED) {
-            float textSize = node.isFinalAssessment() ? 56 : 48;
+            float textSize = node.isFinalAssessment() ? 80 : 64;
             textPaint.setTextSize(textSize);
+
+            // Add star emoji for final assessment
+            if (node.isFinalAssessment()) {
+                Paint starPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+                starPaint.setTextSize(50);
+                starPaint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText("⭐", x, y - 30, starPaint);
+            }
+
             canvas.drawText(
                     String.valueOf(node.getNodeNumber()),
-                    x, y + (textSize / 3), textPaint
+                    x, y + (node.isFinalAssessment() ? 20 : (textSize / 3)), textPaint
             );
         } else {
-            // Draw lock icon for locked nodes
+            // Draw bigger lock icon with glow
             Paint lockPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-            lockPaint.setColor(Color.WHITE);
-            lockPaint.setTextSize(48);
+            lockPaint.setTextSize(70);
             lockPaint.setTextAlign(Paint.Align.CENTER);
-            canvas.drawText("🔒", x, y + 16, lockPaint);
+            lockPaint.setShadowLayer(6, 0, 2, Color.parseColor("#80000000"));
+            canvas.drawText("🔒", x, y + 24, lockPaint);
         }
     }
 
@@ -221,36 +279,52 @@ public class ModulePathView extends View {
         float x = current.getX() * getWidth() / 100f;
         float y = current.getY() * getHeight() / 100f;
 
-        // Draw "YOU ARE HERE" frame
-        RectF frame = new RectF(x - 80, y - 120, x + 80, y - 30);
+        // Draw animated pulsing effect
+        RectF frame = new RectF(x - 110, y - 150, x + 110, y - 25);
 
-        // Draw background
-        canvas.drawRoundRect(frame, 15, 15, bgPaint);
+        // Shadow
+        Paint shadowPaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
+        shadowPaint2.setColor(Color.parseColor("#40000000"));
+        shadowPaint2.setStyle(Paint.Style.FILL);
+        RectF shadowFrame = new RectF(x - 108, y - 146, x + 112, y - 21);
+        canvas.drawRoundRect(shadowFrame, 20, 20, shadowPaint2);
 
-        // Draw border
-        canvas.drawRoundRect(frame, 15, 15, framePaint);
+        // Background with gradient
+        Paint bgGradientPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        LinearGradient bgGradient = new LinearGradient(
+                x, y - 150, x, y - 25,
+                Color.parseColor("#FF1493"),
+                Color.parseColor("#C71585"),
+                Shader.TileMode.CLAMP
+        );
+        bgGradientPaint.setShader(bgGradient);
+        canvas.drawRoundRect(frame, 20, 20, bgGradientPaint);
 
-        // Draw text
+        // Border
+        canvas.drawRoundRect(frame, 20, 20, framePaint);
+
+        // Text with better styling
         Paint textPaint2 = new Paint(Paint.ANTI_ALIAS_FLAG);
         textPaint2.setColor(Color.WHITE);
-        textPaint2.setTextSize(28);
+        textPaint2.setTextSize(36);
         textPaint2.setTextAlign(Paint.Align.CENTER);
         textPaint2.setFakeBoldText(true);
+        textPaint2.setShadowLayer(4, 0, 2, Color.parseColor("#80000000"));
 
-        canvas.drawText("YOU ARE", x, y - 85, textPaint2);
-        canvas.drawText("HERE", x, y - 55, textPaint2);
+        // Emoji
+        canvas.drawText("👆", x, y - 115, textPaint2);
+
+        textPaint2.setTextSize(28);
+        canvas.drawText("YOU ARE", x, y - 80, textPaint2);
+        canvas.drawText("HERE", x, y - 50, textPaint2);
     }
 
     private void drawQuarterMarkers(Canvas canvas) {
-        // Draw "Quarter 1", "Quarter 2" labels at appropriate positions
-        // Q1 marker (around node 3)
-        canvas.drawText("Quarter 1", getWidth() * 0.15f, getHeight() * 0.68f, labelPaint);
-        // Q2 marker (around node 6)
-        canvas.drawText("Quarter 2", getWidth() * 0.70f, getHeight() * 0.45f, labelPaint);
-        // Q3 marker (around node 9)
-        canvas.drawText("Quarter 3", getWidth() * 0.15f, getHeight() * 0.25f, labelPaint);
-        // Q4 marker (around node 12)
-        canvas.drawText("Quarter 4", getWidth() * 0.60f, getHeight() * 0.10f, labelPaint);
+        // Draw "Quarter" labels with better positioning
+        canvas.drawText("Quarter 1", getWidth() * 0.12f, getHeight() * 0.76f, labelPaint);
+        canvas.drawText("Quarter 2", getWidth() * 0.74f, getHeight() * 0.56f, labelPaint);
+        canvas.drawText("Quarter 3", getWidth() * 0.75f, getHeight() * 0.42f, labelPaint);
+        canvas.drawText("Quarter 4", getWidth() * 0.20f, getHeight() * 0.24f, labelPaint);
     }
 
     @Override
@@ -259,11 +333,10 @@ public class ModulePathView extends View {
             float touchX = event.getX();
             float touchY = event.getY();
 
-            // Check if any node was clicked
             for (NodeView node : nodes) {
                 float nodeX = node.getX() * getWidth() / 100f;
                 float nodeY = node.getY() * getHeight() / 100f;
-                float touchRadius = node.isFinalAssessment() ? 70 : 50;
+                float touchRadius = node.isFinalAssessment() ? 100 : 70;
 
                 float distance = (float) Math.sqrt(
                         Math.pow(touchX - nodeX, 2) + Math.pow(touchY - nodeY, 2)
@@ -290,7 +363,7 @@ public class ModulePathView extends View {
             }
         }
 
-        invalidate(); // Force redraw
+        invalidate();
         Log.d(TAG, "invalidate() called");
     }
 

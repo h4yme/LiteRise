@@ -23,11 +23,12 @@
         <com.example.literise.views.ModulePathView
             android:id="@+id/modulePathView"
             android:layout_width="match_parent"
-            android:layout_height="1400dp"
-            android:paddingTop="40dp"
-            android:paddingBottom="40dp"
+            android:layout_height="1500dp"
+            android:paddingTop="80dp"
+            android:paddingBottom="60dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp" />
+
 
     </ScrollView>
 
