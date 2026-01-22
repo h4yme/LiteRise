@@ -267,6 +267,23 @@
             android:name=".activities.ModuleLadderActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- 📚 3-Phase Lesson Flow Activities -->
+        <activity
+            android:name=".activities.LessonContentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.QuizActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.QuizResultActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
     </application>
 
 

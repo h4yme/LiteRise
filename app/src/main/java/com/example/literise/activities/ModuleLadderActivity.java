@@ -328,25 +328,66 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     }
     /**
-
-     * Opens a lesson - routes to fun game activity based on game type!
-
-     * Calculates lesson ID based on module ID and lesson number
-
+     * Opens a lesson - implements 3-phase flow: LESSON → GAME → QUIZ
+     * Routes to appropriate activity based on completion status
      */
-
     private void openLesson(int lessonNumber) {
         // Calculate lesson ID: Module 1 = 101-115, Module 2 = 201-215, etc.
         int lessonId = (moduleId * 100) + lessonNumber;
 
-        // Get the lesson to check its game type
-        Intent intent = null;
+        // TODO: Query StudentNodeProgress table to get actual completion status
+        // For now, using dummy logic to demonstrate the flow
+
+        // Check completion status for this node
+        NodeProgress progress = getNodeProgress(lessonId);
+
+        if (!progress.lessonCompleted) {
+            // PHASE 1: Show Lesson Content
+            startLessonPhase(lessonId, lessonNumber);
+        } else if (!progress.gameCompleted) {
+            // PHASE 2: Show Game
+            startGamePhase(lessonId, lessonNumber);
+        } else if (!progress.quizCompleted) {
+            // PHASE 3: Show Quiz
+            startQuizPhase(lessonId, lessonNumber);
+        } else {
+            // All phases complete - show options (review, replay game, retake quiz)
+            showCompletedNodeOptions(lessonId, lessonNumber);
+        }
+    }
+
+    /**
+     * PHASE 1: Start Lesson Content Display
+     * Shows adaptive content based on placement level
+     */
+    private void startLessonPhase(int lessonId, int lessonNumber) {
+        android.widget.Toast.makeText(this,
+            "📚 Starting Lesson " + lessonNumber,
+            android.widget.Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, LessonContentActivity.class);
+        intent.putExtra("lesson_id", lessonId);
+        intent.putExtra("module_id", moduleId);
+        intent.putExtra("lesson_number", lessonNumber);
+        intent.putExtra("module_name", moduleName);
+        // TODO: Add placement_level from SessionManager
+        startActivity(intent);
+    }
+
+    /**
+     * PHASE 2: Start Game
+     * Routes to appropriate game activity based on game type
+     */
+    private void startGamePhase(int lessonId, int lessonNumber) {
         String gameType = getLessonGameType(lessonId);
 
-        // DEBUG: Show what game type was detected
-        android.widget.Toast.makeText(this, "Lesson " + lessonNumber + " - Game: " + gameType, android.widget.Toast.LENGTH_SHORT).show();
+        android.widget.Toast.makeText(this,
+            "🎮 Starting Game: " + gameType,
+            android.widget.Toast.LENGTH_SHORT).show();
 
-        // Route to the appropriate fun game activity!
+        Intent intent = null;
+
+        // Route to the appropriate fun game activity
         switch (gameType) {
             case "sentence_scramble":
                 intent = new Intent(this, com.example.literise.activities.games.SentenceScrambleActivity.class);
@@ -378,9 +419,63 @@ public class ModuleLadderActivity extends AppCompatActivity {
         if (intent != null) {
             intent.putExtra("lesson_id", lessonId);
             intent.putExtra("module_id", moduleId);
+            intent.putExtra("lesson_number", lessonNumber);
             startActivity(intent);
         }
     }
+
+    /**
+     * PHASE 3: Start Quiz
+     * Shows quiz questions and handles adaptive decisions
+     */
+    private void startQuizPhase(int lessonId, int lessonNumber) {
+        android.widget.Toast.makeText(this,
+            "✅ Starting Quiz " + lessonNumber,
+            android.widget.Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, QuizActivity.class);
+        intent.putExtra("lesson_id", lessonId);
+        intent.putExtra("module_id", moduleId);
+        intent.putExtra("lesson_number", lessonNumber);
+        intent.putExtra("module_name", moduleName);
+        startActivity(intent);
+    }
+
+    /**
+     * Shows options when all phases are complete
+     * Allows review, replay game, or retake quiz
+     */
+    private void showCompletedNodeOptions(int lessonId, int lessonNumber) {
+        android.widget.Toast.makeText(this,
+            "✨ Lesson " + lessonNumber + " Complete!\n📖 Review | 🎮 Replay | ✅ Retake",
+            android.widget.Toast.LENGTH_LONG).show();
+
+        // TODO: Show dialog with options to review lesson, replay game, or retake quiz
+    }
+
+    /**
+     * Gets node progress from cache or database
+     * TODO: Replace with actual API call or local database query
+     */
+    private NodeProgress getNodeProgress(int lessonId) {
+        // DUMMY DATA for testing
+        // In production, this should query StudentNodeProgress table
+        NodeProgress progress = new NodeProgress();
+        progress.lessonCompleted = false; // Force to show lesson first
+        progress.gameCompleted = false;
+        progress.quizCompleted = false;
+        return progress;
+    }
+
+    /**
+     * Inner class to hold node completion status
+     */
+    private static class NodeProgress {
+        boolean lessonCompleted;
+        boolean gameCompleted;
+        boolean quizCompleted;
+    }
+
 
     private String getLessonGameType(int lessonId) {
         // For Module 1, get game type from content provider
