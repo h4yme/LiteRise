@@ -72,20 +72,33 @@ public class ModuleLadderActivity extends AppCompatActivity {
         btnStart = findViewById(R.id.btnStart);
         scrollView = findViewById(R.id.scrollView);
 
-        // Set module title
-        tvModuleTitle.setText(moduleName);
+        // Set module title (defensive null check for build cache issues)
+        if (tvModuleTitle != null) {
+            tvModuleTitle.setText(moduleName);
+        } else {
+            Toast.makeText(this, "Layout error - please rebuild project", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        if (btnBack != null) {
+            btnBack.setOnClickListener(v -> finish());
+        }
 
-        btnStart.setOnClickListener(v -> {
-            // Start first unlocked lesson
-            openLesson(currentLesson);
-        });
+        if (btnStart != null) {
+            btnStart.setOnClickListener(v -> {
+                // Start first unlocked lesson
+                openLesson(currentLesson);
+            });
+        }
     }
 
     private void displayLessonNodes() {
+        if (lessonNodesContainer == null) {
+            // Layout doesn't have lessonNodesContainer - might be using ModulePathView
+            return;
+        }
+
         lessonNodesContainer.removeAllViews();
 
         // Convert dp to pixels for positioning
