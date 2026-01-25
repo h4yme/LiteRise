@@ -97,13 +97,16 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private void setupListeners() {
         backButton.setOnClickListener(v -> finish());
 
-        // ModulePathView will handle node clicks through its own listener
-        // We'll need to set up the click listener for the custom view
+        // Set up node click listener for the custom path view
+        modulePathView.setOnNodeClickListener(lessonNumber -> {
+            openLesson(lessonNumber);
+        });
     }
 
     private void loadModuleProgress() {
         // TODO: Load actual progress from API
         // For now, show default progress
+        modulePathView.setModuleData(moduleId, currentLesson, totalLessons);
         moduleProgress.setProgress(0);
         progressText.setText("0%");
     }
