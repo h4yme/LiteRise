@@ -129,6 +129,15 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     Log.d(TAG, "Success: " + data.isSuccess());
                     Log.d(TAG, "Nodes received: " + (data.getNodes() != null ? data.getNodes().size() : "null"));
                     Log.d(TAG, "Current node ID: " + data.getCurrentNodeId());
+
+                    // Debug: Log raw response
+                    try {
+                        String rawJson = new com.google.gson.Gson().toJson(response.body());
+                        Log.d(TAG, "Raw JSON Response: " + rawJson);
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to serialize response to JSON", e);
+                    }
+
                     parseAndDisplayNodes(data);
                 } else {
                     Log.e(TAG, "API failed with code: " + response.code());
@@ -180,10 +189,14 @@ public class ModuleLadderActivity extends AppCompatActivity {
             int nodeNumber = nodeData.getNodeNumber();
 
             Log.d(TAG, "Processing node " + nodeNumber + ": " + nodeData.getLessonTitle());
+            Log.d(TAG, "  Node ID: " + nodeData.getNodeId());
+            Log.d(TAG, "  Node Type: " + nodeData.getNodeType());
+            Log.d(TAG, "  Quarter: " + nodeData.getQuarter());
+            Log.d(TAG, "  Lesson Completed: " + nodeData.isLessonCompleted());
 
             // Validate node number
             if (nodeNumber < 1 || nodeNumber > 13) {
-                Log.e(TAG, "Invalid node number: " + nodeNumber + " - skipping");
+                Log.e(TAG, "Invalid node number: " + nodeNumber + " - skipping (lessonTitle=" + nodeData.getLessonTitle() + ", nodeId=" + nodeData.getNodeId() + ")");
                 continue;
             }
 
@@ -222,6 +235,15 @@ public class ModuleLadderActivity extends AppCompatActivity {
         }
 
         Log.d(TAG, "Setting " + nodeViews.size() + " nodes to pathView");
+
+        if (nodeViews.isEmpty()) {
+            Log.e(TAG, "No valid nodes! All nodes were skipped.");
+            Toast.makeText(this, "Error: No valid node data received from API", Toast.LENGTH_LONG).show();
+            // Load dummy data as fallback
+            loadDummyData();
+            return;
+        }
+
         pathView.setNodes(nodeViews);
 
         // Update progress
