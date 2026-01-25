@@ -267,6 +267,34 @@
             android:name=".activities.ModuleLadderActivity"
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <!-- 📚 3-Phase Lesson Flow Activities -->
+        <activity
+            android:name=".activities.LessonContentActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.QuizActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
+        <activity
+            android:name=".activities.QuizResultActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".activities.games.PhonicsNinjaActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".activities.games.SynonymSprintActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".activities.games.WordExplosionActivity"
+            android:exported="false"/>
+
     </application>
 
 

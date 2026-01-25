@@ -1,12 +1,9 @@
 package com.example.literise.api;
 
-import com.example.literise.models.AdaptiveDecisionResponse;
 import com.example.literise.models.GetNextItemRequest;
 
-import com.example.literise.models.ModuleLadderResponse;
 import com.example.literise.models.NextItemResponse;
 
-import com.example.literise.models.PacingStrategyResponse;
 import com.example.literise.models.PreAssessmentResponse;
 
 import com.example.literise.models.PronunciationRequest;
@@ -15,7 +12,6 @@ import com.example.literise.models.PronunciationResponse;
 
 import com.example.literise.models.Question;
 
-import com.example.literise.models.QuizSubmitRequest;
 import com.example.literise.models.ResponseModel;
 
 import com.example.literise.models.SaveGameResultRequest;
@@ -215,23 +211,36 @@ public interface ApiService {
             @Part okhttp3.MultipartBody.Part audioFile
     );
 
-    // Add these methods to app/src/main/java/com/example/literise/api/ApiService.java
-
-    @GET("get_module_ladder.php")
-    Call<ModuleLadderResponse> getModuleLadder(
-            @Query("student_id") int studentId,
-            @Query("module_id") int moduleId
+    // 📚 LESSON FLOW APIs - 3-Phase Adaptive System
+    @GET("get_lesson_content.php")
+    Call<com.example.literise.models.LessonContentResponse> getLessonContent(
+            @Query("node_id") int nodeId,
+            @Query("placement_level") int placementLevel
     );
 
+    @GET("get_quiz_questions.php")
+    Call<com.example.literise.models.QuizQuestionsResponse> getQuizQuestions(
+            @Query("node_id") int nodeId,
+            @Query("placement_level") int placementLevel
+    );
+
+    @Headers("Content-Type: application/json")
     @POST("submit_quiz.php")
-    Call<AdaptiveDecisionResponse> submitQuiz(
-            @Body QuizSubmitRequest request
-    );
+    Call<com.example.literise.models.QuizSubmitResponse> submitQuiz(@Body com.example.literise.models.QuizSubmitRequest request);
 
-    @GET("get_pacing_strategy.php")
-    Call<PacingStrategyResponse> getPacingStrategy(
+    @Headers("Content-Type: application/json")
+    @POST("update_node_progress.php")
+    Call<com.example.literise.models.UpdateProgressResponse> updateNodeProgress(@Body com.example.literise.models.UpdateProgressRequest request);
+
+    @GET("get_node_progress.php")
+    Call<com.example.literise.models.NodeProgressResponse> getNodeProgress(
             @Query("student_id") int studentId,
             @Query("node_id") int nodeId
     );
 
+    @GET("get_module_ladder.php")
+    Call<com.example.literise.models.ModuleLadderResponse> getModuleLadder(
+            @Query("student_id") int studentId,
+            @Query("module_id") int moduleId
+    );
 }

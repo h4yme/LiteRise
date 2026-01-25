@@ -1,7 +1,7 @@
 package com.example.literise.models;
 
 import com.google.gson.annotations.SerializedName;
-import java.util.List;
+import java.util.Map;
 
 public class QuizSubmitRequest {
     @SerializedName("student_id")
@@ -10,41 +10,16 @@ public class QuizSubmitRequest {
     @SerializedName("node_id")
     private int nodeId;
 
-    @SerializedName("quiz_score")
-    private int quizScore;
+    @SerializedName("placement_level")
+    private int placementLevel;
 
-    @SerializedName("attempt_count")
-    private int attemptCount;
+    @SerializedName("answers")
+    private Map<Integer, Integer> answers;
 
-    @SerializedName("recent_scores")
-    private List<Integer> recentScores;
-
-    @SerializedName("time_spent")
-    private int timeSpent;
-
-    public QuizSubmitRequest(int studentId, int nodeId, int quizScore,
-                             int attemptCount, List<Integer> recentScores, int timeSpent) {
+    public QuizSubmitRequest(int studentId, int nodeId, int placementLevel, Map<Integer, Integer> answers) {
         this.studentId = studentId;
         this.nodeId = nodeId;
-        this.quizScore = quizScore;
-        this.attemptCount = attemptCount;
-        this.recentScores = recentScores;
-        this.timeSpent = timeSpent;
+        this.placementLevel = placementLevel;
+        this.answers = answers;
     }
-
-    // Getters
-    public int getStudentId() { return studentId; }
-    public int getNodeId() { return nodeId; }
-    public int getQuizScore() { return quizScore; }
-    public int getAttemptCount() { return attemptCount; }
-    public List<Integer> getRecentScores() { return recentScores; }
-    public int getTimeSpent() { return timeSpent; }
-
-    // Setters
-    public void setStudentId(int studentId) { this.studentId = studentId; }
-    public void setNodeId(int nodeId) { this.nodeId = nodeId; }
-    public void setQuizScore(int quizScore) { this.quizScore = quizScore; }
-    public void setAttemptCount(int attemptCount) { this.attemptCount = attemptCount; }
-    public void setRecentScores(List<Integer> recentScores) { this.recentScores = recentScores; }
-    public void setTimeSpent(int timeSpent) { this.timeSpent = timeSpent; }
 }

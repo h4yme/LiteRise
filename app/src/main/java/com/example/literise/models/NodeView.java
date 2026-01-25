@@ -1,23 +1,24 @@
 package com.example.literise.models;
 
-import com.example.literise.R;
-
 public class NodeView {
-    private int nodeId;
-    private int nodeNumber;
-    private String title;
+    private int nodeId;          // Database node ID
+    private int nodeNumber;      // Display number (1-13)
+    private String title;        // Lesson title
+    private float x;             // X position as percentage (0-100)
+    private float y;             // Y position as percentage (0-100)
     private NodeState state;
-    private float x, y; // Position percentages
-    private int quarter;
+    private int quarter;         // Quarter number (1-4, or 0 for final assessment)
     private boolean isFinalAssessment;
-    private int progressPercentage;
 
     public enum NodeState {
-        LOCKED, UNLOCKED, CURRENT, COMPLETED, MASTERED
+        LOCKED,    // Not yet accessible
+        UNLOCKED,  // Available to start
+        CURRENT,   // Currently working on
+        COMPLETED, // Finished
+        MASTERED   // Completed with high score
     }
 
-    public NodeView(int nodeId, int nodeNumber, String title, NodeState state,
-                    float x, float y, int quarter, boolean isFinalAssessment) {
+    public NodeView(int nodeId, int nodeNumber, String title, NodeState state, float x, float y, int quarter, boolean isFinalAssessment) {
         this.nodeId = nodeId;
         this.nodeNumber = nodeNumber;
         this.title = title;
@@ -26,40 +27,43 @@ public class NodeView {
         this.y = y;
         this.quarter = quarter;
         this.isFinalAssessment = isFinalAssessment;
-        this.progressPercentage = 0;
-    }
-
-    public int getDrawableResource() {
-        switch (state) {
-            case LOCKED:
-                return R.drawable.node_locked;
-            case UNLOCKED:
-                return R.drawable.node_unlocked;
-            case CURRENT:
-                return R.drawable.node_current;
-            case COMPLETED:
-                return R.drawable.node_completed;
-            case MASTERED:
-                return R.drawable.node_mastered;
-            default:
-                return R.drawable.node_locked;
-        }
     }
 
     // Getters
-    public int getNodeId() { return nodeId; }
-    public int getNodeNumber() { return nodeNumber; }
-    public String getTitle() { return title; }
-    public NodeState getState() { return state; }
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public int getQuarter() { return quarter; }
-    public boolean isFinalAssessment() { return isFinalAssessment; }
-    public int getProgressPercentage() { return progressPercentage; }
+    public int getNodeId() {
+        return nodeId;
+    }
+
+    public int getNodeNumber() {
+        return nodeNumber;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public NodeState getState() {
+        return state;
+    }
+
+    public int getQuarter() {
+        return quarter;
+    }
+
+    public boolean isFinalAssessment() {
+        return isFinalAssessment;
+    }
 
     // Setters
-    public void setState(NodeState state) { this.state = state; }
-    public void setProgressPercentage(int progressPercentage) {
-        this.progressPercentage = progressPercentage;
+    public void setState(NodeState state) {
+        this.state = state;
     }
 }

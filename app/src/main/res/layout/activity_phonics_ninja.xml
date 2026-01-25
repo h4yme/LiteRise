@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background_ninja">
+
+    <!-- Game Container (for falling words and effects) -->
+    <FrameLayout
+        android:id="@+id/gameContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <!-- UI Overlay -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Top Bar -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:background="@drawable/rounded_bg_dark"
+            android:padding="12dp"
+            android:elevation="8dp">
+
+            <!-- Score Section -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SCORE"
+                    android:textSize="10sp"
+                    android:textColor="#AAAAAA"
+                    android:fontFamily="@font/visby_bold"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/tvScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="28sp"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/visby_bold"/>
+
+                    <TextView
+                        android:id="@+id/tvMultiplier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="2x"
+                        android:textSize="16sp"
+                        android:textColor="#FFD93D"
+                        android:fontFamily="@font/visby_bold"
+                        android:layout_marginStart="8dp"
+                        android:visibility="gone"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="1dp"/>
+
+            <!-- Timer -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TIME"
+                    android:textSize="10sp"
+                    android:textColor="#AAAAAA"
+                    android:fontFamily="@font/visby_bold"/>
+
+                <TextView
+                    android:id="@+id/tvTimer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="45s"
+                    android:textSize="20sp"
+                    android:textColor="#4ECDC4"
+                    android:fontFamily="@font/visby_bold"/>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="16dp"
+                android:layout_height="1dp"/>
+
+            <!-- Lives (Hearts) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/heart1"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="#FF6B6B"
+                    android:layout_marginEnd="4dp"/>
+
+                <ImageView
+                    android:id="@+id/heart2"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="#FF6B6B"
+                    android:layout_marginEnd="4dp"/>
+
+                <ImageView
+                    android:id="@+id/heart3"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:src="@drawable/ic_heart"
+                    app:tint="#FF6B6B"/>
+            </LinearLayout>
+
+            <Space
+                android:layout_width="12dp"
+                android:layout_height="1dp"/>
+
+            <!-- Pause Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPause"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:text="⏸"
+                android:textSize="20sp"
+                android:fontFamily="@font/visby_bold"
+                app:cornerRadius="24dp"
+                android:backgroundTint="#333333"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:iconPadding="0dp"/>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="12dp"/>
+
+        <!-- Progress Bar -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:progressDrawable="@drawable/progress_gradient"
+            android:max="100"
+            android:progress="100"
+            android:elevation="4dp"/>
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="20dp"/>
+
+        <!-- Target Pattern Card -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardTargetPattern"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="12dp"
+            android:backgroundTint="#6B4ECDC4">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="⚔️ SLICE TARGET WORDS ⚔️"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.1"/>
+
+                <TextView
+                    android:id="@+id/tvTargetPattern"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="CVCC Words"
+                    android:textSize="18sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/visby_bold"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <Space
+            android:layout_width="1dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <!-- Combo Card (Centered, Hidden by default) -->
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardCombo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="150dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="16dp"
+            android:backgroundTint="#A770EF">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🔥"
+                    android:textSize="32sp"/>
+
+                <TextView
+                    android:id="@+id/tvCombo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5x COMBO!"
+                    android:textSize="32sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/visby_bold"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="NINJA MASTER"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:fontFamily="@font/visby_bold"
+                    android:layout_marginTop="4dp"
+                    android:alpha="0.8"/>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- Bottom Instructions -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:background="@drawable/rounded_bg_dark"
+            android:padding="12dp"
+            android:layout_marginTop="16dp"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="✨ SWIPE TO SLICE WORDS ✨"
+                android:textSize="12sp"
+                android:textColor="#4ECDC4"
+                android:fontFamily="@font/visby_bold"
+                android:letterSpacing="0.1"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>

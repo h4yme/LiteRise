@@ -1,35 +1,43 @@
 package com.example.literise.models;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class ModuleLadderResponse {
-    @SerializedName("nodes")
-    private List<NodeData> nodes;
-
-    @SerializedName("supplementalNodes")
-    private List<SupplementalNodeData> supplementalNodes;
-
-    @SerializedName("currentNodeId")
-    private int currentNodeId;
-
-    @SerializedName("placementLevel")
-    private int placementLevel;
-
     @SerializedName("success")
     private boolean success;
 
-    public List<NodeData> getNodes() { return nodes; }
-    public List<SupplementalNodeData> getSupplementalNodes() { return supplementalNodes; }
-    public int getCurrentNodeId() { return currentNodeId; }
-    public int getPlacementLevel() { return placementLevel; }
-    public boolean isSuccess() { return success; }
+    @SerializedName("nodes")
+    private List<NodeData> nodes;
 
-    public void setNodes(List<NodeData> nodes) { this.nodes = nodes; }
-    public void setSupplementalNodes(List<SupplementalNodeData> supplementalNodes) {
-        this.supplementalNodes = supplementalNodes;
+    @SerializedName("currentNodeId")
+    private Integer currentNodeId;  // Changed to Integer to handle null
+
+    @SerializedName("placementLevel")
+    private Integer placementLevel;
+
+    @SerializedName("message")
+    private String message;
+
+    // Getters
+    public boolean isSuccess() {
+        return success;
     }
-    public void setCurrentNodeId(int currentNodeId) { this.currentNodeId = currentNodeId; }
-    public void setPlacementLevel(int placementLevel) { this.placementLevel = placementLevel; }
-    public void setSuccess(boolean success) { this.success = success; }
+
+    public List<NodeData> getNodes() {
+        return nodes;
+    }
+
+    public int getCurrentNodeId() {
+        return currentNodeId != null ? currentNodeId : 0;
+    }
+
+    public Integer getPlacementLevel() {
+        return placementLevel;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }
