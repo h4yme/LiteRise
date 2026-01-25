@@ -3,29 +3,29 @@ package com.example.literise.models;
 import com.google.gson.annotations.SerializedName;
 
 public class NodeData {
-    @SerializedName("node_id")
+    @SerializedName("NodeID")
     private int nodeId;
 
-    @SerializedName("node_number")
+    @SerializedName("NodeNumber")
     private int nodeNumber;
 
-    @SerializedName("lesson_title")
+    @SerializedName("LessonTitle")
     private String lessonTitle;
 
-    @SerializedName("node_type")
-    private String nodeType;  // "REGULAR_LESSON" or "FINAL_ASSESSMENT"
+    @SerializedName("NodeType")
+    private String nodeType;  // "CORE_LESSON" or "FINAL_ASSESSMENT"
 
-    @SerializedName("quarter")
-    private int quarter;  // 1-4, or 0 for final assessment
+    @SerializedName("Quarter")
+    private String quarter;  // Changed to String since API returns "1", "2", "3", "4", or null
 
-    @SerializedName("lesson_completed")
-    private boolean lessonCompleted;
+    @SerializedName("LessonCompleted")
+    private String lessonCompleted;  // Changed to String since API returns "0" or "1"
 
-    @SerializedName("game_completed")
-    private boolean gameCompleted;
+    @SerializedName("GameCompleted")
+    private String gameCompleted;  // Changed to String since API returns "0" or "1"
 
-    @SerializedName("quiz_completed")
-    private boolean quizCompleted;
+    @SerializedName("QuizCompleted")
+    private String quizCompleted;  // Changed to String since API returns "0" or "1"
 
     // Getters
     public int getNodeId() {
@@ -45,18 +45,23 @@ public class NodeData {
     }
 
     public int getQuarter() {
-        return quarter;
+        // Parse string to int, handle null for final assessment
+        try {
+            return quarter != null ? Integer.parseInt(quarter) : 0;
+        } catch (NumberFormatException e) {
+            return 0;
+        }
     }
 
     public boolean isLessonCompleted() {
-        return lessonCompleted;
+        return "1".equals(lessonCompleted);
     }
 
     public boolean isGameCompleted() {
-        return gameCompleted;
+        return "1".equals(gameCompleted);
     }
 
     public boolean isQuizCompleted() {
-        return quizCompleted;
+        return "1".equals(quizCompleted);
     }
 }

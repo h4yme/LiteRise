@@ -11,8 +11,11 @@ public class ModuleLadderResponse {
     @SerializedName("nodes")
     private List<NodeData> nodes;
 
-    @SerializedName("current_node_id")
-    private int currentNodeId;
+    @SerializedName("currentNodeId")
+    private Integer currentNodeId;  // Changed to Integer to handle null
+
+    @SerializedName("placementLevel")
+    private Integer placementLevel;
 
     @SerializedName("message")
     private String message;
@@ -27,7 +30,11 @@ public class ModuleLadderResponse {
     }
 
     public int getCurrentNodeId() {
-        return currentNodeId;
+        return currentNodeId != null ? currentNodeId : 0;
+    }
+
+    public Integer getPlacementLevel() {
+        return placementLevel;
     }
 
     public String getMessage() {
