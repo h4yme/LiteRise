@@ -1,5 +1,6 @@
 package com.example.literise.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -9,14 +10,26 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.activities.games.DialogueReadingActivity;
+import com.example.literise.activities.games.FillInTheBlanksActivity;
+import com.example.literise.activities.games.MinimalPairsActivity;
+import com.example.literise.activities.games.PictureMatchActivity;
+import com.example.literise.activities.games.SentenceScrambleActivity;
+import com.example.literise.activities.games.StorySequencingActivity;
+import com.example.literise.activities.games.TimedTrailActivity;
+import com.example.literise.activities.games.WordHuntActivity;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.ModuleLadderResponse;
 import com.example.literise.models.NodeData;
+import com.example.literise.models.NodeProgressResponse;
 import com.example.literise.models.NodeView;
 import com.example.literise.views.ModulePathView;
 
@@ -45,6 +58,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private String moduleDomain;
     private int moduleLevel;
     private int priority;
+    private int placementLevel;
+
+    // Activity result launchers for refreshing ladder on return
+    private ActivityResultLauncher<Intent> lessonLauncher;
+    private ActivityResultLauncher<Intent> gameLauncher;
+    private ActivityResultLauncher<Intent> quizLauncher;
 
     // Path coordinates
     // Better coordinates that follow the actual background path
@@ -57,6 +76,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_module_ladder);
 
         Log.d(TAG, "onCreate started");
+
+        // Initialize activity result launchers BEFORE setContentView
+        initializeActivityLaunchers();
 
         // Initialize views
         pathView = findViewById(R.id.modulePathView);
@@ -77,6 +99,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         moduleDomain = getIntent().getStringExtra("module_domain");
         moduleLevel = getIntent().getIntExtra("module_level", 1);
         priority = getIntent().getIntExtra("priority", 1);
+        placementLevel = sessionManager.getPlacementLevel();
 
         // Fallback if module name not provided
         if (moduleName == null || moduleName.isEmpty()) {
@@ -112,6 +135,41 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private void showLoading(boolean show) {
         loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Initialize activity result launchers for refreshing ladder when returning from activities
+     */
+    private void initializeActivityLaunchers() {
+        // Lesson launcher - refreshes ladder on return
+        lessonLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Log.d(TAG, "Returned from LessonContentActivity");
+                // Refresh the module ladder to show updated progress
+                loadModuleLadder();
+            }
+        );
+
+        // Game launcher - refreshes ladder on return
+        gameLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Log.d(TAG, "Returned from Game Activity");
+                // Refresh the module ladder to show updated progress
+                loadModuleLadder();
+            }
+        );
+
+        // Quiz launcher - refreshes ladder on return
+        quizLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                Log.d(TAG, "Returned from QuizActivity");
+                // Refresh the module ladder to show updated progress
+                loadModuleLadder();
+            }
+        );
     }
 
     private void loadModuleLadder() {
@@ -261,27 +319,260 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private void handleNodeClick(NodeView node) {
         Log.d(TAG, "Node clicked: " + node.getNodeNumber() + " - " + node.getTitle() + " (State: " + node.getState() + ")");
 
-        if (node.getState() == NodeView.NodeState.LOCKED) {
-            Toast.makeText(this, "🔒 Complete previous lessons first!", Toast.LENGTH_SHORT).show();
-        } else if (node.getState() == NodeView.NodeState.CURRENT ||
-                node.getState() == NodeView.NodeState.UNLOCKED) {
-            startLesson(node);
-        } else if (node.getState() == NodeView.NodeState.COMPLETED) {
-            Toast.makeText(this, "✓ Lesson completed!", Toast.LENGTH_SHORT).show();
+        switch (node.getState()) {
+            case LOCKED:
+                Toast.makeText(this, "🔒 Complete previous lessons first!", Toast.LENGTH_SHORT).show();
+                break;
+
+            case CURRENT:
+            case UNLOCKED:
+                // Start the 3-phase flow from where they left off
+                startLesson(node);
+                break;
+
+            case COMPLETED:
+            case MASTERED:
+                // Show options to review, replay, or retake
+                showCompletedNodeOptions(node);
+                break;
         }
     }
 
     private void startLesson(NodeView node) {
-        // TODO: Integrate with 3-phase flow (LESSON → GAME → QUIZ)
-        Toast.makeText(this, "Starting: " + node.getTitle(), Toast.LENGTH_SHORT).show();
-        Log.d(TAG, "Starting lesson for node: " + node.getNodeId());
+        Log.d(TAG, "Starting lesson for node: " + node.getNodeId() + " - " + node.getTitle());
 
-        // You can launch your lesson activity here
-        // Intent intent = new Intent(this, LessonContentActivity.class);
-        // intent.putExtra("node_id", node.getNodeId());
-        // intent.putExtra("module_id", moduleId);
-        // intent.putExtra("lesson_title", node.getTitle());
-        // startActivity(intent);
+        // Check progress to determine which phase to start
+        int studentId = sessionManager.getStudentId();
+        showLoading(true);
+
+        apiService.getNodeProgress(studentId, node.getNodeId()).enqueue(new Callback<NodeProgressResponse>() {
+            @Override
+            public void onResponse(Call<NodeProgressResponse> call, Response<NodeProgressResponse> response) {
+                showLoading(false);
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    NodeProgressResponse.Progress progress = response.body().getProgress();
+                    Log.d(TAG, "Node progress - Lesson: " + progress.isLessonCompleted() +
+                          ", Game: " + progress.isGameCompleted() +
+                          ", Quiz: " + progress.isQuizCompleted());
+
+                    routeToAppropriatePhase(node, progress);
+                } else {
+                    // No progress found - start from lesson phase
+                    Log.d(TAG, "No progress found, starting from lesson phase");
+                    startLessonPhase(node);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NodeProgressResponse> call, Throwable t) {
+                showLoading(false);
+                Log.e(TAG, "Failed to get node progress: " + t.getMessage());
+                // On error, start from lesson phase
+                startLessonPhase(node);
+            }
+        });
+    }
+
+    /**
+     * Route to appropriate phase based on completion status
+     */
+    private void routeToAppropriatePhase(NodeView node, NodeProgressResponse.Progress progress) {
+        if (!progress.isLessonCompleted()) {
+            // PHASE 1: Show Lesson Content
+            startLessonPhase(node);
+        } else if (!progress.isGameCompleted()) {
+            // PHASE 2: Show Game
+            startGamePhase(node);
+        } else if (!progress.isQuizCompleted()) {
+            // PHASE 3: Show Quiz
+            startQuizPhase(node);
+        } else {
+            // All phases complete - show options (review, replay game, retake quiz)
+            showCompletedNodeOptions(node);
+        }
+    }
+
+    /**
+     * PHASE 1: Start Lesson Content Display
+     */
+    private void startLessonPhase(NodeView node) {
+        Log.d(TAG, "Starting PHASE 1: LESSON for node " + node.getNodeNumber());
+        Toast.makeText(this, "📚 Starting Lesson: " + node.getTitle(), Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, LessonContentActivity.class);
+        intent.putExtra("node_id", node.getNodeId());
+        intent.putExtra("module_id", moduleId);
+        intent.putExtra("lesson_number", node.getNodeNumber());
+        intent.putExtra("lesson_title", node.getTitle());
+        intent.putExtra("placement_level", placementLevel);
+
+        // Use launcher to refresh ladder on return
+        lessonLauncher.launch(intent);
+    }
+
+    /**
+     * PHASE 2: Start Game
+     */
+    private void startGamePhase(NodeView node) {
+        Log.d(TAG, "Starting PHASE 2: GAME for node " + node.getNodeNumber());
+
+        // Determine which game to play based on node/module
+        String gameType = selectGameForNode(node);
+        Class<?> gameActivityClass = getGameActivityClass(gameType);
+
+        if (gameActivityClass == null) {
+            Log.w(TAG, "No game available for type: " + gameType + ", skipping to quiz");
+            Toast.makeText(this, "🎮 Game coming soon! Moving to quiz...", Toast.LENGTH_SHORT).show();
+            startQuizPhase(node);
+            return;
+        }
+
+        Toast.makeText(this, "🎮 Starting Game: " + formatGameName(gameType), Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, gameActivityClass);
+        intent.putExtra("node_id", node.getNodeId());
+        intent.putExtra("module_id", moduleId);
+        intent.putExtra("lesson_number", node.getNodeNumber());
+        intent.putExtra("lesson_id", node.getNodeId()); // Some games expect lesson_id
+        intent.putExtra("placement_level", placementLevel);
+        intent.putExtra("game_type", gameType);
+
+        // Use launcher to refresh ladder on return
+        gameLauncher.launch(intent);
+    }
+
+    /**
+     * Select appropriate game based on node and module characteristics
+     */
+    private String selectGameForNode(NodeView node) {
+        // Strategy: Vary games to keep engagement high
+        // Use node number modulo to cycle through available games
+        int nodeNum = node.getNodeNumber();
+
+        // Final assessment gets a special game
+        if (node.isFinalAssessment()) {
+            return "word_hunt"; // Challenging game for final assessment
+        }
+
+        // Rotate through games based on module domain and node number
+        if (moduleDomain != null) {
+            switch (moduleDomain.toLowerCase()) {
+                case "phonics":
+                    // Phonics benefits from word-focused games
+                    return (nodeNum % 3 == 0) ? "word_hunt" :
+                           (nodeNum % 3 == 1) ? "minimal_pairs" : "picture_match";
+
+                case "grammar":
+                    // Grammar benefits from sentence-focused games
+                    return (nodeNum % 2 == 0) ? "sentence_scramble" : "fill_in_blanks";
+
+                case "vocabulary":
+                    // Vocabulary benefits from word association games
+                    return (nodeNum % 3 == 0) ? "word_hunt" :
+                           (nodeNum % 3 == 1) ? "picture_match" : "story_sequencing";
+
+                case "comprehending":
+                    // Comprehension benefits from reading games
+                    return (nodeNum % 2 == 0) ? "dialogue_reading" : "story_sequencing";
+
+                case "creating":
+                    // Writing benefits from sentence building
+                    return (nodeNum % 2 == 0) ? "sentence_scramble" : "fill_in_blanks";
+            }
+        }
+
+        // Default rotation if domain unknown
+        String[] defaultGames = {"word_hunt", "sentence_scramble", "picture_match"};
+        return defaultGames[nodeNum % defaultGames.length];
+    }
+
+    /**
+     * Get the Activity class for a game type
+     */
+    private Class<?> getGameActivityClass(String gameType) {
+        switch (gameType) {
+            case "word_hunt":
+                return WordHuntActivity.class;
+            case "sentence_scramble":
+                return SentenceScrambleActivity.class;
+            case "picture_match":
+                return PictureMatchActivity.class;
+            case "fill_in_blanks":
+                return FillInTheBlanksActivity.class;
+            case "dialogue_reading":
+                return DialogueReadingActivity.class;
+            case "story_sequencing":
+                return StorySequencingActivity.class;
+            case "minimal_pairs":
+                return MinimalPairsActivity.class;
+            case "timed_trail":
+                return TimedTrailActivity.class;
+            default:
+                Log.w(TAG, "Unknown game type: " + gameType);
+                return null;
+        }
+    }
+
+    /**
+     * Format game type name for display
+     */
+    private String formatGameName(String gameType) {
+        switch (gameType) {
+            case "word_hunt": return "Word Hunt";
+            case "sentence_scramble": return "Sentence Scramble";
+            case "picture_match": return "Picture Match";
+            case "fill_in_blanks": return "Fill in the Blanks";
+            case "dialogue_reading": return "Dialogue Reading";
+            case "story_sequencing": return "Story Sequencing";
+            case "minimal_pairs": return "Minimal Pairs";
+            case "timed_trail": return "Timed Trail";
+            default: return gameType;
+        }
+    }
+
+    /**
+     * PHASE 3: Start Quiz
+     */
+    private void startQuizPhase(NodeView node) {
+        Log.d(TAG, "Starting PHASE 3: QUIZ for node " + node.getNodeNumber());
+        Toast.makeText(this, "✅ Starting Quiz: " + node.getTitle(), Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, QuizActivity.class);
+        intent.putExtra("node_id", node.getNodeId());
+        intent.putExtra("module_id", moduleId);
+        intent.putExtra("lesson_number", node.getNodeNumber());
+        intent.putExtra("module_name", moduleName);
+        intent.putExtra("lesson_title", node.getTitle());
+        intent.putExtra("placement_level", placementLevel);
+
+        // Use launcher to refresh ladder on return
+        quizLauncher.launch(intent);
+    }
+
+    /**
+     * All phases complete - show options
+     */
+    private void showCompletedNodeOptions(NodeView node) {
+        Log.d(TAG, "Showing completed node options for node " + node.getNodeNumber());
+
+        new AlertDialog.Builder(this)
+            .setTitle("✨ " + node.getTitle())
+            .setMessage("You've completed this lesson! What would you like to do?")
+            .setPositiveButton("📖 Review Lesson", (dialog, which) -> {
+                // Review the lesson content
+                startLessonPhase(node);
+            })
+            .setNeutralButton("🎮 Replay Game", (dialog, which) -> {
+                // Replay the game
+                startGamePhase(node);
+            })
+            .setNegativeButton("✅ Retake Quiz", (dialog, which) -> {
+                // Retake the quiz
+                startQuizPhase(node);
+            })
+            .setCancelable(true)
+            .show();
     }
 
     // TEMPORARY: Test with dummy data
