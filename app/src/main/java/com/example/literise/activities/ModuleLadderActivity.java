@@ -1,16 +1,13 @@
 package com.example.literise.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.LayoutInflater;
+import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ScrollView;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.FrameLayout;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,408 +15,359 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
-import com.example.literise.models.NodeProgressResponse;
+import com.example.literise.models.ModuleLadderResponse;
+import com.example.literise.models.NodeData;
+import com.example.literise.models.NodeView;
+import com.example.literise.views.ModulePathView;
 
-import com.google.android.material.button.MaterialButton;
+import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ModuleLadderActivity extends AppCompatActivity {
+    private static final String TAG = "ModuleLadderActivity";
 
-    private ScrollView scrollView;
-    private ImageView btnBack;
-    private TextView tvModuleTitle, tvModuleSubtitle;
-    private LinearLayout lessonNodesContainer;
-    private MaterialButton btnStart;
+    private ModulePathView pathView;
+    private TextView moduleTitle;
+    private TextView progressText;
+    private ProgressBar moduleProgress;
+    private ImageButton backButton;
+    private FrameLayout loadingOverlay;
 
+    private ApiService apiService;
     private SessionManager sessionManager;
-
-    private String moduleName;
+    private int studentId;
     private int moduleId;
+    private String moduleName;
+    private String moduleDomain;
+    private int moduleLevel;
+    private int priority;
 
-    private int totalLessons = 15; // Total lessons per module (15 for Module 1)
-    private int currentLesson = 15; // Current unlocked lesson
+    // Path coordinates
+    // Better coordinates that follow the actual background path
+    private static final int[] PATH_X = {50, 28, 18, 22, 32, 48, 65, 72, 68, 52, 38, 45, 50};
+    private static final int[] PATH_Y = {88, 82, 76, 70, 64, 58, 52, 46, 40, 34, 28, 22, 15};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_module_ladder);
 
-        // Initialize SessionManager
+        Log.d(TAG, "onCreate started");
+
+        // Initialize views
+        pathView = findViewById(R.id.modulePathView);
+        moduleTitle = findViewById(R.id.moduleTitle);
+        progressText = findViewById(R.id.progressText);
+        moduleProgress = findViewById(R.id.moduleProgress);
+        backButton = findViewById(R.id.backButton);
+        loadingOverlay = findViewById(R.id.loadingOverlay);
+
+        // Initialize API and session
+        apiService = ApiClient.getClient(this).create(ApiService.class);
         sessionManager = new SessionManager(this);
 
-        // Get module info from intent
-        moduleName = getIntent().getStringExtra("module_name");
+        // Get data from intent (passed from DashboardActivity)
+        studentId = sessionManager.getStudentId();
         moduleId = getIntent().getIntExtra("module_id", 1);
+        moduleName = getIntent().getStringExtra("module_name");
+        moduleDomain = getIntent().getStringExtra("module_domain");
+        moduleLevel = getIntent().getIntExtra("module_level", 1);
+        priority = getIntent().getIntExtra("priority", 1);
 
-        if (moduleName == null) {
-            moduleName = "Reading Comprehension";
+        // Fallback if module name not provided
+        if (moduleName == null || moduleName.isEmpty()) {
+            moduleName = "Module " + moduleId;
         }
 
-        initializeViews();
-        setupListeners();
-        displayLessonNodes();
-        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
+        Log.d(TAG, "Module Info:");
+        Log.d(TAG, "  Student ID: " + studentId);
+        Log.d(TAG, "  Module ID: " + moduleId);
+        Log.d(TAG, "  Module Name: " + moduleName);
+        Log.d(TAG, "  Module Domain: " + moduleDomain);
+        Log.d(TAG, "  Module Level: " + moduleLevel);
+        Log.d(TAG, "  Priority: " + priority);
+
+        // Set module title
+        moduleTitle.setText(moduleName);
+
+        // Set up back button - returns to Dashboard
+        backButton.setOnClickListener(v -> {
+            Log.d(TAG, "Back button clicked");
+            finish(); // Returns to DashboardActivity
+        });
+
+        // Set up node click listener
+        pathView.setOnNodeClickListener(node -> handleNodeClick(node));
+
+        // Load module data from API
+        loadModuleLadder();
+
+        // OPTIONAL: Uncomment to test with dummy data
+        // loadDummyData();
     }
 
-    private void initializeViews() {
-        btnBack = findViewById(R.id.btnBack);
-        tvModuleTitle = findViewById(R.id.tvModuleTitle);
-        tvModuleSubtitle = findViewById(R.id.tvModuleSubtitle);
-        lessonNodesContainer = findViewById(R.id.lessonNodesContainer);
-        btnStart = findViewById(R.id.btnStart);
-        scrollView = findViewById(R.id.scrollView);
-
-        // Set module title (defensive null check for build cache issues)
-        if (tvModuleTitle != null) {
-            tvModuleTitle.setText(moduleName);
-        } else {
-            Toast.makeText(this, "Layout error - please rebuild project", Toast.LENGTH_LONG).show();
-        }
+    private void showLoading(boolean show) {
+        loadingOverlay.setVisibility(show ? View.VISIBLE : View.GONE);
     }
 
-    private void setupListeners() {
-        if (btnBack != null) {
-            btnBack.setOnClickListener(v -> finish());
-        }
+    private void loadModuleLadder() {
+        Log.d(TAG, "Loading module ladder for student: " + studentId + ", module: " + moduleId);
+        showLoading(true);
 
-        if (btnStart != null) {
-            btnStart.setOnClickListener(v -> {
-                // Start first unlocked lesson
-                openLesson(currentLesson);
-            });
-        }
-    }
-
-    private void displayLessonNodes() {
-        if (lessonNodesContainer == null) {
-            // Layout doesn't have lessonNodesContainer - might be using ModulePathView
-            return;
-        }
-
-        lessonNodesContainer.removeAllViews();
-
-        // Convert dp to pixels for positioning
-        float density = getResources().getDisplayMetrics().density;
-        int horizontalOffset = (int) (40 * density); // Offset from center for zigzag
-
-        // Display nodes from bottom to top (reversed order)
-        // So lesson 1 (current) is at the bottom near START button
-        for (int i = totalLessons; i >= 1; i--) {
-            // Create a wrapper FrameLayout for horizontal positioning
-            FrameLayout wrapper = new FrameLayout(this);
-            LinearLayout.LayoutParams wrapperParams = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            wrapper.setLayoutParams(wrapperParams);
-
-            // Inflate the node view
-            View nodeView = LayoutInflater.from(this).inflate(
-                    R.layout.item_lesson_node,
-                    wrapper,
-                    false
-            );
-
-            ImageView ivNodeBackground = nodeView.findViewById(R.id.ivNodeBackground);
-            ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
-            ImageView ivGameBadge = nodeView.findViewById(R.id.ivGameBadge);
-            TextView tvLessonNumber = nodeView.findViewById(R.id.tvLessonNumber);
-
-            tvLessonNumber.setText(String.valueOf(i));
-
-            if (i < currentLesson) {
-                // Completed lesson - gold
-                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_completed);
-                ivNodeIcon.setImageResource(R.drawable.ic_star);
-                ivNodeIcon.setColorFilter(0xFFFFFFFF); // White star
-            } else if (i == currentLesson) {
-                // Current unlocked lesson - white
-                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_unlocked);
-                ivNodeIcon.setImageResource(R.drawable.ic_play);
-                ivNodeIcon.setColorFilter(0xFF7C3AED); // Purple play icon
-            } else {
-                // Locked lesson - translucent white
-                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_locked);
-                ivNodeIcon.setImageResource(R.drawable.ic_lock);
-                ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
-            }
-
-            // Set game type badge
-            int lessonId = (moduleId * 100) + i;
-            String gameType = getLessonGameType(lessonId);
-            setGameBadge(ivGameBadge, gameType);
-
-            // Zigzag pattern - calculate horizontal position
-            int position = (i - 1) % 4; // Pattern repeats every 4 nodes
-            int leftMargin;
-
-            switch (position) {
-                case 0: // Center
-                    leftMargin = 0; // Will be centered by gravity
-                    break;
-                case 1: // Right
-                    leftMargin = horizontalOffset;
-                    break;
-                case 2: // Center
-                    leftMargin = 0;
-                    break;
-                case 3: // Left
-                    leftMargin = -horizontalOffset;
-                    break;
-                default:
-                    leftMargin = 0;
-                    break;
-            }
-
-            // Position node within wrapper using FrameLayout params
-            FrameLayout.LayoutParams nodeParams = new FrameLayout.LayoutParams(
-                    FrameLayout.LayoutParams.WRAP_CONTENT,
-                    FrameLayout.LayoutParams.WRAP_CONTENT
-            );
-            nodeParams.gravity = android.view.Gravity.CENTER_HORIZONTAL;
-            nodeParams.leftMargin = leftMargin;
-            nodeParams.rightMargin = -leftMargin; // Compensate
-            nodeView.setLayoutParams(nodeParams);
-
-            wrapper.addView(nodeView);
-
-            final int lessonNumber = i;
-            wrapper.setOnClickListener(v -> {
-                if (lessonNumber <= currentLesson) {
-                    // Can play this lesson
-                    openLesson(lessonNumber);
-                } else {
-                    // Locked lesson
-                    Toast.makeText(this,
-                            "Complete previous lessons to unlock",
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            lessonNodesContainer.addView(wrapper);
-        }
-    }
-
-    /**
-     * Opens a lesson - implements 3-phase flow: LESSON → GAME → QUIZ
-     * Routes to appropriate activity based on completion status
-     */
-    private void openLesson(int lessonNumber) {
-        // Calculate node ID: Module 1 = 1-13, Module 2 = 14-26, etc.
-        int nodeId = ((moduleId - 1) * 13) + lessonNumber;
-
-        // Query API to get actual completion status
-        checkNodeProgressAndRoute(nodeId, lessonNumber);
-    }
-
-    /**
-     * Check node progress from API and route to appropriate phase
-     */
-    private void checkNodeProgressAndRoute(int nodeId, int lessonNumber) {
-        int studentId = sessionManager.getStudentId();
-
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.getNodeProgress(studentId, nodeId).enqueue(new Callback<NodeProgressResponse>() {
+        apiService.getModuleLadder(studentId, moduleId).enqueue(new Callback<ModuleLadderResponse>() {
             @Override
-            public void onResponse(Call<NodeProgressResponse> call, Response<NodeProgressResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    NodeProgressResponse.Progress progress = response.body().getProgress();
-                    routeToAppropriatePhase(nodeId, lessonNumber, progress);
+            public void onResponse(Call<ModuleLadderResponse> call, Response<ModuleLadderResponse> response) {
+                showLoading(false);
+                Log.d(TAG, "API Response Code: " + response.code());
+
+                if (response.isSuccessful() && response.body() != null) {
+                    ModuleLadderResponse data = response.body();
+                    Log.d(TAG, "Success: " + data.isSuccess());
+                    Log.d(TAG, "Nodes received: " + (data.getNodes() != null ? data.getNodes().size() : "null"));
+                    Log.d(TAG, "Current node ID: " + data.getCurrentNodeId());
+                    parseAndDisplayNodes(data);
                 } else {
-                    // No progress found - start from lesson phase
-                    startLessonPhase(nodeId, lessonNumber);
+                    Log.e(TAG, "API failed with code: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "null";
+                        Log.e(TAG, "Error body: " + errorBody);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    Toast.makeText(ModuleLadderActivity.this,
+                            "Failed to load module (Code: " + response.code() + ")", Toast.LENGTH_LONG).show();
+
+                    // Load dummy data as fallback
+                    loadDummyData();
                 }
             }
 
             @Override
-            public void onFailure(Call<NodeProgressResponse> call, Throwable t) {
+            public void onFailure(Call<ModuleLadderResponse> call, Throwable t) {
+                showLoading(false);
+                Log.e(TAG, "Network error: " + t.getMessage(), t);
+                t.printStackTrace();
                 Toast.makeText(ModuleLadderActivity.this,
-                    "Network error: " + t.getMessage(),
-                    Toast.LENGTH_SHORT).show();
+                        "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+
+                // Load dummy data as fallback
+                loadDummyData();
             }
         });
     }
 
-    /**
-     * Route to appropriate phase based on completion status
-     */
-    private void routeToAppropriatePhase(int nodeId, int lessonNumber, NodeProgressResponse.Progress progress) {
-        if (!progress.isLessonCompleted()) {
-            // PHASE 1: Show Lesson Content
-            startLessonPhase(nodeId, lessonNumber);
-        } else if (!progress.isGameCompleted()) {
-            // PHASE 2: Show Game
-            startGamePhase(nodeId, lessonNumber);
-        } else if (!progress.isQuizCompleted()) {
-            // PHASE 3: Show Quiz
-            startQuizPhase(nodeId, lessonNumber);
-        } else {
-            // All phases complete - show options (review, replay game, retake quiz)
-            showCompletedNodeOptions(nodeId, lessonNumber);
-        }
-    }
+    private void parseAndDisplayNodes(ModuleLadderResponse data) {
+        Log.d(TAG, "Parsing nodes...");
+        List<NodeData> nodesData = data.getNodes();
 
-    /**
-     * PHASE 1: Start Lesson Content Display
-     * Shows adaptive content based on placement level
-     */
-    private void startLessonPhase(int nodeId, int lessonNumber) {
-        Toast.makeText(this,
-            "📚 Starting Lesson " + lessonNumber,
-            Toast.LENGTH_SHORT).show();
-
-        Intent intent = new Intent(this, LessonContentActivity.class);
-        intent.putExtra("node_id", nodeId);
-        intent.putExtra("module_id", moduleId);
-        intent.putExtra("lesson_number", lessonNumber);
-        intent.putExtra("module_name", moduleName);
-        startActivity(intent);
-    }
-
-    /**
-     * PHASE 2: Start Game
-     * Routes to appropriate game activity based on game type
-     */
-    private void startGamePhase(int nodeId, int lessonNumber) {
-        int legacyLessonId = (moduleId * 100) + lessonNumber;
-        String gameType = getLessonGameType(legacyLessonId);
-
-        Toast.makeText(this,
-            "🎮 Starting Game: " + gameType,
-            Toast.LENGTH_SHORT).show();
-
-        Intent intent = null;
-
-        // Route to the appropriate fun game activity
-        switch (gameType) {
-            case "sentence_scramble":
-                intent = new Intent(this, com.example.literise.activities.games.SentenceScrambleActivity.class);
-                break;
-
-            case "word_hunt":
-                intent = new Intent(this, com.example.literise.activities.games.WordHuntActivity.class);
-                break;
-
-            case "timed_trail":
-                intent = new Intent(this, com.example.literise.activities.games.TimedTrailActivity.class);
-                break;
-
-            case "shadow_read":
-                intent = new Intent(this, com.example.literise.activities.games.DialogueReadingActivity.class);
-                break;
-
-            case "minimal_pairs":
-                intent = new Intent(this, com.example.literise.activities.games.MinimalPairsActivity.class);
-                break;
-
-            case "traditional":
-            default:
-                // Fall back to traditional lesson activity
-                intent = new Intent(this, ModuleLessonActivity.class);
-                break;
+        if (nodesData == null || nodesData.isEmpty()) {
+            Log.e(TAG, "No nodes data received!");
+            Toast.makeText(this, "No nodes found for this module", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        if (intent != null) {
-            intent.putExtra("node_id", nodeId);
-            intent.putExtra("module_id", moduleId);
-            intent.putExtra("lesson_number", lessonNumber);
-            startActivity(intent);
+        Log.d(TAG, "Total nodes: " + nodesData.size());
+
+        int currentNodeId = data.getCurrentNodeId();
+        List<NodeView> nodeViews = new ArrayList<>();
+
+        for (int i = 0; i < nodesData.size(); i++) {
+            NodeData nodeData = nodesData.get(i);
+            int nodeNumber = nodeData.getNodeNumber();
+
+            Log.d(TAG, "Processing node " + nodeNumber + ": " + nodeData.getLessonTitle());
+
+            // Determine node state
+            NodeView.NodeState state;
+            if (nodeData.getNodeId() == currentNodeId) {
+                state = NodeView.NodeState.CURRENT;
+            } else if (nodeData.isLessonCompleted() &&
+                    nodeData.isGameCompleted() &&
+                    nodeData.isQuizCompleted()) {
+                state = NodeView.NodeState.COMPLETED;
+            } else if (nodeNumber == 1 || (i > 0 && nodeViews.get(i - 1).getState() == NodeView.NodeState.COMPLETED)) {
+                state = NodeView.NodeState.UNLOCKED;
+            } else {
+                state = NodeView.NodeState.LOCKED;
+            }
+
+            // Get position from arrays (check bounds)
+            if (nodeNumber - 1 >= PATH_X.length || nodeNumber - 1 >= PATH_Y.length) {
+                Log.e(TAG, "Node number " + nodeNumber + " exceeds path coordinates!");
+                continue;
+            }
+
+            float x = PATH_X[nodeNumber - 1];
+            float y = PATH_Y[nodeNumber - 1];
+
+            boolean isFinal = nodeData.getNodeType().equals("FINAL_ASSESSMENT");
+
+            NodeView nodeView = new NodeView(
+                    nodeData.getNodeId(),
+                    nodeNumber,
+                    nodeData.getLessonTitle(),
+                    state,
+                    x, y,
+                    nodeData.getQuarter(),
+                    isFinal
+            );
+
+            nodeViews.add(nodeView);
+            Log.d(TAG, "Added node: " + nodeNumber + " at (" + x + ", " + y + ") state: " + state);
         }
-    }
 
-    /**
-     * PHASE 3: Start Quiz
-     * Shows quiz questions and handles adaptive decisions
-     */
-    private void startQuizPhase(int nodeId, int lessonNumber) {
-        Toast.makeText(this,
-            "✅ Starting Quiz " + lessonNumber,
-            Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Setting " + nodeViews.size() + " nodes to pathView");
+        pathView.setNodes(nodeViews);
 
-        Intent intent = new Intent(this, QuizActivity.class);
-        intent.putExtra("node_id", nodeId);
-        intent.putExtra("module_id", moduleId);
-        intent.putExtra("lesson_number", lessonNumber);
-        intent.putExtra("module_name", moduleName);
-        startActivity(intent);
-    }
-
-    /**
-     * Shows options when all phases are complete
-     * Allows review, replay game, or retake quiz
-     */
-    private void showCompletedNodeOptions(int nodeId, int lessonNumber) {
-        Toast.makeText(this,
-            "✨ Lesson " + lessonNumber + " Complete!\n📖 Review | 🎮 Replay | ✅ Retake",
-            Toast.LENGTH_LONG).show();
-
-        // TODO: Show dialog with options to review lesson, replay game, or retake quiz
-    }
-
-    private String getLessonGameType(int lessonId) {
-        // For Module 1, get game type from content provider
-        if (moduleId == 1) {
-            try {
-                java.lang.reflect.Method method = com.example.literise.content.Module1ContentProvider.class
-                        .getDeclaredMethod("getAllLessons");
-                java.util.List<?> lessons = (java.util.List<?>) method.invoke(null);
-
-                android.util.Log.d("ModuleLadder", "Got " + lessons.size() + " lessons from provider");
-
-                for (Object lessonObj : lessons) {
-                    com.example.literise.models.Lesson lesson = (com.example.literise.models.Lesson) lessonObj;
-                    if (lesson.getLessonId() == lessonId) {
-                        String gameType = lesson.getGameType();
-                        android.util.Log.d("ModuleLadder", "Lesson " + lessonId + " has game type: " + gameType);
-                        return gameType != null ? gameType : "traditional";
-                    }
-                }
-                android.util.Log.w("ModuleLadder", "Lesson " + lessonId + " not found in provider");
-            } catch (Exception e) {
-                android.util.Log.e("ModuleLadder", "Error getting game type: " + e.getMessage());
-                e.printStackTrace();
+        // Update progress
+        int completedNodes = 0;
+        for (NodeView node : nodeViews) {
+            if (node.getState() == NodeView.NodeState.COMPLETED) {
+                completedNodes++;
             }
         }
-        return "traditional";
+        int progress = (completedNodes * 100) / nodeViews.size();
+        moduleProgress.setProgress(progress);
+        progressText.setText(progress + "%");
     }
 
-    /**
-     * Sets the game badge icon based on the game type
-     */
-    private void setGameBadge(android.widget.ImageView gameBadge, String gameType) {
-        if (gameBadge == null) return;
+    private void handleNodeClick(NodeView node) {
+        Log.d(TAG, "Node clicked: " + node.getNodeNumber() + " - " + node.getTitle() + " (State: " + node.getState() + ")");
 
-        int iconResource;
-        switch (gameType) {
-            case "word_hunt":
-                iconResource = R.drawable.ic_game_word_hunt;
-                gameBadge.setVisibility(android.view.View.VISIBLE);
-                break;
-            case "sentence_scramble":
-                iconResource = R.drawable.ic_game_sentence_scramble;
-                gameBadge.setVisibility(android.view.View.VISIBLE);
-                break;
-            case "timed_trail":
-                iconResource = R.drawable.ic_game_timed_trail;
-                gameBadge.setVisibility(android.view.View.VISIBLE);
-                break;
-            case "shadow_read":
-                iconResource = R.drawable.ic_game_shadow_read;
-                gameBadge.setVisibility(android.view.View.VISIBLE);
-                break;
-            case "minimal_pairs":
-                iconResource = R.drawable.ic_game_minimal_pairs;
-                gameBadge.setVisibility(android.view.View.VISIBLE);
-                break;
-            case "traditional":
-            default:
-                // No badge for traditional lessons
-                gameBadge.setVisibility(android.view.View.GONE);
-                return;
+        if (node.getState() == NodeView.NodeState.LOCKED) {
+            Toast.makeText(this, "🔒 Complete previous lessons first!", Toast.LENGTH_SHORT).show();
+        } else if (node.getState() == NodeView.NodeState.CURRENT ||
+                node.getState() == NodeView.NodeState.UNLOCKED) {
+            startLesson(node);
+        } else if (node.getState() == NodeView.NodeState.COMPLETED) {
+            Toast.makeText(this, "✓ Lesson completed!", Toast.LENGTH_SHORT).show();
         }
-        gameBadge.setImageResource(iconResource);
+    }
+
+    private void startLesson(NodeView node) {
+        // TODO: Integrate with 3-phase flow (LESSON → GAME → QUIZ)
+        Toast.makeText(this, "Starting: " + node.getTitle(), Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "Starting lesson for node: " + node.getNodeId());
+
+        // You can launch your lesson activity here
+        // Intent intent = new Intent(this, LessonContentActivity.class);
+        // intent.putExtra("node_id", node.getNodeId());
+        // intent.putExtra("module_id", moduleId);
+        // intent.putExtra("lesson_title", node.getTitle());
+        // startActivity(intent);
+    }
+
+    // TEMPORARY: Test with dummy data
+    private void loadDummyData() {
+        Log.d(TAG, "Loading dummy data for module: " + moduleName);
+        List<NodeView> dummyNodes = new ArrayList<>();
+
+        // Different lesson titles based on module
+        String[] lessonTitles = getLessonTitlesForModule(moduleId);
+
+        for (int i = 0; i < 13; i++) {
+            NodeView.NodeState state;
+            if (i == 0) {
+                state = NodeView.NodeState.CURRENT;
+            } else if (i < 3) {
+                state = NodeView.NodeState.UNLOCKED;
+            } else {
+                state = NodeView.NodeState.LOCKED;
+            }
+
+            int quarter = (i / 3) + 1;
+            if (i == 12) quarter = 0; // Final assessment
+
+            NodeView node = new NodeView(
+                    i + 1,
+                    i + 1,
+                    lessonTitles[i],
+                    state,
+                    PATH_X[i],
+                    PATH_Y[i],
+                    quarter,
+                    i == 12
+            );
+            dummyNodes.add(node);
+            Log.d(TAG, "Dummy node " + (i + 1) + ": " + lessonTitles[i] + " at (" + PATH_X[i] + ", " + PATH_Y[i] + ")");
+        }
+
+        pathView.setNodes(dummyNodes);
+        moduleProgress.setProgress(15);
+        progressText.setText("15%");
+
+        Toast.makeText(this, "Loaded dummy data (API unavailable)", Toast.LENGTH_LONG).show();
+    }
+
+    private String[] getLessonTitlesForModule(int moduleId) {
+        // Return appropriate lesson titles based on module ID
+        // Module IDs are assigned based on priority order from placement test
+        // We need to map back to the actual module content
+
+        // Get the actual module name to determine content
+        String[] titles = new String[13];
+
+        if (moduleName.contains("Phonics")) {
+            titles = new String[] {
+                    "Basic Sight Words", "CVC Patterns", "Short Vowel Sounds",
+                    "Long Vowel Sounds", "Blends and Digraphs", "R-Controlled Vowels",
+                    "Silent Letters", "Multi-Syllabic Words", "Word Families",
+                    "Advanced Phonics Patterns", "Reading Fluency Practice", "Phonics Review",
+                    "Module Assessment"
+            };
+        } else if (moduleName.contains("Vocabulary")) {
+            titles = new String[] {
+                    "Basic Nouns and Verbs", "Describing Words", "Everyday Words",
+                    "Synonyms and Antonyms", "Context Clues", "Word Roots and Prefixes",
+                    "Compound Words", "Multiple Meaning Words", "Academic Vocabulary",
+                    "Figurative Language Basics", "Word Choice and Usage", "Vocabulary in Context",
+                    "Module Assessment"
+            };
+        } else if (moduleName.contains("Grammar")) {
+            titles = new String[] {
+                    "Sentence Basics", "Capitalization Rules", "End Punctuation",
+                    "Nouns and Pronouns", "Verbs and Tenses", "Subject-Verb Agreement",
+                    "Adjectives and Adverbs", "Conjunctions", "Types of Sentences",
+                    "Sentence Expansion", "Common Grammar Errors", "Grammar in Writing",
+                    "Module Assessment"
+            };
+        } else if (moduleName.contains("Comprehending")) {
+            titles = new String[] {
+                    "Main Idea and Details", "Story Elements", "Sequence of Events",
+                    "Making Predictions", "Cause and Effect", "Compare and Contrast",
+                    "Making Inferences", "Author's Purpose", "Fact vs Opinion",
+                    "Text Features", "Summarizing", "Critical Reading",
+                    "Module Assessment"
+            };
+        } else if (moduleName.contains("Creating")) {
+            titles = new String[] {
+                    "Writing Complete Sentences", "Organizing Ideas", "Narrative Writing Basics",
+                    "Descriptive Writing", "Writing Dialogue", "Informative Writing",
+                    "Opinion Writing", "Writing Process", "Paragraph Structure",
+                    "Creative Story Writing", "Revising and Editing", "Publishing and Sharing",
+                    "Module Assessment"
+            };
+        } else {
+            // Default generic titles
+            titles = new String[] {
+                    "Lesson 1", "Lesson 2", "Lesson 3", "Lesson 4", "Lesson 5", "Lesson 6",
+                    "Lesson 7", "Lesson 8", "Lesson 9", "Lesson 10", "Lesson 11", "Lesson 12",
+                    "Module Assessment"
+            };
+        }
+
+        return titles;
+    }
+
+    @Override
+    public void onBackPressed() {
+        // Handle back button press - return to Dashboard
+        Log.d(TAG, "onBackPressed called");
+        super.onBackPressed();
+        finish();
     }
 }
