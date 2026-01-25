@@ -86,7 +86,7 @@ public class QuizActivity extends AppCompatActivity {
         moduleId = getIntent().getIntExtra("module_id", 1);
         lessonNumber = getIntent().getIntExtra("lesson_number", 1);
         moduleName = getIntent().getStringExtra("module_name");
-        placementLevel = sessionManager.getPlacementLevel();
+        placementLevel = convertPlacementLevelToInt(sessionManager.getPlacementLevel());
 
         initializeViews();
         setupListeners();
@@ -175,10 +175,10 @@ public class QuizActivity extends AppCompatActivity {
         tvQuestionNumber.setText("🤔 Question " + (currentQuestionIndex + 1) + " of " + totalQuestions);
         tvProgress.setText((currentQuestionIndex + 1) + "/" + totalQuestions);
         tvQuestionText.setText(question.getQuestionText());
-        rbOption1.setText("A) " + question.getOption1());
-        rbOption2.setText("B) " + question.getOption2());
-        rbOption3.setText("C) " + question.getOption3());
-        rbOption4.setText("D) " + question.getOption4());
+        rbOption1.setText("A) " + question.getOptionA());
+        rbOption2.setText("B) " + question.getOptionB());
+        rbOption3.setText("C) " + question.getOptionC());
+        rbOption4.setText("D) " + question.getOptionD());
 
         // Clear previous selection
         radioGroupOptions.clearCheck();
@@ -258,13 +258,28 @@ public class QuizActivity extends AppCompatActivity {
         intent.putExtra("node_id", nodeId);
         intent.putExtra("module_id", moduleId);
         intent.putExtra("lesson_number", lessonNumber);
-        intent.putExtra("score_percent", result.getScorePercent());
-        intent.putExtra("correct_count", result.getCorrectCount());
-        intent.putExtra("total_questions", result.getTotalQuestions());
-        intent.putExtra("adaptive_decision", result.getAdaptiveDecision());
-        intent.putExtra("xp_awarded", result.getXpAwarded());
+        intent.putExtra("score_percent", result.getResult().getScorePercent());
+        intent.putExtra("correct_count", result.getResult().getCorrectCount());
+        intent.putExtra("total_questions", result.getResult().getTotalQuestions());
+        intent.putExtra("adaptive_decision", result.getResult().getAdaptiveDecision());
+        intent.putExtra("xp_awarded", result.getResult().getXpAwarded());
         intent.putExtra("placement_level", placementLevel);
         startActivity(intent);
         finish();
+    }
+
+    /**
+     * Convert placement level string to integer for API calls
+     */
+    private int convertPlacementLevelToInt(String levelString) {
+        if (levelString == null) return 2; // Default to intermediate
+
+        if (levelString.contains("2") || levelString.toLowerCase().contains("beginner")) {
+            return 1;
+        } else if (levelString.contains("4") || levelString.toLowerCase().contains("advanced")) {
+            return 3;
+        } else {
+            return 2; // Grade 3 or intermediate
+        }
     }
 }

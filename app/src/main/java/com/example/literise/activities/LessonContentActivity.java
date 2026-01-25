@@ -54,7 +54,7 @@ public class LessonContentActivity extends AppCompatActivity {
 
         nodeId = getIntent().getIntExtra("node_id", 1);
         lessonNumber = getIntent().getIntExtra("lesson_number", 1);
-        placementLevel = getIntent().getIntExtra("placement_level", 2);
+        placementLevel = convertPlacementLevelToInt(sessionManager.getPlacementLevel());
 
         initializeViews();
         setupListeners();
@@ -141,5 +141,20 @@ public class LessonContentActivity extends AppCompatActivity {
                 btnComplete.setEnabled(true);
             }
         });
+    }
+
+    /**
+     * Convert placement level string to integer for API calls
+     */
+    private int convertPlacementLevelToInt(String levelString) {
+        if (levelString == null) return 2; // Default to intermediate
+
+        if (levelString.contains("2") || levelString.toLowerCase().contains("beginner")) {
+            return 1;
+        } else if (levelString.contains("4") || levelString.toLowerCase().contains("advanced")) {
+            return 3;
+        } else {
+            return 2; // Grade 3 or intermediate
+        }
     }
 }
