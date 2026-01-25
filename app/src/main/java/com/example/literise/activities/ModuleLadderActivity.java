@@ -99,7 +99,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         moduleDomain = getIntent().getStringExtra("module_domain");
         moduleLevel = getIntent().getIntExtra("module_level", 1);
         priority = getIntent().getIntExtra("priority", 1);
-        placementLevel = sessionManager.getPlacementLevel();
+        placementLevel = convertPlacementLevelToInt(sessionManager.getPlacementLevel());
 
         // Fallback if module name not provided
         if (moduleName == null || moduleName.isEmpty()) {
@@ -675,6 +675,24 @@ public class ModuleLadderActivity extends AppCompatActivity {
         }
 
         return titles;
+    }
+
+    /**
+     * Convert placement level string to integer for API calls
+     * Grade 2 / Beginner → 1
+     * Grade 3 / Intermediate → 2 (default)
+     * Grade 4 / Advanced → 3
+     */
+    private int convertPlacementLevelToInt(String levelString) {
+        if (levelString == null) return 2; // Default to intermediate
+
+        if (levelString.contains("2") || levelString.toLowerCase().contains("beginner")) {
+            return 1;
+        } else if (levelString.contains("4") || levelString.toLowerCase().contains("advanced")) {
+            return 3;
+        } else {
+            return 2; // Grade 3 or intermediate
+        }
     }
 
     @Override
