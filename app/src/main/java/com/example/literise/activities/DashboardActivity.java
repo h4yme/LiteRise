@@ -218,9 +218,13 @@ public class DashboardActivity extends BaseActivity {
             startActivity(intent);
         });
 
-        // Synonym Sprint - Coming soon
+        // Synonym Sprint - ACTIVE
         btnTestSynonymSprint.setOnClickListener(v -> {
-            Toast.makeText(this, "🏃 Synonym Sprint - Coming Soon!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, SynonymSprintActivity.class);
+            intent.putExtra("node_id", 1);
+            intent.putExtra("student_id", session.getStudentId());
+            intent.putExtra("target_word", "happy");
+            startActivity(intent);
         });
 
         // Word Explosion - Coming soon

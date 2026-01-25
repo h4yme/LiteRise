@@ -305,9 +305,7 @@
                         android:fontFamily="@font/visby_bold"
                         android:backgroundTint="#4ECDC4"
                         app:cornerRadius="12dp"
-                        android:layout_marginStart="8dp"
-                        android:enabled="false"
-                        android:alpha="0.5"/>
+                        android:layout_marginStart="8dp"/>
                 </LinearLayout>
 
                 <!-- Row 2: Word Explosion & Sentence Chef -->
