@@ -1,9 +1,7 @@
 package com.example.literise.activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -12,45 +10,40 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.LessonContentResponse;
+import com.example.literise.models.UpdateProgressRequest;
+import com.example.literise.models.UpdateProgressResponse;
+import com.google.android.material.button.MaterialButton;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * PHASE 1: Lesson Content Display Activity
  *
  * Displays lesson content with adaptive pacing based on placement level:
- * - BEGINNER (Level 1): SLOW pacing, HIGH scaffolding (detailed examples, hints, step-by-step)
+ * - BEGINNER (Level 1): SLOW pacing, HIGH scaffolding
  * - INTERMEDIATE (Level 2): MODERATE pacing, BALANCED scaffolding
- * - ADVANCED (Level 3): FAST pacing, MINIMAL scaffolding (brief explanations)
- *
- * Flow:
- * 1. Load lesson content from API (get_lesson_content.php)
- * 2. Get pacing strategy based on placement level (get_pacing_strategy.php)
- * 3. Display content with appropriate scaffolding
- * 4. Mark LessonCompleted = 1 when student finishes
- * 5. Route to PHASE 2 (Game)
+ * - ADVANCED (Level 3): FAST pacing, MINIMAL scaffolding
  */
 public class LessonContentActivity extends AppCompatActivity {
 
-    // UI Components
     private ImageView btnBack;
     private TextView tvLessonTitle;
     private TextView tvLessonNumber;
     private TextView tvLessonContent;
     private TextView tvScaffolding;
     private ProgressBar progressBar;
-    private Button btnComplete;
+    private MaterialButton btnComplete;
 
-    // Data
-    private int lessonId;
-    private int moduleId;
+    private int nodeId;
     private int lessonNumber;
-    private String moduleName;
-    private int placementLevel; // 1=Beginner, 2=Intermediate, 3=Advanced
+    private int placementLevel;
     private SessionManager sessionManager;
-
-    // Pacing Strategy
-    private String pacingSpeed; // SLOW, MODERATE, FAST
-    private String scaffoldingLevel; // HIGH, BALANCED, MINIMAL
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +52,9 @@ public class LessonContentActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
-        // Get data from intent
-        lessonId = getIntent().getIntExtra("lesson_id", 101);
-        moduleId = getIntent().getIntExtra("module_id", 1);
+        nodeId = getIntent().getIntExtra("node_id", 1);
         lessonNumber = getIntent().getIntExtra("lesson_number", 1);
-        moduleName = getIntent().getStringExtra("module_name");
-        placementLevel = getIntent().getIntExtra("placement_level", 2); // Default to intermediate level
+        placementLevel = getIntent().getIntExtra("placement_level", 2);
 
         initializeViews();
         setupListeners();
@@ -80,134 +70,76 @@ public class LessonContentActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         btnComplete = findViewById(R.id.btnComplete);
 
-        // Set lesson number
-        tvLessonNumber.setText("Lesson " + lessonNumber);
+        tvLessonNumber.setText("📖 Lesson " + lessonNumber);
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> finish());
+        btnComplete.setOnClickListener(v -> markLessonCompleted());
+    }
 
-        btnComplete.setOnClickListener(v -> {
-            markLessonCompleted();
+    private void loadLessonContent() {
+        progressBar.setVisibility(View.VISIBLE);
+        btnComplete.setEnabled(false);
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.getLessonContent(nodeId, placementLevel).enqueue(new Callback<LessonContentResponse>() {
+            @Override
+            public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                progressBar.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    displayLessonContent(response.body());
+                    btnComplete.setEnabled(true);
+                } else {
+                    Toast.makeText(LessonContentActivity.this, "Failed to load lesson", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(LessonContentActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                finish();
+            }
         });
     }
 
-    /**
-     * Load lesson content with adaptive pacing
-     */
-    private void loadLessonContent() {
-        progressBar.setVisibility(View.VISIBLE);
-
-        // Determine pacing strategy based on placement level
-        determinePacingStrategy();
-
-        // TODO: Replace with actual API call to get_lesson_content.php
-        // For now, using dummy content to demonstrate the flow
-
-        String lessonTitle = "Lesson " + lessonNumber + ": Reading Comprehension";
-        String lessonContent = generateDummyContent();
-
-        // Display content
-        tvLessonTitle.setText(lessonTitle);
-        tvLessonContent.setText(lessonContent);
-
-        progressBar.setVisibility(View.GONE);
-        btnComplete.setEnabled(true);
+    private void displayLessonContent(LessonContentResponse data) {
+        tvLessonTitle.setText(data.getLesson().getTitle());
+        tvLessonContent.setText(data.getLesson().getContent());
+        tvScaffolding.setText(data.getPacing().getDescription());
     }
 
-    /**
-     * Determine pacing strategy based on placement level
-     */
-    private void determinePacingStrategy() {
-        switch (placementLevel) {
-            case 1: // BEGINNER
-                pacingSpeed = "SLOW";
-                scaffoldingLevel = "HIGH";
-                tvScaffolding.setText("📖 BEGINNER MODE: Detailed explanations with examples");
-                break;
-
-            case 2: // INTERMEDIATE
-                pacingSpeed = "MODERATE";
-                scaffoldingLevel = "BALANCED";
-                tvScaffolding.setText("📘 INTERMEDIATE MODE: Balanced content");
-                break;
-
-            case 3: // ADVANCED
-                pacingSpeed = "FAST";
-                scaffoldingLevel = "MINIMAL";
-                tvScaffolding.setText("📕 ADVANCED MODE: Concise content");
-                break;
-
-            default:
-                pacingSpeed = "MODERATE";
-                scaffoldingLevel = "BALANCED";
-                tvScaffolding.setText("📘 INTERMEDIATE MODE: Balanced content");
-                break;
-        }
-    }
-
-    /**
-     * Generate dummy content based on pacing strategy
-     * TODO: Replace with actual content from API
-     */
-    private String generateDummyContent() {
-        StringBuilder content = new StringBuilder();
-
-        switch (scaffoldingLevel) {
-            case "HIGH": // BEGINNER - Detailed with examples
-                content.append("Welcome to this lesson! Let's learn step by step.\n\n");
-                content.append("📌 Key Concept:\n");
-                content.append("Reading comprehension is understanding what you read.\n\n");
-                content.append("💡 Example 1:\n");
-                content.append("\"The cat sat on the mat.\"\n");
-                content.append("Who? The cat. Where? On the mat.\n\n");
-                content.append("💡 Example 2:\n");
-                content.append("\"John walked to school.\"\n");
-                content.append("Who? John. Where did he go? To school.\n\n");
-                content.append("✨ Tip: Always ask yourself: Who? What? Where? When? Why?\n\n");
-                content.append("Now you try! Read the passage below carefully...");
-                break;
-
-            case "BALANCED": // INTERMEDIATE
-                content.append("Let's review reading comprehension strategies.\n\n");
-                content.append("📌 Key Concepts:\n");
-                content.append("• Identify main idea\n");
-                content.append("• Find supporting details\n");
-                content.append("• Make inferences\n\n");
-                content.append("💡 Example:\n");
-                content.append("\"The rain poured down. Sarah grabbed her umbrella.\"\n");
-                content.append("Main idea: It's raining. Inference: Sarah needs protection.\n\n");
-                content.append("Let's practice with the passage below...");
-                break;
-
-            case "MINIMAL": // ADVANCED - Brief
-                content.append("Reading Comprehension: Advanced Strategies\n\n");
-                content.append("Focus areas:\n");
-                content.append("• Critical analysis\n");
-                content.append("• Implicit meaning\n");
-                content.append("• Author's purpose\n\n");
-                content.append("Apply these strategies to the passage below...");
-                break;
-        }
-
-        return content.toString();
-    }
-
-    /**
-     * Mark lesson as completed and proceed to next phase (Game)
-     */
     private void markLessonCompleted() {
         progressBar.setVisibility(View.VISIBLE);
         btnComplete.setEnabled(false);
 
-        // TODO: API call to update_node_progress.php
-        // Set LessonCompleted = 1
+        int studentId = sessionManager.getStudentId();
+        UpdateProgressRequest request = new UpdateProgressRequest(studentId, nodeId, "lesson");
 
-        Toast.makeText(this,
-            "✅ Lesson Complete! Moving to Game...",
-            Toast.LENGTH_SHORT).show();
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.updateNodeProgress(request).enqueue(new Callback<UpdateProgressResponse>() {
+            @Override
+            public void onResponse(Call<UpdateProgressResponse> call, Response<UpdateProgressResponse> response) {
+                progressBar.setVisibility(View.GONE);
 
-        // Return to ModuleLadderActivity - it will route to Phase 2 (Game)
-        finish();
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    Toast.makeText(LessonContentActivity.this, "✅ Lesson Complete! Moving to Game...", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(LessonContentActivity.this, "Failed to save progress", Toast.LENGTH_SHORT).show();
+                    btnComplete.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UpdateProgressResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(LessonContentActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                btnComplete.setEnabled(true);
+            }
+        });
     }
 }

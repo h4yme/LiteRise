@@ -26,8 +26,16 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
+import com.example.literise.database.SessionManager;
+import com.example.literise.models.NodeProgressResponse;
 
 import com.google.android.material.button.MaterialButton;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 
@@ -43,7 +51,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
     private MaterialButton btnStart;
 
-
+    private SessionManager sessionManager;
 
     private String moduleName;
     private int moduleId;
@@ -63,6 +71,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         setContentView(R.layout.activity_module_ladder);
 
 
+
+        // Initialize SessionManager
+        sessionManager = new SessionManager(this);
 
         // Get module info from intent
 
@@ -332,27 +343,57 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Routes to appropriate activity based on completion status
      */
     private void openLesson(int lessonNumber) {
-        // Calculate lesson ID: Module 1 = 101-115, Module 2 = 201-215, etc.
-        int lessonId = (moduleId * 100) + lessonNumber;
+        // Calculate node ID: Module 1 = 1-13, Module 2 = 14-26, etc.
+        int nodeId = ((moduleId - 1) * 13) + lessonNumber;
 
-        // TODO: Query StudentNodeProgress table to get actual completion status
-        // For now, using dummy logic to demonstrate the flow
+        // Query API to get actual completion status
+        checkNodeProgressAndRoute(nodeId, lessonNumber);
+    }
 
-        // Check completion status for this node
-        NodeProgress progress = getNodeProgress(lessonId);
+    /**
+     * Check node progress from API and route to appropriate phase
+     */
+    private void checkNodeProgressAndRoute(int nodeId, int lessonNumber) {
+        int studentId = sessionManager.getStudentId();
 
-        if (!progress.lessonCompleted) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.getNodeProgress(studentId, nodeId).enqueue(new Callback<NodeProgressResponse>() {
+            @Override
+            public void onResponse(Call<NodeProgressResponse> call, Response<NodeProgressResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    NodeProgressResponse.Progress progress = response.body().getProgress();
+                    routeToAppropriatePhase(nodeId, lessonNumber, progress);
+                } else {
+                    // No progress found - start from lesson phase
+                    startLessonPhase(nodeId, lessonNumber);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NodeProgressResponse> call, Throwable t) {
+                android.widget.Toast.makeText(ModuleLadderActivity.this,
+                    "Network error: " + t.getMessage(),
+                    android.widget.Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    /**
+     * Route to appropriate phase based on completion status
+     */
+    private void routeToAppropriatePhase(int nodeId, int lessonNumber, NodeProgressResponse.Progress progress) {
+        if (!progress.isLessonCompleted()) {
             // PHASE 1: Show Lesson Content
-            startLessonPhase(lessonId, lessonNumber);
-        } else if (!progress.gameCompleted) {
+            startLessonPhase(nodeId, lessonNumber);
+        } else if (!progress.isGameCompleted()) {
             // PHASE 2: Show Game
-            startGamePhase(lessonId, lessonNumber);
-        } else if (!progress.quizCompleted) {
+            startGamePhase(nodeId, lessonNumber);
+        } else if (!progress.isQuizCompleted()) {
             // PHASE 3: Show Quiz
-            startQuizPhase(lessonId, lessonNumber);
+            startQuizPhase(nodeId, lessonNumber);
         } else {
             // All phases complete - show options (review, replay game, retake quiz)
-            showCompletedNodeOptions(lessonId, lessonNumber);
+            showCompletedNodeOptions(nodeId, lessonNumber);
         }
     }
 
@@ -360,17 +401,16 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * PHASE 1: Start Lesson Content Display
      * Shows adaptive content based on placement level
      */
-    private void startLessonPhase(int lessonId, int lessonNumber) {
+    private void startLessonPhase(int nodeId, int lessonNumber) {
         android.widget.Toast.makeText(this,
             "📚 Starting Lesson " + lessonNumber,
             android.widget.Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, LessonContentActivity.class);
-        intent.putExtra("lesson_id", lessonId);
+        intent.putExtra("node_id", nodeId);
         intent.putExtra("module_id", moduleId);
         intent.putExtra("lesson_number", lessonNumber);
         intent.putExtra("module_name", moduleName);
-        // TODO: Add placement_level from SessionManager
         startActivity(intent);
     }
 
@@ -378,8 +418,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * PHASE 2: Start Game
      * Routes to appropriate game activity based on game type
      */
-    private void startGamePhase(int lessonId, int lessonNumber) {
-        String gameType = getLessonGameType(lessonId);
+    private void startGamePhase(int nodeId, int lessonNumber) {
+        int legacyLessonId = (moduleId * 100) + lessonNumber;
+        String gameType = getLessonGameType(legacyLessonId);
 
         android.widget.Toast.makeText(this,
             "🎮 Starting Game: " + gameType,
@@ -417,7 +458,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         }
 
         if (intent != null) {
-            intent.putExtra("lesson_id", lessonId);
+            intent.putExtra("node_id", nodeId);
             intent.putExtra("module_id", moduleId);
             intent.putExtra("lesson_number", lessonNumber);
             startActivity(intent);
@@ -428,13 +469,13 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * PHASE 3: Start Quiz
      * Shows quiz questions and handles adaptive decisions
      */
-    private void startQuizPhase(int lessonId, int lessonNumber) {
+    private void startQuizPhase(int nodeId, int lessonNumber) {
         android.widget.Toast.makeText(this,
             "✅ Starting Quiz " + lessonNumber,
             android.widget.Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, QuizActivity.class);
-        intent.putExtra("lesson_id", lessonId);
+        intent.putExtra("node_id", nodeId);
         intent.putExtra("module_id", moduleId);
         intent.putExtra("lesson_number", lessonNumber);
         intent.putExtra("module_name", moduleName);
@@ -445,35 +486,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Shows options when all phases are complete
      * Allows review, replay game, or retake quiz
      */
-    private void showCompletedNodeOptions(int lessonId, int lessonNumber) {
+    private void showCompletedNodeOptions(int nodeId, int lessonNumber) {
         android.widget.Toast.makeText(this,
             "✨ Lesson " + lessonNumber + " Complete!\n📖 Review | 🎮 Replay | ✅ Retake",
             android.widget.Toast.LENGTH_LONG).show();
 
         // TODO: Show dialog with options to review lesson, replay game, or retake quiz
-    }
-
-    /**
-     * Gets node progress from cache or database
-     * TODO: Replace with actual API call or local database query
-     */
-    private NodeProgress getNodeProgress(int lessonId) {
-        // DUMMY DATA for testing
-        // In production, this should query StudentNodeProgress table
-        NodeProgress progress = new NodeProgress();
-        progress.lessonCompleted = false; // Force to show lesson first
-        progress.gameCompleted = false;
-        progress.quizCompleted = false;
-        return progress;
-    }
-
-    /**
-     * Inner class to hold node completion status
-     */
-    private static class NodeProgress {
-        boolean lessonCompleted;
-        boolean gameCompleted;
-        boolean quizCompleted;
     }
 
 

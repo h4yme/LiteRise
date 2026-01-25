@@ -14,10 +14,21 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.QuizQuestionsResponse;
+import com.example.literise.models.QuizSubmitRequest;
+import com.example.literise.models.QuizSubmitResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * PHASE 3: Quiz Activity with Adaptive Decisions
@@ -50,7 +61,7 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvProgress;
 
     // Data
-    private int lessonId;
+    private int nodeId;
     private int moduleId;
     private int lessonNumber;
     private String moduleName;
@@ -58,8 +69,8 @@ public class QuizActivity extends AppCompatActivity {
     private SessionManager sessionManager;
 
     // Quiz State
-    private List<QuizQuestion> questions = new ArrayList<>();
-    private List<Integer> selectedAnswers = new ArrayList<>();
+    private List<QuizQuestionsResponse.Question> questions = new ArrayList<>();
+    private Map<Integer, Integer> selectedAnswers = new HashMap<>();
     private int currentQuestionIndex = 0;
     private int totalQuestions = 5;
 
@@ -71,11 +82,11 @@ public class QuizActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
 
         // Get data from intent
-        lessonId = getIntent().getIntExtra("lesson_id", 101);
+        nodeId = getIntent().getIntExtra("node_id", 1);
         moduleId = getIntent().getIntExtra("module_id", 1);
         lessonNumber = getIntent().getIntExtra("lesson_number", 1);
         moduleName = getIntent().getStringExtra("module_name");
-        placementLevel = getIntent().getIntExtra("placement_level", 2); // Default to intermediate level
+        placementLevel = sessionManager.getPlacementLevel();
 
         initializeViews();
         setupListeners();
@@ -118,38 +129,35 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     /**
-     * Load quiz questions from API or dummy data
+     * Load quiz questions from API
      */
     private void loadQuizQuestions() {
         progressBar.setVisibility(View.VISIBLE);
+        btnNext.setEnabled(false);
 
-        // TODO: Replace with actual API call to get_quiz_questions.php
-        // For now, using dummy questions
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.getQuizQuestions(nodeId, placementLevel).enqueue(new Callback<QuizQuestionsResponse>() {
+            @Override
+            public void onResponse(Call<QuizQuestionsResponse> call, Response<QuizQuestionsResponse> response) {
+                progressBar.setVisibility(View.GONE);
 
-        generateDummyQuestions();
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    questions = response.body().getQuiz().getQuestions();
+                    totalQuestions = questions.size();
+                    displayCurrentQuestion();
+                } else {
+                    Toast.makeText(QuizActivity.this, "Failed to load quiz questions", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
 
-        progressBar.setVisibility(View.GONE);
-        displayCurrentQuestion();
-    }
-
-    /**
-     * Generate dummy quiz questions
-     * TODO: Replace with API data
-     */
-    private void generateDummyQuestions() {
-        questions.clear();
-
-        for (int i = 1; i <= totalQuestions; i++) {
-            QuizQuestion question = new QuizQuestion();
-            question.questionId = i;
-            question.questionText = "Question " + i + ": What is the main idea of the passage?";
-            question.option1 = "Option A: The story is about friendship";
-            question.option2 = "Option B: The story is about adventure";
-            question.option3 = "Option C: The story is about learning";
-            question.option4 = "Option D: The story is about nature";
-            question.correctAnswer = 1; // Option A
-            questions.add(question);
-        }
+            @Override
+            public void onFailure(Call<QuizQuestionsResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(QuizActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                finish();
+            }
+        });
     }
 
     /**
@@ -161,16 +169,16 @@ public class QuizActivity extends AppCompatActivity {
             return;
         }
 
-        QuizQuestion question = questions.get(currentQuestionIndex);
+        QuizQuestionsResponse.Question question = questions.get(currentQuestionIndex);
 
         // Update UI
-        tvQuestionNumber.setText("Question " + (currentQuestionIndex + 1) + " of " + totalQuestions);
+        tvQuestionNumber.setText("🤔 Question " + (currentQuestionIndex + 1) + " of " + totalQuestions);
         tvProgress.setText((currentQuestionIndex + 1) + "/" + totalQuestions);
-        tvQuestionText.setText(question.questionText);
-        rbOption1.setText(question.option1);
-        rbOption2.setText(question.option2);
-        rbOption3.setText(question.option3);
-        rbOption4.setText(question.option4);
+        tvQuestionText.setText(question.getQuestionText());
+        rbOption1.setText("A) " + question.getOption1());
+        rbOption2.setText("B) " + question.getOption2());
+        rbOption3.setText("C) " + question.getOption3());
+        rbOption4.setText("D) " + question.getOption4());
 
         // Clear previous selection
         radioGroupOptions.clearCheck();
@@ -178,9 +186,9 @@ public class QuizActivity extends AppCompatActivity {
 
         // Update button text
         if (currentQuestionIndex == totalQuestions - 1) {
-            btnNext.setText("Submit Quiz");
+            btnNext.setText("✅ Submit Quiz");
         } else {
-            btnNext.setText("Next Question →");
+            btnNext.setText("Next Question ➡️");
         }
     }
 
@@ -197,7 +205,9 @@ public class QuizActivity extends AppCompatActivity {
         else if (selectedId == R.id.rbOption3) selectedOptionIndex = 3;
         else if (selectedId == R.id.rbOption4) selectedOptionIndex = 4;
 
-        selectedAnswers.add(selectedOptionIndex);
+        // Store answer with question ID as key
+        QuizQuestionsResponse.Question currentQuestion = questions.get(currentQuestionIndex);
+        selectedAnswers.put(currentQuestion.getQuestionId(), selectedOptionIndex);
 
         // Move to next question or submit
         currentQuestionIndex++;
@@ -205,74 +215,56 @@ public class QuizActivity extends AppCompatActivity {
     }
 
     /**
-     * Submit quiz and get adaptive decision
+     * Submit quiz and get adaptive decision from API
      */
     private void submitQuiz() {
         progressBar.setVisibility(View.VISIBLE);
         btnNext.setEnabled(false);
 
-        // Calculate score
-        int correctCount = 0;
-        for (int i = 0; i < questions.size(); i++) {
-            if (selectedAnswers.get(i) == questions.get(i).correctAnswer) {
-                correctCount++;
+        int studentId = sessionManager.getStudentId();
+
+        // Create submit request with student answers
+        QuizSubmitRequest request = new QuizSubmitRequest(studentId, nodeId, placementLevel, selectedAnswers);
+
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.submitQuiz(request).enqueue(new Callback<QuizSubmitResponse>() {
+            @Override
+            public void onResponse(Call<QuizSubmitResponse> call, Response<QuizSubmitResponse> response) {
+                progressBar.setVisibility(View.GONE);
+
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    QuizSubmitResponse result = response.body();
+                    showQuizResults(result);
+                } else {
+                    Toast.makeText(QuizActivity.this, "Failed to submit quiz", Toast.LENGTH_SHORT).show();
+                    btnNext.setEnabled(true);
+                }
             }
-        }
 
-        int scorePercent = (correctCount * 100) / totalQuestions;
-
-        // Determine adaptive decision
-        String adaptiveDecision = determineAdaptiveDecision(scorePercent);
-
-        // TODO: API call to submit_quiz.php with answers
-        // Receive XP award and adaptive decision
-
-        // Show results
-        showQuizResults(scorePercent, correctCount, adaptiveDecision);
-    }
-
-    /**
-     * Determine adaptive decision based on score and placement level
-     */
-    private String determineAdaptiveDecision(int scorePercent) {
-        if (scorePercent < 70) {
-            return "ADD_INTERVENTION"; // Mandatory remedial node
-        } else if (scorePercent >= 70 && scorePercent < 80 && placementLevel == 1) {
-            return "ADD_SUPPLEMENTAL"; // Optional practice for beginners
-        } else if (scorePercent >= 90 && placementLevel == 3) {
-            return "OFFER_ENRICHMENT"; // Optional challenge for advanced
-        } else {
-            return "PROCEED"; // Normal progression
-        }
+            @Override
+            public void onFailure(Call<QuizSubmitResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(QuizActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                btnNext.setEnabled(true);
+            }
+        });
     }
 
     /**
      * Show quiz results and adaptive decision
      */
-    private void showQuizResults(int scorePercent, int correctCount, String decision) {
+    private void showQuizResults(QuizSubmitResponse result) {
         Intent intent = new Intent(this, QuizResultActivity.class);
-        intent.putExtra("lesson_id", lessonId);
+        intent.putExtra("node_id", nodeId);
         intent.putExtra("module_id", moduleId);
         intent.putExtra("lesson_number", lessonNumber);
-        intent.putExtra("score_percent", scorePercent);
-        intent.putExtra("correct_count", correctCount);
-        intent.putExtra("total_questions", totalQuestions);
-        intent.putExtra("adaptive_decision", decision);
+        intent.putExtra("score_percent", result.getScorePercent());
+        intent.putExtra("correct_count", result.getCorrectCount());
+        intent.putExtra("total_questions", result.getTotalQuestions());
+        intent.putExtra("adaptive_decision", result.getAdaptiveDecision());
+        intent.putExtra("xp_awarded", result.getXpAwarded());
         intent.putExtra("placement_level", placementLevel);
         startActivity(intent);
         finish();
-    }
-
-    /**
-     * Inner class for quiz question
-     */
-    private static class QuizQuestion {
-        int questionId;
-        String questionText;
-        String option1;
-        String option2;
-        String option3;
-        String option4;
-        int correctAnswer; // 1-4
     }
 }

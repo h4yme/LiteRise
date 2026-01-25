@@ -210,4 +210,31 @@ public interface ApiService {
             @Part("target_word") okhttp3.RequestBody targetWord,
             @Part okhttp3.MultipartBody.Part audioFile
     );
+
+    // 📚 LESSON FLOW APIs - 3-Phase Adaptive System
+    @GET("get_lesson_content.php")
+    Call<com.example.literise.models.LessonContentResponse> getLessonContent(
+        @Query("node_id") int nodeId,
+        @Query("placement_level") int placementLevel
+    );
+
+    @GET("get_quiz_questions.php")
+    Call<com.example.literise.models.QuizQuestionsResponse> getQuizQuestions(
+        @Query("node_id") int nodeId,
+        @Query("placement_level") int placementLevel
+    );
+
+    @Headers("Content-Type: application/json")
+    @POST("submit_quiz.php")
+    Call<com.example.literise.models.QuizSubmitResponse> submitQuiz(@Body com.example.literise.models.QuizSubmitRequest request);
+
+    @Headers("Content-Type: application/json")
+    @POST("update_node_progress.php")
+    Call<com.example.literise.models.UpdateProgressResponse> updateNodeProgress(@Body com.example.literise.models.UpdateProgressRequest request);
+
+    @GET("get_node_progress.php")
+    Call<com.example.literise.models.NodeProgressResponse> getNodeProgress(
+        @Query("student_id") int studentId,
+        @Query("node_id") int nodeId
+    );
 }
