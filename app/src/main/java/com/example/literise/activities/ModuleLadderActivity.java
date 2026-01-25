@@ -60,10 +60,14 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private int priority;
     private int placementLevel;
 
-    // Activity result launchers for refreshing ladder on return
+    // Activity result launchers for auto-proceeding through phases
     private ActivityResultLauncher<Intent> lessonLauncher;
     private ActivityResultLauncher<Intent> gameLauncher;
     private ActivityResultLauncher<Intent> quizLauncher;
+
+    // Track current node for auto-progression
+    private NodeView currentNode;
+    private boolean isAutoProceedMode = true; // Auto-proceed through phases
 
     // Path coordinates
     // Better coordinates that follow the actual background path
@@ -138,35 +142,63 @@ public class ModuleLadderActivity extends AppCompatActivity {
     }
 
     /**
-     * Initialize activity result launchers for refreshing ladder when returning from activities
+     * Initialize activity result launchers for auto-progressing through phases
+     * Flow: LESSON → GAME → QUIZ → LADDER (seamless progression)
      */
     private void initializeActivityLaunchers() {
-        // Lesson launcher - refreshes ladder on return
+        // Lesson launcher - auto-proceed to game after completion
         lessonLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 Log.d(TAG, "Returned from LessonContentActivity");
-                // Refresh the module ladder to show updated progress
-                loadModuleLadder();
+
+                if (isAutoProceedMode && currentNode != null) {
+                    // Automatically proceed to game phase
+                    Log.d(TAG, "Auto-proceeding to Game phase");
+                    Toast.makeText(this, "✅ Lesson Complete! Now let's play! 🎮", Toast.LENGTH_SHORT).show();
+
+                    // Small delay for toast to show
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        startGamePhase(currentNode);
+                    }, 800);
+                } else {
+                    // User backed out or reviewing - refresh ladder
+                    loadModuleLadder();
+                }
             }
         );
 
-        // Game launcher - refreshes ladder on return
+        // Game launcher - auto-proceed to quiz after completion
         gameLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 Log.d(TAG, "Returned from Game Activity");
-                // Refresh the module ladder to show updated progress
-                loadModuleLadder();
+
+                if (isAutoProceedMode && currentNode != null) {
+                    // Automatically proceed to quiz phase
+                    Log.d(TAG, "Auto-proceeding to Quiz phase");
+                    Toast.makeText(this, "🎉 Great job! Time for the quiz! ✅", Toast.LENGTH_SHORT).show();
+
+                    // Small delay for toast to show
+                    new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                        startQuizPhase(currentNode);
+                    }, 800);
+                } else {
+                    // User backed out or reviewing - refresh ladder
+                    loadModuleLadder();
+                }
             }
         );
 
-        // Quiz launcher - refreshes ladder on return
+        // Quiz launcher - final phase, always refresh ladder
         quizLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
-                Log.d(TAG, "Returned from QuizActivity");
-                // Refresh the module ladder to show updated progress
+                Log.d(TAG, "Returned from QuizActivity - End of learning flow");
+                Toast.makeText(this, "🌟 Awesome! Lesson complete!", Toast.LENGTH_SHORT).show();
+
+                // Quiz is the final phase - refresh ladder to show completion
+                currentNode = null; // Clear current node
                 loadModuleLadder();
             }
         );
@@ -326,13 +358,15 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             case CURRENT:
             case UNLOCKED:
-                // Start the 3-phase flow from where they left off
+                // Start the 3-phase flow from where they left off (auto-proceed mode)
+                isAutoProceedMode = true;
+                currentNode = node;
                 startLesson(node);
                 break;
 
             case COMPLETED:
             case MASTERED:
-                // Show options to review, replay, or retake
+                // Show options to review, replay, or retake (manual mode)
                 showCompletedNodeOptions(node);
                 break;
         }
@@ -560,15 +594,21 @@ public class ModuleLadderActivity extends AppCompatActivity {
             .setTitle("✨ " + node.getTitle())
             .setMessage("You've completed this lesson! What would you like to do?")
             .setPositiveButton("📖 Review Lesson", (dialog, which) -> {
-                // Review the lesson content
+                // Review mode - don't auto-proceed
+                isAutoProceedMode = false;
+                currentNode = node;
                 startLessonPhase(node);
             })
             .setNeutralButton("🎮 Replay Game", (dialog, which) -> {
-                // Replay the game
+                // Review mode - don't auto-proceed
+                isAutoProceedMode = false;
+                currentNode = node;
                 startGamePhase(node);
             })
             .setNegativeButton("✅ Retake Quiz", (dialog, which) -> {
-                // Retake the quiz
+                // Review mode - don't auto-proceed
+                isAutoProceedMode = false;
+                currentNode = node;
                 startQuizPhase(node);
             })
             .setCancelable(true)
