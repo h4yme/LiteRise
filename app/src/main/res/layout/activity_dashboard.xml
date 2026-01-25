@@ -245,6 +245,143 @@
                 android:clipToPadding="false"
                 android:nestedScrollingEnabled="false"/>
 
+            <!-- Game Testing Section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🎮 Game Testing"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#2D3436"
+                android:fontFamily="@font/poppins_semibold"
+                android:layout_marginTop="24dp"
+                android:layout_marginBottom="4dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Quick access to test all games"
+                android:textSize="13sp"
+                android:textColor="#636E72"
+                android:fontFamily="@font/visby_regular"
+                android:layout_marginBottom="16dp"/>
+
+            <!-- Game Buttons Grid -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_rounded_white"
+                android:padding="16dp">
+
+                <!-- Row 1: Phonics Ninja & Synonym Sprint -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestPhonicsNinja"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="🥷 Phonics Ninja"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#FF6B6B"
+                        app:cornerRadius="12dp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestSynonymSprint"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="🏃 Synonym Sprint"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#4ECDC4"
+                        app:cornerRadius="12dp"
+                        android:layout_marginStart="8dp"
+                        android:enabled="false"
+                        android:alpha="0.5"/>
+                </LinearLayout>
+
+                <!-- Row 2: Word Explosion & Sentence Chef -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestWordExplosion"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="💥 Word Explosion"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#A770EF"
+                        app:cornerRadius="12dp"
+                        android:layout_marginEnd="8dp"
+                        android:enabled="false"
+                        android:alpha="0.5"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestSentenceChef"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="👨‍🍳 Sentence Chef"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#FFD93D"
+                        app:cornerRadius="12dp"
+                        android:layout_marginStart="8dp"
+                        android:enabled="false"
+                        android:alpha="0.5"/>
+                </LinearLayout>
+
+                <!-- Row 3: Word Hunt & Sentence Scramble (Existing) -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestWordHunt"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="🔍 Word Hunt"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#667EEA"
+                        app:cornerRadius="12dp"
+                        android:layout_marginEnd="8dp"/>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestSentenceScramble"
+                        android:layout_width="0dp"
+                        android:layout_height="60dp"
+                        android:layout_weight="1"
+                        android:text="🔀 Sentence Scramble"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:fontFamily="@font/visby_bold"
+                        android:backgroundTint="#44A08D"
+                        app:cornerRadius="12dp"
+                        android:layout_marginStart="8dp"/>
+                </LinearLayout>
+            </LinearLayout>
+
             <!-- Bottom Spacing for Bottom Nav -->
             <View
                 android:layout_width="match_parent"

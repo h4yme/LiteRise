@@ -1,9 +1,6 @@
 package com.example.literise.activities;
 
-
-
 import android.content.Intent;
-
 import android.os.Bundle;
 
 import android.view.LayoutInflater;
@@ -44,6 +41,10 @@ public class DashboardActivity extends BaseActivity {
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
     private List<LearningModule> modules;
+
+    // Game testing buttons
+    private MaterialButton btnTestPhonicsNinja, btnTestSynonymSprint, btnTestWordExplosion;
+    private MaterialButton btnTestSentenceChef, btnTestWordHunt, btnTestSentenceScramble;
 
     // Custom Bottom Navigation Views
     private LinearLayout navHome, navModules, navProgress, navProfile;
@@ -163,6 +164,14 @@ public class DashboardActivity extends BaseActivity {
 
         stepIndicatorContainer = findViewById(R.id.stepIndicatorContainer);
 
+        // Game testing buttons
+        btnTestPhonicsNinja = findViewById(R.id.btnTestPhonicsNinja);
+        btnTestSynonymSprint = findViewById(R.id.btnTestSynonymSprint);
+        btnTestWordExplosion = findViewById(R.id.btnTestWordExplosion);
+        btnTestSentenceChef = findViewById(R.id.btnTestSentenceChef);
+        btnTestWordHunt = findViewById(R.id.btnTestWordHunt);
+        btnTestSentenceScramble = findViewById(R.id.btnTestSentenceScramble);
+
     }
 
 
@@ -190,6 +199,63 @@ public class DashboardActivity extends BaseActivity {
         // Show tutorial on first visit
 
         showTutorialIfFirstTime();
+
+        // Game testing button listeners
+        setupGameTestListeners();
+
+    }
+
+    /**
+     * Setup game testing button listeners
+     */
+    private void setupGameTestListeners() {
+        // Phonics Ninja - ACTIVE
+        btnTestPhonicsNinja.setOnClickListener(v -> {
+            Intent intent = new Intent(this, PhonicsNinjaActivity.class);
+            intent.putExtra("node_id", 1);
+            intent.putExtra("student_id", session.getStudentId());
+            intent.putExtra("target_pattern", "CVCC");
+            startActivity(intent);
+        });
+
+        // Synonym Sprint - Coming soon
+        btnTestSynonymSprint.setOnClickListener(v -> {
+            Toast.makeText(this, "🏃 Synonym Sprint - Coming Soon!", Toast.LENGTH_SHORT).show();
+        });
+
+        // Word Explosion - Coming soon
+        btnTestWordExplosion.setOnClickListener(v -> {
+            Toast.makeText(this, "💥 Word Explosion - Coming Soon!", Toast.LENGTH_SHORT).show();
+        });
+
+        // Sentence Chef - Coming soon
+        btnTestSentenceChef.setOnClickListener(v -> {
+            Toast.makeText(this, "👨‍🍳 Sentence Chef - Coming Soon!", Toast.LENGTH_SHORT).show();
+        });
+
+        // Word Hunt - If exists
+        btnTestWordHunt.setOnClickListener(v -> {
+            try {
+                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.WordHuntActivity"));
+                intent.putExtra("node_id", 1);
+                intent.putExtra("student_id", session.getStudentId());
+                startActivity(intent);
+            } catch (ClassNotFoundException e) {
+                Toast.makeText(this, "🔍 Word Hunt - Activity not found", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Sentence Scramble - If exists
+        btnTestSentenceScramble.setOnClickListener(v -> {
+            try {
+                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.SentenceScrambleActivity"));
+                intent.putExtra("node_id", 1);
+                intent.putExtra("student_id", session.getStudentId());
+                startActivity(intent);
+            } catch (ClassNotFoundException e) {
+                Toast.makeText(this, "🔀 Sentence Scramble - Activity not found", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
