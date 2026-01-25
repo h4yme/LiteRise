@@ -181,6 +181,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             Log.d(TAG, "Processing node " + nodeNumber + ": " + nodeData.getLessonTitle());
 
+            // Validate node number
+            if (nodeNumber < 1 || nodeNumber > 13) {
+                Log.e(TAG, "Invalid node number: " + nodeNumber + " - skipping");
+                continue;
+            }
+
             // Determine node state
             NodeView.NodeState state;
             if (nodeData.getNodeId() == currentNodeId) {
@@ -195,12 +201,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 state = NodeView.NodeState.LOCKED;
             }
 
-            // Get position from arrays (check bounds)
-            if (nodeNumber - 1 >= PATH_X.length || nodeNumber - 1 >= PATH_Y.length) {
-                Log.e(TAG, "Node number " + nodeNumber + " exceeds path coordinates!");
-                continue;
-            }
-
+            // Get position from arrays (already validated above)
             float x = PATH_X[nodeNumber - 1];
             float y = PATH_Y[nodeNumber - 1];
 
