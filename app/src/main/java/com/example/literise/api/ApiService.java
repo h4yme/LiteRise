@@ -237,4 +237,10 @@ public interface ApiService {
         @Query("student_id") int studentId,
         @Query("node_id") int nodeId
     );
+
+    @GET("get_module_ladder.php")
+    Call<com.example.literise.models.ModuleLadderResponse> getModuleLadder(
+        @Query("student_id") int studentId,
+        @Query("module_id") int moduleId
+    );
 }
