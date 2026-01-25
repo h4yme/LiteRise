@@ -1,23 +1,16 @@
 package com.example.literise.activities;
 
-
-
 import android.content.Intent;
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
-
 import android.view.View;
-
 import android.widget.ImageView;
-
 import android.widget.LinearLayout;
-
 import android.view.ViewGroup;
-
-import android.widget.ImageView;
-import android.widget.ProgressBar;
+import android.widget.FrameLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,20 +20,19 @@ import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.NodeProgressResponse;
 
+import com.google.android.material.button.MaterialButton;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-
-
 public class ModuleLadderActivity extends AppCompatActivity {
 
-
-    private ImageView backButton;
-    private TextView moduleTitle;
-    private ProgressBar moduleProgress;
-    private TextView progressText;
-    private com.example.literise.views.ModulePathView modulePathView;
+    private ScrollView scrollView;
+    private ImageView btnBack;
+    private TextView tvModuleTitle, tvModuleSubtitle;
+    private LinearLayout lessonNodesContainer;
+    private MaterialButton btnStart;
 
     private SessionManager sessionManager;
 
@@ -50,68 +42,153 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private int totalLessons = 15; // Total lessons per module (15 for Module 1)
     private int currentLesson = 15; // Current unlocked lesson
 
-
-
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_module_ladder);
-
-
 
         // Initialize SessionManager
         sessionManager = new SessionManager(this);
 
         // Get module info from intent
-
         moduleName = getIntent().getStringExtra("module_name");
         moduleId = getIntent().getIntExtra("module_id", 1);
 
         if (moduleName == null) {
-
             moduleName = "Reading Comprehension";
-
         }
-
-
 
         initializeViews();
         setupListeners();
-        loadModuleProgress();
+        displayLessonNodes();
+        scrollView.post(() -> scrollView.fullScroll(View.FOCUS_DOWN));
     }
 
     private void initializeViews() {
-        backButton = findViewById(R.id.backButton);
-        moduleTitle = findViewById(R.id.moduleTitle);
-        moduleProgress = findViewById(R.id.moduleProgress);
-        progressText = findViewById(R.id.progressText);
-        modulePathView = findViewById(R.id.modulePathView);
+        btnBack = findViewById(R.id.btnBack);
+        tvModuleTitle = findViewById(R.id.tvModuleTitle);
+        tvModuleSubtitle = findViewById(R.id.tvModuleSubtitle);
+        lessonNodesContainer = findViewById(R.id.lessonNodesContainer);
+        btnStart = findViewById(R.id.btnStart);
+        scrollView = findViewById(R.id.scrollView);
 
         // Set module title
-        moduleTitle.setText(moduleName);
+        tvModuleTitle.setText(moduleName);
     }
 
     private void setupListeners() {
-        backButton.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> finish());
 
-        // Set up node click listener for the custom path view
-        modulePathView.setOnNodeClickListener(lessonNumber -> {
-            openLesson(lessonNumber);
+        btnStart.setOnClickListener(v -> {
+            // Start first unlocked lesson
+            openLesson(currentLesson);
         });
     }
 
-    private void loadModuleProgress() {
-        // TODO: Load actual progress from API
-        // For now, show default progress
-        modulePathView.setModuleData(moduleId, currentLesson, totalLessons);
-        moduleProgress.setProgress(0);
-        progressText.setText("0%");
+    private void displayLessonNodes() {
+        lessonNodesContainer.removeAllViews();
+
+        // Convert dp to pixels for positioning
+        float density = getResources().getDisplayMetrics().density;
+        int horizontalOffset = (int) (40 * density); // Offset from center for zigzag
+
+        // Display nodes from bottom to top (reversed order)
+        // So lesson 1 (current) is at the bottom near START button
+        for (int i = totalLessons; i >= 1; i--) {
+            // Create a wrapper FrameLayout for horizontal positioning
+            FrameLayout wrapper = new FrameLayout(this);
+            LinearLayout.LayoutParams wrapperParams = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            wrapper.setLayoutParams(wrapperParams);
+
+            // Inflate the node view
+            View nodeView = LayoutInflater.from(this).inflate(
+                    R.layout.item_lesson_node,
+                    wrapper,
+                    false
+            );
+
+            ImageView ivNodeBackground = nodeView.findViewById(R.id.ivNodeBackground);
+            ImageView ivNodeIcon = nodeView.findViewById(R.id.ivNodeIcon);
+            ImageView ivGameBadge = nodeView.findViewById(R.id.ivGameBadge);
+            TextView tvLessonNumber = nodeView.findViewById(R.id.tvLessonNumber);
+
+            tvLessonNumber.setText(String.valueOf(i));
+
+            if (i < currentLesson) {
+                // Completed lesson - gold
+                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_completed);
+                ivNodeIcon.setImageResource(R.drawable.ic_star);
+                ivNodeIcon.setColorFilter(0xFFFFFFFF); // White star
+            } else if (i == currentLesson) {
+                // Current unlocked lesson - white
+                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_unlocked);
+                ivNodeIcon.setImageResource(R.drawable.ic_play);
+                ivNodeIcon.setColorFilter(0xFF7C3AED); // Purple play icon
+            } else {
+                // Locked lesson - translucent white
+                ivNodeBackground.setImageResource(R.drawable.bg_lesson_node_locked);
+                ivNodeIcon.setImageResource(R.drawable.ic_lock);
+                ivNodeIcon.setColorFilter(0xFF9D68F5); // Light purple lock
+            }
+
+            // Set game type badge
+            int lessonId = (moduleId * 100) + i;
+            String gameType = getLessonGameType(lessonId);
+            setGameBadge(ivGameBadge, gameType);
+
+            // Zigzag pattern - calculate horizontal position
+            int position = (i - 1) % 4; // Pattern repeats every 4 nodes
+            int leftMargin;
+
+            switch (position) {
+                case 0: // Center
+                    leftMargin = 0; // Will be centered by gravity
+                    break;
+                case 1: // Right
+                    leftMargin = horizontalOffset;
+                    break;
+                case 2: // Center
+                    leftMargin = 0;
+                    break;
+                case 3: // Left
+                    leftMargin = -horizontalOffset;
+                    break;
+                default:
+                    leftMargin = 0;
+                    break;
+            }
+
+            // Position node within wrapper using FrameLayout params
+            FrameLayout.LayoutParams nodeParams = new FrameLayout.LayoutParams(
+                    FrameLayout.LayoutParams.WRAP_CONTENT,
+                    FrameLayout.LayoutParams.WRAP_CONTENT
+            );
+            nodeParams.gravity = android.view.Gravity.CENTER_HORIZONTAL;
+            nodeParams.leftMargin = leftMargin;
+            nodeParams.rightMargin = -leftMargin; // Compensate
+            nodeView.setLayoutParams(nodeParams);
+
+            wrapper.addView(nodeView);
+
+            final int lessonNumber = i;
+            wrapper.setOnClickListener(v -> {
+                if (lessonNumber <= currentLesson) {
+                    // Can play this lesson
+                    openLesson(lessonNumber);
+                } else {
+                    // Locked lesson
+                    Toast.makeText(this,
+                            "Complete previous lessons to unlock",
+                            Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            lessonNodesContainer.addView(wrapper);
+        }
     }
-
-
 
     /**
      * Opens a lesson - implements 3-phase flow: LESSON → GAME → QUIZ
@@ -146,9 +223,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<NodeProgressResponse> call, Throwable t) {
-                android.widget.Toast.makeText(ModuleLadderActivity.this,
+                Toast.makeText(ModuleLadderActivity.this,
                     "Network error: " + t.getMessage(),
-                    android.widget.Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -177,9 +254,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Shows adaptive content based on placement level
      */
     private void startLessonPhase(int nodeId, int lessonNumber) {
-        android.widget.Toast.makeText(this,
+        Toast.makeText(this,
             "📚 Starting Lesson " + lessonNumber,
-            android.widget.Toast.LENGTH_SHORT).show();
+            Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, LessonContentActivity.class);
         intent.putExtra("node_id", nodeId);
@@ -197,9 +274,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
         int legacyLessonId = (moduleId * 100) + lessonNumber;
         String gameType = getLessonGameType(legacyLessonId);
 
-        android.widget.Toast.makeText(this,
+        Toast.makeText(this,
             "🎮 Starting Game: " + gameType,
-            android.widget.Toast.LENGTH_SHORT).show();
+            Toast.LENGTH_SHORT).show();
 
         Intent intent = null;
 
@@ -245,9 +322,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Shows quiz questions and handles adaptive decisions
      */
     private void startQuizPhase(int nodeId, int lessonNumber) {
-        android.widget.Toast.makeText(this,
+        Toast.makeText(this,
             "✅ Starting Quiz " + lessonNumber,
-            android.widget.Toast.LENGTH_SHORT).show();
+            Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, QuizActivity.class);
         intent.putExtra("node_id", nodeId);
@@ -262,13 +339,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Allows review, replay game, or retake quiz
      */
     private void showCompletedNodeOptions(int nodeId, int lessonNumber) {
-        android.widget.Toast.makeText(this,
+        Toast.makeText(this,
             "✨ Lesson " + lessonNumber + " Complete!\n📖 Review | 🎮 Replay | ✅ Retake",
-            android.widget.Toast.LENGTH_LONG).show();
+            Toast.LENGTH_LONG).show();
 
         // TODO: Show dialog with options to review lesson, replay game, or retake quiz
     }
-
 
     private String getLessonGameType(int lessonId) {
         // For Module 1, get game type from content provider
@@ -333,5 +409,4 @@ public class ModuleLadderActivity extends AppCompatActivity {
         }
         gameBadge.setImageResource(iconResource);
     }
-
 }
