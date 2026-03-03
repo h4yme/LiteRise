@@ -36,6 +36,7 @@ if (!$phpmailerAvailable && file_exists(__DIR__ . '/PHPMailer.php')) {
  * @param string $from Sender email
  * @return bool True if email sent successfully
  */
+if (!function_exists('sendEmail')):
 function sendEmail($to, $subject, $htmlBody, $from = null) {
     global $phpmailerAvailable;
 
@@ -54,7 +55,9 @@ function sendEmail($to, $subject, $htmlBody, $from = null) {
         return sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName);
     }
 }
+endif;
 
+if (!function_exists('sendEmailViaSMTP')):
 /**
  * Send email using PHPMailer with SMTP
  */
@@ -98,7 +101,9 @@ function sendEmailViaSMTP($to, $subject, $htmlBody, $from, $fromName) {
         return false;
     }
 }
+endif;
 
+if (!function_exists('sendEmailViaBasicPHP')):
 /**
  * Send email using basic PHP mail() function (fallback)
  */
@@ -126,7 +131,9 @@ function sendEmailViaBasicPHP($to, $subject, $htmlBody, $from, $fromName) {
     error_log("Email sent successfully to: $to");
     return true;
 }
+endif;
 
+if (!function_exists('sendOTPEmail')):
 /**
  * Send OTP email for password reset
  *
@@ -281,7 +288,9 @@ HTML;
 
     return sendEmail($email, $subject, $htmlBody);
 }
+endif;
 
+if (!function_exists('sendWelcomeEmail')):
 /**
  * Send welcome email to new users
  *
@@ -470,7 +479,9 @@ HTML;
 
     return sendEmail($email, $subject, $htmlBody);
 }
+endif;
 
+if (!function_exists('generateOTP')):
 /**
  * Generate random 6-digit OTP code
  *
@@ -479,5 +490,6 @@ HTML;
 function generateOTP() {
     return str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
 }
+endif;
 
 ?>
