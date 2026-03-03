@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".activities.WelcomeOnboardingActivity">
+    android:background="#2D1B6B">
 
-    <!-- Skip Button (Top Right) -->
+    <!-- Sound Toggle (Top Left) -->
+    <ImageButton
+        android:id="@+id/btnSound"
+        android:layout_width="44dp"
+        android:layout_height="44dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="44dp"
+        android:background="@drawable/bg_circle_white_alpha"
+        android:contentDescription="Toggle music"
+        android:padding="10dp"
+        android:src="@drawable/ic_volume_up" />
+
+    <!-- Skip (Top Right) -->
     <TextView
         android:id="@+id/tvSkip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="44dp"
+        android:layout_marginEnd="20dp"
         android:background="?attr/selectableItemBackgroundBorderless"
         android:clickable="true"
         android:focusable="true"
         android:fontFamily="@font/visby_medium"
-        android:padding="12dp"
+        android:padding="10dp"
         android:text="Skip"
-        android:textColor="#636E72"
+        android:textColor="#CCFFFFFF"
         android:textSize="16sp" />
 
-    <!-- ViewPager for slides -->
+    <!-- ViewPager -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottomContainer"
-        android:layout_marginBottom="24dp" />
+        android:layout_below="@id/tvSkip"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp" />
 
     <!-- Bottom Container -->
     <LinearLayout
@@ -39,39 +53,41 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:gravity="center_horizontal"
         android:orientation="vertical"
-        android:padding="24dp"
-        android:gravity="center_horizontal">
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="38dp"
+        android:paddingTop="4dp">
 
-        <!-- Page Indicator Lines -->
+        <!-- Animated Pill Indicators -->
         <LinearLayout
             android:id="@+id/indicatorContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_marginBottom="18dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <View
                 android:id="@+id/indicator1"
-                android:layout_width="24dp"
-                android:layout_height="4dp"
-                android:background="@drawable/tab_indicator_active"
-                android:layout_marginEnd="8dp" />
+                android:layout_width="32dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/indicator_dot_active" />
 
             <View
                 android:id="@+id/indicator2"
-                android:layout_width="24dp"
-                android:layout_height="4dp"
-                android:background="@drawable/tab_indicator_inactive"
-                android:layout_marginEnd="8dp" />
+                android:layout_width="10dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/indicator_dot_inactive" />
 
             <View
                 android:id="@+id/indicator3"
-                android:layout_width="24dp"
-                android:layout_height="4dp"
-                android:background="@drawable/tab_indicator_inactive" />
-
+                android:layout_width="10dp"
+                android:layout_height="8dp"
+                android:background="@drawable/indicator_dot_inactive" />
         </LinearLayout>
 
         <!-- Continue Button -->
@@ -85,10 +101,9 @@
             android:textAllCaps="false"
             android:textColor="@color/white"
             android:textSize="17sp"
-            android:textStyle="bold"
             app:backgroundTint="#FF8C42"
-            app:cornerRadius="16dp" />
-
+            app:cornerRadius="20dp"
+            app:elevation="6dp" />
     </LinearLayout>
 
 </RelativeLayout>
