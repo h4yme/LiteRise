@@ -1,0 +1,252 @@
+✅ COMPLETE IMPLEMENTATION CHECKLIST
+🎨 PHASE 1: Update Existing Screens (Match Design Mockup)
+1.1 Splash Screen Update
+ Update activity_splash.xml:
+Add yellow/orange radial sunburst gradient background
+Center "LiteRise" logo (large, bold)
+Add "Read • Learn • Rise!" tagline below
+Make it match the mockup exactly
+ Keep 2-second delay in SplashActivity.java
+ Routing logic already correct (Welcome → Assessment → Dashboard)
+1.2 Login Screen Update
+ Update activity_login.xml to match mockup:
+Keep blue→pink gradient background ✓ (already has it)
+Verify "LiteRise" text at top ✓
+Verify "Welcome Back!" heading ✓
+Verify input fields styling ✓
+Verify orange "Let's Read!" button ✓
+Check Remember Me + Forgot Password layout
+Check "New to LiteRise? Sign Up Here!" at bottom
+ Animations already added ✓
+ Update routing in LoginActivity.java:
+First time → WelcomeActivity
+No assessment → AdaptivePreAssessmentActivity
+Has assessment → DashboardActivity
+🎭 PHASE 2: New Onboarding Screens
+2.1 WelcomeActivity (First-time intro)
+ Create activity_welcome.xml:
+Purple gradient background (like mockup style)
+ViewPager with 2-3 intro slides
+Each slide: Large mascot image + simple text
+ Slides:
+Mascot happy: "Hi! I'm here to help you learn!"
+Mascot excited: "Let's explore reading together!"
+Mascot pointing: "Ready to start?"
+ "Next" and "Skip" buttons
+ Create WelcomeActivity.java:
+ViewPager navigation
+Save hasSeenWelcome = true in SessionManager
+Navigate to NicknameSetupActivity
+2.2 NicknameSetupActivity
+ Create activity_nickname_setup.xml:
+Green/teal gradient background
+Mascot pointing image at top
+"What should we call you?" heading
+Fun rounded input field
+Colorful "Continue" button
+ Create NicknameSetupActivity.java:
+Save nickname to database via API
+Navigate to AdaptivePreAssessmentActivity
+📝 PHASE 3: Update Pre-Assessment
+3.1 Update AdaptivePreAssessmentActivity
+ Add mascot to layout (top corner, small)
+ Add tutorial overlay for first-time users:
+"Tap the answer you think is correct"
+Mascot speech bubble
+ REMOVE instant feedback:
+Remove green/red indicators after answer
+Remove "Correct!"/"Incorrect!" toasts
+Only show neutral: "Great job!", "Keep going!"
+ Keep question progression
+ Navigate to AssessmentResultsActivity when done
+📊 PHASE 4: Assessment Results
+4.1 Create AssessmentResultsActivity
+ Create activity_assessment_results.xml:
+Gradient background
+Large mascot (excited/celebrating)
+Score display with circular progress
+"Your Results" heading
+List of modules with unlock order
+ Create AssessmentResultsActivity.java:
+Calculate weakest → strongest modules
+Set priority module
+Display unlock order
+"Start Learning!" button → DashboardActivity
+🏠 PHASE 5: Redesign Dashboard
+5.1 Update DashboardActivity
+ Update activity_dashboard.xml:
+Keep current header (XP, streak, etc.)
+Replace lesson cards with module cards
+RecyclerView with module cards
+Each card shows:
+Module icon + name
+Colored gradient accent (per module)
+Progress: "3/12 steps completed"
+Lock icon if locked
+"START" or "CONTINUE" button
+ Update DashboardActivity.java:
+Fetch modules with progress from API
+Show priority module unlocked
+Others locked until previous complete
+Click → ModuleLadderActivity
+🪜 PHASE 6: Module Ladder System
+6.1 Create ModuleLadderActivity
+ Create activity_module_ladder.xml:
+Gradient header with module info
+Mascot in header (small, encouraging)
+RecyclerView: Vertical ladder steps
+Each step card shows:
+Step number + name
+Activity type icon
+Stars (0-3)
+Lock/unlock status
+"START", "RETRY", or "✓ COMPLETED"
+ Create ModuleLadderActivity.java:
+Fetch ladder steps from API
+Display locked/unlocked states
+Click step → Launch activity (Word Hunt, Scramble, etc.)
+Return from activity → Update progress
+When all steps done → Unlock Module Test
+6.2 Create ModuleTestActivity
+ Create test activity for module assessment
+ 10 questions covering module content
+ 70% to pass
+ Pass → Unlock next module
+ Fail → Can retry
+🎮 PHASE 7: New Game Activities
+7.1 Picture Match Game
+ Create PictureMatchActivity
+ Match words to images
+ Drag-and-drop or tap to match
+ Score based on accuracy + time
+7.2 Fill in the Blanks
+ Create FillInBlanksActivity
+ Sentences with missing words
+ Word bank to choose from
+ Vocabulary and context practice
+7.3 Story Sequencing
+ Create StorySequencingActivity
+ Scrambled story events
+ Drag to reorder correctly
+ Comprehension skill building
+7.4 Synonym/Antonym Match
+ Create SynonymAntonymActivity
+ Match word pairs
+ Builds vocabulary depth
+7.5 Dialogue Reading
+ Create DialogueReadingActivity
+ Character dialogue practice
+ Read aloud with expression
+ Optional: Speech recognition scoring
+🎁 PHASE 8: Rewards & Progression
+8.1 Badge System
+ Create Badge model class
+ Create badges table in database
+ Create badge unlock logic:
+Story Explorer (6 steps in Comprehension)
+Sound Master (Complete Phonics)
+Word Collector (50 vocabulary words)
+Etc. (10 total badges)
+ Badge unlock animation (confetti + dialog)
+ Badge collection screen
+8.2 XP & Stars
+ Update step completion to award XP
+ Calculate stars based on accuracy:
+90-100% = 3 stars
+70-89% = 2 stars
+60-69% = 1 star
+<60% = Retry
+ Update student XP in database
+ Show XP progress bar on dashboard
+🏆 PHASE 9: Leaderboard
+9.1 Create LeaderboardActivity
+ Create activity_leaderboard.xml:
+Gradient background
+Trophy icon at top
+"Top Learners" heading
+RecyclerView: Top 10 students
+Show: Rank, Nickname, XP, Badges
+Highlight current student
+ Create LeaderboardActivity.java:
+Fetch leaderboard from API
+Show nicknames only (no real names)
+Mascot encouragement based on rank
+ Add leaderboard button to dashboard
+🔧 PHASE 10: Backend/API Updates
+10.1 Database Changes
+ Run migration: sql/add_onboarding_features.sql ✓ (already created)
+ Verify tables created:
+Students (new fields) ✓
+Modules ✓
+ModuleLadderSteps ✓
+StudentModuleProgress ✓
+StudentStepResults ✓
+Badges (new)
+10.2 API Endpoints
+ Update login.php: Return new fields (nickname, completedWelcome, priorityModule)
+ Create save_nickname.php: Save student nickname
+ Create get_modules.php: Get modules with student progress
+ Create get_module_steps.php: Get ladder steps for module
+ Create save_step_result.php: Save step completion + XP + stars
+ Create get_leaderboard.php: Get top students by XP
+ Update submit_responses.php: Calculate priority module from assessment
+ Create unlock_badge.php: Award badge to student
+ Create get_student_badges.php: Get student's badges
+🎨 PHASE 11: UI/UX Polish
+11.1 Animations
+ Fade transitions between screens ✓ (already have)
+ Scale animation on button press ✓ (already have)
+ Mascot bounce animation (on load)
+ Progress bar animations
+ Confetti on badge unlock
+ Star rating animation
+ Unlock animation for modules
+11.2 Sound Effects
+ Add button click sound
+ Add success sound
+ Add failure/retry sound
+ Add badge unlock sound
+ Add star rating sound
+ Volume control in settings
+11.3 Colors & Gradients
+ Create module-specific gradients:
+Reading Comprehension: Blue
+Phonics: Orange
+Vocabulary: Purple
+Spelling: Green
+Fluency: Pink
+ Consistent color scheme throughout
+✅ PHASE 12: Testing & Final Touches
+12.1 SessionManager Updates
+ Add hasSeenWelcome() method ✓ (already in LoginActivity)
+ Add saveNickname() method
+ Add getNickname() method
+12.2 Flow Testing
+ Test: New user → Welcome → Nickname → Assessment → Results → Dashboard
+ Test: Returning user → Dashboard
+ Test: Module unlocking order (weakest first)
+ Test: Ladder progression (must complete steps in order)
+ Test: Retry failed steps
+ Test: Module test unlock after all steps
+ Test: Badge unlocking
+ Test: Leaderboard display
+ Test: XP accumulation
+📝 SUMMARY
+Total Tasks: ~90 items
+
+Screens to Create/Modify:
+
+✏️ Modify: Splash (1)
+✏️ Modify: Login (verify/polish) (1)
+✏️ Modify: AdaptivePreAssessment (1)
+✏️ Modify: Dashboard (1)
+➕ New: Welcome (1)
+➕ New: NicknameSetup (1)
+➕ New: AssessmentResults (1)
+➕ New: ModuleLadder (1)
+➕ New: ModuleTest (1)
+➕ New: 5 Game Activities (5)
+➕ New: Leaderboard (1)
+Total: 15 activities
+
+API Endpoints: 8 new + 2 updates = 10 total
