@@ -42,24 +42,21 @@ try {
     // Determine number of questions
     $numQuestions = 5;
     
-    // Get quiz questions
+    // Get quiz questions (OptionsJSON holds options as {"A":"...","B":"...","C":"...","D":"..."})
     $stmt = $conn->prepare("
-        SELECT TOP (?) 
+        SELECT TOP (?)
             QuestionID,
             QuestionText,
-            OptionA,
-            OptionB,
-            OptionC,
-            OptionD,
-            Difficulty
+            OptionsJSON,
+            EstimatedDifficulty
         FROM QuizQuestions
-        WHERE NodeID = ?
+        WHERE NodeID = ? AND (IsActive IS NULL OR IsActive = 1)
         ORDER BY NEWID()
     ");
-    
+
     $stmt->execute([$numQuestions, $nodeId]);
     $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     if (empty($questions)) {
         http_response_code(404);
         echo json_encode([
@@ -68,16 +65,17 @@ try {
         ]);
         exit;
     }
-    
-    // Remove correct answers (validated server-side)
+
+    // Remove correct answers (validated server-side); parse OptionsJSON into option_a..d
     $questionsForClient = array_map(function($q) {
+        $opts = json_decode($q['OptionsJSON'] ?? '{}', true) ?: [];
         return [
-            'question_id' => $q['QuestionID'],
+            'question_id'   => $q['QuestionID'],
             'question_text' => $q['QuestionText'],
-            'option_a' => $q['OptionA'],
-            'option_b' => $q['OptionB'],
-            'option_c' => $q['OptionC'],
-            'option_d' => $q['OptionD']
+            'option_a'      => $opts['A'] ?? null,
+            'option_b'      => $opts['B'] ?? null,
+            'option_c'      => $opts['C'] ?? null,
+            'option_d'      => $opts['D'] ?? null
         ];
     }, $questions);
     
