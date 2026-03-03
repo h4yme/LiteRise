@@ -6,14 +6,15 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_dashboard">
 
-    <!-- Main Content ScrollView -->
+    <!-- Main Content ScrollView - extends behind floating nav -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:clipToPadding="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -24,197 +25,233 @@
             android:padding="20dp"
             android:paddingBottom="20dp">
 
-            <!-- Header Section with Settings -->
-            <LinearLayout
+            <!-- Header Section with Settings and Lottie -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
                 android:layout_marginBottom="8dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <!-- Greeting -->
-                    <TextView
-                        android:id="@+id/tvWelcome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hello, Student!"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#7C3AED"
-                        android:fontFamily="@font/visby_bold"/>
-
-                    <!-- Subtitle -->
-                    <TextView
-                        android:id="@+id/tvMotivation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ready to learn something new today?"
-                        android:textSize="14sp"
-                        android:textColor="#636E72"
-                        android:fontFamily="@font/visby_regular"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <!-- Settings Icon -->
-                <ImageView
-                    android:id="@+id/ivSettings"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_settings"
-                    android:background="@drawable/bg_rounded_white"
-                    android:padding="10dp"
-                    app:tint="#636E72"
-                    android:contentDescription="Settings"/>
-            </LinearLayout>
-
-            <!-- Gamification Stats Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
+                <!-- Sparkle Lottie decoration in header -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieHeaderSparkle"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginEnd="40dp"
+                    app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                    app:lottie_loop="true"
+                    app:lottie_autoPlay="true"
+                    android:alpha="0.5"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
-                    android:padding="16dp"
                     android:gravity="center_vertical">
 
-                    <!-- Leo Mascot -->
-                    <ImageView
-                        android:id="@+id/ivLeoMascot"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:src="@drawable/leo_placement_test"
-                        android:scaleType="fitCenter"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Leo Mascot"/>
-
-                    <!-- Stats Grid -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-                        <!-- Top Row: XP and Streak -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <!-- Greeting -->
+                        <TextView
+                            android:id="@+id/tvWelcome"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
+                            android:text="Hello, Student!"
+                            android:textSize="28sp"
+                            android:textStyle="bold"
+                            android:textColor="#7C3AED"
+                            android:fontFamily="@font/visby_bold"/>
 
-                            <!-- XP -->
+                        <!-- Subtitle -->
+                        <TextView
+                            android:id="@+id/tvMotivation"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Ready to learn something new today?"
+                            android:textSize="14sp"
+                            android:textColor="#636E72"
+                            android:fontFamily="@font/visby_regular"
+                            android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                    <!-- Settings Icon -->
+                    <ImageView
+                        android:id="@+id/ivSettings"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_settings"
+                        android:background="@drawable/bg_rounded_white"
+                        android:padding="10dp"
+                        app:tint="#636E72"
+                        android:contentDescription="Settings"/>
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- Gamification Stats Card with Lottie sparkle -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                android:clipChildren="false">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="6dp"
+                    app:strokeWidth="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:background="@android:color/white"
+                        android:padding="16dp"
+                        android:gravity="center_vertical">
+
+                        <!-- Leo Mascot -->
+                        <ImageView
+                            android:id="@+id/ivLeoMascot"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:src="@drawable/leo_placement_test"
+                            android:scaleType="fitCenter"
+                            android:layout_marginEnd="16dp"
+                            android:contentDescription="Leo Mascot"/>
+
+                        <!-- Stats Grid -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <!-- Top Row: XP and Streak -->
                             <LinearLayout
-                                android:layout_width="0dp"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_weight="1"
+                                android:orientation="horizontal"
+                                android:layout_marginBottom="8dp">
+
+                                <!-- XP -->
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:background="@drawable/bg_light_purple"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp"
+                                    android:layout_marginEnd="6dp">
+
+                                    <ImageView
+                                        android:layout_width="20dp"
+                                        android:layout_height="20dp"
+                                        android:src="@drawable/ic_star"
+                                        android:layout_marginEnd="6dp"
+                                        app:tint="#FFD700"
+                                        android:contentDescription="XP"/>
+
+                                    <TextView
+                                        android:id="@+id/tvHeaderXP"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0 XP"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#2D3436"
+                                        android:fontFamily="@font/poppins_semibold"/>
+                                </LinearLayout>
+
+                                <!-- Streak -->
+                                <LinearLayout
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:background="@drawable/bg_light_orange"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingTop="8dp"
+                                    android:paddingBottom="8dp"
+                                    android:layout_marginStart="6dp">
+
+                                    <ImageView
+                                        android:layout_width="18dp"
+                                        android:layout_height="18dp"
+                                        android:src="@drawable/ic_fire"
+                                        android:layout_marginEnd="6dp"
+                                        app:tint="#FF6B35"
+                                        android:contentDescription="Streak"/>
+
+                                    <TextView
+                                        android:id="@+id/tvStreak"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0 Day"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#2D3436"
+                                        android:fontFamily="@font/poppins_semibold"/>
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Bottom Row: Badges -->
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
                                 android:orientation="horizontal"
                                 android:gravity="center_vertical"
-                                android:background="@drawable/bg_light_purple"
+                                android:background="@drawable/bg_light_blue"
                                 android:paddingStart="12dp"
                                 android:paddingEnd="12dp"
                                 android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
-                                android:layout_marginEnd="6dp">
+                                android:paddingBottom="8dp">
 
                                 <ImageView
                                     android:layout_width="20dp"
                                     android:layout_height="20dp"
                                     android:src="@drawable/ic_star"
                                     android:layout_marginEnd="6dp"
-                                    app:tint="#FFD700"
-                                    android:contentDescription="XP"/>
+                                    app:tint="#60A5FA"
+                                    android:contentDescription="Badges"/>
 
                                 <TextView
-                                    android:id="@+id/tvHeaderXP"
+                                    android:id="@+id/tvBadges"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:text="0 XP"
+                                    android:text="0 Badges Earned"
                                     android:textSize="12sp"
                                     android:textStyle="bold"
                                     android:textColor="#2D3436"
                                     android:fontFamily="@font/poppins_semibold"/>
                             </LinearLayout>
-
-                            <!-- Streak -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:background="@drawable/bg_light_orange"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
-                                android:layout_marginStart="6dp">
-
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
-                                    android:src="@drawable/ic_fire"
-                                    android:layout_marginEnd="6dp"
-                                    app:tint="#FF6B35"
-                                    android:contentDescription="Streak"/>
-
-                                <TextView
-                                    android:id="@+id/tvStreak"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0 Day"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#2D3436"
-                                    android:fontFamily="@font/poppins_semibold"/>
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- Bottom Row: Badges -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/bg_light_blue"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_star"
-                                android:layout_marginEnd="6dp"
-                                app:tint="#60A5FA"
-                                android:contentDescription="Badges"/>
-
-                            <TextView
-                                android:id="@+id/tvBadges"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 Badges Earned"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#2D3436"
-                                android:fontFamily="@font/poppins_semibold"/>
                         </LinearLayout>
                     </LinearLayout>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Sparkle Lottie overlay on stats card -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieStatsSparkle"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginEnd="8dp"
+                    app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                    app:lottie_loop="true"
+                    app:lottie_autoPlay="true"
+                    android:alpha="0.7"/>
+
+            </FrameLayout>
 
             <!-- Your Learning Path Section -->
             <TextView
@@ -378,10 +415,10 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Bottom Spacing for Bottom Nav -->
+            <!-- Bottom Spacing for Floating Bottom Nav -->
             <View
                 android:layout_width="match_parent"
-                android:layout_height="80dp"/>
+                android:layout_height="100dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

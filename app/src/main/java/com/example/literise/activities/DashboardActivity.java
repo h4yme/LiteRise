@@ -3,8 +3,6 @@ package com.example.literise.activities;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.view.LayoutInflater;
-
 import android.view.View;
 
 import android.widget.ImageView;
@@ -16,6 +14,7 @@ import android.widget.Toast;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.activities.games.SynonymSprintActivity;
@@ -53,6 +52,10 @@ public class DashboardActivity extends BaseActivity {
     private LinearLayout navHome, navModules, navProgress, navProfile;
     private ImageView iconHome, iconModules, iconProgress, iconProfile;
     private TextView labelHome, labelModules, labelProgress, labelProfile;
+    private View indicatorHome, indicatorModules, indicatorProgress, indicatorProfile;
+
+    // Lottie Animation Views
+    private LottieAnimationView lottieHeaderSparkle, lottieStatsSparkle;
 
     // Tutorial views
 
@@ -150,6 +153,16 @@ public class DashboardActivity extends BaseActivity {
         labelModules = findViewById(R.id.labelModules);
         labelProgress = findViewById(R.id.labelProgress);
         labelProfile = findViewById(R.id.labelProfile);
+
+        // Nav pill indicators
+        indicatorHome = findViewById(R.id.indicatorHome);
+        indicatorModules = findViewById(R.id.indicatorModules);
+        indicatorProgress = findViewById(R.id.indicatorProgress);
+        indicatorProfile = findViewById(R.id.indicatorProfile);
+
+        // Lottie animations
+        lottieHeaderSparkle = findViewById(R.id.lottieHeaderSparkle);
+        lottieStatsSparkle = findViewById(R.id.lottieStatsSparkle);
 
         // Tutorial views
 
@@ -271,106 +284,111 @@ public class DashboardActivity extends BaseActivity {
     }
 
     /**
-     * Handle navigation item selection with animation
+     * Handle navigation item selection with Material 3 style animation
      */
     private void selectNavItem(int position) {
-        // Reset all items with animation
+        // Reset all items
         resetNavItems();
 
-        // Set selected item with expanding animation
+        // Activate selected item
         switch (position) {
             case 0: // Home
-                animateNavSelection(navHome, iconHome, labelHome);
+                activateNavItem(iconHome, labelHome, indicatorHome, R.drawable.ic_home_filled);
                 loadModulesFromPlacementResults();
                 break;
 
             case 1: // Modules
-                animateNavSelection(navModules, iconModules, labelModules);
+                activateNavItem(iconModules, labelModules, indicatorModules, R.drawable.ic_book_filled);
                 Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
                 break;
 
             case 2: // Progress
-                animateNavSelection(navProgress, iconProgress, labelProgress);
+                activateNavItem(iconProgress, labelProgress, indicatorProgress, R.drawable.ic_chart_filled);
                 Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
                 break;
 
             case 3: // Profile
-                animateNavSelection(navProfile, iconProfile, labelProfile);
+                activateNavItem(iconProfile, labelProfile, indicatorProfile, R.drawable.ic_user_filled);
                 openSettings();
                 break;
         }
     }
 
     /**
-     * Animate navigation item selection with expand effect
+     * Activate a nav item with filled icon, pill indicator, and bounce animation
      */
-    private void animateNavSelection(LinearLayout navItem, ImageView icon, TextView label) {
-        // Set background
-        navItem.setBackgroundResource(R.drawable.nav_item_selected_bg);
+    private void activateNavItem(ImageView icon, TextView label, View indicator, int filledIconRes) {
+        int purpleColor = 0xFF7C3AED;
 
-        // Change icon color
-        icon.setColorFilter(getResources().getColor(R.color.purple_600));
-
-        // Show and animate label with scale and fade
-        label.setVisibility(View.VISIBLE);
-        label.setAlpha(0f);
-        label.setScaleX(0.8f);
-        label.setScaleY(0.8f);
-
-        label.animate()
+        // Show pill indicator with scale-in animation
+        indicator.setVisibility(View.VISIBLE);
+        indicator.setAlpha(0f);
+        indicator.setScaleX(0.3f);
+        indicator.setScaleY(0.3f);
+        indicator.animate()
                 .alpha(1f)
                 .scaleX(1f)
                 .scaleY(1f)
-                .setDuration(200)
+                .setDuration(300)
                 .start();
 
-        // Animate pill background with scale
-        navItem.setScaleX(0.95f);
-        navItem.setScaleY(0.95f);
-        navItem.animate()
-                .scaleX(1f)
-                .scaleY(1f)
-                .setDuration(200)
+        // Switch to filled icon
+        icon.setImageResource(filledIconRes);
+        icon.setColorFilter(purpleColor);
+
+        // Bounce icon animation
+        icon.animate()
+                .scaleX(1.25f)
+                .scaleY(1.25f)
+                .setDuration(150)
+                .withEndAction(() ->
+                    icon.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .start()
+                )
                 .start();
+
+        // Highlight label
+        label.setTextColor(purpleColor);
+        label.setAlpha(0f);
+        label.animate().alpha(1f).setDuration(250).start();
     }
 
     /**
-     * Reset all navigation items to unselected state with fade out animation
+     * Reset all navigation items to unselected state
      */
     private void resetNavItems() {
-        // Animate hide all labels
-        animateHideLabel(labelHome);
-        animateHideLabel(labelModules);
-        animateHideLabel(labelProgress);
-        animateHideLabel(labelProfile);
+        int grayColor = 0xFF9CA3AF;
 
-        // Reset backgrounds
-        navHome.setBackgroundResource(android.R.color.transparent);
-        navModules.setBackgroundResource(android.R.color.transparent);
-        navProgress.setBackgroundResource(android.R.color.transparent);
-        navProfile.setBackgroundResource(android.R.color.transparent);
+        // Hide all pill indicators
+        indicatorHome.setVisibility(View.INVISIBLE);
+        indicatorModules.setVisibility(View.INVISIBLE);
+        indicatorProgress.setVisibility(View.INVISIBLE);
+        indicatorProfile.setVisibility(View.INVISIBLE);
 
-        // Reset icon colors to gray
-        int grayColor = getResources().getColor(R.color.gray_400);
+        // Set all icons to outline versions
+        iconHome.setImageResource(R.drawable.ic_home);
+        iconModules.setImageResource(R.drawable.ic_book);
+        iconProgress.setImageResource(R.drawable.ic_chart);
+        iconProfile.setImageResource(R.drawable.ic_user);
+
+        // Gray all icons
         iconHome.setColorFilter(grayColor);
         iconModules.setColorFilter(grayColor);
         iconProgress.setColorFilter(grayColor);
         iconProfile.setColorFilter(grayColor);
-    }
 
-    /**
-     * Animate hiding label with fade and scale
-     */
-    private void animateHideLabel(TextView label) {
-        if (label.getVisibility() == View.VISIBLE) {
-            label.animate()
-                    .alpha(0f)
-                    .scaleX(0.8f)
-                    .scaleY(0.8f)
-                    .setDuration(150)
-                    .withEndAction(() -> label.setVisibility(View.GONE))
-                    .start();
-        }
+        // Gray all labels
+        labelHome.setTextColor(grayColor);
+        labelModules.setTextColor(grayColor);
+        labelProgress.setTextColor(grayColor);
+        labelProfile.setTextColor(grayColor);
+        labelHome.setAlpha(1f);
+        labelModules.setAlpha(1f);
+        labelProgress.setAlpha(1f);
+        labelProfile.setAlpha(1f);
     }
 
     private void loadUserData() {

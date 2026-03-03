@@ -1,160 +1,205 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:background="@drawable/bg_bottom_nav"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp"
     android:paddingStart="16dp"
     android:paddingEnd="16dp"
-    android:gravity="center"
-    android:weightSum="4">
+    android:paddingBottom="12dp">
 
-    <!-- Home -->
-    <LinearLayout
-        android:id="@+id/navHome"
-        android:layout_width="0dp"
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="@drawable/nav_item_selected_bg"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+        app:cardCornerRadius="28dp"
+        app:cardElevation="16dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="#FFFFFF">
 
-        <ImageView
-            android:id="@+id/iconHome"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_home"
-            app:tint="#7C3AED"
-            android:contentDescription="Home"/>
-
-        <TextView
-            android:id="@+id/labelHome"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Home"
-            android:textSize="12sp"
-            android:textColor="#7C3AED"
-            android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="none"
-            android:visibility="visible"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:paddingTop="6dp"
+            android:paddingBottom="6dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:gravity="center"
+            android:weightSum="4">
 
-    <!-- Modules -->
-    <LinearLayout
-        android:id="@+id/navModules"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+            <!-- Home -->
+            <LinearLayout
+                android:id="@+id/navHome"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
 
-        <ImageView
-            android:id="@+id/iconModules"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_book"
-            app:tint="#9CA3AF"
-            android:contentDescription="Modules"/>
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="32dp">
 
-        <TextView
-            android:id="@+id/labelModules"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Modules"
-            android:textSize="12sp"
-            android:textColor="#7C3AED"
-            android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="none"
-            android:visibility="gone"/>
-    </LinearLayout>
+                    <View
+                        android:id="@+id/indicatorHome"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="visible"/>
 
-    <!-- Progress -->
-    <LinearLayout
-        android:id="@+id/navProgress"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+                    <ImageView
+                        android:id="@+id/iconHome"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_home_filled"
+                        app:tint="#7C3AED"
+                        android:contentDescription="Home"/>
+                </FrameLayout>
 
-        <ImageView
-            android:id="@+id/iconProgress"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_chart"
-            app:tint="#9CA3AF"
-            android:contentDescription="Progress"/>
+                <TextView
+                    android:id="@+id/labelHome"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Home"
+                    android:textSize="11sp"
+                    android:textColor="#7C3AED"
+                    android:fontFamily="@font/visby_bold"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/labelProgress"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Progress"
-            android:textSize="12sp"
-            android:textColor="#7C3AED"
-            android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="none"
-            android:visibility="gone"/>
-    </LinearLayout>
+            <!-- Modules -->
+            <LinearLayout
+                android:id="@+id/navModules"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
 
-    <!-- Profile -->
-    <LinearLayout
-        android:id="@+id/navProfile"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp">
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="32dp">
 
-        <ImageView
-            android:id="@+id/iconProfile"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:src="@drawable/ic_user"
-            app:tint="#9CA3AF"
-            android:contentDescription="Profile"/>
+                    <View
+                        android:id="@+id/indicatorModules"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="invisible"/>
 
-        <TextView
-            android:id="@+id/labelProfile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="12sp"
-            android:textColor="#7C3AED"
-            android:fontFamily="@font/visby_bold"
-            android:layout_marginStart="6dp"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="none"
-            android:visibility="gone"/>
-    </LinearLayout>
+                    <ImageView
+                        android:id="@+id/iconModules"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_book"
+                        app:tint="#9CA3AF"
+                        android:contentDescription="Modules"/>
+                </FrameLayout>
 
-</LinearLayout>
+                <TextView
+                    android:id="@+id/labelModules"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Modules"
+                    android:textSize="11sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Progress -->
+            <LinearLayout
+                android:id="@+id/navProgress"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="32dp">
+
+                    <View
+                        android:id="@+id/indicatorProgress"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="invisible"/>
+
+                    <ImageView
+                        android:id="@+id/iconProgress"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_chart"
+                        app:tint="#9CA3AF"
+                        android:contentDescription="Progress"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/labelProgress"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Progress"
+                    android:textSize="11sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+            <!-- Profile -->
+            <LinearLayout
+                android:id="@+id/navProfile"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
+
+                <FrameLayout
+                    android:layout_width="56dp"
+                    android:layout_height="32dp">
+
+                    <View
+                        android:id="@+id/indicatorProfile"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="invisible"/>
+
+                    <ImageView
+                        android:id="@+id/iconProfile"
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_user"
+                        app:tint="#9CA3AF"
+                        android:contentDescription="Profile"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/labelProfile"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Profile"
+                    android:textSize="11sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginTop="4dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>
