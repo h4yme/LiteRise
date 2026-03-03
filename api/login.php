@@ -214,7 +214,7 @@ try {
 
         'Nickname' => $student['Nickname'] ?? null,
 
-        'PreAssessmentCompleted' => (bool)$student['PreAssessmentCompleted'],
+        'PreAssessmentCompleted' => isset($student['PreAssessmentCompleted']) ? (bool)$student['PreAssessmentCompleted'] : false,
 
         'AssessmentStatus' => $student['AssessmentStatus'] ?? 'Not Started',
 

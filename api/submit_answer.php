@@ -1,104 +1,96 @@
 <?php
-
-/**
- * LiteRise Submit Answer API
- * POST /api/submit_answer.php
- *
- * Request Body:
- * {
- *   "student_id": 1,
- *   "item_id": 5,
- *   "session_id": 10,
- *   "assessment_type": "PreAssessment",
- *   "selected_answer": "A",
- *   "is_correct": true,
- *   "student_theta": 0.5,
- *   "response_time": 12,
- *   "question_number": 3,
- *   "device_info": "Android 12",
- *   "interaction_data": "{}"
- * }
- */
-
 require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
+
+$authUser = requireAuth();
 
 $data = getJsonInput();
 
-$studentID      = (int)($data['student_id'] ?? 0);
-$itemID         = (int)($data['item_id'] ?? 0);
-$sessionID      = (int)($data['session_id'] ?? 0);
-$assessmentType = trim($data['assessment_type'] ?? 'PreAssessment');
-$selectedAnswer = trim($data['selected_answer'] ?? '');
-$isCorrect      = (bool)($data['is_correct'] ?? false);
-$studentTheta   = (float)($data['student_theta'] ?? 0.0);
-$responseTime   = isset($data['response_time']) ? (int)$data['response_time'] : null;
-$questionNumber = (int)($data['question_number'] ?? 1);
-$deviceInfo     = $data['device_info'] ?? null;
-$interactionData= $data['interaction_data'] ?? null;
+// Validate required fields for ANSWER submission (not placement)
+validateRequired($data, [
+    'student_id',
+    'item_id',
+    'session_id',
+    'assessment_type',
+    'student_theta',
+    'question_number'
+]);
 
-if ($studentID <= 0 || $itemID <= 0 || $sessionID <= 0) {
-    sendError("student_id, item_id, and session_id are required", 400);
+$studentID = (int)$data['student_id'];
+$itemID = (int)$data['item_id'];
+$sessionID = (int)$data['session_id'];
+$assessmentType = sanitizeInput($data['assessment_type']);
+$selectedAnswer = isset($data['selected_answer']) ? sanitizeInput($data['selected_answer']) : '';
+$studentTheta = (float)$data['student_theta'];
+
+// Determine correctness server-side
+$isCorrect = false;
+if (!empty($selectedAnswer)) {
+    $stmt = $conn->prepare("SELECT CorrectAnswer FROM dbo.AssessmentItems WHERE ItemID = ?");
+    $stmt->execute([$itemID]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($row) {
+        $correctAnswer = trim($row['CorrectAnswer']);
+        $isCorrect = (strcasecmp(trim($selectedAnswer), $correctAnswer) === 0);
+    }
+}
+
+$responseTime = isset($data['response_time']) ? (int)$data['response_time'] : null;
+$questionNumber = (int)$data['question_number'];
+$deviceInfo = isset($data['device_info']) ? sanitizeInput($data['device_info']) : null;
+$interactionData = isset($data['interaction_data']) ? $data['interaction_data'] : null;
+
+if ($authUser['studentID'] != $studentID) {
+    sendError("Unauthorized", 403);
 }
 
 try {
-    $stmt = $conn->prepare(
-        "EXEC SP_RecordStudentResponse
-            @StudentID           = :sid,
-            @ItemID              = :iid,
-            @SessionID           = :sess,
-            @AssessmentType      = :atype,
-            @SelectedAnswer      = :ans,
-            @IsCorrect           = :correct,
-            @StudentThetaAtTime  = :theta,
-            @ResponseTime        = :rtime,
-            @QuestionNumber      = :qnum,
-            @DeviceInfo          = :device,
-            @InteractionData     = :idata"
-    );
-    $stmt->bindValue(':sid',     $studentID,       PDO::PARAM_INT);
-    $stmt->bindValue(':iid',     $itemID,          PDO::PARAM_INT);
-    $stmt->bindValue(':sess',    $sessionID,       PDO::PARAM_INT);
-    $stmt->bindValue(':atype',   $assessmentType,  PDO::PARAM_STR);
-    $stmt->bindValue(':ans',     $selectedAnswer,  PDO::PARAM_STR);
-    $stmt->bindValue(':correct', $isCorrect ? 1 : 0, PDO::PARAM_INT);
-    $stmt->bindValue(':theta',   $studentTheta);
-    $stmt->bindValue(':rtime',   $responseTime,    PDO::PARAM_INT);
-    $stmt->bindValue(':qnum',    $questionNumber,  PDO::PARAM_INT);
-    $stmt->bindValue(':device',  $deviceInfo,      PDO::PARAM_STR);
-    $stmt->bindValue(':idata',   $interactionData, PDO::PARAM_STR);
-    $stmt->execute();
+    $stmt = $conn->prepare("EXEC dbo.SP_RecordStudentResponse
+        @StudentID = ?, @ItemID = ?, @SessionID = ?, @AssessmentType = ?,
+        @SelectedAnswer = ?, @IsCorrect = ?, @StudentThetaAtTime = ?,
+        @ResponseTime = ?, @QuestionNumber = ?, @DeviceInfo = ?, @InteractionData = ?
+    ");
 
-    $row        = $stmt->fetch(PDO::FETCH_ASSOC);
-    $responseID = (int)($row['ResponseID'] ?? 0);
+    $stmt->execute([
+        $studentID, $itemID, $sessionID, $assessmentType,
+        $selectedAnswer, $isCorrect ? 1 : 0, $studentTheta,
+        $responseTime, $questionNumber, $deviceInfo, $interactionData
+    ]);
+
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $responseID = $result ? (int)$result['ResponseID'] : 0;
+
+    // Calculate new theta
+    $thetaAdjustment = $isCorrect ? 0.1 : -0.1;
+    $newTheta = max(-3.0, min(3.0, $studentTheta + $thetaAdjustment));
 
     // Get item parameters for feedback
-    $itemStmt = $conn->prepare(
-        "SELECT DifficultyParam, DiscriminationParam, GuessingParam FROM AssessmentItems WHERE ItemID = ?"
-    );
+    $itemStmt = $conn->prepare("SELECT DifficultyParam, DiscriminationParam, GuessingParam FROM dbo.AssessmentItems WHERE ItemID = ?");
     $itemStmt->execute([$itemID]);
     $item = $itemStmt->fetch(PDO::FETCH_ASSOC);
 
-    $expectedProb = 0.25;
+    $expectedProbability = 0.5;
     if ($item) {
         $b = (float)$item['DifficultyParam'];
         $a = (float)$item['DiscriminationParam'];
-        $c = (float)($item['GuessingParam'] ?? 0.25);
-        $expectedProb = $c + (1 - $c) / (1 + exp(-1.7 * $a * ($studentTheta - $b)));
+        $c = (float)$item['GuessingParam'];
+        $expectedProbability = $c + (1 - $c) / (1 + exp(-1.7 * $a * ($studentTheta - $b)));
     }
 
     sendResponse([
-        'success'     => true,
+        'success' => true,
         'response_id' => $responseID,
-        'is_correct'  => $isCorrect,
-        'feedback'    => [
-            'message'               => $isCorrect ? 'Correct!' : 'Keep going!',
-            'expected_probability'  => round($expectedProb, 4),
-            'new_theta_estimate'    => $studentTheta,
-        ],
-    ]);
+        'is_correct' => $isCorrect,
+        'feedback' => [
+            'message' => $isCorrect ? "Correct! Great job! 🎉" : "Not quite. Keep trying! 💪",
+            'expected_probability' => round($expectedProbability, 3),
+            'new_theta_estimate' => round($newTheta, 3)
+        ]
+    ], 201);
 
-} catch (PDOException $e) {
-    error_log("submit_answer error: " . $e->getMessage());
+} catch (Exception $e) {
+    error_log("Submit answer error: " . $e->getMessage());
     sendError("Failed to submit answer", 500, $e->getMessage());
 }
 ?>

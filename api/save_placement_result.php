@@ -1,123 +1,108 @@
 <?php
-
-/**
- * LiteRise Save Placement Result API
- * POST /api/save_placement_result.php
- *
- * Request Body:
- * {
- *   "student_id": 1,
- *   "session_id": 10,
- *   "assessment_type": "PreAssessment",
- *   "final_theta": 0.75,
- *   "placement_level": 3,
- *   "level_name": "Proficient",
- *   "total_questions": 20,
- *   "correct_answers": 15,
- *   "accuracy_percentage": 75.0,
- *   "category_scores": {"Vocabulary":0.8,"Grammar":0.7},
- *   "category_theta":  {"Vocabulary":0.9,"Grammar":0.6},
- *   "time_spent_seconds": 600
- * }
- */
-
 require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
+
+$authUser = requireAuth();
 
 $data = getJsonInput();
 
-$studentID          = (int)($data['student_id'] ?? 0);
-$sessionID          = (int)($data['session_id'] ?? 0);
-$assessmentType     = trim($data['assessment_type'] ?? 'PreAssessment');
-$finalTheta         = (float)($data['final_theta'] ?? 0);
-$placementLevel     = (int)($data['placement_level'] ?? 1);
-$levelName          = trim($data['level_name'] ?? 'Beginner');
-$totalQuestions     = (int)($data['total_questions'] ?? 0);
-$correctAnswers     = (int)($data['correct_answers'] ?? 0);
-$accuracyPercentage = (float)($data['accuracy_percentage'] ?? 0);
-$categoryScores     = $data['category_scores'] ?? [];
-$categoryTheta      = $data['category_theta'] ?? [];
-$timeSpent          = isset($data['time_spent_seconds']) ? (int)$data['time_spent_seconds'] : null;
-$deviceInfo         = $data['device_info'] ?? null;
-$appVersion         = $data['app_version'] ?? null;
+validateRequired($data, [
+    'student_id',
+    'session_id',
+    'assessment_type',
+    'final_theta',
+    'placement_level',
+    'total_questions',
+    'correct_answers',
+    'accuracy_percentage'
+]);
 
-if ($studentID <= 0) {
-    sendError("student_id is required", 400);
+$studentID = (int)$data['student_id'];
+$sessionID = (int)$data['session_id'];
+$assessmentType = sanitizeInput($data['assessment_type']);
+$finalTheta = (float)$data['final_theta'];
+$placementLevel = (int)$data['placement_level'];
+$levelName = isset($data['level_name']) ? sanitizeInput($data['level_name']) : '';
+$totalQuestions = (int)$data['total_questions'];
+$correctAnswers = (int)$data['correct_answers'];
+$accuracyPercentage = (float)$data['accuracy_percentage'];
+
+if ($authUser['studentID'] != $studentID) {
+    sendError("Unauthorized", 403);
 }
 
-// Extract named category scores (up to 4)
-$cats   = array_values((array)$categoryScores);
-$thetas = array_values((array)$categoryTheta);
+$categoryScores = $data['category_scores'] ?? [];
+$cat1 = isset($categoryScores['category1']) ? (int)$categoryScores['category1'] : null;
+$cat2 = isset($categoryScores['category2']) ? (int)$categoryScores['category2'] : null;
+$cat3 = isset($categoryScores['category3']) ? (int)$categoryScores['category3'] : null;
+$cat4 = isset($categoryScores['category4']) ? (int)$categoryScores['category4'] : null;
+$cat5 = isset($categoryScores['category5']) ? (int)$categoryScores['category5'] : null;
+
+$categoryTheta = $data['category_theta'] ?? [];
+$theta1 = isset($categoryTheta['category1']) ? (float)$categoryTheta['category1'] : null;
+$theta2 = isset($categoryTheta['category2']) ? (float)$categoryTheta['category2'] : null;
+$theta3 = isset($categoryTheta['category3']) ? (float)$categoryTheta['category3'] : null;
+$theta4 = isset($categoryTheta['category4']) ? (float)$categoryTheta['category4'] : null;
+$theta5 = isset($categoryTheta['category5']) ? (float)$categoryTheta['category5'] : null;
+
+$timeSpent = isset($data['time_spent_seconds']) ? (int)$data['time_spent_seconds'] : null;
+$deviceInfo = isset($data['device_info']) ? sanitizeInput($data['device_info']) : null;
+$appVersion = isset($data['app_version']) ? sanitizeInput($data['app_version']) : null;
 
 try {
-    $stmt = $conn->prepare(
-        "EXEC SP_SavePlacementResult
-            @StudentID            = :sid,
-            @SessionID            = :sess,
-            @AssessmentType       = :atype,
-            @FinalTheta           = :theta,
-            @PlacementLevel       = :level,
-            @LevelName            = :lname,
-            @TotalQuestions       = :total,
-            @CorrectAnswers       = :correct,
-            @AccuracyPercentage   = :acc,
-            @Category1Score       = :c1s,
-            @Category2Score       = :c2s,
-            @Category3Score       = :c3s,
-            @Category4Score       = :c4s,
-            @Category1Theta       = :c1t,
-            @Category2Theta       = :c2t,
-            @Category3Theta       = :c3t,
-            @Category4Theta       = :c4t,
-            @TimeSpentSeconds     = :time,
-            @DeviceInfo           = :device,
-            @AppVersion           = :ver"
-    );
+    $conn->beginTransaction();
 
-    $stmt->bindValue(':sid',     $studentID,          PDO::PARAM_INT);
-    $stmt->bindValue(':sess',    $sessionID,          PDO::PARAM_INT);
-    $stmt->bindValue(':atype',   $assessmentType,     PDO::PARAM_STR);
-    $stmt->bindValue(':theta',   $finalTheta);
-    $stmt->bindValue(':level',   $placementLevel,     PDO::PARAM_INT);
-    $stmt->bindValue(':lname',   $levelName,          PDO::PARAM_STR);
-    $stmt->bindValue(':total',   $totalQuestions,     PDO::PARAM_INT);
-    $stmt->bindValue(':correct', $correctAnswers,     PDO::PARAM_INT);
-    $stmt->bindValue(':acc',     $accuracyPercentage);
-    $stmt->bindValue(':c1s',     $cats[0] ?? null);
-    $stmt->bindValue(':c2s',     $cats[1] ?? null);
-    $stmt->bindValue(':c3s',     $cats[2] ?? null);
-    $stmt->bindValue(':c4s',     $cats[3] ?? null);
-    $stmt->bindValue(':c1t',     $thetas[0] ?? null);
-    $stmt->bindValue(':c2t',     $thetas[1] ?? null);
-    $stmt->bindValue(':c3t',     $thetas[2] ?? null);
-    $stmt->bindValue(':c4t',     $thetas[3] ?? null);
-    $stmt->bindValue(':time',    $timeSpent,          PDO::PARAM_INT);
-    $stmt->bindValue(':device',  $deviceInfo,         PDO::PARAM_STR);
-    $stmt->bindValue(':ver',     $appVersion,         PDO::PARAM_STR);
-    $stmt->execute();
+    $sql = "INSERT INTO dbo.PlacementResults (
+        StudentID, SessionID, AssessmentType, FinalTheta, PlacementLevel, LevelName,
+        TotalQuestions, CorrectAnswers, AccuracyPercentage,
+        Category1Score, Category2Score, Category3Score, Category4Score, Category5Score,
+        Category1Theta, Category2Theta, Category3Theta, Category4Theta, Category5Theta,
+        TimeSpentSeconds, DeviceInfo, AppVersion, CompletedDate
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, GETDATE())";
 
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $stmt = $conn->prepare($sql);
+    $stmt->execute([
+        $studentID, $sessionID, $assessmentType, $finalTheta, $placementLevel, $levelName,
+        $totalQuestions, $correctAnswers, $accuracyPercentage,
+        $cat1, $cat2, $cat3, $cat4, $cat5,
+        $theta1, $theta2, $theta3, $theta4, $theta5,
+        $timeSpent, $deviceInfo, $appVersion
+    ]);
 
-    // Update student pre/post assessment status
-    $flag = ($assessmentType === 'PreAssessment') ? 'PreAssessmentCompleted' : 'PostAssessmentCompleted';
-    $conn->prepare("UPDATE Students SET $flag = 1, AssessmentStatus = 'Completed', CurrentAbility = :theta WHERE StudentID = :sid")
-         ->execute([':theta' => $finalTheta, ':sid' => $studentID]);
+    if ($assessmentType === 'PreAssessment') {
+        $sql = "UPDATE dbo.Students 
+            SET Cat1_PhonicsWordStudy = ?, Cat2_VocabularyWordKnowledge = ?,
+                Cat3_GrammarAwareness = ?, Cat4_ComprehendingText = ?, Cat5_CreatingComposing = ?,
+                Cat1_PhonicsWordStudy_Theta = ?, Cat2_VocabularyWordKnowledge_Theta = ?,
+                Cat3_GrammarAwareness_Theta = ?, Cat4_ComprehendingText_Theta = ?, Cat5_CreatingComposing_Theta = ?,
+                PreAssessmentLevel = ?, PreAssessmentTheta = ?, PreAssessmentDate = GETDATE(), PreAssessmentCompleted = 1
+            WHERE StudentID = ?";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([
+            $cat1, $cat2, $cat3, $cat4, $cat5,
+            $theta1, $theta2, $theta3, $theta4, $theta5,
+            $placementLevel, $finalTheta, $studentID
+        ]);
+    } else {
+        $sql = "UPDATE dbo.Students 
+            SET PostAssessmentLevel = ?, PostAssessmentTheta = ?, PostAssessmentDate = GETDATE(), PostAssessmentCompleted = 1
+            WHERE StudentID = ?";
+        
+        $stmt = $conn->prepare($sql);
+        $stmt->execute([$placementLevel, $finalTheta, $studentID]);
+    }
+
+    $conn->commit();
 
     sendResponse([
         'success' => true,
-        'message' => 'Placement result saved',
-        'result'  => [
-            'ResultID'           => (int)($row['ResultID'] ?? 0),
-            'StudentID'          => $studentID,
-            'AssessmentType'     => $assessmentType,
-            'PlacementLevel'     => $placementLevel,
-            'LevelName'          => $levelName,
-            'AccuracyPercentage' => $accuracyPercentage,
-            'CompletedDate'      => date('Y-m-d H:i:s'),
-        ],
-    ]);
+        'message' => 'Placement result saved successfully'
+    ], 201);
 
-} catch (PDOException $e) {
-    error_log("save_placement_result error: " . $e->getMessage());
+} catch (Exception $e) {
+    $conn->rollBack();
+    error_log("Save placement error: " . $e->getMessage());
     sendError("Failed to save placement result", 500, $e->getMessage());
 }
 ?>

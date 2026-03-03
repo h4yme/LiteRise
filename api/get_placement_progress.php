@@ -1,120 +1,186 @@
 <?php
-
 /**
  * LiteRise Get Placement Progress API
  * GET /api/get_placement_progress.php?student_id=1
+ *
+ * Returns complete placement assessment progress including:
+ * - Pre and post assessment results
+ * - Growth metrics
+ * - Session history
+ * - Comparison data
+ *
+ * Response:
+ * {
+ *   "success": true,
+ *   "student": {
+ *     "StudentID": 1,
+ *     "FirstName": "John",
+ *     "PreAssessmentCompleted": true,
+ *     "PostAssessmentCompleted": false,
+ *     "AssessmentStatus": "Pre-Completed"
+ *   },
+ *   "results": {
+ *     "pre": { ... },
+ *     "post": null
+ *   },
+ *   "comparison": {
+ *     "ThetaGrowth": 0.5,
+ *     "LevelGrowth": 1,
+ *     "AccuracyGrowth": 15.0
+ *   },
+ *   "session_history": [ ... ]
+ * }
  */
 
 require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
-$studentID = (int)($_GET['student_id'] ?? 0);
+// Require authentication
+$authUser = requireAuth();
 
-if ($studentID <= 0) {
-    sendError("student_id is required", 400);
+// Get student ID from query params or use authenticated user's ID
+$studentID = $_GET['student_id'] ?? $authUser['studentID'];
+
+// Validate student ID
+if ($studentID == 0 || !is_numeric($studentID)) {
+    sendError("Valid student_id is required", 400);
+}
+
+// Verify the authenticated user can access this student's data
+// (Allow access to own data or if admin - simplified for now)
+if ($authUser['studentID'] != $studentID) {
+    sendError("Unauthorized: Cannot access another student's data", 403);
 }
 
 try {
-    // Get student info
-    $stmt = $conn->prepare(
-        "SELECT StudentID, FirstName, LastName, Email,
-                ISNULL(PreAssessmentCompleted,0) AS PreAssessmentCompleted,
-                ISNULL(PostAssessmentCompleted,0) AS PostAssessmentCompleted,
-                ISNULL(AssessmentStatus,'Not Started') AS AssessmentStatus
-         FROM Students WHERE StudentID = ?"
-    );
-    $stmt->execute([$studentID]);
-    $student = $stmt->fetch(PDO::FETCH_ASSOC);
+    // Call stored procedure to get student progress
+    $stmt = $conn->prepare("EXEC SP_GetStudentProgress @StudentID = :studentID");
+    $stmt->bindValue(':studentID', $studentID, PDO::PARAM_INT);
+    $stmt->execute();
 
+    // Get student info (first result set)
+    $student = $stmt->fetch(PDO::FETCH_ASSOC);
     if (!$student) {
         sendError("Student not found", 404);
     }
 
-    // Get placement results
-    $resStmt = $conn->prepare(
-        "SELECT TOP 1 ResultID, AssessmentType, CompletedDate, FinalTheta,
-                PlacementLevel, LevelName, AccuracyPercentage, TotalQuestions, CorrectAnswers,
-                Category1Score, Category2Score, Category3Score, Category4Score
-         FROM PlacementResults
-         WHERE StudentID = ? AND AssessmentType = 'PreAssessment'
-         ORDER BY CompletedDate DESC"
-    );
-    $resStmt->execute([$studentID]);
-    $preResult = $resStmt->fetch(PDO::FETCH_ASSOC);
+    // Move to next result set (placement results)
+    $stmt->nextRowset();
+    $allResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    $postStmt = $conn->prepare(
-        "SELECT TOP 1 ResultID, AssessmentType, CompletedDate, FinalTheta,
-                PlacementLevel, LevelName, AccuracyPercentage, TotalQuestions, CorrectAnswers,
-                Category1Score, Category2Score, Category3Score, Category4Score
-         FROM PlacementResults
-         WHERE StudentID = ? AND AssessmentType = 'PostAssessment'
-         ORDER BY CompletedDate DESC"
-    );
-    $postStmt->execute([$studentID]);
-    $postResult = $postStmt->fetch(PDO::FETCH_ASSOC);
-
-    // Build category scores map
-    function buildCategoryScores($row) {
-        if (!$row) return null;
-        return [
-            'ResultID'           => (int)$row['ResultID'],
-            'AssessmentType'     => $row['AssessmentType'],
-            'CompletedDate'      => $row['CompletedDate'],
-            'FinalTheta'         => (float)$row['FinalTheta'],
-            'PlacementLevel'     => (int)$row['PlacementLevel'],
-            'LevelName'          => $row['LevelName'],
-            'AccuracyPercentage' => (float)$row['AccuracyPercentage'],
-            'TotalQuestions'     => (int)$row['TotalQuestions'],
-            'CorrectAnswers'     => (int)$row['CorrectAnswers'],
-            'CategoryScores'     => [
-                'Category1' => $row['Category1Score'] !== null ? (float)$row['Category1Score'] : null,
-                'Category2' => $row['Category2Score'] !== null ? (float)$row['Category2Score'] : null,
-                'Category3' => $row['Category3Score'] !== null ? (float)$row['Category3Score'] : null,
-                'Category4' => $row['Category4Score'] !== null ? (float)$row['Category4Score'] : null,
-            ],
-        ];
+    // Separate pre and post results
+    $preResult = null;
+    $postResult = null;
+    foreach ($allResults as $result) {
+        if ($result['AssessmentType'] === 'PreAssessment') {
+            $preResult = $result;
+        } elseif ($result['AssessmentType'] === 'PostAssessment') {
+            $postResult = $result;
+        }
     }
 
-    // Comparison data
-    $comparison = null;
-    if ($preResult && $postResult) {
-        $comparison = [
-            'ThetaGrowth'       => (float)$postResult['FinalTheta'] - (float)$preResult['FinalTheta'],
-            'LevelGrowth'       => (int)$postResult['PlacementLevel'] - (int)$preResult['PlacementLevel'],
-            'AccuracyGrowth'    => (float)$postResult['AccuracyPercentage'] - (float)$preResult['AccuracyPercentage'],
-            'ComparisonStatus'  => ((float)$postResult['FinalTheta'] > (float)$preResult['FinalTheta'])
-                                    ? 'Improved' : 'No Change',
-        ];
-    }
+    // Move to next result set (session history)
+    $stmt->nextRowset();
+    $sessionHistory = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Recent session logs
-    $logStmt = $conn->prepare(
-        "SELECT TOP 10 LogID, SessionType, SessionTag, LoggedAt, DeviceInfo
-         FROM StudentSessionLogs WHERE StudentID = ? ORDER BY LoggedAt DESC"
-    );
-    $logStmt->execute([$studentID]);
-    $sessionHistory = $logStmt->fetchAll(PDO::FETCH_ASSOC);
+    // Move to next result set (comparison view)
+    $stmt->nextRowset();
+    $comparison = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    sendResponse([
+    // Format response
+    $response = [
         'success' => true,
         'student' => [
-            'StudentID'              => (int)$student['StudentID'],
-            'FirstName'              => $student['FirstName'],
-            'LastName'               => $student['LastName'],
-            'Email'                  => $student['Email'],
+            'StudentID' => (int)$student['StudentID'],
+            'FirstName' => $student['FirstName'],
+            'LastName' => $student['LastName'],
+            'Nickname' => $student['Nickname'],
+            'GradeLevel' => (int)$student['GradeLevel'],
+            'CurrentAbility' => (float)$student['CurrentAbility'],
             'PreAssessmentCompleted' => (bool)$student['PreAssessmentCompleted'],
-            'PostAssessmentCompleted'=> (bool)$student['PostAssessmentCompleted'],
-            'AssessmentStatus'       => $student['AssessmentStatus'],
+            'PreAssessmentDate' => $student['PreAssessmentDate'],
+            'PreAssessmentLevel' => $student['PreAssessmentLevel'] ? (int)$student['PreAssessmentLevel'] : null,
+            'PostAssessmentCompleted' => (bool)$student['PostAssessmentCompleted'],
+            'PostAssessmentDate' => $student['PostAssessmentDate'],
+            'PostAssessmentLevel' => $student['PostAssessmentLevel'] ? (int)$student['PostAssessmentLevel'] : null,
+            'AssessmentStatus' => $student['AssessmentStatus'],
+            'LastLoginDate' => $student['LastLoginDate'],
+            'TotalLoginCount' => (int)$student['TotalLoginCount']
         ],
         'results' => [
-            'pre'  => buildCategoryScores($preResult),
-            'post' => buildCategoryScores($postResult),
+            'pre' => $preResult ? formatResult($preResult) : null,
+            'post' => $postResult ? formatResult($postResult) : null
         ],
-        'comparison'      => $comparison,
-        'session_history' => $sessionHistory,
-    ]);
+        'comparison' => $comparison ? [
+            'PreLevel' => $comparison['PreLevel'] ? (int)$comparison['PreLevel'] : null,
+            'PostLevel' => $comparison['PostLevel'] ? (int)$comparison['PostLevel'] : null,
+            'LevelGrowth' => $comparison['LevelGrowth'] ? (int)$comparison['LevelGrowth'] : null,
+            'PreAccuracy' => $comparison['PreAccuracy'] ? (float)$comparison['PreAccuracy'] : null,
+            'PostAccuracy' => $comparison['PostAccuracy'] ? (float)$comparison['PostAccuracy'] : null,
+            'AccuracyGrowth' => $comparison['AccuracyGrowth'] ? (float)$comparison['AccuracyGrowth'] : null,
+            'ThetaGrowth' => $comparison['ThetaGrowth'] ? (float)$comparison['ThetaGrowth'] : null,
+            'Category1Growth' => $comparison['Category1Growth'] ? (float)$comparison['Category1Growth'] : null,
+            'Category2Growth' => $comparison['Category2Growth'] ? (float)$comparison['Category2Growth'] : null,
+            'Category3Growth' => $comparison['Category3Growth'] ? (float)$comparison['Category3Growth'] : null,
+            'Category4Growth' => $comparison['Category4Growth'] ? (float)$comparison['Category4Growth'] : null,
+            'ComparisonStatus' => $comparison['ComparisonStatus']
+        ] : null,
+        'session_history' => array_map('formatSessionLog', $sessionHistory)
+    ];
+
+    sendResponse($response);
 
 } catch (PDOException $e) {
-    error_log("get_placement_progress error: " . $e->getMessage());
-    sendError("Failed to get placement progress", 500, $e->getMessage());
+    error_log("Get placement progress error: " . $e->getMessage());
+    sendError("Failed to retrieve placement progress", 500, $e->getMessage());
+} catch (Exception $e) {
+    error_log("Get placement progress error: " . $e->getMessage());
+    sendError("An error occurred", 500, $e->getMessage());
+}
+
+/**
+ * Format placement result for API response
+ */
+function formatResult($result) {
+    return [
+        'ResultID' => (int)$result['ResultID'],
+        'AssessmentType' => $result['AssessmentType'],
+        'CompletedDate' => $result['CompletedDate'],
+        'FinalTheta' => (float)$result['FinalTheta'],
+        'PlacementLevel' => (int)$result['PlacementLevel'],
+        'LevelName' => $result['LevelName'],
+        'TotalQuestions' => (int)$result['TotalQuestions'],
+        'CorrectAnswers' => (int)$result['CorrectAnswers'],
+        'AccuracyPercentage' => (float)$result['AccuracyPercentage'],
+        'CategoryScores' => [
+            'category1' => $result['Category1Score'] ? (float)$result['Category1Score'] : null,
+            'category2' => $result['Category2Score'] ? (float)$result['Category2Score'] : null,
+            'category3' => $result['Category3Score'] ? (float)$result['Category3Score'] : null,
+            'category4' => $result['Category4Score'] ? (float)$result['Category4Score'] : null
+        ],
+        'CategoryTheta' => [
+            'category1' => $result['Category1Theta'] ? (float)$result['Category1Theta'] : null,
+            'category2' => $result['Category2Theta'] ? (float)$result['Category2Theta'] : null,
+            'category3' => $result['Category3Theta'] ? (float)$result['Category3Theta'] : null,
+            'category4' => $result['Category4Theta'] ? (float)$result['Category4Theta'] : null
+        ],
+        'TimeSpentSeconds' => $result['TimeSpentSeconds'] ? (int)$result['TimeSpentSeconds'] : null,
+        'DeviceInfo' => $result['DeviceInfo'],
+        'AppVersion' => $result['AppVersion']
+    ];
+}
+
+/**
+ * Format session log for API response
+ */
+function formatSessionLog($log) {
+    return [
+        'LogID' => (int)$log['LogID'],
+        'SessionType' => $log['SessionType'],
+        'SessionTag' => $log['SessionTag'],
+        'LoggedAt' => $log['LoggedAt'],
+        'DeviceInfo' => $log['DeviceInfo'],
+        'IPAddress' => $log['IPAddress']
+    ];
 }
 ?>
