@@ -1,453 +1,212 @@
 <?php
-
 /**
-
  * LiteRise Database Connection and Helper Functions
-
- * This file provides database connectivity and common utility functions
-
  */
 
- 
+if (defined('LITERISE_DB_LOADED')) {
+    return;
+}
+define('LITERISE_DB_LOADED', true);
 
-// Set headers for all API responses
+/**
+ * IMPORTANT:
+ * - On Azure App Service, it's best to set DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD in "Configuration > Application settings"
+ * - .env is optional (useful locally)
+ */
 
+// CORS + JSON headers for API
 header('Content-Type: application/json');
-
 header('Access-Control-Allow-Origin: *');
-
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
- 
-
-// Handle preflight OPTIONS request
-
+// Preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-
     http_response_code(200);
-
     exit();
-
 }
 
- 
-
-// Load environment variables from .env file
-
-function loadEnv($path) {
-
-    if (!file_exists($path)) {
-
-        error_log("Warning: .env file not found at $path");
-
-        return;
-
-    }
-
- 
-
-    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-
-    foreach ($lines as $line) {
-
-        $line = trim($line);
-
- 
-
-        // Skip comments and empty lines
-
-        if (empty($line) || strpos($line, '#') === 0) {
-
-            continue;
-
+// Load .env (optional)
+if (!function_exists('loadEnv')) {
+    function loadEnv(string $path): void {
+        if (!file_exists($path)) {
+            error_log("Warning: .env file not found at $path");
+            return;
         }
 
- 
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) continue;
 
-        // Parse key=value
+            if (strpos($line, '=') !== false) {
+                [$key, $value] = explode('=', $line, 2);
+                $key = trim($key);
+                $value = trim($value);
+                $value = trim($value, "\"'");
 
-        if (strpos($line, '=') !== false) {
-
-            list($key, $value) = explode('=', $line, 2);
-
-            $key = trim($key);
-
-            $value = trim($value);
-
- 
-
-            // Remove quotes if present
-
-            $value = trim($value, '"\'');
-
- 
-
-            $_ENV[$key] = $value;
-
-            putenv("$key=$value");
-
+                $_ENV[$key] = $value;
+                putenv("$key=$value");
+            }
         }
-
     }
-
 }
 
- 
+// Read env var helper (this fixes your fatal error)
+if (!function_exists('envv')) {
+    function envv(string $key, $default = null) {
+        // Priority: getenv -> $_ENV -> $_SERVER -> default
+        $val = getenv($key);
+        if ($val !== false && $val !== '') return $val;
 
-// Load environment variables
+        if (isset($_ENV[$key]) && $_ENV[$key] !== '') return $_ENV[$key];
+        if (isset($_SERVER[$key]) && $_SERVER[$key] !== '') return $_SERVER[$key];
 
-$envFile = __DIR__ . '/../.env';
+        return $default;
+    }
+}
 
-loadEnv($envFile);
+// Load .env from project root (optional)
+$envFile = realpath(__DIR__ . '/../.env');
+if ($envFile) {
+    loadEnv($envFile);
+} else {
+    error_log("Warning: .env file not found at " . __DIR__ . "/../.env");
+}
 
- 
+// DB config (NO insecure local defaults for production)
+$serverName = envv('DB_SERVER', 'literise.database.windows.net'); // e.g. literise.database.windows.net
+$database   = envv('DB_NAME',   'literisedb');
+$username   = envv('DB_USER',   'SAliterise'); // e.g. SAliterise (or admin user)
+$password   = envv('DB_PASSWORD', 'p@ssw0rd'); // MUST set in env vars or Azure App Service config
+$debugMode  = strtolower((string)envv('DEBUG_MODE', 'false')) === 'true';
 
-// Database configuration from environment variables
+// Basic validation (helps catch misconfig early)
+if ($username === '' || $password === '') {
+    http_response_code(500);
+    echo json_encode([
+        "success" => false,
+        "error" => "Server misconfigured",
+        "message" => "Missing DB_USER or DB_PASSWORD. Set them in Azure App Service > Configuration."
+    ]);
+    exit;
+}
 
-$serverName = $_ENV['DB_SERVER'] ?? 'DESKTOP-PEM6F9E\SQLEXPRESS';
-
-$database = $_ENV['DB_NAME'] ?? 'LiteRiseDB';
-
-$username = $_ENV['DB_USER'] ?? 'sa';
-
-$password = $_ENV['DB_PASSWORD'] ?? 'p@ssw0rd';
-
- 
-
-// Global database connection
-
+// Global DB connection
 $conn = null;
 
- 
-
 try {
+    // Azure SQL recommended DSN settings
+    // NOTE: use tcp: + port 1433, Encrypt=yes
+    $dsn = "sqlsrv:Server=tcp:$serverName,1433;Database=$database;Encrypt=yes;TrustServerCertificate=no;LoginTimeout=30;";
 
-    // Connect using SQL Server PDO driver
+    $conn = new PDO($dsn, $username, $password, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
 
-    $conn = new PDO("sqlsrv:Server=$serverName;Database=$database", $username, $password);
-
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
- 
-
-    // Log successful connection in debug mode
-
-    if (($_ENV['DEBUG_MODE'] ?? 'false') === 'true') {
-
+    if ($debugMode) {
         error_log("✅ Database connection successful");
-
     }
 
 } catch (PDOException $e) {
-
     http_response_code(500);
-
-    $errorMessage = ($_ENV['DEBUG_MODE'] ?? 'false') === 'true'
-
-        ? $e->getMessage()
-
-        : "Database connection failed";
-
- 
-
+    $msg = $debugMode ? $e->getMessage() : "Database connection failed";
     echo json_encode([
-
         "success" => false,
-
         "error" => "Database connection failed",
-
-        "message" => $errorMessage
-
+        "message" => $msg
     ]);
-
- 
-
     error_log("❌ Database connection failed: " . $e->getMessage());
-
     exit;
-
 }
 
- 
+/* ---------- helpers ---------- */
 
-/**
-
- * Send successful JSON response
-
- *
-
- * @param mixed $data Data to send
-
- * @param int $statusCode HTTP status code
-
- */
-
-function sendResponse($data, $statusCode = 200) {
-
-    http_response_code($statusCode);
-
- 
-
-    // Ensure data has success flag
-
-    if (is_array($data) && !isset($data['success'])) {
-
-        $data['success'] = true;
-
+if (!function_exists('sendResponse')) {
+    function sendResponse($data, int $statusCode = 200): void {
+        http_response_code($statusCode);
+        if (is_array($data) && !isset($data['success'])) $data['success'] = true;
+        echo json_encode($data);
+        exit;
     }
-
- 
-
-    echo json_encode($data);
-
-    exit;
-
 }
 
- 
+if (!function_exists('sendError')) {
+    function sendError(string $message, int $statusCode = 400, $details = null): void {
+        http_response_code($statusCode);
 
-/**
+        $response = ["success" => false, "error" => $message];
 
- * Send error JSON response
+        $debugMode = strtolower((string)envv('DEBUG_MODE', 'false')) === 'true';
+        if ($details !== null && $debugMode) $response['details'] = $details;
 
- *
-
- * @param string $message Error message
-
- * @param int $statusCode HTTP status code
-
- * @param mixed $details Additional error details (only in debug mode)
-
- */
-
-function sendError($message, $statusCode = 400, $details = null) {
-
-    http_response_code($statusCode);
-
- 
-
-    $response = [
-
-        "success" => false,
-
-        "error" => $message
-
-    ];
-
- 
-
-    // Include details only in debug mode
-
-    if ($details && ($_ENV['DEBUG_MODE'] ?? 'false') === 'true') {
-
-        $response['details'] = $details;
-
+        echo json_encode($response);
+        exit;
     }
-
- 
-
-    echo json_encode($response);
-
-    exit;
-
 }
 
- 
-
-/**
-
- * Validate required fields in request data
-
- *
-
- * @param array $data Request data
-
- * @param array $requiredFields Array of required field names
-
- * @return bool True if all fields present, exits with error if not
-
- */
-
-function validateRequired($data, $requiredFields) {
-
-    $missing = [];
-
- 
-
-    foreach ($requiredFields as $field) {
-
-        if (!isset($data[$field]) || trim($data[$field]) === '') {
-
-            $missing[] = $field;
-
+if (!function_exists('validateRequired')) {
+    function validateRequired(array $data, array $requiredFields): bool {
+        $missing = [];
+        foreach ($requiredFields as $field) {
+            if (!isset($data[$field]) || trim((string)$data[$field]) === '') {
+                $missing[] = $field;
+            }
         }
-
-    }
-
- 
-
-    if (!empty($missing)) {
-
-        sendError("Missing required fields: " . implode(', ', $missing), 400);
-
-    }
-
- 
-
-    return true;
-
-}
-
- 
-
-/**
-
- * Get JSON input from request body
-
- *
-
- * @return array Decoded JSON data
-
- */
-
-function getJsonInput() {
-
-    $input = file_get_contents("php://input");
-
-    $data = json_decode($input, true);
-
- 
-
-    if (json_last_error() !== JSON_ERROR_NONE) {
-
-        sendError("Invalid JSON input: " . json_last_error_msg(), 400);
-
-    }
-
- 
-
-    return $data ?? [];
-
-}
-
- 
-
-/**
-
- * Sanitize string input
-
- *
-
- * @param string $input Input string
-
- * @return string Sanitized string
-
- */
-
-function sanitizeInput($input) {
-
-    return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
-
-}
-
- 
-
-/**
-
- * Validate email format
-
- *
-
- * @param string $email Email address
-
- * @return bool True if valid
-
- */
-
-function isValidEmail($email) {
-
-    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
-
-}
-
- 
-
-/**
-
- * Log activity to ActivityLog table
-
- *
-
- * @param int $studentID Student ID
-
- * @param string $activityType Type of activity
-
- * @param string $activityDetails Details of activity
-
- */
-
-function logActivity($studentID, $activityType, $activityDetails = '') {
-
-    global $conn;
-
- 
-
-    try {
-
-        $stmt = $conn->prepare(
-
-            "INSERT INTO ActivityLog (StudentID, ActivityType, ActivityDetails)
-
-             VALUES (?, ?, ?)"
-
-        );
-
-        $stmt->execute([$studentID, $activityType, $activityDetails]);
-
-    } catch (Exception $e) {
-
-        // Don't fail the request if logging fails
-
-        error_log("Failed to log activity: " . $e->getMessage());
-
-    }
-
-}
-
- 
-
-/**
-
- * Check if database connection is alive
-
- *
-
- * @return bool True if connected
-
- */
-
-function isDatabaseConnected() {
-
-    global $conn;
-
- 
-
-    try {
-
-        $conn->query("SELECT 1");
-
+        if (!empty($missing)) {
+            sendError("Missing required fields: " . implode(', ', $missing), 400);
+        }
         return true;
-
-    } catch (Exception $e) {
-
-        return false;
-
     }
-
 }
 
-?>
+if (!function_exists('getJsonInput')) {
+    function getJsonInput(): array {
+        $input = file_get_contents("php://input");
+        $data = json_decode($input, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            sendError("Invalid JSON input: " . json_last_error_msg(), 400);
+        }
+        return $data ?? [];
+    }
+}
+
+if (!function_exists('sanitizeInput')) {
+    function sanitizeInput(string $input): string {
+        return htmlspecialchars(trim($input), ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('isValidEmail')) {
+    function isValidEmail(string $email): bool {
+        return filter_var($email, FILTER_VALIDATE_EMAIL) !== false;
+    }
+}
+
+if (!function_exists('logActivity')) {
+    function logActivity(int $studentID, string $activityType, string $activityDetails = ''): void {
+        global $conn;
+        try {
+            $stmt = $conn->prepare(
+                "INSERT INTO ActivityLog (StudentID, ActivityType, ActivityDetails) VALUES (?, ?, ?)"
+            );
+            $stmt->execute([$studentID, $activityType, $activityDetails]);
+        } catch (Exception $e) {
+            error_log("Failed to log activity: " . $e->getMessage());
+        }
+    }
+}
+
+if (!function_exists('isDatabaseConnected')) {
+    function isDatabaseConnected(): bool {
+        global $conn;
+        try {
+            $conn->query("SELECT 1");
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+}

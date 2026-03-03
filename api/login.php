@@ -1,5 +1,6 @@
 <?php
 
+
 /**
 
  * LiteRise Student Login API
@@ -148,7 +149,7 @@ try {
 
         $debugInfo = null;
 
-        if (($_ENV['DEBUG_MODE'] ?? 'false') === 'true') {
+        if ((($_ENV['DEBUG_MODE'] ?? getenv('DEBUG_MODE')) ?? 'false') === 'true') {
 
             $debugInfo = [
 
@@ -211,8 +212,6 @@ try {
         'LongestStreak' => (int)$student['LongestStreak'],
 
         'LastLogin' => $student['LastLogin'] ?? null,
-
-        'Nickname' => $student['Nickname'] ?? null,
 
         'PreAssessmentCompleted' => isset($student['PreAssessmentCompleted']) ? (bool)$student['PreAssessmentCompleted'] : false,
 

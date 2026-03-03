@@ -125,7 +125,7 @@ try {
     ];
 
     // In debug mode, include OTP in response (REMOVE IN PRODUCTION!)
-    if (($_ENV['DEBUG_MODE'] ?? 'false') === 'true') {
+    if ((($_ENV['DEBUG_MODE'] ?? getenv('DEBUG_MODE')) ?? 'false') === 'true') {
         $response['debug_otp'] = $otpCode;
     }
 

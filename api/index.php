@@ -1,8 +1,8 @@
 <?php
-$server = $_ENV['DB_SERVER'] ?? 'DESKTOP-PEM6F9E\SQLEXPRESS';
-$db     = $_ENV['DB_NAME'] ?? 'LiteRiseDB';
-$user   = $_ENV['DB_USER'] ?? 'sa';
-$pass   = $_ENV['DB_PASSWORD'] ?? 'p@ssw0rd';
+$server = ($_ENV['DB_SERVER'] ?? getenv('DB_SERVER')) ?? 'DESKTOP-PEM6F9E\SQLEXPRESS';
+$db     = ($_ENV['DB_NAME'] ?? getenv('DB_NAME')) ?? 'LiteRiseDB';
+$user   = ($_ENV['DB_USER'] ?? getenv('DB_USER')) ?? 'sa';
+$pass   = ($_ENV['DB_PASSWORD'] ?? getenv('DB_PASSWORD')) ?? 'p@ssw0rd';
 
 $dsn = "sqlsrv:Server=$server;Database=$db";
 

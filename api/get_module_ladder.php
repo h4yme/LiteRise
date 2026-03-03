@@ -42,14 +42,11 @@ try {
     $stmt->execute([$studentId, $moduleId]);
     $nodes = $stmt->fetchAll();
     
-    // Get visible supplemental nodes for this module's nodes
+    // Get visible supplemental nodes
     $stmt = $conn->prepare("
-        SELECT SN.SupplementalNodeID, SN.NodeType, SN.AfterNodeID, SN.Title,
-               SN.ContentJSON, SN.SkillCategory, SN.EstimatedDuration, SN.XPReward, SN.IsVisible
-        FROM SupplementalNodes SN
-        WHERE SN.AfterNodeID IN (SELECT NodeID FROM Nodes WHERE ModuleID = ?)
-          AND SN.IsVisible = 1
-          AND (SN.IsActive IS NULL OR SN.IsActive = 1)
+        SELECT * FROM SupplementalNodes 
+        WHERE AfterNodeID IN (SELECT NodeID FROM Nodes WHERE ModuleID = ?)
+        AND IsVisible = 1
     ");
     $stmt->execute([$moduleId]);
     $supplementalNodes = $stmt->fetchAll();
