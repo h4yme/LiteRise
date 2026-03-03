@@ -1,44 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp">
+    android:orientation="vertical">
 
-    <!-- Slide Image -->
-    <ImageView
-        android:id="@+id/ivSlideImage"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        android:layout_marginBottom="40dp"
-        android:contentDescription="Onboarding illustration"
-        android:scaleType="fitCenter"
-        android:src="@drawable/onboarding_slide_1" />
-
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tvSlideTitle"
+    <!-- Top Colored Section with Lottie Animation -->
+    <FrameLayout
+        android:id="@+id/topSection"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/visby_bold"
-        android:gravity="center"
-        android:text="Discover Stories from Islamic History"
-        android:textColor="#2D3436"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
+        android:layout_height="0dp"
+        android:layout_weight="1.1">
 
-    <!-- Description -->
-    <TextView
-        android:id="@+id/tvSlideDescription"
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/lottieAnimation"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_speed="1.0" />
+
+    </FrameLayout>
+
+    <!-- Bottom White Text Section -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/visby_regular"
-        android:gravity="center"
-        android:lineSpacingExtra="4dp"
-        android:text="Listen to beautiful audio stories of Prophets and heroes of Islam – made just for kids!"
-        android:textColor="#636E72"
-        android:textSize="15sp" />
+        android:layout_height="0dp"
+        android:layout_weight="0.9"
+        android:background="@color/white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:paddingTop="32dp"
+        android:paddingBottom="8dp">
+
+        <!-- Slide Title -->
+        <TextView
+            android:id="@+id/tvSlideTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/visby_bold"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:text="Discover Stories from Islamic History"
+            android:textColor="#1A1A2E"
+            android:textSize="22sp"
+            android:layout_marginBottom="14dp" />
+
+        <!-- Slide Description -->
+        <TextView
+            android:id="@+id/tvSlideDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/visby_regular"
+            android:gravity="center"
+            android:lineSpacingExtra="5dp"
+            android:text="Listen to beautiful audio stories of Prophets and heroes of Islam – made just for kids!"
+            android:textColor="#636E72"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
 </LinearLayout>

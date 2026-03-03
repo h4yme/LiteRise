@@ -1,16 +1,17 @@
 package com.example.literise.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
-import com.example.literise.activities.WelcomeOnboardingActivity;
 
 public class OnboardingSlideAdapter extends RecyclerView.Adapter<OnboardingSlideAdapter.SlideViewHolder> {
 
@@ -28,14 +29,22 @@ public class OnboardingSlideAdapter extends RecyclerView.Adapter<OnboardingSlide
             "Earn points, unlock badges, and see your learning journey come to life!"
     };
 
-    private final int[] images = {
-            R.drawable.onboarding_slide_1,  // Placeholder - replace with your vectors
-            R.drawable.onboarding_slide_2,  // Placeholder - replace with your vectors
-            R.drawable.onboarding_slide_3   // Placeholder - replace with your vectors
+    // Lottie raw resource IDs — replace JSONs in res/raw/ with actual LottieFiles animations
+    private final int[] lottieRawRes = {
+            R.raw.onboarding_lottie_1,
+            R.raw.onboarding_lottie_2,
+            R.raw.onboarding_lottie_3
     };
 
-    public OnboardingSlideAdapter(WelcomeOnboardingActivity activity) {
-        // Constructor
+    // Per-slide background colors for the top section
+    private final int[] bgColors = {
+            Color.parseColor("#FFF3E0"),  // Warm orange tint  — Stories
+            Color.parseColor("#F3E5F5"),  // Soft purple tint  — Quiz
+            Color.parseColor("#E8F5E9")   // Soft green tint   — Rewards
+    };
+
+    public OnboardingSlideAdapter(Context context) {
+        // context reserved for future use
     }
 
     @NonNull
@@ -50,7 +59,15 @@ public class OnboardingSlideAdapter extends RecyclerView.Adapter<OnboardingSlide
     public void onBindViewHolder(@NonNull SlideViewHolder holder, int position) {
         holder.title.setText(titles[position]);
         holder.description.setText(descriptions[position]);
-        holder.image.setImageResource(images[position]);
+        holder.topSection.setBackgroundColor(bgColors[position]);
+        holder.lottieView.setAnimation(lottieRawRes[position]);
+        holder.lottieView.playAnimation();
+    }
+
+    @Override
+    public void onViewRecycled(@NonNull SlideViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.lottieView.cancelAnimation();
     }
 
     @Override
@@ -59,15 +76,17 @@ public class OnboardingSlideAdapter extends RecyclerView.Adapter<OnboardingSlide
     }
 
     static class SlideViewHolder extends RecyclerView.ViewHolder {
-        ImageView image;
+        LottieAnimationView lottieView;
         TextView title;
         TextView description;
+        View topSection;
 
         SlideViewHolder(@NonNull View itemView) {
             super(itemView);
-            image = itemView.findViewById(R.id.ivSlideImage);
+            lottieView = itemView.findViewById(R.id.lottieAnimation);
             title = itemView.findViewById(R.id.tvSlideTitle);
             description = itemView.findViewById(R.id.tvSlideDescription);
+            topSection = itemView.findViewById(R.id.topSection);
         }
     }
 }
