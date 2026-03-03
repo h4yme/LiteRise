@@ -18,15 +18,15 @@ public class OnboardingSlideAdapter extends RecyclerView.Adapter<OnboardingSlide
     private static final int SLIDE_COUNT = 3;
 
     private final String[] titles = {
-            "Discover Stories from Islamic History",
-            "Fun Quizzes After Each Story",
-            "Grow with Rewards"
+            "Rise Up with English!",
+            "Learn Through Exciting Games",
+            "Earn Rewards as You Grow"
     };
 
     private final String[] descriptions = {
-            "Listen to beautiful audio stories of Prophets and heroes of Islam – made just for kids!",
-            "Unlock quizzes after listening to test what you've learned – smart and exciting!",
-            "Earn points, unlock badges, and see your learning journey come to life!"
+            "Join Leo on a fun journey to boost your reading, vocabulary, and grammar — made for kids just like you!",
+            "Play Phonics Ninja, Word Explosion, Sentence Scramble and more — every game makes you a stronger reader!",
+            "Collect XP, unlock badges, and keep your streak going — the more you learn, the more you rise!"
     };
 
     // Lottie raw resource IDs — replace JSONs in res/raw/ with actual LottieFiles animations

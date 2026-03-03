@@ -44,7 +44,7 @@
             android:fontFamily="@font/visby_bold"
             android:gravity="center"
             android:lineSpacingExtra="2dp"
-            android:text="Discover Stories from Islamic History"
+            android:text="Rise Up with English!"
             android:textColor="#1A1A2E"
             android:textSize="22sp"
             android:layout_marginBottom="14dp" />
@@ -57,7 +57,7 @@
             android:fontFamily="@font/visby_regular"
             android:gravity="center"
             android:lineSpacingExtra="5dp"
-            android:text="Listen to beautiful audio stories of Prophets and heroes of Islam – made just for kids!"
+            android:text="Join Leo on a fun journey to boost your reading, vocabulary, and grammar — made for kids just like you!"
             android:textColor="#636E72"
             android:textSize="14sp" />
 
