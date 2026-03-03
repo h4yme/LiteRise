@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.literise.R;
-import com.example.literise.activities.games.PhonicsNinjaActivity;
+
 import com.example.literise.activities.games.SynonymSprintActivity;
 import com.example.literise.activities.games.WordExplosionActivity;
 import com.example.literise.adapters.ModuleAdapter;
@@ -213,13 +213,13 @@ public class DashboardActivity extends BaseActivity {
      */
     private void setupGameTestListeners() {
         // Phonics Ninja - ACTIVE
-        btnTestPhonicsNinja.setOnClickListener(v -> {
+       /* btnTestPhonicsNinja.setOnClickListener(v -> {
             Intent intent = new Intent(this, PhonicsNinjaActivity.class);
             intent.putExtra("node_id", 1);
             intent.putExtra("student_id", session.getStudentId());
             intent.putExtra("target_pattern", "CVCC");
             startActivity(intent);
-        });
+        });*/
 
         btnTestSynonymSprint.setOnClickListener(v -> {
             Intent intent = new Intent(this, SynonymSprintActivity.class);

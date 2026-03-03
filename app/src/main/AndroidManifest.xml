@@ -283,9 +283,7 @@
             android:name=".activities.QuizResultActivity"
             android:exported="false"/>
 
-        <activity
-            android:name=".activities.games.PhonicsNinjaActivity"
-            android:exported="false"/>
+
 
         <activity
             android:name=".activities.games.SynonymSprintActivity"

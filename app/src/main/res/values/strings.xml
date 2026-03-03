@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">LiteRise</string>
+    <string name="app_name">LiteRiseWithAPI</string>
     <string name="tagline">Read • Learn • Rise!</string>
     <string name="welcome_back">Welcome Back!</string>
     <string name="login_subtitle">Log in to continue your reading adventure</string>
