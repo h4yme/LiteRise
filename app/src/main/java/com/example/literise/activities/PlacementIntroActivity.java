@@ -1,92 +1,174 @@
 package com.example.literise.activities;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RelativeLayout;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator;
 
 import com.example.literise.R;
-import com.example.literise.views.LeoDialogueView;
 import com.google.android.material.button.MaterialButton;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class PlacementIntroActivity extends AppCompatActivity {
 
-    private RelativeLayout rootLayout;
-    private MaterialButton btnStartPlacement;
-    private LeoDialogueView dialogueView;
+    private static final int STEP_COUNT = 4;
+
+    private ImageView ivLeo;
+    private TextView tvStepTitle;
+    private TextView tvStepDescription;
+    private MaterialButton btnNext;
+    private TextView tvSkip;
+    private View[] dots;
+
+    private ObjectAnimator floatAnimator;
+    private int currentStep = 0;
+
+    private static final String[] TITLES = {
+        "Hi! I'm Leo! \uD83D\uDC4B",
+        "A Quick Reading Check \uD83D\uDCDA",
+        "What to Expect \uD83C\uDFAF",
+        "You're All Set! \uD83C\uDF1F"
+    };
+
+    private static final String[] DESCRIPTIONS = {
+        "I'm your reading buddy here at LiteRise! Together we'll go on an amazing English adventure built just for you.",
+        "I'll ask you 25 fun questions to find your perfect reading level. Don't worry — it's not a real test! Think of it as a reading adventure.",
+        "We'll explore phonics, vocabulary, grammar, reading, and writing! Questions adjust as we go — I'll make sure it's just right for you.",
+        "Take your time, trust yourself, and have fun! I'll be right here cheering you on every single step of the way. Ready to rise?"
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_placement_intro);
 
-        rootLayout = findViewById(R.id.rootLayout);
-        btnStartPlacement = findViewById(R.id.btnStartPlacement);
+        ivLeo            = findViewById(R.id.ivLeo);
+        tvStepTitle      = findViewById(R.id.tvStepTitle);
+        tvStepDescription = findViewById(R.id.tvStepDescription);
+        btnNext          = findViewById(R.id.btnNext);
+        tvSkip           = findViewById(R.id.tvSkip);
 
-        // Start Leo's tutorial dialogue when button is clicked
-        btnStartPlacement.setOnClickListener(v -> showLeoTutorial());
-    }
+        dots = new View[]{
+            findViewById(R.id.dot1),
+            findViewById(R.id.dot2),
+            findViewById(R.id.dot3),
+            findViewById(R.id.dot4)
+        };
 
-    private void showLeoTutorial() {
-        // Create Leo's dialogue messages
-        List<LeoDialogueView.DialogueMessage> messages = new ArrayList<>();
+        startLeoFloat();
+        applyStep(0);
 
-        // Message 1: Introduction
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "Hi! I'm Leo, your reading buddy! 👋\n\nI'm so excited to start this reading adventure with you!"
-        ));
-
-        // Message 2: Purpose of placement test
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "Before we start, I need to know your reading level.\n\nThis helps me find the PERFECT stories just for you! 📚"
-        ));
-
-        // Message 3: What is placement test
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "The Placement Test is like a fun game!\n\nI'll ask you questions about:\n• Listening to stories 🎧\n• Reading words 📖\n• Understanding what you read 🤔"
-        ));
-
-        // Message 4: How it works
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "Here's how it works:\n\n1️⃣ I'll show you 25 questions\n2️⃣ Questions get easier or harder based on your answers\n3️⃣ Take your time - no rushing!\n4️⃣ You can skip if you're not sure\n\nIt takes about 10-15 minutes!"
-        ));
-
-        // Message 5: Question types
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "You'll see 5 types of questions:\n\n🔤 Phonics - Letter sounds\n📚 Vocabulary - Word meanings\n✏️ Grammar - Sentence structure\n📖 Reading - Story comprehension\n✍️ Writing - Creating sentences\n\nAll questions are FUN!"
-        ));
-
-        // Message 6: Encouragement
-        messages.add(new LeoDialogueView.DialogueMessage(
-                "Remember:\n\n✅ Do your BEST\n✅ Don't rush\n✅ It's okay to make mistakes\n✅ I'm here to help!\n\nLet's find your perfect reading level! 🌟"
-        ));
-
-        // Create and show dialogue view
-        dialogueView = new LeoDialogueView(this);
-        dialogueView.setDialogueMessages(messages);
-        dialogueView.setDialogueCompleteListener(() -> {
-            // When Leo finishes talking, start the placement test
-            startPlacementTest();
+        btnNext.setOnClickListener(v -> {
+            if (currentStep < STEP_COUNT - 1) {
+                currentStep++;
+                animateToNextStep();
+            } else {
+                startPlacementTest();
+            }
         });
-        dialogueView.show((ViewGroup) rootLayout);
+
+        tvSkip.setOnClickListener(v -> startPlacementTest());
     }
+
+    // ─── Leo floating animation ───────────────────────────────────────────────
+
+    private void startLeoFloat() {
+        float density = getResources().getDisplayMetrics().density;
+        floatAnimator = ObjectAnimator.ofFloat(ivLeo, "translationY",
+                -12 * density, 12 * density);
+        floatAnimator.setDuration(1800);
+        floatAnimator.setRepeatCount(ValueAnimator.INFINITE);
+        floatAnimator.setRepeatMode(ValueAnimator.REVERSE);
+        floatAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+        floatAnimator.start();
+    }
+
+    // ─── Step transitions ─────────────────────────────────────────────────────
+
+    private void applyStep(int step) {
+        tvStepTitle.setText(TITLES[step]);
+        tvStepDescription.setText(DESCRIPTIONS[step]);
+        btnNext.setText(step == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
+        updateDots(step);
+    }
+
+    private void animateToNextStep() {
+        // Fade out title + description
+        tvStepTitle.animate().alpha(0f).setDuration(140).withEndAction(() -> {
+            tvStepTitle.setText(TITLES[currentStep]);
+            tvStepTitle.animate().alpha(1f).setDuration(200).start();
+        }).start();
+
+        tvStepDescription.animate().alpha(0f).setDuration(140).withEndAction(() -> {
+            tvStepDescription.setText(DESCRIPTIONS[currentStep]);
+            tvStepDescription.animate().alpha(1f).setDuration(200).start();
+        }).start();
+
+        // Pop Leo slightly
+        ivLeo.animate()
+            .scaleX(0.88f).scaleY(0.88f)
+            .setDuration(130)
+            .withEndAction(() ->
+                ivLeo.animate()
+                    .scaleX(1f).scaleY(1f)
+                    .setDuration(220)
+                    .setInterpolator(new FastOutSlowInInterpolator())
+                    .start()
+            ).start();
+
+        btnNext.setText(currentStep == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
+        updateDots(currentStep);
+    }
+
+    // ─── Dot indicators ───────────────────────────────────────────────────────
+
+    private void updateDots(int activeStep) {
+        float density = getResources().getDisplayMetrics().density;
+        for (int i = 0; i < dots.length; i++) {
+            boolean isActive = (i == activeStep);
+            int targetPx = (int) ((isActive ? 32 : 10) * density);
+            dots[i].setBackgroundResource(isActive
+                ? R.drawable.indicator_dot_active
+                : R.drawable.indicator_dot_placement_inactive);
+
+            final View dot = dots[i];
+            ValueAnimator anim = ValueAnimator.ofInt(dot.getLayoutParams().width, targetPx);
+            anim.setDuration(250);
+            anim.addUpdateListener(va -> {
+                ViewGroup.LayoutParams params = dot.getLayoutParams();
+                params.width = (int) va.getAnimatedValue();
+                dot.setLayoutParams(params);
+            });
+            anim.start();
+        }
+    }
+
+    // ─── Navigation ──────────────────────────────────────────────────────────
 
     private void startPlacementTest() {
-        // Navigate to Placement Test Activity
         Intent intent = new Intent(PlacementIntroActivity.this, PlacementTestActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
         finish();
     }
 
+    // ─── Lifecycle ───────────────────────────────────────────────────────────
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (floatAnimator != null) floatAnimator.cancel();
+    }
+
     @Override
     public void onBackPressed() {
-        // Don't allow back during placement intro
-        // User must complete placement test
+        // Block back — user must complete or skip walkthrough
     }
 }
