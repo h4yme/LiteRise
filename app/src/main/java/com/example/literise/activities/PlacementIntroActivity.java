@@ -44,6 +44,14 @@ public class PlacementIntroActivity extends AppCompatActivity {
         "Take your time, trust yourself, and have fun! I'll be right here cheering you on every single step of the way. Ready to rise?"
     };
 
+    // One drawable per step — swap out leo_happy once you have real expression PNGs
+    private static final int[] LEO_EXPRESSIONS = {
+        R.drawable.leo_wave,     // Step 1: Hi! I'm Leo!
+        R.drawable.leo_thinking, // Step 2: A Quick Reading Check
+        R.drawable.leo_explain,  // Step 3: What to Expect
+        R.drawable.leo_cheer     // Step 4: You're All Set!
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +101,7 @@ public class PlacementIntroActivity extends AppCompatActivity {
     // ─── Step transitions ─────────────────────────────────────────────────────
 
     private void applyStep(int step) {
+        ivLeo.setImageResource(LEO_EXPRESSIONS[step]);
         tvStepTitle.setText(TITLES[step]);
         tvStepDescription.setText(DESCRIPTIONS[step]);
         btnNext.setText(step == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
@@ -111,17 +120,18 @@ public class PlacementIntroActivity extends AppCompatActivity {
             tvStepDescription.animate().alpha(1f).setDuration(200).start();
         }).start();
 
-        // Pop Leo slightly
+        // Pop Leo slightly and swap expression mid-animation
         ivLeo.animate()
             .scaleX(0.88f).scaleY(0.88f)
             .setDuration(130)
-            .withEndAction(() ->
+            .withEndAction(() -> {
+                ivLeo.setImageResource(LEO_EXPRESSIONS[currentStep]);
                 ivLeo.animate()
                     .scaleX(1f).scaleY(1f)
                     .setDuration(220)
                     .setInterpolator(new FastOutSlowInInterpolator())
-                    .start()
-            ).start();
+                    .start();
+            }).start();
 
         btnNext.setText(currentStep == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
         updateDots(currentStep);
