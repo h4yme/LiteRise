@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -18,10 +20,6 @@ import com.example.literise.models.LearningModule;
 
 import java.util.List;
 
-/**
- * Adapter for displaying learning modules in dashboard
- * Shows modules ordered by priority based on placement test results
- */
 public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleViewHolder> {
 
     private Context context;
@@ -49,30 +47,45 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
     public void onBindViewHolder(@NonNull ModuleViewHolder holder, int position) {
         LearningModule module = modules.get(position);
 
-        // Set gradient background
-        setGradientBackground(holder.gradientBackground, module.getGradientStart(), module.getGradientEnd());
+        // ── Gradient background ────────────────────────────────────────────
+        setGradientBackground(holder.gradientBackground,
+                module.getGradientStart(), module.getGradientEnd());
 
-        // Set module title
+        // ── Module title & subtitle ────────────────────────────────────────
         holder.tvModuleTitle.setText(module.getTitle());
+        holder.tvSubtitle.setText(module.getSubtitle());
 
-        // Set level indicator
-        if (module.isLocked()) {
-            holder.tvLevel.setText("Coming Soon");
-            holder.ivIcon.setImageResource(R.drawable.ic_lock);
-        } else {
-            holder.tvLevel.setText("Level " + module.getLevel());
-            holder.ivIcon.setImageResource(R.drawable.ic_play);
-        }
+        // ── Domain badge (icon + label) ────────────────────────────────────
+        holder.tvDomain.setText(module.getDomain());
+        holder.ivDomainIcon.setImageResource(getDomainIcon(module.getDomain()));
 
-        // Click listener
+        // ── Priority badge ─────────────────────────────────────────────────
+        holder.tvPriority.setText("#" + module.getPriorityOrder());
+
+        // ── Play / lock icon ───────────────────────────────────────────────
+        holder.ivIcon.setImageResource(module.isLocked()
+                ? R.drawable.ic_lock : R.drawable.ic_play);
+
+        // ── Progress bar & percentage ──────────────────────────────────────
+        int scorePct = (int) (module.getPerformanceScore() * 100);
+        holder.progressBar.setProgress(scorePct);
+        holder.tvProgress.setText(scorePct + "%");
+
+        // ── Lesson count ───────────────────────────────────────────────────
+        holder.tvLessonCount.setText(getLessonCount(module.getDomain()) + " Lessons");
+
+        // ── Locked overlay ─────────────────────────────────────────────────
+        holder.lockOverlay.setVisibility(module.isLocked() ? View.VISIBLE : View.GONE);
+
+        // ── Click ─────────────────────────────────────────────────────────
         holder.itemView.setOnClickListener(v -> {
             if (listener != null && !module.isLocked()) {
                 listener.onModuleClick(module);
             }
         });
 
-        // Dim locked modules
-        holder.itemView.setAlpha(module.isLocked() ? 0.6f : 1.0f);
+        // Dim locked cards slightly
+        holder.itemView.setAlpha(module.isLocked() ? 0.75f : 1.0f);
     }
 
     @Override
@@ -80,35 +93,72 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
         return modules.size();
     }
 
-    /**
-     * Set gradient background programmatically
-     */
+    // ── Helpers ────────────────────────────────────────────────────────────
+
     private void setGradientBackground(FrameLayout layout, String colorStart, String colorEnd) {
         GradientDrawable gradient = new GradientDrawable(
-                GradientDrawable.Orientation.TL_BR, // Top-left to bottom-right
-                new int[] {
-                        Color.parseColor(colorStart),
-                        Color.parseColor(colorEnd)
-                }
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{Color.parseColor(colorStart), Color.parseColor(colorEnd)}
         );
-        gradient.setCornerRadius(20 * context.getResources().getDisplayMetrics().density);
+        float radius = 20 * context.getResources().getDisplayMetrics().density;
+        gradient.setCornerRadius(radius);
         layout.setBackground(gradient);
     }
 
+    private int getDomainIcon(String domain) {
+        if (domain == null) return R.drawable.ic_book;
+        switch (domain) {
+            case "Phonics":       return R.drawable.ic_mic;
+            case "Vocabulary":    return R.drawable.ic_book_reading;
+            case "Grammar":       return R.drawable.ic_edit;
+            case "Comprehension": return R.drawable.ic_lightbulb;
+            case "Writing":       return R.drawable.ic_edit;
+            default:              return R.drawable.ic_book;
+        }
+    }
+
+    private int getLessonCount(String domain) {
+        if (domain == null) return 10;
+        switch (domain) {
+            case "Phonics":       return 12;
+            case "Vocabulary":    return 10;
+            case "Grammar":       return 8;
+            case "Comprehension": return 10;
+            case "Writing":       return 8;
+            default:              return 10;
+        }
+    }
+
+    // ── ViewHolder ─────────────────────────────────────────────────────────
+
     static class ModuleViewHolder extends RecyclerView.ViewHolder {
         FrameLayout gradientBackground;
-        TextView tvLevel;
-        TextView tvModuleTitle;
+        LinearLayout domainBadge;
+        ImageView ivDomainIcon;
+        TextView tvDomain;
+        TextView tvPriority;
         ImageView ivIcon;
-        ImageView ivLandscape;
+        TextView tvModuleTitle;
+        TextView tvSubtitle;
+        ProgressBar progressBar;
+        TextView tvProgress;
+        TextView tvLessonCount;
+        LinearLayout lockOverlay;
 
         public ModuleViewHolder(@NonNull View itemView) {
             super(itemView);
             gradientBackground = itemView.findViewById(R.id.gradientBackground);
-            tvLevel = itemView.findViewById(R.id.tvLevel);
-            tvModuleTitle = itemView.findViewById(R.id.tvModuleTitle);
-            ivIcon = itemView.findViewById(R.id.ivIcon);
-            ivLandscape = itemView.findViewById(R.id.ivLandscape);
+            domainBadge        = itemView.findViewById(R.id.domainBadge);
+            ivDomainIcon       = itemView.findViewById(R.id.ivDomainIcon);
+            tvDomain           = itemView.findViewById(R.id.tvDomain);
+            tvPriority         = itemView.findViewById(R.id.tvPriority);
+            ivIcon             = itemView.findViewById(R.id.ivIcon);
+            tvModuleTitle      = itemView.findViewById(R.id.tvModuleTitle);
+            tvSubtitle         = itemView.findViewById(R.id.tvSubtitle);
+            progressBar        = itemView.findViewById(R.id.progressBar);
+            tvProgress         = itemView.findViewById(R.id.tvProgress);
+            tvLessonCount      = itemView.findViewById(R.id.tvLessonCount);
+            lockOverlay        = itemView.findViewById(R.id.lockOverlay);
         }
     }
 }

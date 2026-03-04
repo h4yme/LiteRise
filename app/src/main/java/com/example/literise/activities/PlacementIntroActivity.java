@@ -3,6 +3,7 @@ package com.example.literise.activities;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,6 +29,7 @@ public class PlacementIntroActivity extends AppCompatActivity {
     private View[] dots;
 
     private ObjectAnimator floatAnimator;
+    private MediaPlayer voicePlayer;
     private int currentStep = 0;
 
     private static final String[] TITLES = {
@@ -44,12 +46,19 @@ public class PlacementIntroActivity extends AppCompatActivity {
             "Take your time, trust yourself, and have fun! I'll be right here cheering you on every single step of the way. Ready to rise?"
     };
 
-    // One drawable per step — swap out leo_happy once you have real expression PNGs
     private static final int[] LEO_EXPRESSIONS = {
-            R.drawable.leo_wave,     // Step 1: Hi! I'm Leo!
-            R.drawable.leo_thinking, // Step 2: A Quick Reading Check
-            R.drawable.leo_explain,  // Step 3: What to Expect
-            R.drawable.leo_cheer     // Step 4: You're All Set!
+            R.drawable.leo_wave,      // Step 1
+            R.drawable.leo_thinking,  // Step 2
+            R.drawable.leo_explain,   // Step 3
+            R.drawable.leo_cheer      // Step 4
+    };
+
+    // One MP3 per step — place all 4 in res/raw/
+    private static final int[] STEP_VOICEOVERS = {
+            R.raw.step1,      // Step 1 ✅ already have
+            R.raw.step2,  // Step 2 ✅ already have
+            R.raw.step3,       // Step 3 — add your mp3
+            R.raw.step4         // Step 4 — add your mp3
     };
 
     @Override
@@ -57,11 +66,11 @@ public class PlacementIntroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_placement_intro);
 
-        ivLeo            = findViewById(R.id.ivLeo);
-        tvStepTitle      = findViewById(R.id.tvStepTitle);
+        ivLeo             = findViewById(R.id.ivLeo);
+        tvStepTitle       = findViewById(R.id.tvStepTitle);
         tvStepDescription = findViewById(R.id.tvStepDescription);
-        btnNext          = findViewById(R.id.btnNext);
-        tvSkip           = findViewById(R.id.tvSkip);
+        btnNext           = findViewById(R.id.btnNext);
+        tvSkip            = findViewById(R.id.tvSkip);
 
         dots = new View[]{
                 findViewById(R.id.dot1),
@@ -85,6 +94,29 @@ public class PlacementIntroActivity extends AppCompatActivity {
         tvSkip.setOnClickListener(v -> startPlacementTest());
     }
 
+    // ─── Voiceover ────────────────────────────────────────────────────────────
+
+    private void playStepVoiceover(int step) {
+        stopVoiceover();
+        try {
+            voicePlayer = MediaPlayer.create(this, STEP_VOICEOVERS[step]);
+            if (voicePlayer != null) {
+                voicePlayer.setOnCompletionListener(mp -> stopVoiceover());
+                voicePlayer.start();
+            }
+        } catch (Exception e) {
+            // Missing file or error — silently skip so UI still works
+        }
+    }
+
+    private void stopVoiceover() {
+        if (voicePlayer != null) {
+            if (voicePlayer.isPlaying()) voicePlayer.stop();
+            voicePlayer.release();
+            voicePlayer = null;
+        }
+    }
+
     // ─── Leo floating animation ───────────────────────────────────────────────
 
     private void startLeoFloat() {
@@ -106,10 +138,10 @@ public class PlacementIntroActivity extends AppCompatActivity {
         tvStepDescription.setText(DESCRIPTIONS[step]);
         btnNext.setText(step == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
         updateDots(step);
+        playStepVoiceover(step);  // ← plays voiceover for this step
     }
 
     private void animateToNextStep() {
-        // Fade out title + description
         tvStepTitle.animate().alpha(0f).setDuration(140).withEndAction(() -> {
             tvStepTitle.setText(TITLES[currentStep]);
             tvStepTitle.animate().alpha(1f).setDuration(200).start();
@@ -120,7 +152,6 @@ public class PlacementIntroActivity extends AppCompatActivity {
             tvStepDescription.animate().alpha(1f).setDuration(200).start();
         }).start();
 
-        // Pop Leo slightly and swap expression mid-animation
         ivLeo.animate()
                 .scaleX(0.88f).scaleY(0.88f)
                 .setDuration(130)
@@ -135,6 +166,7 @@ public class PlacementIntroActivity extends AppCompatActivity {
 
         btnNext.setText(currentStep == STEP_COUNT - 1 ? "Start Test! \uD83D\uDE80" : "Next \u2192");
         updateDots(currentStep);
+        playStepVoiceover(currentStep);  // ← stops old, plays new
     }
 
     // ─── Dot indicators ───────────────────────────────────────────────────────
@@ -163,6 +195,7 @@ public class PlacementIntroActivity extends AppCompatActivity {
     // ─── Navigation ──────────────────────────────────────────────────────────
 
     private void startPlacementTest() {
+        stopVoiceover();
         Intent intent = new Intent(PlacementIntroActivity.this, PlacementTestActivity.class);
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
@@ -172,9 +205,22 @@ public class PlacementIntroActivity extends AppCompatActivity {
     // ─── Lifecycle ───────────────────────────────────────────────────────────
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (voicePlayer != null && voicePlayer.isPlaying()) voicePlayer.pause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (voicePlayer != null && !voicePlayer.isPlaying()) voicePlayer.start();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (floatAnimator != null) floatAnimator.cancel();
+        stopVoiceover();
     }
 
     @Override

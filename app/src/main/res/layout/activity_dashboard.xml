@@ -1,392 +1,442 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_dashboard">
+    android:background="#F0EFFE">
 
-    <!-- Main Content ScrollView -->
+    <!-- Main Content — scrolls behind floating nav -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
+        android:clipToPadding="false"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Outer column — NO horizontal padding (header must be full-width) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:paddingBottom="20dp">
+            android:orientation="vertical">
 
-            <!-- Header Section with Settings -->
+            <!-- ═══════════════════════════════════════════════════════════
+                 HERO HEADER  — purple gradient, full width
+                 ═══════════════════════════════════════════════════════════ -->
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_header_purple"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="44dp">
+
+                <!-- Lottie sparkle decoration (top-right corner) -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieHeaderSparkle"
+                    android:layout_width="110dp"
+                    android:layout_height="110dp"
+                    android:layout_gravity="end|top"
+                    android:layout_marginEnd="30dp"
+                    app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                    app:lottie_loop="true"
+                    app:lottie_autoPlay="true"
+                    android:alpha="0.4"/>
+
+                <!-- Header content column -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- TOP ROW: greeting + settings icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
+
+                        <!-- Greeting text -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvWelcome"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Hello, Student!"
+                                android:textSize="26sp"
+                                android:textStyle="bold"
+                                android:textColor="#FFFFFF"
+                                android:fontFamily="@font/visby_bold"/>
+
+                            <TextView
+                                android:id="@+id/tvMotivation"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Ready to learn today?"
+                                android:textSize="13sp"
+                                android:textColor="#CCFFFFFF"
+                                android:fontFamily="@font/visby_regular"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <!-- Settings icon -->
+                        <ImageView
+                            android:id="@+id/ivSettings"
+                            android:layout_width="38dp"
+                            android:layout_height="38dp"
+                            android:src="@drawable/ic_settings"
+                            android:background="@drawable/icon_circle_white"
+                            android:padding="9dp"
+                            app:tint="#FFFFFF"
+                            android:contentDescription="Settings"/>
+                    </LinearLayout>
+
+                    <!-- MIDDLE ROW: stats pills + Leo mascot -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="20dp">
+
+                        <!-- Stats pills column -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <!-- Row 1: XP + Streak -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <!-- XP pill -->
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:background="@drawable/bg_semi_white_pill"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingTop="7dp"
+                                    android:paddingBottom="7dp"
+                                    android:layout_marginEnd="8dp">
+
+                                    <ImageView
+                                        android:layout_width="16dp"
+                                        android:layout_height="16dp"
+                                        android:src="@drawable/ic_star"
+                                        android:layout_marginEnd="5dp"
+                                        app:tint="#FFD700"
+                                        android:contentDescription="XP"/>
+
+                                    <TextView
+                                        android:id="@+id/tvHeaderXP"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0 XP"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#FFFFFF"
+                                        android:fontFamily="@font/visby_bold"/>
+                                </LinearLayout>
+
+                                <!-- Streak pill -->
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:gravity="center_vertical"
+                                    android:background="@drawable/bg_semi_white_pill"
+                                    android:paddingStart="12dp"
+                                    android:paddingEnd="12dp"
+                                    android:paddingTop="7dp"
+                                    android:paddingBottom="7dp">
+
+                                    <ImageView
+                                        android:layout_width="15dp"
+                                        android:layout_height="15dp"
+                                        android:src="@drawable/ic_fire"
+                                        android:layout_marginEnd="5dp"
+                                        app:tint="#FFA07A"
+                                        android:contentDescription="Streak"/>
+
+                                    <TextView
+                                        android:id="@+id/tvStreak"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0 Days"
+                                        android:textSize="12sp"
+                                        android:textStyle="bold"
+                                        android:textColor="#FFFFFF"
+                                        android:fontFamily="@font/visby_bold"/>
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <!-- Row 2: Badges pill -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:background="@drawable/bg_semi_white_pill"
+                                android:paddingStart="12dp"
+                                android:paddingEnd="12dp"
+                                android:paddingTop="7dp"
+                                android:paddingBottom="7dp"
+                                android:layout_marginTop="8dp">
+
+                                <ImageView
+                                    android:layout_width="15dp"
+                                    android:layout_height="15dp"
+                                    android:src="@drawable/ic_badge"
+                                    android:layout_marginEnd="5dp"
+                                    app:tint="#93C5FD"
+                                    android:contentDescription="Badges"/>
+
+                                <TextView
+                                    android:id="@+id/tvBadges"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="0 Badges"
+                                    android:textSize="12sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#FFFFFF"
+                                    android:fontFamily="@font/visby_bold"/>
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <!-- Leo mascot (right side of header) -->
+                        <ImageView
+                            android:id="@+id/ivLeoMascot"
+                            android:layout_width="90dp"
+                            android:layout_height="100dp"
+                            android:src="@drawable/leo_placement_test"
+                            android:scaleType="fitEnd"
+                            android:contentDescription="Leo Mascot"/>
+                    </LinearLayout>
+
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- ═══════════════════════════════════════════════════════════
+                 WHITE CONTENT SECTION — rounded top, overlaps header 24dp
+                 ═══════════════════════════════════════════════════════════ -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="8dp">
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_top_rounded"
+                android:layout_marginTop="-24dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="20dp">
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <!-- Greeting -->
-                    <TextView
-                        android:id="@+id/tvWelcome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Hello, Student!"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
-                        android:textColor="#7C3AED"
-                        android:fontFamily="@font/visby_bold"/>
-
-                    <!-- Subtitle -->
-                    <TextView
-                        android:id="@+id/tvMotivation"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Ready to learn something new today?"
-                        android:textSize="14sp"
-                        android:textColor="#636E72"
-                        android:fontFamily="@font/visby_regular"
-                        android:layout_marginTop="4dp"/>
-                </LinearLayout>
-
-                <!-- Settings Icon -->
-                <ImageView
-                    android:id="@+id/ivSettings"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:src="@drawable/ic_settings"
-                    android:background="@drawable/bg_rounded_white"
-                    android:padding="10dp"
-                    app:tint="#636E72"
-                    android:contentDescription="Settings"/>
-            </LinearLayout>
-
-            <!-- Gamification Stats Card -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="4dp"
-                app:strokeWidth="0dp">
-
+                <!-- SECTION HEADER: "Your Learning Path" + sparkle Lottie -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:background="@android:color/white"
-                    android:padding="16dp"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
 
-                    <!-- Leo Mascot -->
-                    <ImageView
-                        android:id="@+id/ivLeoMascot"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:src="@drawable/leo_placement_test"
-                        android:scaleType="fitCenter"
-                        android:layout_marginEnd="16dp"
-                        android:contentDescription="Leo Mascot"/>
-
-                    <!-- Stats Grid -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical">
 
-                        <!-- Top Row: XP and Streak -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:layout_marginBottom="8dp">
+                            android:text="Your Learning Path"
+                            android:textSize="19sp"
+                            android:textStyle="bold"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_bold"/>
 
-                            <!-- XP -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:background="@drawable/bg_light_purple"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
-                                android:layout_marginEnd="6dp">
-
-                                <ImageView
-                                    android:layout_width="20dp"
-                                    android:layout_height="20dp"
-                                    android:src="@drawable/ic_star"
-                                    android:layout_marginEnd="6dp"
-                                    app:tint="#FFD700"
-                                    android:contentDescription="XP"/>
-
-                                <TextView
-                                    android:id="@+id/tvHeaderXP"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0 XP"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#2D3436"
-                                    android:fontFamily="@font/poppins_semibold"/>
-                            </LinearLayout>
-
-                            <!-- Streak -->
-                            <LinearLayout
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:orientation="horizontal"
-                                android:gravity="center_vertical"
-                                android:background="@drawable/bg_light_orange"
-                                android:paddingStart="12dp"
-                                android:paddingEnd="12dp"
-                                android:paddingTop="8dp"
-                                android:paddingBottom="8dp"
-                                android:layout_marginStart="6dp">
-
-                                <ImageView
-                                    android:layout_width="18dp"
-                                    android:layout_height="18dp"
-                                    android:src="@drawable/ic_fire"
-                                    android:layout_marginEnd="6dp"
-                                    app:tint="#FF6B35"
-                                    android:contentDescription="Streak"/>
-
-                                <TextView
-                                    android:id="@+id/tvStreak"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:text="0 Day"
-                                    android:textSize="12sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#2D3436"
-                                    android:fontFamily="@font/poppins_semibold"/>
-                            </LinearLayout>
-                        </LinearLayout>
-
-                        <!-- Bottom Row: Badges -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:id="@+id/tvModuleSummary"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:background="@drawable/bg_light_blue"
-                            android:paddingStart="12dp"
-                            android:paddingEnd="12dp"
-                            android:paddingTop="8dp"
-                            android:paddingBottom="8dp">
-
-                            <ImageView
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:src="@drawable/ic_star"
-                                android:layout_marginEnd="6dp"
-                                app:tint="#60A5FA"
-                                android:contentDescription="Badges"/>
-
-                            <TextView
-                                android:id="@+id/tvBadges"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="0 Badges Earned"
-                                android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:textColor="#2D3436"
-                                android:fontFamily="@font/poppins_semibold"/>
-                        </LinearLayout>
+                            android:text="Modules prioritized by your needs"
+                            android:textSize="12sp"
+                            android:textColor="#6B7280"
+                            android:fontFamily="@font/visby_regular"
+                            android:layout_marginTop="2dp"/>
                     </LinearLayout>
+
+                    <!-- Sparkle Lottie on the section header -->
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieStatsSparkle"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                        app:lottie_loop="true"
+                        app:lottie_autoPlay="true"
+                        android:alpha="0.8"/>
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <!-- Your Learning Path Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Your Learning Path"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/poppins_semibold"
-                android:layout_marginBottom="4dp"/>
+                <!-- Modules RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvModules"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginTop="8dp"/>
 
-            <TextView
-                android:id="@+id/tvModuleSummary"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Modules prioritized by your needs"
-                android:textSize="13sp"
-                android:textColor="#636E72"
-                android:fontFamily="@font/visby_regular"
-                android:layout_marginBottom="16dp"/>
+                <!-- ─── Game Testing Section ─────────────────────────────── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎮 Game Testing"
+                    android:textSize="19sp"
+                    android:textStyle="bold"
+                    android:textColor="#2D3436"
+                    android:fontFamily="@font/visby_bold"
+                    android:layout_marginTop="28dp"
+                    android:layout_marginBottom="4dp"/>
 
-            <!-- Modules RecyclerView -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rvModules"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clipToPadding="false"
-                android:nestedScrollingEnabled="false"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quick access to test all games"
+                    android:textSize="12sp"
+                    android:textColor="#6B7280"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginBottom="14dp"/>
 
-            <!-- Game Testing Section -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎮 Game Testing"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#2D3436"
-                android:fontFamily="@font/poppins_semibold"
-                android:layout_marginTop="24dp"
-                android:layout_marginBottom="4dp"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quick access to test all games"
-                android:textSize="13sp"
-                android:textColor="#636E72"
-                android:fontFamily="@font/visby_regular"
-                android:layout_marginBottom="16dp"/>
-
-            <!-- Game Buttons Grid -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:background="@drawable/bg_rounded_white"
-                android:padding="16dp">
-
-                <!-- Row 1: Phonics Ninja & Synonym Sprint -->
+                <!-- Game buttons grid -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_rounded_white"
+                    android:padding="14dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestPhonicsNinja"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="🥷 Phonics Ninja"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#FF6B6B"
-                        app:cornerRadius="12dp"
-                        android:layout_marginEnd="8dp"/>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestSynonymSprint"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="🏃 Synonym Sprint"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#4ECDC4"
-                        app:cornerRadius="12dp"
-                        android:layout_marginStart="8dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestPhonicsNinja"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="🥷 Phonics Ninja"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#FF6B6B"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="6dp"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestSynonymSprint"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="🏃 Synonym Sprint"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#4ECDC4"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="10dp">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestWordExplosion"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="💥 Word Explosion"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#A770EF"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="6dp"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestSentenceChef"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="👨‍🍳 Sentence Chef"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#FFD93D"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="6dp"
+                            android:enabled="false"
+                            android:alpha="0.5"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestWordHunt"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="🔍 Word Hunt"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#667EEA"
+                            app:cornerRadius="12dp"
+                            android:layout_marginEnd="6dp"/>
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnTestSentenceScramble"
+                            android:layout_width="0dp"
+                            android:layout_height="56dp"
+                            android:layout_weight="1"
+                            android:text="🔀 Scramble"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:backgroundTint="#44A08D"
+                            app:cornerRadius="12dp"
+                            android:layout_marginStart="6dp"/>
+                    </LinearLayout>
+
                 </LinearLayout>
 
-                <!-- Row 2: Word Explosion & Sentence Chef -->
-                <LinearLayout
+                <!-- Bottom spacing for floating nav -->
+                <View
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginBottom="12dp">
+                    android:layout_height="100dp"/>
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestWordExplosion"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="💥 Word Explosion"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#A770EF"
-                        app:cornerRadius="12dp"
-                        android:layout_marginEnd="8dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestSentenceChef"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="👨‍🍳 Sentence Chef"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#FFD93D"
-                        app:cornerRadius="12dp"
-                        android:layout_marginStart="8dp"
-                        android:enabled="false"
-                        android:alpha="0.5"/>
-                </LinearLayout>
-
-                <!-- Row 3: Word Hunt & Sentence Scramble (Existing) -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestWordHunt"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="🔍 Word Hunt"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#667EEA"
-                        app:cornerRadius="12dp"
-                        android:layout_marginEnd="8dp"/>
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btnTestSentenceScramble"
-                        android:layout_width="0dp"
-                        android:layout_height="60dp"
-                        android:layout_weight="1"
-                        android:text="🔀 Sentence Scramble"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:fontFamily="@font/visby_bold"
-                        android:backgroundTint="#44A08D"
-                        app:cornerRadius="12dp"
-                        android:layout_marginStart="8dp"/>
-                </LinearLayout>
             </LinearLayout>
-
-            <!-- Bottom Spacing for Bottom Nav -->
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="80dp"/>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation -->
+    <!-- Floating Bottom Navigation -->
     <include
         android:id="@+id/customBottomNav"
         layout="@layout/custom_bottom_navigation"
