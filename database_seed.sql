@@ -14,6 +14,8 @@ IF OBJECT_ID('QuizQuestions','U') IS NOT NULL
     DELETE FROM QuizQuestions WHERE NodeID BETWEEN 101 AND 513;
 IF OBJECT_ID('LessonGameContent','U') IS NOT NULL
     DELETE FROM LessonGameContent WHERE LessonID BETWEEN 101 AND 513;
+IF OBJECT_ID('Lessons','U') IS NOT NULL
+    DELETE FROM Lessons WHERE LessonID BETWEEN 101 AND 513;
 IF OBJECT_ID('Nodes','U') IS NOT NULL
     DELETE FROM Nodes WHERE ModuleID IN (1,2,3,4,5);
 IF OBJECT_ID('Modules','U') IS NOT NULL
@@ -1002,10 +1004,83 @@ INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectA
 (212,'What is the root word of "kindness"?','multiple_choice','["kind","kindly","kindness"]','kind',0.3,'vocabulary',NULL);
 GO
 
+-- ── LESSONS (Lessons table, IDs mirror NodeIDs) ──────────────
+SET IDENTITY_INSERT Lessons ON;
+INSERT INTO Lessons (LessonID, LessonTitle, LessonDescription, LessonContent, RequiredAbility, GradeLevel, LessonType, IsActive) VALUES
+-- Phonics (101-113)
+(101,'Sight Words and CVCC Patterns','Recognize sight words and identify CVCC pattern words.',NULL,0.1,3,'phonics',1),
+(102,'CCVC Patterns: Clusters and Diphthongs','Read CCVC words and recognize diphthong sounds.',NULL,0.1,3,'phonics',1),
+(103,'VCV and VCCV Syllable Patterns','Divide multi-syllable words using VCV and VCCV patterns.',NULL,0.2,3,'phonics',1),
+(104,'Q2 Sight Words in Community Sentences','Recognize and use sight words in community-themed sentences.',NULL,0.3,3,'phonics',1),
+(105,'VCV Pattern: The Open Syllable','Apply the VCV rule to divide words and identify long vowels.',NULL,0.3,3,'phonics',1),
+(106,'VCCV Pattern: The Closed Syllable','Apply the VCCV rule to divide words and identify short vowels.',NULL,0.3,3,'phonics',1),
+(107,'Narrative Sight Words: Action and Sequence','Use action sight words correctly in narrative contexts.',NULL,0.5,3,'phonics',1),
+(108,'Descriptive and Quantity Sight Words','Use descriptive and quantity sight words correctly.',NULL,0.5,3,'phonics',1),
+(109,'Comparison and Observation Sight Words','Use comparison sight words in sentences.',NULL,0.5,3,'phonics',1),
+(110,'Complex Sight Words: Reasoning and Abstract','Differentiate and use abstract sight words in complex sentences.',NULL,0.6,3,'phonics',1),
+(111,'Words of Quantity, Time, and Comparison','Use quantity and comparison words logically.',NULL,0.6,3,'phonics',1),
+(112,'Abstract Sight Words and Spatial Directions','Use directional and abstract sight words.',NULL,0.6,3,'phonics',1),
+(113,'Phonics and Word Study: Final Assessment','Demonstrate mastery of all phonics concepts.',NULL,0.8,3,'phonics',1),
+-- Vocabulary (201-213)
+(201,'High-Frequency Words','Identify and read high-frequency words accurately.',NULL,0.1,3,'vocabulary',1),
+(202,'Regional and National Theme Vocabulary','Use vocabulary words related to regional and national themes.',NULL,0.1,3,'vocabulary',1),
+(203,'Content-Specific Words: Math and Science','Use content-specific vocabulary for Math and Science.',NULL,0.2,3,'vocabulary',1),
+(204,'Naming Words: Common and Proper Nouns','Identify and classify common and proper nouns.',NULL,0.3,3,'vocabulary',1),
+(205,'Action Words: Verbs','Identify and use verbs correctly in sentences.',NULL,0.3,3,'vocabulary',1),
+(206,'Describing Words: Adjectives','Identify and use adjectives to describe nouns.',NULL,0.3,3,'vocabulary',1),
+(207,'Word Detectives: Verbs, Adjectives, Demonstrative Pronouns','Identify verbs, adjectives, synonyms, and antonyms.',NULL,0.5,3,'vocabulary',1),
+(208,'Word Builders: Using Vocabulary in Sentences','Use verbs, adjectives, and demonstrative pronouns in sentences.',NULL,0.5,3,'vocabulary',1),
+(209,'Word Masters: Classify and Analyze','Classify word functions and distinguish synonyms from antonyms.',NULL,0.5,3,'vocabulary',1),
+(210,'Word Pattern Challenge: Reading Word Families','Read words using common patterns and recognize word families.',NULL,0.6,3,'vocabulary',1),
+(211,'Spell It Right: Writing Words Correctly','Identify and write correctly spelled words.',NULL,0.6,3,'vocabulary',1),
+(212,'Root Words: Base Words in Nouns, Verbs, Adjectives','Identify root words and understand how suffixes change meaning.',NULL,0.6,3,'vocabulary',1),
+(213,'Vocabulary and Word Knowledge: Final Assessment','Demonstrate mastery of all vocabulary concepts.',NULL,0.8,3,'vocabulary',1),
+-- Grammar (301-313)
+(301,'Sentences and Non-Sentences','Distinguish complete sentences from non-sentences.',NULL,0.1,3,'grammar',1),
+(302,'Sequencing Words in Sentences','Arrange words in correct order to form meaningful sentences.',NULL,0.1,3,'grammar',1),
+(303,'Parts of a Simple Sentence: Subject and Predicate','Identify the subject and predicate in simple sentences.',NULL,0.2,3,'grammar',1),
+(304,'Telling and Asking Sentences','Distinguish declarative from interrogative sentences.',NULL,0.3,3,'grammar',1),
+(305,'Commands and Exclamations','Distinguish imperative from exclamatory sentences.',NULL,0.3,3,'grammar',1),
+(306,'Compound Sentences with Conjunctions','Combine simple sentences using conjunctions (and, but, or).',NULL,0.3,3,'grammar',1),
+(307,'Capitalization and Punctuation Rules','Apply capitalization rules and use correct end punctuation.',NULL,0.5,3,'grammar',1),
+(308,'Discourse Markers: Time Order Words','Use time order words to sequence events.',NULL,0.5,3,'grammar',1),
+(309,'Doers and Actions in Compound Sentences','Identify subject and verb in each part of a compound sentence.',NULL,0.5,3,'grammar',1),
+(310,'National Themes in Sentences','Write sentences about national pride using correct structure.',NULL,0.6,3,'grammar',1),
+(311,'Explanatory Discourse: Using Because','Use "because" to explain reasons and causes.',NULL,0.6,3,'grammar',1),
+(312,'Sentence Intonation and Pitch','Understand rising and falling intonation patterns.',NULL,0.6,3,'grammar',1),
+(313,'Grammar Awareness: Final Assessment','Demonstrate mastery of all grammar concepts.',NULL,0.8,3,'grammar',1),
+-- Comprehension (401-413)
+(401,'Identifying Key Details: Who, What, Where, When','Extract key details from a short text.',NULL,0.1,3,'comprehension',1),
+(402,'Sequencing Events with Signal Words','Arrange story events in chronological order.',NULL,0.1,3,'comprehension',1),
+(403,'Characters and Setting','Identify and describe characters and setting.',NULL,0.2,3,'comprehension',1),
+(404,'Main Idea and Supporting Details','Identify the main idea and supporting details.',NULL,0.3,3,'comprehension',1),
+(405,'Cause and Effect Relationships','Identify cause-and-effect relationships in simple texts.',NULL,0.3,3,'comprehension',1),
+(406,'Making Predictions and Asking Questions','Use text clues to make predictions.',NULL,0.3,3,'comprehension',1),
+(407,'Problem and Solution in Narrative Texts','Identify the problem and solution in a narrative.',NULL,0.5,3,'comprehension',1),
+(408,'Comparing and Contrasting Characters','Compare and contrast characters, events, or ideas.',NULL,0.5,3,'comprehension',1),
+(409,'Context Clues: Synonyms and Antonyms','Use context clues to determine the meaning of unfamiliar words.',NULL,0.5,3,'comprehension',1),
+(410,'Drawing Conclusions and Making Inferences','Draw conclusions using text evidence and prior knowledge.',NULL,0.6,3,'comprehension',1),
+(411,'Text-to-Self Connections','Relate ideas from a text to personal experiences.',NULL,0.6,3,'comprehension',1),
+(412,'Summarizing: Main Idea and Key Details','Summarize a text by identifying the main idea and key details.',NULL,0.6,3,'comprehension',1),
+(413,'Comprehension: Final Assessment','Demonstrate mastery of all comprehension strategies.',NULL,0.8,3,'comprehension',1),
+-- Creating (501-513)
+(501,'Writing Simple Sentences','Write complete, correctly punctuated simple sentences.',NULL,0.1,3,'creating',1),
+(502,'Describing with Adjectives','Write descriptive sentences using adjectives.',NULL,0.1,3,'creating',1),
+(503,'Writing a Simple Paragraph','Write a simple paragraph with a topic sentence and supporting sentences.',NULL,0.2,3,'creating',1),
+(504,'Writing Questions and Commands','Write interrogative and imperative sentences with correct punctuation.',NULL,0.3,3,'creating',1),
+(505,'Writing with Joining Words','Write compound sentences using conjunctions.',NULL,0.3,3,'creating',1),
+(506,'Writing a Short Story','Write a short narrative with beginning, middle, and end.',NULL,0.3,3,'creating',1),
+(507,'Using Time-Order Words in Writing','Write texts using discourse markers to sequence events.',NULL,0.5,3,'creating',1),
+(508,'Writing Explanations with Because','Write explanatory sentences using "because".',NULL,0.5,3,'creating',1),
+(509,'Writing Comparative Sentences','Write sentences comparing two things using comparison words.',NULL,0.5,3,'creating',1),
+(510,'Writing About National Themes','Write about Filipino culture and national pride.',NULL,0.6,3,'creating',1),
+(511,'Writing a Descriptive Paragraph','Write a descriptive paragraph using vivid adjectives and sensory details.',NULL,0.6,3,'creating',1),
+(512,'Writing a Book Response','Write a short response summarizing and reflecting on a text.',NULL,0.6,3,'creating',1),
+(513,'Creating and Composing: Final Assessment','Demonstrate mastery of all composition skills.',NULL,0.8,3,'creating',1);
+SET IDENTITY_INSERT Lessons OFF;
+GO
+
 -- ── LESSON GAME CONTENT (LessonGameContent table) ────────────
--- SKIPPED: LessonGameContent.LessonID is a FK to dbo.Lessons (not Nodes).
--- Insert valid Lessons first, then re-enable these inserts with correct LessonIDs.
-/*
 INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Difficulty, Category) VALUES
 (101,'fill_in_blanks','The cat is _____ on the mat.',
  '{"beforeBlank":"The cat is","afterBlank":"on the mat.","correctAnswer":"sitting","options":["sitting","running","flying","sleeping"]}',0.3,'phonics'),
@@ -1050,13 +1125,14 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
  '{"beforeBlank":"We use","afterBlank":"from the text to make an inference.","correctAnswer":"clues","options":["clues","colors","numbers","shapes"]}',0.5,'comprehension'),
 (412,'fill_in_blanks','A good summary should include the _____ idea.',
  '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}',0.5,'comprehension');
-*/
+GO
 
 -- ── SUMMARY ──────────────────────────────────────────────────
 -- This script inserts:
 --   5 Modules (Phonics, Vocabulary, Grammar, Comprehension, Creating)
 --  65 Nodes  (13 per module: 12 lesson nodes + 1 final assessment)
--- ~350 QuizQuestions from 4 DepEd MATATAG Grade 3 PDFs
+--  65 Lessons (mirroring Nodes, IDs 101-513, for LessonGameContent FK)
+-- ~470 QuizQuestions from 4 DepEd MATATAG Grade 3 PDFs
 --  20 LessonGameContent rows for fill-in-blanks game data
 --
 -- Curriculum Sources:
