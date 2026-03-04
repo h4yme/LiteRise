@@ -1,352 +1,645 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:padding="20dp">
+    android:background="#F8F6FF">
 
-    <!-- Leo Character -->
-    <ImageView
-        android:id="@+id/ivLeoResult"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/leo_happy"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
-
-    <!-- Title -->
-    <TextView
-        android:id="@+id/tvCongrats"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/visby_bold"
-        android:text="Amazing Work!"
-        android:textColor="#2C3E50"
-        android:textSize="24sp"
-        app:layout_constraintTop_toBottomOf="@id/ivLeoResult"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp" />
-
-    <!-- Reading Level Badge -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/levelCard"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:cardBackgroundColor="#4ECDC4"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/tvCongrats"
-        android:layout_marginTop="16dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center">
+            android:orientation="vertical">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🏆"
-                android:textSize="48sp"
-                android:layout_marginBottom="8dp" />
-
-            <TextView
-                android:id="@+id/tvLevelName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_bold"
-                android:text="Developing Reader"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:layout_marginBottom="4dp" />
-
-            <TextView
-                android:id="@+id/tvLevelNumber"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_medium"
-                android:text="Level 3"
-                android:textColor="#FFD93D"
-                android:textSize="16sp" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Statistics Card -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/statsCard"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:cardBackgroundColor="@color/white"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:strokeWidth="1.5dp"
-        app:strokeColor="#E0E0E0"
-        app:layout_constraintTop_toBottomOf="@id/levelCard"
-        app:layout_constraintBottom_toTopOf="@id/btnContinueToDashboard"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp">
-
-            <!-- Performance Stats Row -->
-            <LinearLayout
+            <!-- ===== PURPLE HERO HEADER ===== -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:background="@drawable/bg_gradient_purple"
+                android:paddingBottom="64dp">
 
+                <!-- Layer 1 (deepest): ambient floating stars background -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieStarsBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:alpha="0.35"
+                    app:lottie_rawRes="@raw/placement_intro_bg_lottie"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_speed="0.5"/>
+
+                <!-- Layer 2: rewards/confetti burst overlay -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieConfetti"
+                    android:layout_width="match_parent"
+                    android:layout_height="280dp"
+                    android:alpha="0.22"
+                    app:lottie_rawRes="@raw/onboarding_lottie_3"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_speed="0.65"/>
+
+                <!-- Layer 3 (front): content -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/stat_card_bg"
-                    android:padding="12dp">
+                    android:gravity="center_horizontal"
+                    android:paddingTop="52dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingBottom="20dp">
 
+                    <!-- Leo mascot — replace src with leo_result_celebrate once ready -->
+                    <ImageView
+                        android:id="@+id/ivLeoResult"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:src="@drawable/leo_result_celebrate"
+                        android:scaleType="fitCenter"
+                        android:contentDescription="Leo celebrating your achievement"/>
+
+                    <!-- Congratulation title -->
                     <TextView
-                        android:id="@+id/tvAccuracy"
+                        android:id="@+id/tvCongrats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="Amazing Work!"
+                        android:textSize="28sp"
+                        android:textStyle="bold"
+                        android:textColor="#FFFFFF"
                         android:fontFamily="@font/visby_bold"
-                        android:text="85%"
-                        android:textColor="#4ECDC4"
-                        android:textSize="20sp" />
+                        android:gravity="center"
+                        android:layout_marginTop="8dp"/>
 
-                    <TextView
+                    <!-- Level badge + sparkle side-by-side -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="Accuracy"
-                        android:textColor="#7F8C8D"
-                        android:textSize="11sp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="14dp">
+
+                        <!-- White badge card -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_dialog_rounded"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="20dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:elevation="6dp">
+
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_trophy"
+                                app:tint="#FFD700"
+                                android:contentDescription="Trophy"
+                                android:layout_marginEnd="10dp"/>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tvLevelName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Developing Reader"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#2D3436"
+                                    android:fontFamily="@font/visby_bold"/>
+
+                                <TextView
+                                    android:id="@+id/tvLevelNumber"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Level 3"
+                                    android:textSize="12sp"
+                                    android:textColor="#7C3AED"
+                                    android:fontFamily="@font/poppins_semibold"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <!-- Sparkle Lottie beside badge -->
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lottieBadgeSparkle"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginStart="6dp"
+                            app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_speed="0.8"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
+            </FrameLayout>
 
+            <!-- ===== WHITE CONTENT CARD (overlaps header bottom) ===== -->
+            <LinearLayout
+                android:id="@+id/contentSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_top_round_result"
+                android:layout_marginTop="-32dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="20dp"
+                android:paddingBottom="40dp">
+
+                <!-- Drag handle pill -->
                 <View
-                    android:layout_width="10dp"
-                    android:layout_height="0dp" />
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="#E2D9F3"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp"/>
 
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
-                    android:background="@drawable/stat_card_bg"
-                    android:padding="12dp">
-
-                    <TextView
-                        android:id="@+id/tvQuestionsAnswered"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
-                        android:text="25/25"
-                        android:textColor="#FF8C42"
-                        android:textSize="20sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="Questions"
-                        android:textColor="#7F8C8D"
-                        android:textSize="11sp" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <!-- Category Breakdown Title -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_bold"
-                android:text="Category Breakdown"
-                android:textColor="#2C3E50"
-                android:textSize="13sp"
-                android:layout_marginBottom="10dp" />
-
-            <!-- Category Scores -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <!-- Category 1: Phonics and Word Study -->
+                <!-- "Your Results" section header with sparkle Lottie -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
+                    android:layout_marginBottom="16dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="🔤 Phonics"
-                        android:textColor="#2C3E50"
-                        android:textSize="12sp" />
+                        android:text="Your Results"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A1A2E"
+                        android:fontFamily="@font/visby_bold"/>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieResultsSparkle"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        app:lottie_speed="0.9"/>
+
+                </LinearLayout>
+
+                <!-- ===== STATS ROW ===== -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <!-- Accuracy stat card -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_star"
+                            app:tint="#7C3AED"
+                            android:contentDescription="Accuracy"
+                            android:layout_marginBottom="6dp"/>
+
+                        <TextView
+                            android:id="@+id/tvAccuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="85%"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="#7C3AED"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Accuracy"
+                            android:textSize="11sp"
+                            android:textColor="#9CA3AF"
+                            android:fontFamily="@font/visby_medium"
+                            android:layout_marginTop="2dp"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="1dp"/>
+
+                    <!-- Questions stat card -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_orange"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:src="@drawable/ic_check_circle"
+                            app:tint="#F97316"
+                            android:contentDescription="Questions"
+                            android:layout_marginBottom="6dp"/>
+
+                        <TextView
+                            android:id="@+id/tvQuestionsAnswered"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="25/25"
+                            android:textSize="30sp"
+                            android:textStyle="bold"
+                            android:textColor="#F97316"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Questions"
+                            android:textSize="11sp"
+                            android:textColor="#9CA3AF"
+                            android:fontFamily="@font/visby_medium"
+                            android:layout_marginTop="2dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ===== CATEGORY BREAKDOWN header with Lottie ===== -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Category Breakdown"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#2D3436"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieCategoryAccent"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        app:lottie_rawRes="@raw/onboarding_lottie_2"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        app:lottie_speed="0.7"/>
+
+                </LinearLayout>
+
+                <!-- Category 1: Phonics & Word Study (teal) -->
+                <LinearLayout
+                    android:id="@+id/rowCategory1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_result_category_row"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_mic"
+                        app:tint="#4ECDC4"
+                        android:contentDescription="Phonics"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phonics &amp; Word Study"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory1"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#4ECDC4"
+                            android:progressBackgroundTint="#D0F4F2"
+                            android:layout_marginTop="6dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvCategory1Score"
-                        android:layout_width="wrap_content"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
                         android:text="0%"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
                         android:textColor="#4ECDC4"
-                        android:textSize="13sp" />
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"/>
 
                 </LinearLayout>
 
-                <!-- Category 2: Vocabulary -->
+                <!-- Category 2: Vocabulary (blue) -->
                 <LinearLayout
+                    android:id="@+id/rowCategory2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
+                    android:background="@drawable/bg_result_category_row"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_book_reading"
+                        app:tint="#60A5FA"
+                        android:contentDescription="Vocabulary"/>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="📚 Vocabulary"
-                        android:textColor="#2C3E50"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vocabulary"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory2"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#60A5FA"
+                            android:progressBackgroundTint="#DBEAFE"
+                            android:layout_marginTop="6dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvCategory2Score"
-                        android:layout_width="wrap_content"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
                         android:text="0%"
-                        android:textColor="#4ECDC4"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#60A5FA"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"/>
 
                 </LinearLayout>
 
-                <!-- Category 3: Grammar -->
+                <!-- Category 3: Grammar (orange) -->
                 <LinearLayout
+                    android:id="@+id/rowCategory3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
+                    android:background="@drawable/bg_result_category_row"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="#F97316"
+                        android:contentDescription="Grammar"/>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="✏️ Grammar"
-                        android:textColor="#2C3E50"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Grammar"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory3"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#F97316"
+                            android:progressBackgroundTint="#FFEDD5"
+                            android:layout_marginTop="6dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvCategory3Score"
-                        android:layout_width="wrap_content"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
                         android:text="0%"
-                        android:textColor="#4ECDC4"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#F97316"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"/>
 
                 </LinearLayout>
 
-                <!-- Category 4: Comprehending -->
+                <!-- Category 4: Comprehending (amber) -->
                 <LinearLayout
+                    android:id="@+id/rowCategory4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="6dp">
+                    android:background="@drawable/bg_result_category_row"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_lightbulb"
+                        app:tint="#FBBF24"
+                        android:contentDescription="Comprehending"/>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="📖 Comprehending"
-                        android:textColor="#2C3E50"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Comprehending"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory4"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#FBBF24"
+                            android:progressBackgroundTint="#FEF3C7"
+                            android:layout_marginTop="6dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvCategory4Score"
-                        android:layout_width="wrap_content"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
                         android:text="0%"
-                        android:textColor="#4ECDC4"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#FBBF24"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"/>
 
                 </LinearLayout>
 
-                <!-- Category 5: Creating & Composing -->
+                <!-- Category 5: Creating & Composing (pink) -->
                 <LinearLayout
+                    android:id="@+id/rowCategory5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_result_category_row"
+                    android:padding="12dp"
+                    android:layout_marginBottom="28dp">
 
-                    <TextView
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_pen"
+                        app:tint="#F472B6"
+                        android:contentDescription="Composing"/>
+
+                    <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:fontFamily="@font/visby_medium"
-                        android:text="✍️ Composing"
-                        android:textColor="#2C3E50"
-                        android:textSize="12sp" />
+                        android:orientation="vertical"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginEnd="10dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Creating &amp; Composing"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory5"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="6dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#F472B6"
+                            android:progressBackgroundTint="#FCE7F3"
+                            android:layout_marginTop="6dp"/>
+
+                    </LinearLayout>
 
                     <TextView
                         android:id="@+id/tvCategory5Score"
-                        android:layout_width="wrap_content"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:fontFamily="@font/visby_bold"
                         android:text="0%"
-                        android:textColor="#4ECDC4"
-                        android:textSize="13sp" />
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#F472B6"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"/>
 
                 </LinearLayout>
+
+                <!-- ===== CONTINUE BUTTON ===== -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnContinueToDashboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Let's Start Learning!"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/visby_bold"
+                    app:backgroundTint="#7C3AED"
+                    app:cornerRadius="16dp"
+                    app:icon="@drawable/ic_arrow_right"
+                    app:iconGravity="end"
+                    app:iconTint="@color/white"/>
 
             </LinearLayout>
 
         </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- Continue Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnContinueToDashboard"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:fontFamily="@font/visby_bold"
-        android:text="Continue to Dashboard"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="16sp"
-        app:backgroundTint="#4ECDC4"
-        app:cornerRadius="16dp"
-        app:icon="@drawable/ic_arrow_right"
-        app:iconGravity="end"
-        app:iconTint="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
