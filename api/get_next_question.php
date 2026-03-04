@@ -91,6 +91,27 @@ try {
         sendError("No more questions available for this session", 404);
     }
 
+    // For pronunciation_reading items the passage lives in TargetPronunciation,
+    // not ReadingPassage (which the SP may not select or leaves NULL).
+    // Fetch it with a direct look-up so the app can display the passage text.
+    if (($question['QuestionType'] ?? '') === 'pronunciation_reading'
+        && empty($question['ReadingPassage'])
+    ) {
+        $passageStmt = $conn->prepare("
+            SELECT ReadingPassage, TargetPronunciation
+            FROM dbo.AssessmentItems
+            WHERE ItemID = ?
+        ");
+        $passageStmt->execute([(int)$question['ItemID']]);
+        $itemData = $passageStmt->fetch(PDO::FETCH_ASSOC);
+        if ($itemData) {
+            // Prefer dedicated ReadingPassage column; fall back to TargetPronunciation
+            $question['ReadingPassage'] = !empty($itemData['ReadingPassage'])
+                ? $itemData['ReadingPassage']
+                : ($itemData['TargetPronunciation'] ?? null);
+        }
+    }
+
     // Get progress information
     $progressStmt = $conn->prepare("
         SELECT
