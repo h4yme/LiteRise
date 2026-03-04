@@ -27,15 +27,15 @@ GO
 -- ── MODULES ──────────────────────────────────────────────────
 SET IDENTITY_INSERT Modules ON;
 INSERT INTO Modules (ModuleID, ModuleName, ModuleCode, CategoryMapping, OrderIndex, TotalNodes, Description) VALUES
-(1, 'Phonics and Word Study', 'EN3PWS', 'phonics', 1, 13,
+(1, 'Phonics and Word Study', 'EN3PWS', 1, 1, 13,
  'Learn letter-sound relationships, word patterns (CVCC, CCVC, VCV, VCCV), sight words, and syllable division across all four quarters.'),
-(2, 'Vocabulary and Word Knowledge', 'EN3VWK', 'vocabulary', 2, 13,
+(2, 'Vocabulary and Word Knowledge', 'EN3VWK', 2, 2, 13,
  'Build word knowledge through high-frequency words, regional themes, nouns, verbs, adjectives, synonyms, antonyms, word families, spelling patterns, and root words.'),
-(3, 'Grammar Awareness and Grammatical Structures', 'EN3GAGS', 'grammar', 3, 13,
+(3, 'Grammar Awareness and Grammatical Structures', 'EN3GAGS', 3, 3, 13,
  'Master sentence construction, types of sentences (declarative, interrogative, imperative, exclamatory), compound sentences, capitalization, punctuation, discourse markers, and intonation.'),
-(4, 'Comprehending and Analyzing Texts', 'EN3CAT', 'comprehending', 4, 13,
+(4, 'Comprehending and Analyzing Texts', 'EN3CAT', 4, 4, 13,
  'Develop comprehension skills: key details, sequencing, characters and setting, main idea, cause and effect, problem and solution, compare and contrast, context clues, inference, and summarizing.'),
-(5, 'Creating and Composing Text', 'EN3CCT', 'creating', 5, 13,
+(5, 'Creating and Composing Text', 'EN3CCT', 5, 5, 13,
  'Express ideas through writing: simple sentences, descriptive paragraphs, narrative texts, informational writing, and creative compositions using correct grammar and structure.');
 SET IDENTITY_INSERT Modules OFF;
 GO
@@ -1003,8 +1003,9 @@ INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectA
 GO
 
 -- ── LESSON GAME CONTENT (LessonGameContent table) ────────────
--- Provides word bank data for games: fill_in_blanks, word_hunt, sentence_scramble
--- Phonics: Fill-in-blanks content
+-- SKIPPED: LessonGameContent.LessonID is a FK to dbo.Lessons (not Nodes).
+-- Insert valid Lessons first, then re-enable these inserts with correct LessonIDs.
+/*
 INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Difficulty, Category) VALUES
 (101,'fill_in_blanks','The cat is _____ on the mat.',
  '{"beforeBlank":"The cat is","afterBlank":"on the mat.","correctAnswer":"sitting","options":["sitting","running","flying","sleeping"]}',0.3,'phonics'),
@@ -1016,7 +1017,6 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
  '{"beforeBlank":"Please turn on the","afterBlank":".","correctAnswer":"light","options":["light","right","night","bright"]}',0.3,'phonics'),
 (101,'fill_in_blanks','You should _____ wash your hands.',
  '{"beforeBlank":"You should","afterBlank":"wash your hands.","correctAnswer":"always","options":["always","away","also","after"]}',0.3,'phonics'),
-
 -- Grammar: Fill-in-blanks content
 (301,'fill_in_blanks','The _____ is sleeping.',
  '{"beforeBlank":"The","afterBlank":"is sleeping.","correctAnswer":"cat","options":["cat","run","blue","fast"]}',0.3,'grammar'),
@@ -1028,7 +1028,6 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
  '{"beforeBlank":"I like cats","afterBlank":"I like dogs.","correctAnswer":"and","options":["and","but","or","so"]}',0.5,'grammar'),
 (311,'fill_in_blanks','I wear a jacket _____ it is cold.',
  '{"beforeBlank":"I wear a jacket","afterBlank":"it is cold.","correctAnswer":"because","options":["because","but","and","when"]}',0.5,'grammar'),
-
 -- Vocabulary: Fill-in-blanks content
 (201,'fill_in_blanks','She _____ my friend.',
  '{"beforeBlank":"She","afterBlank":"my friend.","correctAnswer":"is","options":["is","are","am","be"]}',0.3,'vocabulary'),
@@ -1040,7 +1039,6 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
  '{"beforeBlank":"The opposite of hot is","afterBlank":".","correctAnswer":"cold","options":["cold","warm","cool","hot"]}',0.5,'vocabulary'),
 (212,'fill_in_blanks','The root word of "playing" is _____.',
  '{"beforeBlank":"The root word of playing is","afterBlank":".","correctAnswer":"play","options":["play","playing","played","plays"]}',0.5,'vocabulary'),
-
 -- Comprehension: Fill-in-blanks content
 (401,'fill_in_blanks','The _____ tells us where the story happened.',
  '{"beforeBlank":"The","afterBlank":"tells us where the story happened.","correctAnswer":"setting","options":["setting","character","problem","solution"]}',0.5,'comprehension'),
@@ -1052,7 +1050,7 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
  '{"beforeBlank":"We use","afterBlank":"from the text to make an inference.","correctAnswer":"clues","options":["clues","colors","numbers","shapes"]}',0.5,'comprehension'),
 (412,'fill_in_blanks','A good summary should include the _____ idea.',
  '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}',0.5,'comprehension');
-GO
+*/
 
 -- ── SUMMARY ──────────────────────────────────────────────────
 -- This script inserts:
