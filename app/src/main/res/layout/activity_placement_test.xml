@@ -284,4 +284,12 @@
 
     </LinearLayout>
 
+
+    <!-- Pronunciation first-time tutorial overlay (shown once, on top of everything) -->
+    <include layout="@layout/overlay_pronunciation_tutorial"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
