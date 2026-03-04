@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LiteRise – Read • Learn • Rise!</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --purple:  #7C5CFC;
+      --purple2: #9B7FFF;
+      --blue:    #4F8EF7;
+      --dark:    #1A1233;
+      --gray:    #6B7280;
+      --light:   #F5F3FF;
+      --white:   #FFFFFF;
+      --radius:  18px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--dark);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+
+    /* ─── NAV ───────────────────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 7%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(124,92,252,0.08);
+      transition: box-shadow .3s;
+    }
+    nav.scrolled { box-shadow: 0 4px 24px rgba(124,92,252,0.1); }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-logo img {
+      width: 38px; height: 38px; border-radius: 10px;
+      object-fit: cover;
+    }
+    .nav-logo .logo-placeholder {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800; font-size: 16px;
+    }
+    .nav-logo span {
+      font-size: 1.3rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-download {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; padding: 10px 24px; border-radius: 50px;
+      font-weight: 700; font-size: 0.92rem;
+      transition: transform .2s, box-shadow .2s;
+      box-shadow: 0 4px 16px rgba(124,92,252,0.3);
+    }
+    .nav-download:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(124,92,252,0.4); }
+
+    /* ─── HERO ──────────────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 120px 7% 80px;
+      background: linear-gradient(135deg, #F5F3FF 0%, #EEF2FF 50%, #F0F9FF 100%);
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -100px; right: -100px;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,92,252,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -80px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(79,142,247,0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-content {
+      flex: 1; max-width: 520px;
+      position: relative; z-index: 1;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,92,252,0.1); color: var(--purple);
+      padding: 6px 16px; border-radius: 50px;
+      font-size: 0.82rem; font-weight: 700; letter-spacing: .5px;
+      margin-bottom: 22px;
+    }
+    .hero-badge span { font-size: 1rem; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 900; line-height: 1.15;
+      margin-bottom: 18px;
+    }
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.08rem; color: var(--gray);
+      line-height: 1.7; margin-bottom: 36px;
+    }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      color: #fff; padding: 16px 32px; border-radius: 50px;
+      font-weight: 800; font-size: 1rem;
+      box-shadow: 0 8px 32px rgba(124,92,252,0.35);
+      transition: transform .2s, box-shadow .2s;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 40px rgba(124,92,252,0.45); }
+    .btn-primary svg { width: 20px; height: 20px; fill: #fff; }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; color: var(--purple);
+      padding: 16px 28px; border-radius: 50px;
+      font-weight: 700; font-size: 1rem;
+      border: 2px solid rgba(124,92,252,0.2);
+      transition: border-color .2s, transform .2s;
+    }
+    .btn-secondary:hover { border-color: var(--purple); transform: translateY(-3px); }
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 48px;
+    }
+    .stat { display: flex; flex-direction: column; gap: 2px; }
+    .stat-num { font-size: 1.6rem; font-weight: 900; color: var(--purple); }
+    .stat-label { font-size: 0.78rem; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* Phone mockup */
+    .hero-visual {
+      flex: 1; display: flex; justify-content: center; align-items: center;
+      position: relative; z-index: 1;
+    }
+    .phone-mockup {
+      width: 280px;
+      background: var(--dark);
+      border-radius: 44px;
+      padding: 12px;
+      box-shadow: 0 40px 80px rgba(26,18,51,0.3), 0 0 0 1px rgba(255,255,255,0.1);
+      position: relative;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-14px); }
+    }
+    .phone-mockup::before {
+      content: '';
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 6px; background: #333; border-radius: 3px; z-index: 10;
+    }
+    .phone-screen {
+      border-radius: 34px; overflow: hidden;
+      aspect-ratio: 9/19.5; background: var(--light);
+      position: relative;
+    }
+    .phone-screen img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .phone-screen-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, var(--purple) 0%, var(--blue) 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 12px; color: rgba(255,255,255,0.7);
+      font-size: 0.8rem; text-align: center; padding: 20px;
+    }
+    .phone-screen-placeholder .mock-icon {
+      width: 70px; height: 70px; border-radius: 20px;
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem;
+    }
+
+    /* Floating cards */
+    .float-card {
+      position: absolute;
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px 16px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+      display: flex; align-items: center; gap: 10px;
+      font-size: 0.82rem; font-weight: 700;
+      white-space: nowrap;
+    }
+    .float-card .card-icon { font-size: 1.4rem; }
+    .float-card .card-sub { font-size: 0.7rem; font-weight: 500; color: var(--gray); }
+    .float-card-1 { top: 15%; left: -30px; animation: float2 5s ease-in-out infinite; }
+    .float-card-2 { bottom: 20%; right: -20px; animation: float2 5s ease-in-out infinite 1.5s; }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    /* ─── FEATURES ──────────────────────────────────────────────── */
+    section { padding: 90px 7%; }
+    .section-label {
+      text-align: center; font-size: 0.82rem; font-weight: 700;
+      color: var(--purple); letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+      font-weight: 900; line-height: 1.2; margin-bottom: 14px;
+    }
+    .section-sub {
+      text-align: center; color: var(--gray); font-size: 1rem;
+      line-height: 1.7; max-width: 520px; margin: 0 auto 56px;
+    }
+
+    .features { background: #fff; }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 24px;
+    }
+    .feature-card {
+      background: var(--light);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      transition: transform .25s, box-shadow .25s;
+      border: 1px solid rgba(124,92,252,0.07);
+    }
+    .feature-card:hover { transform: translateY(-6px); box-shadow: 0 16px 48px rgba(124,92,252,0.12); }
+    .feature-icon {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--purple), var(--blue));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(124,92,252,0.3);
+    }
+    .feature-card h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; }
+    .feature-card p { font-size: 0.92rem; color: var(--gray); line-height: 1.65; }
+
+    /* ─── SCREENSHOTS ───────────────────────────────────────────── */
+    .screenshots { background: linear-gradient(135deg, #F5F3FF, #EEF2FF); }
+    .screenshots-row {
+      display: flex; gap: 20px; overflow-x: auto;
+      padding-bottom: 20px; scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .screenshots-row::-webkit-scrollbar { display: none; }
+    .screenshot-frame {
+      flex: 0 0 auto;
+      width: 200px;
+      background: var(--dark);
+      border-radius: 32px;
+      padding: 8px;
+      box-shadow: 0 20px 50px rgba(26,18,51,0.2);
+      transition: transform .3s;
+    }
+    .screenshot-frame:hover { transform: scale(1.04) translateY(-6px); }
+    .screenshot-inner {
+      border-radius: 24px; overflow: hidden;
+      aspect-ratio: 9/19.5; background: var(--light);
+    }
+    .screenshot-inner img { width: 100%; height: 100%; object-fit: cover; }
+    .screenshot-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; font-size: 0.72rem; color: rgba(255,255,255,0.6);
+      text-align: center; padding: 12px;
+    }
+    .ss-p1 { background: linear-gradient(160deg, #7C5CFC, #4F8EF7); }
+    .ss-p2 { background: linear-gradient(160deg, #A855F7, #7C5CFC); }
+    .ss-p3 { background: linear-gradient(160deg, #4F8EF7, #06B6D4); }
+    .ss-p4 { background: linear-gradient(160deg, #F59E0B, #EF4444); }
+    .screenshot-label {
+      text-align: center; margin-top: 12px;
+      font-size: 0.78rem; font-weight: 700; color: var(--gray);
+    }
+
+    /* ─── DOWNLOAD CTA ──────────────────────────────────────────── */
+    .download-cta {
+      background: linear-gradient(135deg, var(--purple) 0%, var(--blue) 100%);
+      text-align: center; padding: 90px 7%;
+      position: relative; overflow: hidden;
+    }
+    .download-cta::before {
+      content: '';
+      position: absolute; top: -100px; right: -100px;
+      width: 400px; height: 400px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); pointer-events: none;
+    }
+    .download-cta::after {
+      content: '';
+      position: absolute; bottom: -80px; left: -80px;
+      width: 350px; height: 350px; border-radius: 50%;
+      background: rgba(255,255,255,0.06); pointer-events: none;
+    }
+    .download-cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; color: #fff; margin-bottom: 16px;
+      position: relative; z-index: 1;
+    }
+    .download-cta p {
+      font-size: 1.05rem; color: rgba(255,255,255,0.8);
+      margin-bottom: 40px; position: relative; z-index: 1;
+    }
+    .btn-white {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: #fff; color: var(--purple);
+      padding: 18px 40px; border-radius: 50px;
+      font-weight: 800; font-size: 1.05rem;
+      box-shadow: 0 10px 36px rgba(0,0,0,0.18);
+      transition: transform .2s, box-shadow .2s;
+      position: relative; z-index: 1;
+    }
+    .btn-white:hover { transform: translateY(-3px); box-shadow: 0 18px 48px rgba(0,0,0,0.25); }
+    .btn-white svg { width: 22px; height: 22px; fill: var(--purple); }
+    .file-info {
+      margin-top: 18px; font-size: 0.82rem;
+      color: rgba(255,255,255,0.6);
+      position: relative; z-index: 1;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────────── */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,0.6);
+      text-align: center; padding: 36px 7%;
+      font-size: 0.85rem; line-height: 1.8;
+    }
+    footer strong { color: #fff; }
+
+    /* ─── RESPONSIVE ────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .hero { flex-direction: column; text-align: center; padding-top: 100px; gap: 60px; }
+      .hero-content { max-width: 100%; }
+      .hero-cta { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { width: 100%; }
+      .float-card-1 { left: 0; }
+      .float-card-2 { right: 0; }
+      nav { padding: 14px 5%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <!-- Replace with: <img src="images/icon.png" alt="LiteRise"> -->
+      <div class="logo-placeholder">L</div>
+      <span>LiteRise</span>
+    </div>
+    <a href="#download" class="nav-download">Download APK</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span>📖</span> English Learning App
+      </div>
+      <h1>
+        Learn English the<br>
+        <span class="highlight">Fun Way</span>
+      </h1>
+      <p>
+        LiteRise turns reading and vocabulary into an adventure.
+        Earn badges, beat games, and rise through the levels —
+        one lesson at a time.
+      </p>
+      <div class="hero-cta">
+        <a href="apk/literise.apk" class="btn-primary" download>
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Download APK
+        </a>
+        <a href="#features" class="btn-secondary">
+          Learn More ↓
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">10+</span>
+          <span class="stat-label">Mini Games</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">Free</span>
+          <span class="stat-label">Forever</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">Offline Lessons</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div style="position: relative;">
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <!-- Replace with: <img src="images/screenshot1.png" alt="App screen"> -->
+            <div class="phone-screen-placeholder">
+              <div class="mock-icon">📚</div>
+              <div>screenshot1.png<br><small>Your home screen</small></div>
+            </div>
+          </div>
+        </div>
+        <!-- Floating cards -->
+        <div class="float-card float-card-1">
+          <span class="card-icon">🔥</span>
+          <div>
+            <div>7-Day Streak!</div>
+            <div class="card-sub">Keep it up</div>
+          </div>
+        </div>
+        <div class="float-card float-card-2">
+          <span class="card-icon">⭐</span>
+          <div>
+            <div>Badge Earned</div>
+            <div class="card-sub">Word Hunter</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="section-label">Why LiteRise</div>
+    <h2 class="section-title">Everything you need to<br>master English</h2>
+    <p class="section-sub">Designed for learners who want a fun, structured path from beginner to fluent.</p>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <h3>10+ Mini Games</h3>
+        <p>From Word Hunt and Sentence Scramble to Minimal Pairs — every game is a lesson in disguise.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Track Your Progress</h3>
+        <p>Streaks, badges, and a module ladder keep you motivated and show exactly how far you've come.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Placement Test</h3>
+        <p>Start at the right level. Our smart placement test puts you exactly where you need to be.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🗣️</div>
+        <h3>Pronunciation Practice</h3>
+        <p>Record your voice and get instant feedback on your pronunciation with our built-in tool.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <h3>Story Sequencing</h3>
+        <p>Read real stories and put them in order — build comprehension while you learn.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Earn Badges</h3>
+        <p>Collect achievements as you complete lessons and games. Rise through the ranks!</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCREENSHOTS -->
+  <section class="screenshots" id="screenshots">
+    <div class="section-label">See It In Action</div>
+    <h2 class="section-title">Built for learners,<br>loved by students</h2>
+    <p class="section-sub">A clean, colorful interface that makes learning feel like play.</p>
+
+    <div class="screenshots-row">
+
+      <div>
+        <div class="screenshot-frame">
+          <div class="screenshot-inner">
+            <!-- <img src="images/screenshot1.png" alt="Home"> -->
+            <div class="screenshot-placeholder ss-p1">
+              <div style="font-size:2rem">🏠</div>
+              <div>screenshot1.png<br>Home / Dashboard</div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-label">Dashboard</div>
+      </div>
+
+      <div>
+        <div class="screenshot-frame">
+          <div class="screenshot-inner">
+            <!-- <img src="images/screenshot2.png" alt="Lesson"> -->
+            <div class="screenshot-placeholder ss-p2">
+              <div style="font-size:2rem">📝</div>
+              <div>screenshot2.png<br>Lesson Screen</div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-label">Lessons</div>
+      </div>
+
+      <div>
+        <div class="screenshot-frame">
+          <div class="screenshot-inner">
+            <!-- <img src="images/screenshot3.png" alt="Games"> -->
+            <div class="screenshot-placeholder ss-p3">
+              <div style="font-size:2rem">🎮</div>
+              <div>screenshot3.png<br>Games Screen</div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-label">Mini Games</div>
+      </div>
+
+      <div>
+        <div class="screenshot-frame">
+          <div class="screenshot-inner">
+            <!-- <img src="images/screenshot4.png" alt="Progress"> -->
+            <div class="screenshot-placeholder ss-p4">
+              <div style="font-size:2rem">🏆</div>
+              <div>screenshot4.png<br>Progress / Badges</div>
+            </div>
+          </div>
+        </div>
+        <div class="screenshot-label">Achievements</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DOWNLOAD CTA -->
+  <section class="download-cta" id="download">
+    <h2>Ready to Rise? 🚀</h2>
+    <p>Download LiteRise for free and start your English journey today.</p>
+    <a href="apk/literise.apk" class="btn-white" download>
+      <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+      Download APK — It's Free
+    </a>
+    <div class="file-info">Android 7.0+ required &nbsp;·&nbsp; No account needed to try</div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p><strong>LiteRise</strong> &nbsp;·&nbsp; Read • Learn • Rise!</p>
+    <p style="margin-top:6px">Made with ❤️ for English learners everywhere.</p>
+  </footer>
+
+  <script>
+    // Navbar scroll effect
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 30);
+    });
+
+    // Smooth reveal on scroll
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.style.opacity = '1';
+          e.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.feature-card, .screenshot-frame').forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(30px)';
+      el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
