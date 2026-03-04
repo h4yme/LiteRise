@@ -28,7 +28,7 @@ public class ApiClient {
 
     // For physical device: http://YOUR_PC_IP/api/ (e.g., http://192.168.1.100/api/)
 
-    private static final String BASE_URL = "https://literiseapi-bgfcfgdydvc6djhk.southeastasia-01.azurewebsites.net";
+    private static final String BASE_URL = "http://192.168.1.13/api/";
 
     private static Retrofit retrofit;
 

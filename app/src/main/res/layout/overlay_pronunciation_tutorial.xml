@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/pronunciationTutorialOverlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CC000000"
+    android:clickable="true"
+    android:focusable="true"
+    android:elevation="20dp"
+    android:visibility="gone">
+
+    <!-- Bottom sheet with tutorial card -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
+
+        <!-- Upward arrow indicator -->
+        <TextView
+            android:id="@+id/tvPronTutorialArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="▲"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginBottom="2dp"/>
+
+        <!-- Card -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="16dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <!-- Step dots -->
+                <LinearLayout
+                    android:id="@+id/pronStepDots"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="12dp"/>
+
+                <!-- Leo + text row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:src="@drawable/leo_explain"
+                        android:scaleType="fitCenter"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="Leo"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/tvPronTutorialTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Here's what to say!"
+                            android:textSize="16sp"
+                            android:textColor="#1A1A2E"
+                            android:fontFamily="@font/visby_bold"
+                            android:layout_marginBottom="4dp"/>
+
+                        <TextView
+                            android:id="@+id/tvPronTutorialMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Read the word or passage shown above carefully before you start recording."
+                            android:textSize="12sp"
+                            android:textColor="#636E72"
+                            android:fontFamily="@font/visby_medium"
+                            android:lineSpacingExtra="2dp"/>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Next / Got it button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPronTutorialNext"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="Next →"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/visby_bold"
+                    app:backgroundTint="#7C3AED"
+                    app:cornerRadius="14dp"/>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+</FrameLayout>

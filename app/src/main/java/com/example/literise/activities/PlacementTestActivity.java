@@ -3,7 +3,9 @@ package com.example.literise.activities;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -16,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -87,6 +91,17 @@ public class PlacementTestActivity extends AppCompatActivity {
     private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
 
+    // Pronunciation first-time tutorial
+    private FrameLayout pronunciationTutorialOverlay;
+    private TextView tvPronTutorialTitle;
+    private TextView tvPronTutorialMessage;
+    private MaterialButton btnPronTutorialNext;
+    private LinearLayout pronStepDots;
+    private int pronunciationTutorialStep = 0;
+    private static final int PRON_TUTORIAL_STEPS = 2;
+    private static final String PREF_NAME = "LiteRisePrefs";
+    private static final String PREF_PRON_TUTORIAL_SEEN = "pronunciation_tutorial_seen";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -130,6 +145,13 @@ public class PlacementTestActivity extends AppCompatActivity {
         btnRetry = findViewById(R.id.btnRetry);
         tvQuestionCounter = findViewById(R.id.tvQuestionCounter);
         tvCategoryChip = findViewById(R.id.tvCategoryChip);
+
+        // Pronunciation tutorial overlay
+        pronunciationTutorialOverlay = findViewById(R.id.pronunciationTutorialOverlay);
+        tvPronTutorialTitle = findViewById(R.id.tvPronTutorialTitle);
+        tvPronTutorialMessage = findViewById(R.id.tvPronTutorialMessage);
+        btnPronTutorialNext = findViewById(R.id.btnPronTutorialNext);
+        pronStepDots = findViewById(R.id.pronStepDots);
     }
 
     private void setupListeners() {
@@ -455,16 +477,44 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Note: CorrectAnswer is NOT sent by API (hidden server-side)
         // We'll get correctness feedback when we submit the answer
 
-        // Generate a simple Leo hint based on difficulty
+        // Pick a random Leo hint based on difficulty
+        Random rng = new Random();
         String hint;
         if (apiQuestion.getDifficulty() < -0.5) {
-            hint = "This one is nice and easy! Take your time! 🌟";
+            String[] hints = {
+                    "This one is nice and easy! Take your time! 🌟",
+                    "You know this one — show what you've got! ⭐",
+                    "Warm up time! You've totally got this! 😊",
+                    "Easy peasy! Let's go! 🎈"
+            };
+            hint = hints[rng.nextInt(hints.length)];
         } else if (apiQuestion.getDifficulty() < 0.5) {
-            hint = "You can do this! Think carefully! 💡";
+            String[] hints = {
+                    "You can do this! Think carefully! 💡",
+                    "Take a deep breath — you know this! 🧠",
+                    "Read it again slowly — trust yourself! 👀",
+                    "Almost there — don't rush, you've got it! ✨",
+                    "Leo believes in you! Give it your best! 🦁"
+            };
+            hint = hints[rng.nextInt(hints.length)];
         } else if (apiQuestion.getDifficulty() < 1.5) {
-            hint = "This is a bit challenging - you've got this! 💪";
+            String[] hints = {
+                    "This is a bit challenging — you've got this! 💪",
+                    "Challenge accepted! Give it your best shot! 🚀",
+                    "Tough one, but Leo knows you can do it! 🦁",
+                    "Think it through — you're smarter than you think! 🎯",
+                    "Take your time and make your best guess! 🤔"
+            };
+            hint = hints[rng.nextInt(hints.length)];
         } else {
-            hint = "Wow, a tough one! Do your best! 🎯";
+            String[] hints = {
+                    "Wow, a tough one! Do your best! 🎯",
+                    "Super challenge mode — go for it! 🏆",
+                    "Even hard questions have answers you can find! 🔍",
+                    "Leo's cheering for you — you've got this! 📣",
+                    "Deep breaths. Read carefully. You can crack this! 🧩"
+            };
+            hint = hints[rng.nextInt(hints.length)];
         }
         question.setLeoHint(hint);
 
@@ -556,6 +606,12 @@ public class PlacementTestActivity extends AppCompatActivity {
         TextView tvFeedbackIcon = questionView.findViewById(R.id.tvFeedbackIcon);
         TextView tvFeedbackText = questionView.findViewById(R.id.tvFeedbackText);
         TextView tvScore = questionView.findViewById(R.id.tvScore);
+
+        // Show first-time tutorial if never seen before
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        if (!prefs.getBoolean(PREF_PRON_TUTORIAL_SEEN, false)) {
+            showPronunciationTutorial();
+        }
 
         // Check if this is a reading passage question or single word
         String readingPassage = currentQuestion.getReadingPassage();
@@ -979,6 +1035,68 @@ public class PlacementTestActivity extends AppCompatActivity {
                 return "Answer the Question";
         }
     }
+
+    // ── Pronunciation first-time tutorial ──────────────────────────────────
+
+    private void showPronunciationTutorial() {
+        pronunciationTutorialStep = 0;
+        setupPronTutorialDots();
+        showPronTutorialStep(0);
+        pronunciationTutorialOverlay.setVisibility(View.VISIBLE);
+
+        btnPronTutorialNext.setOnClickListener(v -> {
+            if (pronunciationTutorialStep < PRON_TUTORIAL_STEPS - 1) {
+                pronunciationTutorialStep++;
+                showPronTutorialStep(pronunciationTutorialStep);
+            } else {
+                dismissPronunciationTutorial();
+            }
+        });
+    }
+
+    private void setupPronTutorialDots() {
+        pronStepDots.removeAllViews();
+        float dp = getResources().getDisplayMetrics().density;
+        for (int i = 0; i < PRON_TUTORIAL_STEPS; i++) {
+            View dot = new View(this);
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                    (int) (8 * dp), (int) (8 * dp));
+            params.setMarginEnd((int) (6 * dp));
+            dot.setLayoutParams(params);
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.OVAL);
+            shape.setColor(i == 0 ? 0xFF7C3AED : 0xFFDDD6F3);
+            dot.setBackground(shape);
+            pronStepDots.addView(dot);
+        }
+    }
+
+    private void showPronTutorialStep(int step) {
+        // Update dot colours
+        for (int i = 0; i < pronStepDots.getChildCount(); i++) {
+            GradientDrawable shape = new GradientDrawable();
+            shape.setShape(GradientDrawable.OVAL);
+            shape.setColor(i == step ? 0xFF7C3AED : 0xFFDDD6F3);
+            pronStepDots.getChildAt(i).setBackground(shape);
+        }
+        if (step == 0) {
+            tvPronTutorialTitle.setText("Here's what to say! 👆");
+            tvPronTutorialMessage.setText("Read the word or passage shown at the top carefully — that's what you'll need to say out loud.");
+            btnPronTutorialNext.setText("Next →");
+        } else {
+            tvPronTutorialTitle.setText("Tap to Record! 🎤");
+            tvPronTutorialMessage.setText("Press the green microphone button to start recording your voice. Tap it again when you're done!");
+            btnPronTutorialNext.setText("Got it! 👍");
+        }
+    }
+
+    private void dismissPronunciationTutorial() {
+        pronunciationTutorialOverlay.setVisibility(View.GONE);
+        getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+                .edit().putBoolean(PREF_PRON_TUTORIAL_SEEN, true).apply();
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
 
     private void showLeoHint() {
         if (currentQuestion != null && currentQuestion.getLeoHint() != null) {
