@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F6FF">
+    android:background="#F0EBFF">
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -17,92 +18,102 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- ===== PURPLE HERO HEADER ===== -->
+            <!-- ═══════════════════════════════════════════ -->
+            <!--              HERO SECTION                   -->
+            <!-- ═══════════════════════════════════════════ -->
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_gradient_purple"
-                android:paddingBottom="64dp">
+                android:paddingBottom="60dp">
 
-                <!-- Layer 1 (deepest): ambient floating stars background -->
+                <!-- NEW celebration Lottie — full bleed, behind Leo -->
                 <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/lottieStarsBg"
+                    android:id="@+id/lottieResultCelebrate"
                     android:layout_width="match_parent"
-                    android:layout_height="320dp"
-                    android:alpha="0.35"
-                    app:lottie_rawRes="@raw/placement_intro_bg_lottie"
+                    android:layout_height="340dp"
+                    android:alpha="0.72"
+                    app:lottie_rawRes="@raw/lottie_result_celebrate"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"
-                    app:lottie_speed="0.5"/>
+                    app:lottie_speed="0.85"/>
 
-                <!-- Layer 2: rewards/confetti burst overlay -->
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/lottieConfetti"
-                    android:layout_width="match_parent"
-                    android:layout_height="280dp"
-                    android:alpha="0.22"
-                    app:lottie_rawRes="@raw/onboarding_lottie_3"
-                    app:lottie_autoPlay="true"
-                    app:lottie_loop="true"
-                    app:lottie_speed="0.65"/>
-
-                <!-- Layer 3 (front): content -->
+                <!-- Hero content stack -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:gravity="center_horizontal"
-                    android:paddingTop="52dp"
+                    android:paddingTop="48dp"
                     android:paddingStart="24dp"
                     android:paddingEnd="24dp"
-                    android:paddingBottom="20dp">
+                    android:paddingBottom="16dp">
 
-                    <!-- Leo mascot — replace src with leo_result_celebrate once ready -->
-                    <ImageView
-                        android:id="@+id/ivLeoResult"
-                        android:layout_width="180dp"
-                        android:layout_height="180dp"
-                        android:src="@drawable/leo_result_celebrate"
-                        android:scaleType="fitCenter"
-                        android:contentDescription="Leo celebrating your achievement"/>
+                    <!-- Glow ring + Leo stacked -->
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal">
 
-                    <!-- Congratulation title -->
+                        <View
+                            android:layout_width="196dp"
+                            android:layout_height="196dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/leo_glow_circle"
+                            android:alpha="0.28"/>
+
+                        <!-- Leo — export at 800 × 800 px as leo_result_celebrate.png
+                             then change src to @drawable/leo_result_celebrate -->
+                        <ImageView
+                            android:id="@+id/ivLeoResult"
+                            android:layout_width="180dp"
+                            android:layout_height="180dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/leo_result_celebrate"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="Leo celebrating your achievement"/>
+
+                    </FrameLayout>
+
+                    <!-- Title -->
                     <TextView
                         android:id="@+id/tvCongrats"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Amazing Work!"
-                        android:textSize="28sp"
-                        android:textStyle="bold"
+                        android:textSize="30sp"
                         android:textColor="#FFFFFF"
                         android:fontFamily="@font/visby_bold"
                         android:gravity="center"
-                        android:layout_marginTop="8dp"/>
+                        android:shadowColor="#40000000"
+                        android:shadowDx="0"
+                        android:shadowDy="2"
+                        android:shadowRadius="6"
+                        android:layout_marginTop="10dp"/>
 
-                    <!-- Level badge + sparkle side-by-side -->
+                    <!-- Level badge pill + sparkle -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:layout_marginTop="14dp">
+                        android:layout_marginTop="18dp">
 
-                        <!-- White badge card -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:background="@drawable/bg_dialog_rounded"
-                            android:paddingStart="16dp"
-                            android:paddingEnd="20dp"
-                            android:paddingTop="10dp"
-                            android:paddingBottom="10dp"
-                            android:elevation="6dp">
+                            android:paddingStart="14dp"
+                            android:paddingEnd="18dp"
+                            android:paddingTop="9dp"
+                            android:paddingBottom="9dp"
+                            android:elevation="8dp">
 
                             <ImageView
-                                android:layout_width="26dp"
-                                android:layout_height="26dp"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
                                 android:src="@drawable/ic_trophy"
                                 app:tint="#FFD700"
                                 android:contentDescription="Trophy"
@@ -118,9 +129,8 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Developing Reader"
-                                    android:textSize="15sp"
-                                    android:textStyle="bold"
-                                    android:textColor="#2D3436"
+                                    android:textSize="14sp"
+                                    android:textColor="#1A1A2E"
                                     android:fontFamily="@font/visby_bold"/>
 
                                 <TextView
@@ -128,99 +138,72 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:text="Level 3"
-                                    android:textSize="12sp"
+                                    android:textSize="11sp"
                                     android:textColor="#7C3AED"
                                     android:fontFamily="@font/poppins_semibold"/>
 
                             </LinearLayout>
                         </LinearLayout>
 
-                        <!-- Sparkle Lottie beside badge -->
                         <com.airbnb.lottie.LottieAnimationView
                             android:id="@+id/lottieBadgeSparkle"
-                            android:layout_width="44dp"
-                            android:layout_height="44dp"
-                            android:layout_marginStart="6dp"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
                             app:lottie_rawRes="@raw/lottie_sparkle_stars"
                             app:lottie_autoPlay="true"
                             app:lottie_loop="true"
-                            app:lottie_speed="0.8"/>
+                            app:lottie_speed="0.75"/>
 
                     </LinearLayout>
 
                 </LinearLayout>
             </FrameLayout>
 
-            <!-- ===== WHITE CONTENT CARD (overlaps header bottom) ===== -->
+            <!-- ═══════════════════════════════════════════ -->
+            <!--          WHITE CONTENT CARD                 -->
+            <!-- ═══════════════════════════════════════════ -->
             <LinearLayout
                 android:id="@+id/contentSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:background="@drawable/bg_white_top_round_result"
-                android:layout_marginTop="-32dp"
+                android:layout_marginTop="-36dp"
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
-                android:paddingTop="20dp"
-                android:paddingBottom="40dp">
+                android:paddingTop="14dp"
+                android:paddingBottom="48dp">
 
-                <!-- Drag handle pill -->
+                <!-- Drag handle -->
                 <View
-                    android:layout_width="40dp"
+                    android:layout_width="36dp"
                     android:layout_height="4dp"
-                    android:background="#E2D9F3"
+                    android:background="#DDD6F3"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="20dp"/>
 
-                <!-- "Your Results" section header with sparkle Lottie -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="16dp">
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="Your Results"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="#1A1A2E"
-                        android:fontFamily="@font/visby_bold"/>
-
-                    <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottieResultsSparkle"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
-                        app:lottie_rawRes="@raw/lottie_sparkle_stars"
-                        app:lottie_autoPlay="true"
-                        app:lottie_loop="true"
-                        app:lottie_speed="0.9"/>
-
-                </LinearLayout>
-
-                <!-- ===== STATS ROW ===== -->
+                <!-- ── STATS ROW ── -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_marginBottom="24dp">
 
-                    <!-- Accuracy stat card -->
+                    <!-- Accuracy card -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@drawable/bg_light_purple"
-                        android:padding="16dp">
+                        android:background="@drawable/bg_card_modern"
+                        android:padding="18dp"
+                        android:elevation="4dp">
 
                         <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:src="@drawable/ic_star"
                             app:tint="#7C3AED"
                             android:contentDescription="Accuracy"
@@ -231,8 +214,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="85%"
-                            android:textSize="30sp"
-                            android:textStyle="bold"
+                            android:textSize="32sp"
                             android:textColor="#7C3AED"
                             android:fontFamily="@font/visby_bold"/>
 
@@ -251,19 +233,20 @@
                         android:layout_width="12dp"
                         android:layout_height="1dp"/>
 
-                    <!-- Questions stat card -->
+                    <!-- Questions card -->
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:gravity="center"
-                        android:background="@drawable/bg_light_orange"
-                        android:padding="16dp">
+                        android:background="@drawable/bg_card_modern"
+                        android:padding="18dp"
+                        android:elevation="4dp">
 
                         <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
                             android:src="@drawable/ic_check_circle"
                             app:tint="#F97316"
                             android:contentDescription="Questions"
@@ -274,8 +257,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="25/25"
-                            android:textSize="30sp"
-                            android:textStyle="bold"
+                            android:textSize="32sp"
                             android:textColor="#F97316"
                             android:fontFamily="@font/visby_bold"/>
 
@@ -292,60 +274,65 @@
 
                 </LinearLayout>
 
-                <!-- ===== CATEGORY BREAKDOWN header with Lottie ===== -->
+                <!-- ── CATEGORY BREAKDOWN HEADER ── -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="14dp">
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="Category Breakdown"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/poppins_semibold"/>
+                        android:textSize="15sp"
+                        android:textColor="#1A1A2E"
+                        android:fontFamily="@font/visby_bold"/>
 
                     <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottieCategoryAccent"
-                        android:layout_width="42dp"
-                        android:layout_height="42dp"
-                        app:lottie_rawRes="@raw/onboarding_lottie_2"
+                        android:id="@+id/lottieResultsSparkle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        app:lottie_rawRes="@raw/lottie_sparkle_stars"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
-                        app:lottie_speed="0.7"/>
+                        app:lottie_speed="0.8"/>
 
                 </LinearLayout>
 
-                <!-- Category 1: Phonics & Word Study (teal) -->
+                <!-- Category 1: Phonics & Word Study -->
                 <LinearLayout
                     android:id="@+id/rowCategory1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_result_category_row"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp">
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#4ECDC4"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:src="@drawable/ic_mic"
                         app:tint="#4ECDC4"
-                        android:contentDescription="Phonics"/>
+                        android:contentDescription="Phonics"
+                        android:layout_marginEnd="10dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -359,12 +346,12 @@
                             android:id="@+id/pbCategory1"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="6dp"
+                            android:layout_height="8dp"
                             android:max="100"
                             android:progress="0"
                             android:progressTint="#4ECDC4"
                             android:progressBackgroundTint="#D0F4F2"
-                            android:layout_marginTop="6dp"/>
+                            android:layout_marginTop="7dp"/>
 
                     </LinearLayout>
 
@@ -374,38 +361,44 @@
                         android:layout_height="wrap_content"
                         android:text="0%"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="#4ECDC4"
                         android:fontFamily="@font/poppins_semibold"
-                        android:gravity="end"/>
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <!-- Category 2: Vocabulary (blue) -->
+                <!-- Category 2: Vocabulary -->
                 <LinearLayout
                     android:id="@+id/rowCategory2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_result_category_row"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp">
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#60A5FA"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:src="@drawable/ic_book_reading"
                         app:tint="#60A5FA"
-                        android:contentDescription="Vocabulary"/>
+                        android:contentDescription="Vocabulary"
+                        android:layout_marginEnd="10dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -419,12 +412,12 @@
                             android:id="@+id/pbCategory2"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="6dp"
+                            android:layout_height="8dp"
                             android:max="100"
                             android:progress="0"
                             android:progressTint="#60A5FA"
                             android:progressBackgroundTint="#DBEAFE"
-                            android:layout_marginTop="6dp"/>
+                            android:layout_marginTop="7dp"/>
 
                     </LinearLayout>
 
@@ -434,38 +427,44 @@
                         android:layout_height="wrap_content"
                         android:text="0%"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="#60A5FA"
                         android:fontFamily="@font/poppins_semibold"
-                        android:gravity="end"/>
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <!-- Category 3: Grammar (orange) -->
+                <!-- Category 3: Grammar -->
                 <LinearLayout
                     android:id="@+id/rowCategory3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_result_category_row"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp">
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#F97316"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:src="@drawable/ic_edit"
                         app:tint="#F97316"
-                        android:contentDescription="Grammar"/>
+                        android:contentDescription="Grammar"
+                        android:layout_marginEnd="10dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -479,12 +478,12 @@
                             android:id="@+id/pbCategory3"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="6dp"
+                            android:layout_height="8dp"
                             android:max="100"
                             android:progress="0"
                             android:progressTint="#F97316"
                             android:progressBackgroundTint="#FFEDD5"
-                            android:layout_marginTop="6dp"/>
+                            android:layout_marginTop="7dp"/>
 
                     </LinearLayout>
 
@@ -494,38 +493,44 @@
                         android:layout_height="wrap_content"
                         android:text="0%"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="#F97316"
                         android:fontFamily="@font/poppins_semibold"
-                        android:gravity="end"/>
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <!-- Category 4: Comprehending (amber) -->
+                <!-- Category 4: Comprehending -->
                 <LinearLayout
                     android:id="@+id/rowCategory4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_result_category_row"
-                    android:padding="12dp"
-                    android:layout_marginBottom="8dp">
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#FBBF24"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:src="@drawable/ic_lightbulb"
                         app:tint="#FBBF24"
-                        android:contentDescription="Comprehending"/>
+                        android:contentDescription="Comprehending"
+                        android:layout_marginEnd="10dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -539,12 +544,12 @@
                             android:id="@+id/pbCategory4"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="6dp"
+                            android:layout_height="8dp"
                             android:max="100"
                             android:progress="0"
                             android:progressTint="#FBBF24"
                             android:progressBackgroundTint="#FEF3C7"
-                            android:layout_marginTop="6dp"/>
+                            android:layout_marginTop="7dp"/>
 
                     </LinearLayout>
 
@@ -554,38 +559,44 @@
                         android:layout_height="wrap_content"
                         android:text="0%"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="#FBBF24"
                         android:fontFamily="@font/poppins_semibold"
-                        android:gravity="end"/>
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <!-- Category 5: Creating & Composing (pink) -->
+                <!-- Category 5: Creating & Composing -->
                 <LinearLayout
                     android:id="@+id/rowCategory5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:background="@drawable/bg_result_category_row"
-                    android:padding="12dp"
-                    android:layout_marginBottom="28dp">
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="32dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#F472B6"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:src="@drawable/ic_pen"
                         app:tint="#F472B6"
-                        android:contentDescription="Composing"/>
+                        android:contentDescription="Composing"
+                        android:layout_marginEnd="10dp"/>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginEnd="10dp">
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -599,12 +610,12 @@
                             android:id="@+id/pbCategory5"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
-                            android:layout_height="6dp"
+                            android:layout_height="8dp"
                             android:max="100"
                             android:progress="0"
                             android:progressTint="#F472B6"
                             android:progressBackgroundTint="#FCE7F3"
-                            android:layout_marginTop="6dp"/>
+                            android:layout_marginTop="7dp"/>
 
                     </LinearLayout>
 
@@ -614,28 +625,30 @@
                         android:layout_height="wrap_content"
                         android:text="0%"
                         android:textSize="13sp"
-                        android:textStyle="bold"
                         android:textColor="#F472B6"
                         android:fontFamily="@font/poppins_semibold"
-                        android:gravity="end"/>
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <!-- ===== CONTINUE BUTTON ===== -->
+                <!-- ── CONTINUE BUTTON ── -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnContinueToDashboard"
                     android:layout_width="match_parent"
-                    android:layout_height="56dp"
+                    android:layout_height="58dp"
                     android:text="Let's Start Learning!"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="16sp"
                     android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.01"
                     app:backgroundTint="#7C3AED"
-                    app:cornerRadius="16dp"
+                    app:cornerRadius="18dp"
                     app:icon="@drawable/ic_arrow_right"
                     app:iconGravity="end"
-                    app:iconTint="@color/white"/>
+                    app:iconTint="@color/white"
+                    app:elevation="6dp"/>
 
             </LinearLayout>
 

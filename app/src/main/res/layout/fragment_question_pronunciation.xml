@@ -5,32 +5,46 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- Instruction Card -->
+    <!-- Instruction + Word Card (gradient purple) -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#4ECDC4"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="4dp"
-        android:layout_marginBottom="24dp">
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="6dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/bg_gradient_purple"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center">
+            android:padding="24dp">
 
-            <!-- Instruction Text -->
-            <TextView
-                android:layout_width="match_parent"
+            <!-- Instruction label -->
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/visby_bold"
-                android:text="Say this word out loud!"
-                android:textAlignment="center"
-                android:textColor="@color/white"
-                android:textSize="16sp"
-                android:layout_marginBottom="12dp" />
+                android:gravity="center_vertical"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:text="🎤"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:text="Say this out loud!"
+                    android:textColor="#D8CAFF"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
 
             <!-- Word to Pronounce -->
             <TextView
@@ -40,114 +54,114 @@
                 android:fontFamily="@font/visby_bold"
                 android:text="Beautiful"
                 android:textAlignment="center"
-                android:textColor="#FFD93D"
-                android:textSize="32sp" />
+                android:textColor="#FFE566"
+                android:textSize="34sp" />
 
-            <!-- Passage to Read (for pronunciation_reading questions) -->
+            <!-- Passage to Read (for pronunciation_reading) -->
             <TextView
                 android:id="@+id/tvPassageToRead"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/visby_medium"
+                android:lineSpacingExtra="5dp"
                 android:text="Tom has a red ball. He plays with it every day."
                 android:textAlignment="center"
                 android:textColor="@color/white"
-                android:textSize="18sp"
-                android:visibility="gone"
-                android:lineSpacingExtra="4dp" />
+                android:textSize="17sp"
+                android:visibility="gone" />
 
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Recording Controls -->
+    <!-- Recording Controls Card -->
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="20dp"
-        app:cardElevation="2dp"
-        app:strokeWidth="1.5dp"
-        app:strokeColor="#E0E0E0"
-        android:layout_marginBottom="20dp">
+        app:cardElevation="3dp"
+        app:strokeColor="#EDE9FF"
+        app:strokeWidth="2dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:orientation="vertical"
-            android:padding="20dp"
-            android:gravity="center">
+            android:padding="24dp">
 
             <!-- Recording Status -->
             <TextView
                 android:id="@+id/tvRecordingStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:fontFamily="@font/visby_bold"
                 android:text="Tap the microphone to start"
-                android:textColor="#7F8C8D"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:textColor="#9E9E9E"
+                android:textSize="13sp" />
 
-            <!-- Microphone Button -->
+            <!-- Microphone FAB -->
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/btnMicrophone"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_mic"
                 app:backgroundTint="@color/success_green"
-                app:elevation="4dp"
+                app:elevation="6dp"
                 app:fabSize="normal"
-                app:tint="@color/white"
-                android:layout_marginBottom="12dp" />
+                app:tint="@color/white" />
 
-            <!-- Waveform Animation Container -->
+            <!-- Waveform Animation (hidden when not recording) -->
             <LinearLayout
                 android:id="@+id/waveformContainer"
                 android:layout_width="match_parent"
-                android:layout_height="32dp"
-                android:orientation="horizontal"
+                android:layout_height="36dp"
                 android:gravity="center"
-                android:visibility="gone"
-                android:layout_marginBottom="12dp">
+                android:layout_marginBottom="12dp"
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <View
                     android:id="@+id/wave1"
-                    android:layout_width="6dp"
-                    android:layout_height="16dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@color/success_green" />
+                    android:layout_width="7dp"
+                    android:layout_height="14dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@color/purple_600" />
 
                 <View
                     android:id="@+id/wave2"
-                    android:layout_width="6dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@color/success_green" />
+                    android:layout_width="7dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@color/purple_600" />
 
                 <View
                     android:id="@+id/wave3"
-                    android:layout_width="6dp"
-                    android:layout_height="32dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@color/success_green" />
+                    android:layout_width="7dp"
+                    android:layout_height="34dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@color/purple_600" />
 
                 <View
                     android:id="@+id/wave4"
-                    android:layout_width="6dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="3dp"
-                    android:background="@color/success_green" />
+                    android:layout_width="7dp"
+                    android:layout_height="22dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@color/purple_600" />
 
                 <View
                     android:id="@+id/wave5"
-                    android:layout_width="6dp"
-                    android:layout_height="16dp"
-                    android:background="@color/success_green" />
+                    android:layout_width="7dp"
+                    android:layout_height="14dp"
+                    android:background="@color/purple_600" />
 
             </LinearLayout>
 
-            <!-- Play Back Button (Hidden initially) -->
+            <!-- Playback Button (hidden initially) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPlayback"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
@@ -156,41 +170,47 @@
                 android:fontFamily="@font/visby_bold"
                 android:text="Listen to your recording"
                 android:textAllCaps="false"
+                android:textColor="@color/purple_600"
                 android:textSize="12sp"
+                android:visibility="gone"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/ic_play"
                 app:iconGravity="start"
-                android:visibility="gone" />
+                app:iconTint="@color/purple_600"
+                app:strokeColor="@color/purple_600"
+                app:strokeWidth="1.5dp" />
 
         </LinearLayout>
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Feedback Card (shown after recording) -->
+    <!-- Feedback Card (shown after evaluation) -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/feedbackCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         app:cardBackgroundColor="#E8F5E9"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        android:visibility="gone">
+        app:cardCornerRadius="18dp"
+        app:cardElevation="0dp"
+        app:strokeColor="#A5D6A7"
+        app:strokeWidth="1.5dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:padding="16dp">
 
             <!-- Feedback Icon -->
             <TextView
                 android:id="@+id/tvFeedbackIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="14dp"
                 android:text="🎉"
-                android:textSize="36sp"
-                android:layout_marginEnd="12dp" />
+                android:textSize="36sp" />
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -198,25 +218,23 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <!-- Feedback Text -->
                 <TextView
                     android:id="@+id/tvFeedbackText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
                     android:fontFamily="@font/visby_bold"
                     android:text="Great job! You said it perfectly!"
                     android:textColor="#2E7D32"
-                    android:textSize="14sp"
-                    android:layout_marginBottom="4dp" />
+                    android:textSize="14sp" />
 
-                <!-- Score -->
                 <TextView
                     android:id="@+id/tvScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/visby_medium"
-                    android:text="95% Match"
-                    android:textColor="#1B5E20"
+                    android:text="95% Accuracy"
+                    android:textColor="#388E3C"
                     android:textSize="12sp" />
 
             </LinearLayout>
