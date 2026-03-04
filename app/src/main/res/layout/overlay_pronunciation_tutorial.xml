@@ -7,15 +7,8 @@
     android:background="#CC000000"
     android:clickable="true"
     android:focusable="true"
+    android:elevation="20dp"
     android:visibility="gone">
-
-    <!-- Spotlight ring — repositioned by code to sit over the active element -->
-    <View
-        android:id="@+id/pronSpotlightRing"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:background="@drawable/bg_spotlight_circle"
-        android:visibility="invisible"/>
 
     <!-- Bottom sheet with tutorial card -->
     <LinearLayout
@@ -23,7 +16,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:orientation="vertical"
-        android:padding="20dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="16dp">
 
         <!-- Upward arrow indicator -->
         <TextView
@@ -33,14 +28,14 @@
             android:layout_gravity="center_horizontal"
             android:text="▲"
             android:textColor="#FFFFFF"
-            android:textSize="22sp"
+            android:textSize="18sp"
             android:layout_marginBottom="2dp"/>
 
         <!-- Card -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="24dp"
+            app:cardCornerRadius="20dp"
             app:cardElevation="16dp"
             app:cardBackgroundColor="#FFFFFF">
 
@@ -48,7 +43,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="24dp">
+                android:padding="18dp">
 
                 <!-- Step dots -->
                 <LinearLayout
@@ -57,22 +52,22 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="16dp"/>
+                    android:layout_marginBottom="12dp"/>
 
-                <!-- Leo + text -->
+                <!-- Leo + text row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginBottom="20dp">
+                    android:layout_marginBottom="14dp">
 
                     <ImageView
-                        android:layout_width="64dp"
-                        android:layout_height="64dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:src="@drawable/leo_happy"
                         android:scaleType="fitCenter"
-                        android:layout_marginEnd="14dp"
+                        android:layout_marginEnd="12dp"
                         android:contentDescription="Leo"/>
 
                     <LinearLayout
@@ -86,20 +81,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Here's what to say!"
-                            android:textSize="17sp"
+                            android:textSize="16sp"
                             android:textColor="#1A1A2E"
                             android:fontFamily="@font/visby_bold"
-                            android:layout_marginBottom="6dp"/>
+                            android:layout_marginBottom="4dp"/>
 
                         <TextView
                             android:id="@+id/tvPronTutorialMessage"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:text="Read the word or passage shown above carefully before you start recording."
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textColor="#636E72"
                             android:fontFamily="@font/visby_medium"
-                            android:lineSpacingExtra="3dp"/>
+                            android:lineSpacingExtra="2dp"/>
 
                     </LinearLayout>
                 </LinearLayout>
@@ -108,14 +103,14 @@
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnPronTutorialNext"
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="46dp"
                     android:text="Next →"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
-                    android:textSize="15sp"
+                    android:textSize="14sp"
                     android:fontFamily="@font/visby_bold"
                     app:backgroundTint="#7C3AED"
-                    app:cornerRadius="16dp"/>
+                    app:cornerRadius="14dp"/>
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
