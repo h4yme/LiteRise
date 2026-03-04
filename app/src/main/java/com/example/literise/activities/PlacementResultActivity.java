@@ -6,13 +6,17 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -34,10 +38,15 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private static final String TAG = "PlacementResultActivity";
 
-    private ConstraintLayout rootLayout;
-    private TextView tvLevelName, tvLevelNumber;
+    // Views
+    private LottieAnimationView lottieConfetti;
+    private TextView tvCongrats, tvLevelName, tvLevelNumber;
     private TextView tvAccuracy, tvQuestionsAnswered;
     private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score, tvCategory5Score;
+    private ProgressBar pbCategory1, pbCategory2, pbCategory3, pbCategory4, pbCategory5;
+    private View rowCategory1, rowCategory2, rowCategory3, rowCategory4, rowCategory5;
+    private View ivLeoResult;
+    private View contentSection;
     private MaterialButton btnContinueToDashboard;
 
     // Placement results data
@@ -65,24 +74,39 @@ public class PlacementResultActivity extends AppCompatActivity {
         getResultsFromIntent();
         displayResults();
         savePlacementResult();
-
-        // Leo's congratulation will be shown on Dashboard instead
-        // Results screen should be clean and focused on the assessment results
-
+        startEntranceAnimations();
         setupListeners();
     }
 
     private void initViews() {
-        rootLayout = findViewById(R.id.rootLayout);
+        lottieConfetti = findViewById(R.id.lottieConfetti);
+        ivLeoResult = findViewById(R.id.ivLeoResult);
+        contentSection = findViewById(R.id.contentSection);
+
+        tvCongrats = findViewById(R.id.tvCongrats);
         tvLevelName = findViewById(R.id.tvLevelName);
         tvLevelNumber = findViewById(R.id.tvLevelNumber);
         tvAccuracy = findViewById(R.id.tvAccuracy);
         tvQuestionsAnswered = findViewById(R.id.tvQuestionsAnswered);
+
         tvCategory1Score = findViewById(R.id.tvCategory1Score);
         tvCategory2Score = findViewById(R.id.tvCategory2Score);
         tvCategory3Score = findViewById(R.id.tvCategory3Score);
         tvCategory4Score = findViewById(R.id.tvCategory4Score);
         tvCategory5Score = findViewById(R.id.tvCategory5Score);
+
+        pbCategory1 = findViewById(R.id.pbCategory1);
+        pbCategory2 = findViewById(R.id.pbCategory2);
+        pbCategory3 = findViewById(R.id.pbCategory3);
+        pbCategory4 = findViewById(R.id.pbCategory4);
+        pbCategory5 = findViewById(R.id.pbCategory5);
+
+        rowCategory1 = findViewById(R.id.rowCategory1);
+        rowCategory2 = findViewById(R.id.rowCategory2);
+        rowCategory3 = findViewById(R.id.rowCategory3);
+        rowCategory4 = findViewById(R.id.rowCategory4);
+        rowCategory5 = findViewById(R.id.rowCategory5);
+
         btnContinueToDashboard = findViewById(R.id.btnContinueToDashboard);
     }
 
@@ -100,7 +124,6 @@ public class PlacementResultActivity extends AppCompatActivity {
             startTime = passedStartTime;
         }
 
-        // Default values if not provided
         if (levelName == null || levelName.isEmpty()) {
             levelName = getLevelNameFromLevel(placementLevel);
         }
@@ -119,106 +142,151 @@ public class PlacementResultActivity extends AppCompatActivity {
     }
 
     private void displayResults() {
-        // Display reading level
         tvLevelName.setText(levelName);
         tvLevelNumber.setText("Level " + placementLevel);
-
-        // Display accuracy
         tvAccuracy.setText(String.format("%.0f%%", accuracy));
-
-        // Display questions answered
         tvQuestionsAnswered.setText(totalAnswered + "/" + 25);
 
-        // Display category scores
         if (categoryScores.length >= 5) {
             tvCategory1Score.setText(categoryScores[0] + "%");
             tvCategory2Score.setText(categoryScores[1] + "%");
             tvCategory3Score.setText(categoryScores[2] + "%");
             tvCategory4Score.setText(categoryScores[3] + "%");
             tvCategory5Score.setText(categoryScores[4] + "%");
+
+            // Animate progress bars after a short delay so the entrance animation is visible
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                animateProgressBar(pbCategory1, categoryScores[0]);
+                animateProgressBar(pbCategory2, categoryScores[1]);
+                animateProgressBar(pbCategory3, categoryScores[2]);
+                animateProgressBar(pbCategory4, categoryScores[3]);
+                animateProgressBar(pbCategory5, categoryScores[4]);
+            }, 800);
         }
+    }
+
+    private void animateProgressBar(ProgressBar bar, int target) {
+        android.animation.ObjectAnimator anim = android.animation.ObjectAnimator.ofInt(bar, "progress", 0, target);
+        anim.setDuration(700);
+        anim.setInterpolator(new android.view.animation.DecelerateInterpolator());
+        anim.start();
+    }
+
+    private void startEntranceAnimations() {
+        // Leo: drop in from above with overshoot bounce
+        ivLeoResult.setTranslationY(-100f);
+        ivLeoResult.setAlpha(0f);
+        ivLeoResult.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(650)
+                .setInterpolator(new OvershootInterpolator(0.9f))
+                .start();
+
+        // Content card: slide up from below
+        contentSection.setTranslationY(80f);
+        contentSection.setAlpha(0f);
+        contentSection.animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(600)
+                .setStartDelay(250)
+                .setInterpolator(new OvershootInterpolator(0.5f))
+                .start();
+
+        // Category rows: staggered slide-in from left
+        View[] rows = {rowCategory1, rowCategory2, rowCategory3, rowCategory4, rowCategory5};
+        for (int i = 0; i < rows.length; i++) {
+            if (rows[i] == null) continue;
+            rows[i].setAlpha(0f);
+            rows[i].setTranslationX(-40f);
+            rows[i].animate()
+                    .alpha(1f)
+                    .translationX(0f)
+                    .setDuration(380)
+                    .setStartDelay(480 + i * 90L)
+                    .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                    .start();
+        }
+
+        // Continue button: fade up last
+        btnContinueToDashboard.setAlpha(0f);
+        btnContinueToDashboard.setTranslationY(20f);
+        btnContinueToDashboard.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .setDuration(400)
+                .setStartDelay(950)
+                .start();
+
+        // Trigger Leo dialogue after animations settle
+        new Handler(Looper.getMainLooper()).postDelayed(this::showLeoCongratulation, 1400);
     }
 
     private void showLeoCongratulation() {
         List<LeoDialogueView.DialogueMessage> messages = new ArrayList<>();
-
-        // Congratulation message based on level
-        String congratsMessage = getCongratsMessage(placementLevel);
-        messages.add(new LeoDialogueView.DialogueMessage(congratsMessage));
-
-        // Encouraging message
-        String encouragementMessage = getEncouragementMessage(placementLevel);
-        messages.add(new LeoDialogueView.DialogueMessage(encouragementMessage));
-
-        // Next steps message
+        messages.add(new LeoDialogueView.DialogueMessage(getCongratsMessage(placementLevel)));
+        messages.add(new LeoDialogueView.DialogueMessage(getEncouragementMessage(placementLevel)));
         messages.add(new LeoDialogueView.DialogueMessage(
                 "Now, let's start your reading adventure!\n\n" +
-                        "I've picked the perfect stories for your level. " +
-                        "You'll get better and better with each story you read! 📚✨"
+                "I've picked the perfect stories for your level. " +
+                "You'll get better and better with each story you read! \uD83D\uDCDA✨"
         ));
 
-        // Create and show dialogue view
         LeoDialogueView dialogueView = new LeoDialogueView(this);
         dialogueView.setDialogueMessages(messages);
-        dialogueView.setDialogueCompleteListener(() -> {
-            // Dialogue complete - user can now proceed
-        });
-        dialogueView.show((ViewGroup) rootLayout);
+        dialogueView.setDialogueCompleteListener(() -> { /* user can now proceed */ });
+        dialogueView.show((ViewGroup) getWindow().getDecorView().getRootView());
     }
 
     private String getCongratsMessage(int level) {
         switch (level) {
             case 1:
-                return "🌟 Wonderful job!\n\n" +
-                        "You're a Beginner Reader! " +
-                        "You're just starting your reading journey, and that's amazing! " +
-                        "Every great reader starts right where you are! 🎉";
+                return "\uD83C\uDF1F Yay! You finished!\n\n" +
+                        "I knew you could do it! I am SO happy for you right now! " +
+                        "You're a Beginner Reader — and guess what? That's exactly where every great reading adventure starts! \uD83C\uDF89";
             case 2:
-                return "🌟 Fantastic work!\n\n" +
-                        "You're an Early Reader! " +
-                        "You're building your reading skills beautifully! " +
-                        "Keep up the great work! 🎉";
+                return "\uD83C\uDF1F Wow, look at you go!\n\n" +
+                        "You did an amazing job on the whole test! I'm literally clapping for you! " +
+                        "You're an Early Reader — you're already learning so many cool things! \uD83C\uDF89";
             case 3:
-                return "🌟 Excellent job!\n\n" +
-                        "You're a Developing Reader! " +
-                        "You're making wonderful progress in your reading! " +
-                        "You're doing so well! 🎉";
+                return "\uD83C\uDF1F Incredible!\n\n" +
+                        "You did SO great on the test! Seriously, you should feel really proud right now — I definitely am! " +
+                        "You're a Developing Reader — you're growing stronger every single day! \uD83C\uDF89";
             case 4:
-                return "🌟 Outstanding!\n\n" +
-                        "You're a Fluent Reader! " +
-                        "Wow! You're reading really well! " +
-                        "I'm so proud of you! 🎉";
+                return "\uD83C\uDF1F Oh WOW!\n\n" +
+                        "You are such a strong, incredible reader! I am beyond proud of you — you really, truly impressed me! " +
+                        "You're a Fluent Reader — that is SO amazing! \uD83C\uDF89";
             default:
-                return "🌟 Great job completing the test! 🎉";
+                return "\uD83C\uDF1F Great job completing the test! \uD83C\uDF89";
         }
     }
 
     private String getEncouragementMessage(int level) {
         switch (level) {
             case 1:
-                return "I'll be with you every step of the way! 💪\n\n" +
-                        "We'll start with fun, simple stories that are just right for you. " +
-                        "Remember, every reader was once a beginner!";
+                return "You're already a star to me! \uD83D\uDCAA\n\n" +
+                        "I'll be with you every step of the way! We'll start with fun, " +
+                        "simple stories that are just right for you. Remember — every great reader was once a beginner!";
             case 2:
-                return "You're growing as a reader! 💪\n\n" +
-                        "I've selected stories that will challenge you just the right amount. " +
-                        "Keep reading, and you'll be amazed at how much you'll learn!";
+                return "You're growing as a reader! \uD83D\uDCAA\n\n" +
+                        "I chose some really fun stories that are just perfect for where you are right now. " +
+                        "Each one will make you even more awesome. You've got this!";
             case 3:
-                return "You're becoming a strong reader! 💪\n\n" +
-                        "The stories I've picked will help you become even better! " +
-                        "You're on your way to becoming a fluent reader!";
+                return "You're becoming a strong reader! \uD83D\uDCAA\n\n" +
+                        "I found the perfect stories that will help you level up even more! " +
+                        "You're on your way to becoming a fluent reader — and I can't wait to see you get there!";
             case 4:
-                return "You're an amazing reader! 💪\n\n" +
-                        "I've found exciting stories that will keep challenging you! " +
-                        "Keep reading and exploring new books!";
+                return "You are an amazing reader! \uD83D\uDCAA\n\n" +
+                        "I've saved my most exciting and challenging stories just for readers like you. " +
+                        "Get ready — this is going to be SO amazing!";
             default:
-                return "Let's keep learning together! 💪";
+                return "Let's keep learning together! \uD83D\uDCAA";
         }
     }
 
     private void setupListeners() {
         btnContinueToDashboard.setOnClickListener(v -> {
-            // Navigate to Dashboard
             Intent intent = new Intent(PlacementResultActivity.this, DashboardActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -243,29 +311,21 @@ public class PlacementResultActivity extends AppCompatActivity {
             return;
         }
 
-        // Determine assessment type based on whether student has completed assessment before
         String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
 
-        // Skip API call in demo mode, but still update local session manager
         if (com.example.literise.utils.AppConfig.DEMO_MODE) {
             Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
             if ("PreAssessment".equals(assessmentType)) {
                 sessionManager.setAssessmentCompleted(true);
-                sessionManager.setAssessmentStarted(false); // Clear started flag
+                sessionManager.setAssessmentStarted(false);
             }
             return;
         }
 
-        // Generate session ID based on timestamp
         int sessionId = (int) (System.currentTimeMillis() / 1000);
-
-        // Calculate time spent in seconds
         int timeSpentSeconds = (int) ((System.currentTimeMillis() - startTime) / 1000);
-
-        // Build device info
         String deviceInfo = Build.MANUFACTURER + " " + Build.MODEL + ", Android " + Build.VERSION.RELEASE;
 
-        // Create request
         SavePlacementResultRequest request = new SavePlacementResultRequest(
                 studentId,
                 sessionId,
@@ -278,17 +338,14 @@ public class PlacementResultActivity extends AppCompatActivity {
                 accuracy
         );
 
-        // Set category scores
         for (int i = 0; i < categoryScores.length && i < 5; i++) {
             request.setCategoryScore(i + 1, categoryScores[i]);
         }
 
-        // Set optional fields
         request.setTimeSpentSeconds(timeSpentSeconds);
         request.setDeviceInfo(deviceInfo);
         request.setAppVersion(getAppVersion());
 
-        // Make API call
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         Call<SavePlacementResultResponse> call = apiService.savePlacementResult(request);
 
@@ -299,13 +356,11 @@ public class PlacementResultActivity extends AppCompatActivity {
                     SavePlacementResultResponse result = response.body();
                     Log.d(TAG, "Placement result saved successfully: " + result.getMessage());
 
-                    // Mark assessment as completed if this was PreAssessment
                     if ("PreAssessment".equals(assessmentType)) {
                         sessionManager.setAssessmentCompleted(true);
-                        sessionManager.setAssessmentStarted(false); // Clear started flag
+                        sessionManager.setAssessmentStarted(false);
                     }
 
-                    // Log assessment completion
                     SessionLogger.logAssessmentComplete(PlacementResultActivity.this, studentId, assessmentType);
                 } else {
                     Log.e(TAG, "Failed to save placement result: " + response.code());
@@ -321,6 +376,6 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Don't allow back - user must continue to dashboard
+        // Prevent back navigation — user must continue to dashboard
     }
 }
