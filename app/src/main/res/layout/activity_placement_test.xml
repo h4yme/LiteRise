@@ -4,109 +4,167 @@
     android:id="@+id/rootLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@drawable/bg_placement_gradient">
+
+    <!-- Background Lottie (subtle sparkles) -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.12"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+        app:lottie_speed="0.4" />
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="16dp"
-        android:gravity="center_vertical"
+        android:paddingTop="20dp"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- Back Button (Circular) -->
-        <androidx.cardview.widget.CardView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:cardBackgroundColor="#FFE8E8"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="2dp">
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="44dp"
+            android:layout_height="44dp"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="4dp">
 
             <ImageView
                 android:id="@+id/btnBack"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_arrow_back"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
-                app:tint="#E74C3C" />
+                android:padding="10dp"
+                android:src="@drawable/ic_arrow_back"
+                app:tint="@color/purple_600" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Progress Bar -->
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyleHorizontal"
+        <!-- Progress Area -->
+        <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="8dp"
-            android:layout_weight="1"
-            android:max="100"
-            android:progress="12"
-            android:progressTint="#FFD93D"
-            android:progressBackgroundTint="#F0F0F0"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
-            android:layout_marginEnd="12dp" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <!-- Skip Button -->
-        <TextView
-            android:id="@+id/btnSkip"
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="match_parent"
+                android:layout_height="10dp"
+                android:max="100"
+                android:progress="4"
+                android:progressBackgroundTint="#E8E0FF"
+                android:progressBackgroundTintMode="src_in"
+                android:progressTint="@color/purple_600" />
+
+            <TextView
+                android:id="@+id/tvQuestionCounter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/visby_bold"
+                android:text="Q 1 / 25"
+                android:textColor="@color/purple_600"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <!-- Skip Button (pill card) -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true"
-            android:fontFamily="@font/visby_bold"
-            android:padding="8dp"
-            android:text="Skip"
-            android:textColor="#95A5A6"
-            android:textSize="14sp" />
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp">
+
+            <TextView
+                android:id="@+id/btnSkip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/visby_bold"
+                android:paddingBottom="8dp"
+                android:paddingEnd="14dp"
+                android:paddingStart="14dp"
+                android:paddingTop="8dp"
+                android:text="Skip"
+                android:textColor="#95A5A6"
+                android:textSize="13sp" />
+
+        </com.google.android.material.card.MaterialCardView>
 
     </LinearLayout>
 
-    <!-- Main Content Container (Non-scrollable) -->
+    <!-- Main Content Container -->
     <LinearLayout
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:orientation="vertical"
-        android:paddingStart="20dp"
         android:paddingEnd="20dp"
-        android:paddingTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/topBar"
-        app:layout_constraintBottom_toTopOf="@id/bottomContainer">
+        android:paddingStart="20dp"
+        android:paddingTop="10dp"
+        app:layout_constraintBottom_toTopOf="@id/bottomContainer"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
 
-        <!-- Question Type Header -->
+        <!-- Question Type Header Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="14dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <TextView
+            <!-- Category Chip -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/chipCategory"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="✨"
-                android:textSize="18sp"
-                android:layout_marginEnd="8dp" />
+                android:layout_marginEnd="10dp"
+                app:cardBackgroundColor="#EDE9FF"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp">
 
+                <TextView
+                    android:id="@+id/tvCategoryChip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/visby_bold"
+                    android:paddingBottom="5dp"
+                    android:paddingEnd="10dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="5dp"
+                    android:text="🔤 Phonics"
+                    android:textColor="@color/purple_600"
+                    android:textSize="11sp" />
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Question Type Text -->
             <TextView
                 android:id="@+id/tvQuestionType"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:fontFamily="@font/visby_bold"
-                android:text="Correct Word"
+                android:text="Answer the Question"
                 android:textColor="#2C3E50"
-                android:textSize="16sp" />
-
-            <View
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:background="@drawable/bg_circle"
-                android:backgroundTint="#2C3E50" />
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -124,9 +182,13 @@
         android:id="@+id/bottomContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="20dp"
         android:background="@color/white"
+        android:elevation="12dp"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp"
+        android:paddingTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <!-- Leo Hint (Hidden initially) -->
@@ -136,22 +198,24 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
             android:visibility="gone"
-            app:cardBackgroundColor="#E8F5E9"
+            app:cardBackgroundColor="#FFFBEC"
             app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp"
+            app:strokeColor="#FFE099"
+            app:strokeWidth="1.5dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 android:padding="12dp">
 
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/leo_happy"
-                    android:layout_marginEnd="10dp" />
+                    android:layout_marginEnd="10dp"
+                    android:src="@drawable/leo_happy" />
 
                 <TextView
                     android:id="@+id/tvLeoHint"
@@ -160,8 +224,8 @@
                     android:layout_weight="1"
                     android:fontFamily="@font/visby_bold"
                     android:text="Pick the right word!"
-                    android:textColor="#2E7D32"
-                    android:textSize="14sp" />
+                    android:textColor="#92640B"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -177,8 +241,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <!-- Continue Button -->
             <com.google.android.material.button.MaterialButton
@@ -186,16 +250,16 @@
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
+                android:layout_marginEnd="10dp"
                 android:layout_weight="1"
                 android:fontFamily="@font/visby_bold"
                 android:text="Continue"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:textSize="16sp"
-                app:backgroundTint="#4ECDC4"
+                app:backgroundTint="@color/purple_600"
                 app:cornerRadius="20dp"
-                app:elevation="4dp"
-                android:layout_marginEnd="10dp" />
+                app:elevation="4dp" />
 
             <!-- Retry Button -->
             <com.google.android.material.button.MaterialButton
@@ -206,15 +270,15 @@
                 android:fontFamily="@font/visby_medium"
                 android:text="Retry"
                 android:textAllCaps="false"
-                android:textColor="#95A5A6"
+                android:textColor="@color/purple_600"
                 android:textSize="16sp"
-                app:strokeColor="#BDC3C7"
-                app:strokeWidth="1.5dp"
+                android:visibility="gone"
                 app:cornerRadius="20dp"
                 app:icon="@drawable/ic_refresh"
                 app:iconGravity="start"
-                app:iconTint="#95A5A6"
-                android:visibility="gone" />
+                app:iconTint="@color/purple_600"
+                app:strokeColor="@color/purple_600"
+                app:strokeWidth="1.5dp" />
 
         </LinearLayout>
 

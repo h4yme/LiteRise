@@ -33,15 +33,10 @@ import com.example.literise.models.AdaptiveQuestionResponse;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.models.SubmitAnswerResponse;
 import com.example.literise.utils.IRTEngine;
-import com.example.literise.utils.KaraokeTextHelper;
 import com.example.literise.utils.SessionLogger;
 import com.example.literise.utils.SoundEffectsHelper;
-import com.example.literise.utils.SpeechRecognitionHelper;
-import com.example.literise.utils.TextToSpeechHelper;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import android.widget.SeekBar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +54,8 @@ public class PlacementTestActivity extends AppCompatActivity {
     private MaterialCardView leoHintContainer;
     private TextView tvLeoHint;
     private MaterialButton btnContinue, btnRetry;
+    private TextView tvQuestionCounter;
+    private TextView tvCategoryChip;
 
     // IRT Engine and Question Bank
     private IRTEngine irtEngine;
@@ -69,15 +66,8 @@ public class PlacementTestActivity extends AppCompatActivity {
     private int currentSessionId;
     private long questionStartTime;
 
-    // Speech Recognition
-    private SpeechRecognitionHelper speechRecognitionHelper;
-
     // Pronunciation Assessment
     private PronunciationHelper pronunciationHelper;
-
-    // Karaoke Reading
-    private KaraokeTextHelper karaokeTextHelper;
-    private TextToSpeechHelper textToSpeechHelper;
 
     // Sound Effects
     private SoundEffectsHelper soundEffectsHelper;
@@ -138,6 +128,8 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvLeoHint = findViewById(R.id.tvLeoHint);
         btnContinue = findViewById(R.id.btnContinue);
         btnRetry = findViewById(R.id.btnRetry);
+        tvQuestionCounter = findViewById(R.id.tvQuestionCounter);
+        tvCategoryChip = findViewById(R.id.tvCategoryChip);
     }
 
     private void setupListeners() {
@@ -316,14 +308,6 @@ public class PlacementTestActivity extends AppCompatActivity {
         tvCategoryName.setText(name);
         tvLeoMessage.setText(message);
 
-        // Speak Leo's message
-        final String finalMessage = message;
-        new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            if (textToSpeechHelper != null && textToSpeechHelper.isInitialized()) {
-                textToSpeechHelper.speak(finalMessage, null);
-            }
-        }, 500);
-
         // Continue button
         btnContinue.setOnClickListener(v -> {
             dialog.dismiss();
@@ -369,6 +353,23 @@ public class PlacementTestActivity extends AppCompatActivity {
     private void updateProgress() {
         int progress = (int) ((currentQuestionNumber / (float) totalQuestions) * 100);
         progressBar.setProgress(progress);
+        if (tvQuestionCounter != null) {
+            tvQuestionCounter.setText("Q " + currentQuestionNumber + " / " + totalQuestions);
+        }
+        if (tvCategoryChip != null) {
+            tvCategoryChip.setText(getCategoryChipLabel(currentCategory));
+        }
+    }
+
+    private String getCategoryChipLabel(int category) {
+        switch (category) {
+            case 1: return "🔤 Phonics";
+            case 2: return "📚 Vocabulary";
+            case 3: return "✏️ Grammar";
+            case 4: return "📖 Comprehension";
+            case 5: return "✍️ Composing";
+            default: return "📝 Question";
+        }
     }
 
     private void updateCurrentCategory() {
@@ -868,21 +869,12 @@ public class PlacementTestActivity extends AppCompatActivity {
         // Set question type
         tvQuestionType.setText("📖 Reading Comprehension");
 
-        // Initialize Text-to-Speech
-        if (textToSpeechHelper == null) {
-            textToSpeechHelper = new TextToSpeechHelper(this);
-        }
-
         // Get UI elements
         MaterialCardView readingPassageCard = questionView.findViewById(R.id.readingPassageCard);
-        MaterialCardView controlPanelCard = questionView.findViewById(R.id.controlPanelCard);
-        TextView tvReadingText = questionView.findViewById(R.id.tvReadingText);
-        TextView tvReadingStatus = questionView.findViewById(R.id.tvReadingStatus);
-        FloatingActionButton btnPlay = questionView.findViewById(R.id.btnPlay);
-        FloatingActionButton btnStop = questionView.findViewById(R.id.btnStop);
-        SeekBar seekBarSpeed = questionView.findViewById(R.id.seekBarSpeed);
         MaterialCardView comprehensionCard = questionView.findViewById(R.id.comprehensionCard);
+        TextView tvReadingText = questionView.findViewById(R.id.tvReadingText);
         TextView tvComprehensionQuestion = questionView.findViewById(R.id.tvComprehensionQuestion);
+        MaterialButton btnDoneReading = questionView.findViewById(R.id.btnDoneReading);
         MaterialButton btnAnswer1 = questionView.findViewById(R.id.btnAnswer1);
         MaterialButton btnAnswer2 = questionView.findViewById(R.id.btnAnswer2);
         MaterialButton btnAnswer3 = questionView.findViewById(R.id.btnAnswer3);
@@ -895,157 +887,60 @@ public class PlacementTestActivity extends AppCompatActivity {
         }
         tvReadingText.setText(readingText);
 
-        // Initialize karaoke helper
-        karaokeTextHelper = new KaraokeTextHelper(tvReadingText);
-        karaokeTextHelper.setReadingSpeed(1); // Normal speed by default
+        // Set up comprehension question and options
+        tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
+        List<String> options = currentQuestion.getOptions();
+        if (options != null && !options.isEmpty()) {
+            if (options.size() >= 1) { btnAnswer1.setText(options.get(0)); }
+            if (options.size() >= 2) { btnAnswer2.setText(options.get(1)); }
+            if (options.size() >= 3) { btnAnswer3.setText(options.get(2)); }
+            if (options.size() >= 4) { btnAnswer4.setText(options.get(3)); }
+        }
 
-        // Play button listener
-        final String finalReadingText = readingText;
-        btnPlay.setOnClickListener(v -> {
-            if (karaokeTextHelper.isPlaying()) {
-                // Pause
-                karaokeTextHelper.pause();
-                textToSpeechHelper.stop();
-                btnPlay.setImageResource(R.drawable.ic_play);
-                tvReadingStatus.setText("Paused - Tap play to continue");
-            } else {
-                // Start or resume
-                btnPlay.setImageResource(R.drawable.ic_stop);
-                tvReadingStatus.setText("Reading... Follow along!");
-                tvReadingStatus.setTextColor(getColor(R.color.primary_blue));
+        // Done Reading button reveals comprehension question
+        btnDoneReading.setOnClickListener(v -> {
+            readingPassageCard.setVisibility(View.GONE);
+            comprehensionCard.setVisibility(View.VISIBLE);
 
-                karaokeTextHelper.start(new KaraokeTextHelper.KaraokeCallback() {
-                    @Override
-                    public void onWordHighlighted(int wordIndex, String word) {
-                        // Word is highlighted, TTS reads it
-                        if (wordIndex == 0) {
-                            // Start TTS for entire passage
-                            textToSpeechHelper.speak(finalReadingText, null);
-                        }
-                    }
+            // Show answer buttons based on option count
+            if (options != null) {
+                btnAnswer1.setVisibility(options.size() >= 1 ? View.VISIBLE : View.GONE);
+                btnAnswer2.setVisibility(options.size() >= 2 ? View.VISIBLE : View.GONE);
+                btnAnswer3.setVisibility(options.size() >= 3 ? View.VISIBLE : View.GONE);
+                btnAnswer4.setVisibility(options.size() >= 4 ? View.VISIBLE : View.GONE);
+            }
 
-                    @Override
-                    public void onReadingComplete() {
-                        runOnUiThread(() -> {
-                            btnPlay.setImageResource(R.drawable.ic_play);
-                            tvReadingStatus.setText("Great job reading!");
-                            tvReadingStatus.setTextColor(getColor(R.color.success_green));
-
-                            // Show comprehension question
-                            if (currentQuestion.getOptions() != null && !currentQuestion.getOptions().isEmpty()) {
-                                // Hide reading passage and controls to make room for all 4 answer buttons
-                                readingPassageCard.setVisibility(View.GONE);
-                                controlPanelCard.setVisibility(View.GONE);
-
-                                comprehensionCard.setVisibility(View.VISIBLE);
-                                tvComprehensionQuestion.setText(currentQuestion.getQuestionText());
-
-                                List<String> options = currentQuestion.getOptions();
-                                android.util.Log.d("PlacementTest", "Reading question has " + options.size() + " options");
-                                if (options.size() >= 4) {
-                                    btnAnswer1.setText(options.get(0));
-                                    btnAnswer1.setVisibility(View.VISIBLE);
-                                    btnAnswer2.setText(options.get(1));
-                                    btnAnswer2.setVisibility(View.VISIBLE);
-                                    btnAnswer3.setText(options.get(2));
-                                    btnAnswer3.setVisibility(View.VISIBLE);
-                                    btnAnswer4.setText(options.get(3));
-                                    btnAnswer4.setVisibility(View.VISIBLE);
-                                } else if (options.size() >= 3) {
-                                    btnAnswer1.setText(options.get(0));
-                                    btnAnswer1.setVisibility(View.VISIBLE);
-                                    btnAnswer2.setText(options.get(1));
-                                    btnAnswer2.setVisibility(View.VISIBLE);
-                                    btnAnswer3.setText(options.get(2));
-                                    btnAnswer3.setVisibility(View.VISIBLE);
-                                    btnAnswer4.setVisibility(View.GONE);
-                                } else if (options.size() >= 2) {
-                                    btnAnswer1.setText(options.get(0));
-                                    btnAnswer1.setVisibility(View.VISIBLE);
-                                    btnAnswer2.setText(options.get(1));
-                                    btnAnswer2.setVisibility(View.VISIBLE);
-                                    btnAnswer3.setVisibility(View.GONE);
-                                    btnAnswer4.setVisibility(View.GONE);
-                                }
-
-                                // Scroll to show comprehension card
-                                questionView.postDelayed(() -> {
-                                    comprehensionCard.requestFocus();
-                                }, 300);
-                            } else {
-                                // No comprehension question, enable continue
-                                selectedAnswer = "completed";
-                                btnContinue.setEnabled(true);
-                                android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
-                                        PlacementTestActivity.this, R.anim.bounce);
-                                btnContinue.startAnimation(bounceAnim);
-                            }
-                        });
-                    }
-                });
+            if (options == null || options.isEmpty()) {
+                // No comprehension question – auto-enable continue
+                selectedAnswer = "completed";
+                btnContinue.setEnabled(true);
+                android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
+                        PlacementTestActivity.this, R.anim.bounce);
+                btnContinue.startAnimation(bounceAnim);
             }
         });
 
-        // Stop button listener
-        btnStop.setOnClickListener(v -> {
-            karaokeTextHelper.stop();
-            textToSpeechHelper.stop();
-            btnPlay.setImageResource(R.drawable.ic_play);
-            tvReadingStatus.setText("Tap play to start reading!");
-            tvReadingStatus.setTextColor(getColor(R.color.text_secondary));
-
-            // Show reading passage and controls again
-            readingPassageCard.setVisibility(View.VISIBLE);
-            controlPanelCard.setVisibility(View.VISIBLE);
-            comprehensionCard.setVisibility(View.GONE);
-        });
-
-        // Speed slider listener
-        seekBarSpeed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser && karaokeTextHelper != null) {
-                    karaokeTextHelper.setReadingSpeed(progress);
-
-                    // Also adjust TTS speed
-                    float ttsSpeed = 0.7f + (progress * 0.3f); // 0.7 to 1.3
-                    // Speed will be applied on next read
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        // Comprehension answer buttons
+        // Comprehension answer click listener
         View.OnClickListener answerClickListener = v -> {
-            // Reset all button colors
             btnAnswer1.setBackgroundTintList(getColorStateList(android.R.color.white));
-            btnAnswer1.setTextColor(getColor(R.color.text_primary));
+            btnAnswer1.setTextColor(getColor(R.color.purple_600));
             btnAnswer2.setBackgroundTintList(getColorStateList(android.R.color.white));
-            btnAnswer2.setTextColor(getColor(R.color.text_primary));
+            btnAnswer2.setTextColor(getColor(R.color.purple_600));
             btnAnswer3.setBackgroundTintList(getColorStateList(android.R.color.white));
-            btnAnswer3.setTextColor(getColor(R.color.text_primary));
+            btnAnswer3.setTextColor(getColor(R.color.purple_600));
             btnAnswer4.setBackgroundTintList(getColorStateList(android.R.color.white));
-            btnAnswer4.setTextColor(getColor(R.color.text_primary));
+            btnAnswer4.setTextColor(getColor(R.color.purple_600));
 
-            // Highlight selected
             MaterialButton selectedBtn = (MaterialButton) v;
-            selectedBtn.setBackgroundTintList(getColorStateList(R.color.primary_blue));
+            selectedBtn.setBackgroundTintList(getColorStateList(R.color.purple_600));
             selectedBtn.setTextColor(getColor(android.R.color.white));
 
-            // Play pop animation
             android.view.animation.Animation popAnim = android.view.animation.AnimationUtils.loadAnimation(
                     this, R.anim.option_pop);
             v.startAnimation(popAnim);
 
-            // Store answer text and letter
             selectedAnswer = selectedBtn.getText().toString();
 
-            // Determine which button was clicked and set the letter
             if (v.getId() == R.id.btnAnswer1) {
                 selectedAnswerLetter = "A";
             } else if (v.getId() == R.id.btnAnswer2) {
@@ -1056,7 +951,6 @@ public class PlacementTestActivity extends AppCompatActivity {
                 selectedAnswerLetter = "D";
             }
 
-            // Enable continue button
             btnContinue.setEnabled(true);
             android.view.animation.Animation bounceAnim = android.view.animation.AnimationUtils.loadAnimation(
                     this, R.anim.bounce);
@@ -1467,15 +1361,6 @@ public class PlacementTestActivity extends AppCompatActivity {
         super.onDestroy();
         if (questionBankHelper != null) {
             questionBankHelper.close();
-        }
-        if (speechRecognitionHelper != null) {
-            speechRecognitionHelper.destroy();
-        }
-        if (karaokeTextHelper != null) {
-            karaokeTextHelper.destroy();
-        }
-        if (textToSpeechHelper != null) {
-            textToSpeechHelper.shutdown();
         }
         if (soundEffectsHelper != null) {
             soundEffectsHelper.release();
