@@ -243,11 +243,41 @@ public class WordHuntActivity extends BaseGameActivity {
 
 
         initializeViews();
+        applyModuleTheme();
 
         setupListeners();
 
         loadWords();
 
+    }
+
+    private void applyModuleTheme() {
+        try {
+            Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#7C3AED";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#4F46E5";
+
+            // Tint timer progress bar
+            if (timerProgress != null) {
+                timerProgress.setProgressTintList(
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+            }
+
+            // Apply module color to word list card
+            androidx.cardview.widget.CardView cardWordList = findViewById(R.id.cardWordList);
+            if (cardWordList != null) {
+                android.graphics.drawable.GradientDrawable grad =
+                    new android.graphics.drawable.GradientDrawable(
+                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                        new int[]{android.graphics.Color.parseColor(colorStart),
+                                  android.graphics.Color.parseColor(colorEnd)});
+                float r = 16 * getResources().getDisplayMetrics().density;
+                grad.setCornerRadius(r);
+                cardWordList.setBackground(grad);
+            }
+        } catch (Exception ignored) {}
     }
 
 

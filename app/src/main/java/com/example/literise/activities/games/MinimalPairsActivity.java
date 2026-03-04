@@ -78,6 +78,7 @@ public class MinimalPairsActivity extends BaseGameActivity {
         session = new SessionManager(this);
 
         initializeViews();
+        applyModuleTheme();
         setupMinimalPairs();
         setupTextToSpeech();
         setupSpeechRecognition();
@@ -105,6 +106,26 @@ public class MinimalPairsActivity extends BaseGameActivity {
         btnNext.setVisibility(View.GONE);
         tvFeedback.setVisibility(View.GONE);
         ivMouthShape.setVisibility(View.GONE);
+    }
+
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#FF6B6B";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#FF8E53";
+            android.view.View header = findViewById(R.id.header);
+            if (header != null) {
+                android.graphics.drawable.GradientDrawable grad =
+                    new android.graphics.drawable.GradientDrawable(
+                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                        new int[]{android.graphics.Color.parseColor(colorStart),
+                                  android.graphics.Color.parseColor(colorEnd)});
+                grad.setCornerRadius(0f);
+                header.setBackground(grad);
+            }
+        } catch (Exception ignored) {}
     }
 
     private void setupMinimalPairs() {

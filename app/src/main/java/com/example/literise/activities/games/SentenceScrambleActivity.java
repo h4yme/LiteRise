@@ -235,11 +235,47 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
 
         initializeViews();
+        applyModuleTheme();
 
         setupListeners();
 
         loadSentences();
 
+    }
+
+    private void applyModuleTheme() {
+        try {
+            Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#7C3AED";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#4F46E5";
+
+            // Tint timer progress bar
+            if (timerProgress != null) {
+                timerProgress.setProgressTintList(
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+            }
+
+            // Apply module color to word bank card
+            androidx.cardview.widget.CardView cardWordBank = findViewById(R.id.cardWordBank);
+            if (cardWordBank != null) {
+                android.graphics.drawable.GradientDrawable grad =
+                    new android.graphics.drawable.GradientDrawable(
+                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                        new int[]{android.graphics.Color.parseColor(colorStart),
+                                  android.graphics.Color.parseColor(colorEnd)});
+                float r = 20 * getResources().getDisplayMetrics().density;
+                grad.setCornerRadius(r);
+                cardWordBank.setBackground(grad);
+            }
+
+            // Apply module name to title subtitle if module_name extra present
+            String moduleName = intent.getStringExtra("module_name");
+            if (moduleName != null && !moduleName.isEmpty() && tvTitle != null) {
+                tvTitle.setText("Sentence Scramble");
+            }
+        } catch (Exception ignored) {}
     }
 
 

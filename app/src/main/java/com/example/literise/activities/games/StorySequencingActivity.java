@@ -76,6 +76,7 @@ public class StorySequencingActivity extends BaseGameActivity {
 
         session = new SessionManager(this);
         initializeViews();
+        applyModuleTheme();
         setupStoryData();
         setupRecyclerView();
         setupListeners();
@@ -103,6 +104,28 @@ public class StorySequencingActivity extends BaseGameActivity {
 
         btnShuffle = findViewById(R.id.btnShuffle);
 
+    }
+
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#FFD93D";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#FFA93D";
+            if (btnCheckAnswer != null) {
+                btnCheckAnswer.setBackgroundTintList(
+                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+                btnCheckAnswer.setTextColor(android.graphics.Color.parseColor("#1F2937"));
+            }
+            if (btnHint != null) {
+                btnHint.setStrokeColor(android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor(colorStart)));
+                btnHint.setTextColor(android.graphics.Color.parseColor(colorStart));
+                btnHint.setIconTint(android.content.res.ColorStateList.valueOf(
+                    android.graphics.Color.parseColor(colorStart)));
+            }
+        } catch (Exception ignored) {}
     }
 
 
