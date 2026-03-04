@@ -93,23 +93,31 @@ if ($audioFile['size'] > $maxFileSize) {
     sendError('Audio file too large. Maximum size: 10MB', 400);
 }
 
-// Get item details for pronunciation assessment
-$itemStmt = $conn->prepare("
-    SELECT TargetPronunciation, PhoneticTranscription, MinimumAccuracy, DifficultyParam, Category
-    FROM dbo.AssessmentItems
-    WHERE ItemID = ?
-");
-$itemStmt->execute([$itemID]);
-$item = $itemStmt->fetch(PDO::FETCH_ASSOC);
+// Get item details for pronunciation assessment (soft lookup — use POST data as fallback)
+$targetPronunciation = $targetWord;
+$minAccuracy = 65;
+$itemDifficulty = 0.0;
+$category = 'Oral Language';
 
-if (!$item) {
-    sendError('Assessment item not found', 404);
+try {
+    $itemStmt = $conn->prepare("
+        SELECT TargetPronunciation, MinimumAccuracy, DifficultyParam, Category
+        FROM dbo.AssessmentItems
+        WHERE ItemID = ?
+    ");
+    $itemStmt->execute([$itemID]);
+    $item = $itemStmt->fetch(PDO::FETCH_ASSOC);
+    if ($item) {
+        $targetPronunciation = $item['TargetPronunciation'] ?? $targetWord;
+        $minAccuracy        = $item['MinimumAccuracy']    ?? 65;
+        $itemDifficulty     = $item['DifficultyParam']    ?? 0.0;
+        $category           = $item['Category']           ?? 'Oral Language';
+    } else {
+        error_log("WARNING: ItemID $itemID not found in AssessmentItems — using POST target_word '$targetWord'");
+    }
+} catch (Exception $e) {
+    error_log("WARNING: Could not query AssessmentItems for ItemID $itemID: " . $e->getMessage());
 }
-
-$targetPronunciation = $item['TargetPronunciation'] ?? $targetWord;
-$minAccuracy = $item['MinimumAccuracy'] ?? 65;
-$itemDifficulty = $item['DifficultyParam'] ?? 0.0;
-$category = $item['Category'] ?? 'Oral Language';
 
 // =============================================
 // Google Cloud Speech-to-Text API
