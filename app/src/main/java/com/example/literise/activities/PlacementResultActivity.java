@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -38,14 +39,26 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private static final String TAG = "PlacementResultActivity";
 
-    // Views
+    // Leo + header Lottie
+    private ImageView ivLeoResult;
+    private LottieAnimationView lottieStarsBg;
     private LottieAnimationView lottieConfetti;
+    private LottieAnimationView lottieBadgeSparkle;
+
+    // Content section Lottie
+    private LottieAnimationView lottieResultsSparkle;
+    private LottieAnimationView lottieCategoryAccent;
+
+    // Text
     private TextView tvCongrats, tvLevelName, tvLevelNumber;
     private TextView tvAccuracy, tvQuestionsAnswered;
     private TextView tvCategory1Score, tvCategory2Score, tvCategory3Score, tvCategory4Score, tvCategory5Score;
+
+    // Progress bars
     private ProgressBar pbCategory1, pbCategory2, pbCategory3, pbCategory4, pbCategory5;
+
+    // Animated rows + container
     private View rowCategory1, rowCategory2, rowCategory3, rowCategory4, rowCategory5;
-    private View ivLeoResult;
     private View contentSection;
     private MaterialButton btnContinueToDashboard;
 
@@ -79,28 +92,36 @@ public class PlacementResultActivity extends AppCompatActivity {
     }
 
     private void initViews() {
-        lottieConfetti = findViewById(R.id.lottieConfetti);
         ivLeoResult = findViewById(R.id.ivLeoResult);
         contentSection = findViewById(R.id.contentSection);
 
+        // Lottie views
+        lottieStarsBg = findViewById(R.id.lottieStarsBg);
+        lottieConfetti = findViewById(R.id.lottieConfetti);
+        lottieBadgeSparkle = findViewById(R.id.lottieBadgeSparkle);
+        lottieResultsSparkle = findViewById(R.id.lottieResultsSparkle);
+        lottieCategoryAccent = findViewById(R.id.lottieCategoryAccent);
+
+        // Text views
         tvCongrats = findViewById(R.id.tvCongrats);
         tvLevelName = findViewById(R.id.tvLevelName);
         tvLevelNumber = findViewById(R.id.tvLevelNumber);
         tvAccuracy = findViewById(R.id.tvAccuracy);
         tvQuestionsAnswered = findViewById(R.id.tvQuestionsAnswered);
-
         tvCategory1Score = findViewById(R.id.tvCategory1Score);
         tvCategory2Score = findViewById(R.id.tvCategory2Score);
         tvCategory3Score = findViewById(R.id.tvCategory3Score);
         tvCategory4Score = findViewById(R.id.tvCategory4Score);
         tvCategory5Score = findViewById(R.id.tvCategory5Score);
 
+        // Progress bars
         pbCategory1 = findViewById(R.id.pbCategory1);
         pbCategory2 = findViewById(R.id.pbCategory2);
         pbCategory3 = findViewById(R.id.pbCategory3);
         pbCategory4 = findViewById(R.id.pbCategory4);
         pbCategory5 = findViewById(R.id.pbCategory5);
 
+        // Category rows for stagger animation
         rowCategory1 = findViewById(R.id.rowCategory1);
         rowCategory2 = findViewById(R.id.rowCategory2);
         rowCategory3 = findViewById(R.id.rowCategory3);
@@ -120,9 +141,7 @@ public class PlacementResultActivity extends AppCompatActivity {
         categoryScores = intent.getIntArrayExtra("category_scores");
         finalTheta = intent.getDoubleExtra("final_theta", 0.0);
         long passedStartTime = intent.getLongExtra("start_time", 0);
-        if (passedStartTime > 0) {
-            startTime = passedStartTime;
-        }
+        if (passedStartTime > 0) startTime = passedStartTime;
 
         if (levelName == null || levelName.isEmpty()) {
             levelName = getLevelNameFromLevel(placementLevel);
@@ -154,33 +173,34 @@ public class PlacementResultActivity extends AppCompatActivity {
             tvCategory4Score.setText(categoryScores[3] + "%");
             tvCategory5Score.setText(categoryScores[4] + "%");
 
-            // Animate progress bars after a short delay so the entrance animation is visible
+            // Animate progress bars after entrance animations complete
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
                 animateProgressBar(pbCategory1, categoryScores[0]);
                 animateProgressBar(pbCategory2, categoryScores[1]);
                 animateProgressBar(pbCategory3, categoryScores[2]);
                 animateProgressBar(pbCategory4, categoryScores[3]);
                 animateProgressBar(pbCategory5, categoryScores[4]);
-            }, 800);
+            }, 900);
         }
     }
 
     private void animateProgressBar(ProgressBar bar, int target) {
         android.animation.ObjectAnimator anim = android.animation.ObjectAnimator.ofInt(bar, "progress", 0, target);
-        anim.setDuration(700);
+        anim.setDuration(750);
         anim.setInterpolator(new android.view.animation.DecelerateInterpolator());
         anim.start();
     }
 
     private void startEntranceAnimations() {
-        // Leo: drop in from above with overshoot bounce
-        ivLeoResult.setTranslationY(-100f);
+        // Leo: appear from above with overshoot bounce
+        ivLeoResult.setTranslationY(-120f);
         ivLeoResult.setAlpha(0f);
         ivLeoResult.animate()
                 .translationY(0f)
                 .alpha(1f)
-                .setDuration(650)
-                .setInterpolator(new OvershootInterpolator(0.9f))
+                .setDuration(700)
+                .setInterpolator(new OvershootInterpolator(1.0f))
+                .withEndAction(this::startLeoPulse)
                 .start();
 
         // Content card: slide up from below
@@ -190,7 +210,7 @@ public class PlacementResultActivity extends AppCompatActivity {
                 .translationY(0f)
                 .alpha(1f)
                 .setDuration(600)
-                .setStartDelay(250)
+                .setStartDelay(280)
                 .setInterpolator(new OvershootInterpolator(0.5f))
                 .start();
 
@@ -204,7 +224,7 @@ public class PlacementResultActivity extends AppCompatActivity {
                     .alpha(1f)
                     .translationX(0f)
                     .setDuration(380)
-                    .setStartDelay(480 + i * 90L)
+                    .setStartDelay(500 + i * 90L)
                     .setInterpolator(new android.view.animation.DecelerateInterpolator())
                     .start();
         }
@@ -216,11 +236,55 @@ public class PlacementResultActivity extends AppCompatActivity {
                 .alpha(1f)
                 .translationY(0f)
                 .setDuration(400)
-                .setStartDelay(950)
+                .setStartDelay(980)
                 .start();
 
-        // Trigger Leo dialogue after animations settle
-        new Handler(Looper.getMainLooper()).postDelayed(this::showLeoCongratulation, 1400);
+        // Leo dialogue fires after everything settles
+        new Handler(Looper.getMainLooper()).postDelayed(this::showLeoCongratulation, 1500);
+    }
+
+    /** Gentle infinite breathing/pulse on Leo after entrance completes */
+    private void startLeoPulse() {
+        ivLeoResult.animate()
+                .scaleX(1.07f).scaleY(1.07f)
+                .setDuration(900)
+                .setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator())
+                .withEndAction(() -> ivLeoResult.animate()
+                        .scaleX(1f).scaleY(1f)
+                        .setDuration(900)
+                        .setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator())
+                        .withEndAction(this::startLeoPulse)
+                        .start())
+                .start();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pauseLotties();
+        ivLeoResult.animate().cancel();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        resumeLotties();
+    }
+
+    private void pauseLotties() {
+        if (lottieStarsBg != null) lottieStarsBg.pauseAnimation();
+        if (lottieConfetti != null) lottieConfetti.pauseAnimation();
+        if (lottieBadgeSparkle != null) lottieBadgeSparkle.pauseAnimation();
+        if (lottieResultsSparkle != null) lottieResultsSparkle.pauseAnimation();
+        if (lottieCategoryAccent != null) lottieCategoryAccent.pauseAnimation();
+    }
+
+    private void resumeLotties() {
+        if (lottieStarsBg != null) lottieStarsBg.resumeAnimation();
+        if (lottieConfetti != null) lottieConfetti.resumeAnimation();
+        if (lottieBadgeSparkle != null) lottieBadgeSparkle.resumeAnimation();
+        if (lottieResultsSparkle != null) lottieResultsSparkle.resumeAnimation();
+        if (lottieCategoryAccent != null) lottieCategoryAccent.resumeAnimation();
     }
 
     private void showLeoCongratulation() {
@@ -235,7 +299,7 @@ public class PlacementResultActivity extends AppCompatActivity {
 
         LeoDialogueView dialogueView = new LeoDialogueView(this);
         dialogueView.setDialogueMessages(messages);
-        dialogueView.setDialogueCompleteListener(() -> { /* user can now proceed */ });
+        dialogueView.setDialogueCompleteListener(() -> { /* user can proceed */ });
         dialogueView.show((ViewGroup) getWindow().getDecorView().getRootView());
     }
 

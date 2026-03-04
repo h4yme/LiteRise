@@ -24,19 +24,29 @@
                 android:background="@drawable/bg_gradient_purple"
                 android:paddingBottom="64dp">
 
-                <!-- Lottie rewards/confetti overlay (subtle) -->
+                <!-- Layer 1 (deepest): ambient floating stars background -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieStarsBg"
+                    android:layout_width="match_parent"
+                    android:layout_height="320dp"
+                    android:alpha="0.35"
+                    app:lottie_rawRes="@raw/placement_intro_bg_lottie"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_speed="0.5"/>
+
+                <!-- Layer 2: rewards/confetti burst overlay -->
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieConfetti"
                     android:layout_width="match_parent"
-                    android:layout_height="260dp"
-                    android:alpha="0.2"
-                    android:scaleType="centerCrop"
+                    android:layout_height="280dp"
+                    android:alpha="0.22"
                     app:lottie_rawRes="@raw/onboarding_lottie_3"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"
-                    app:lottie_speed="0.6"/>
+                    app:lottie_speed="0.65"/>
 
-                <!-- Header content stacked on top of Lottie -->
+                <!-- Layer 3 (front): content -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -47,11 +57,11 @@
                     android:paddingEnd="24dp"
                     android:paddingBottom="20dp">
 
-                    <!-- Leo mascot (success/confetti expression) -->
+                    <!-- Leo mascot — replace src with leo_result_celebrate once ready -->
                     <ImageView
                         android:id="@+id/ivLeoResult"
-                        android:layout_width="160dp"
-                        android:layout_height="160dp"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
                         android:src="@drawable/leo_success_confetti"
                         android:scaleType="fitCenter"
                         android:contentDescription="Leo celebrating your achievement"/>
@@ -67,55 +77,75 @@
                         android:textColor="#FFFFFF"
                         android:fontFamily="@font/visby_bold"
                         android:gravity="center"
-                        android:layout_marginTop="10dp"/>
+                        android:layout_marginTop="8dp"/>
 
-                    <!-- Level badge pill (white card) -->
+                    <!-- Level badge + sparkle side-by-side -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:background="@drawable/bg_dialog_rounded"
-                        android:paddingStart="16dp"
-                        android:paddingEnd="20dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp"
-                        android:layout_marginTop="14dp"
-                        android:elevation="6dp">
+                        android:layout_marginTop="14dp">
 
-                        <ImageView
-                            android:layout_width="26dp"
-                            android:layout_height="26dp"
-                            android:src="@drawable/ic_trophy"
-                            app:tint="#FFD700"
-                            android:contentDescription="Trophy"
-                            android:layout_marginEnd="10dp"/>
-
+                        <!-- White badge card -->
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_dialog_rounded"
+                            android:paddingStart="16dp"
+                            android:paddingEnd="20dp"
+                            android:paddingTop="10dp"
+                            android:paddingBottom="10dp"
+                            android:elevation="6dp">
 
-                            <TextView
-                                android:id="@+id/tvLevelName"
+                            <ImageView
+                                android:layout_width="26dp"
+                                android:layout_height="26dp"
+                                android:src="@drawable/ic_trophy"
+                                app:tint="#FFD700"
+                                android:contentDescription="Trophy"
+                                android:layout_marginEnd="10dp"/>
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Developing Reader"
-                                android:textSize="15sp"
-                                android:textStyle="bold"
-                                android:textColor="#2D3436"
-                                android:fontFamily="@font/visby_bold"/>
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvLevelNumber"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Level 3"
-                                android:textSize="12sp"
-                                android:textColor="#7C3AED"
-                                android:fontFamily="@font/poppins_semibold"/>
+                                <TextView
+                                    android:id="@+id/tvLevelName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Developing Reader"
+                                    android:textSize="15sp"
+                                    android:textStyle="bold"
+                                    android:textColor="#2D3436"
+                                    android:fontFamily="@font/visby_bold"/>
 
+                                <TextView
+                                    android:id="@+id/tvLevelNumber"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Level 3"
+                                    android:textSize="12sp"
+                                    android:textColor="#7C3AED"
+                                    android:fontFamily="@font/poppins_semibold"/>
+
+                            </LinearLayout>
                         </LinearLayout>
+
+                        <!-- Sparkle Lottie beside badge -->
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lottieBadgeSparkle"
+                            android:layout_width="44dp"
+                            android:layout_height="44dp"
+                            android:layout_marginStart="6dp"
+                            app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_speed="0.8"/>
+
                     </LinearLayout>
 
                 </LinearLayout>
@@ -140,7 +170,36 @@
                     android:layout_height="4dp"
                     android:background="#E2D9F3"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dp"/>
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- "Your Results" section header with sparkle Lottie -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Your Results"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="#1A1A2E"
+                        android:fontFamily="@font/visby_bold"/>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieResultsSparkle"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        app:lottie_speed="0.9"/>
+
+                </LinearLayout>
 
                 <!-- ===== STATS ROW ===== -->
                 <LinearLayout
@@ -233,16 +292,34 @@
 
                 </LinearLayout>
 
-                <!-- ===== CATEGORY BREAKDOWN ===== -->
-                <TextView
-                    android:layout_width="wrap_content"
+                <!-- ===== CATEGORY BREAKDOWN header with Lottie ===== -->
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Category Breakdown"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:layout_marginBottom="12dp"/>
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Category Breakdown"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="#2D3436"
+                        android:fontFamily="@font/poppins_semibold"/>
+
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieCategoryAccent"
+                        android:layout_width="42dp"
+                        android:layout_height="42dp"
+                        app:lottie_rawRes="@raw/onboarding_lottie_2"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        app:lottie_speed="0.7"/>
+
+                </LinearLayout>
 
                 <!-- Category 1: Phonics & Word Study (teal) -->
                 <LinearLayout
@@ -424,7 +501,7 @@
 
                 </LinearLayout>
 
-                <!-- Category 4: Comprehending (yellow/amber) -->
+                <!-- Category 4: Comprehending (amber) -->
                 <LinearLayout
                     android:id="@+id/rowCategory4"
                     android:layout_width="match_parent"
