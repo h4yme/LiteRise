@@ -217,25 +217,16 @@ public class PlacementTestActivity extends AppCompatActivity {
             @Override
             public void onError(String error) {
                 runOnUiThread(() -> {
-                    // Log error
+                    Log.e(TAG, "Failed to load question from API: " + error);
                     Toast.makeText(PlacementTestActivity.this,
                             "Error loading question: " + error, Toast.LENGTH_SHORT).show();
-
-                    // Fallback: try to use local question bank
-                    categoryQuestions = questionBankHelper.getQuestionsByCategory(currentCategory);
-                    currentQuestion = irtEngine.selectNextQuestion(categoryQuestions);
-
-                    if (currentQuestion != null) {
-                        questionStartTime = System.currentTimeMillis();
-                        displayCurrentQuestion();
+                    // Retry with next question slot rather than using local fallback IDs
+                    // that don't exist in dbo.AssessmentItems on Azure
+                    if (currentCategory < 5) {
+                        currentCategory++;
+                        loadNextQuestion();
                     } else {
-                        // No fallback available either
-                        if (currentCategory < 5) {
-                            currentCategory++;
-                            loadNextQuestion();
-                        } else {
-                            showResults();
-                        }
+                        showResults();
                     }
                 });
             }
