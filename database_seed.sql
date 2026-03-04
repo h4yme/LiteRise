@@ -9,11 +9,23 @@
 USE LiteRiseDB;
 GO
 
--- ── MODULES ──────────────────────────────────────────────────
-IF OBJECT_ID('Modules','U') IS NOT NULL BEGIN
+-- ── CLEANUP: delete in FK-safe order ─────────────────────────
+IF OBJECT_ID('QuizQuestions','U') IS NOT NULL
+    DELETE FROM QuizQuestions WHERE NodeID BETWEEN 101 AND 513;
+IF OBJECT_ID('LessonGameContent','U') IS NOT NULL
+    DELETE FROM LessonGameContent WHERE LessonID BETWEEN 101 AND 513;
+IF OBJECT_ID('Nodes','U') IS NOT NULL
+    DELETE FROM Nodes WHERE ModuleID IN (1,2,3,4,5);
+IF OBJECT_ID('Modules','U') IS NOT NULL
     DELETE FROM Modules WHERE ModuleID IN (1,2,3,4,5);
-END
+GO
 
+-- ── FIX COLUMN TYPES ──────────────────────────────────────────
+ALTER TABLE QuizQuestions ALTER COLUMN CorrectAnswer NVARCHAR(500);
+GO
+
+-- ── MODULES ──────────────────────────────────────────────────
+SET IDENTITY_INSERT Modules ON;
 INSERT INTO Modules (ModuleID, ModuleName, ModuleCode, CategoryMapping, OrderIndex, TotalNodes, Description) VALUES
 (1, 'Phonics and Word Study', 'EN3PWS', 'phonics', 1, 13,
  'Learn letter-sound relationships, word patterns (CVCC, CCVC, VCV, VCCV), sight words, and syllable division across all four quarters.'),
@@ -25,13 +37,11 @@ INSERT INTO Modules (ModuleID, ModuleName, ModuleCode, CategoryMapping, OrderInd
  'Develop comprehension skills: key details, sequencing, characters and setting, main idea, cause and effect, problem and solution, compare and contrast, context clues, inference, and summarizing.'),
 (5, 'Creating and Composing Text', 'EN3CCT', 'creating', 5, 13,
  'Express ideas through writing: simple sentences, descriptive paragraphs, narrative texts, informational writing, and creative compositions using correct grammar and structure.');
+SET IDENTITY_INSERT Modules OFF;
 GO
 
 -- ── NODES: PHONICS (ModuleID=1, NodeIDs 101-113) ─────────────
-IF OBJECT_ID('Nodes','U') IS NOT NULL BEGIN
-    DELETE FROM Nodes WHERE ModuleID IN (1,2,3,4,5);
-END
-
+SET IDENTITY_INSERT Nodes ON;
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (101, 1, 'lesson', 1, 1,
  'Sight Words and CVCC Patterns',
@@ -374,12 +384,10 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all composition skills: simple sentences, descriptive writing, narrative texts, explanatory writing, comparative sentences, and complete paragraphs.',
  '{"type":"cumulative","quarters":["Q1: Simple sentences, descriptive sentences, paragraph structure","Q2: Questions and commands, compound sentences, short stories","Q3: Time-order words, explanatory writing with because, comparative sentences","Q4: National theme writing, descriptive paragraphs, book responses"],"totalItems":20}',
  'creating', 45, 100);
+SET IDENTITY_INSERT Nodes OFF;
 GO
 
 -- ── QUIZ QUESTIONS: PHONICS MODULE (NodeIDs 101-113) ─────────
-IF OBJECT_ID('QuizQuestions','U') IS NOT NULL BEGIN
-    DELETE FROM QuizQuestions WHERE NodeID BETWEEN 101 AND 513;
-END
 
 -- Node 101: Sight Words & CVCC Patterns
 INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
@@ -996,58 +1004,54 @@ GO
 
 -- ── LESSON GAME CONTENT (LessonGameContent table) ────────────
 -- Provides word bank data for games: fill_in_blanks, word_hunt, sentence_scramble
-IF OBJECT_ID('LessonGameContent','U') IS NOT NULL BEGIN
-    DELETE FROM LessonGameContent WHERE LessonID BETWEEN 101 AND 513;
-END
-
 -- Phonics: Fill-in-blanks content
 INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Difficulty, Category) VALUES
 (101,'fill_in_blanks','The cat is _____ on the mat.',
- '{"beforeBlank":"The cat is","afterBlank":"on the mat.","correctAnswer":"sitting","options":["sitting","running","flying","sleeping"]}','easy','phonics'),
+ '{"beforeBlank":"The cat is","afterBlank":"on the mat.","correctAnswer":"sitting","options":["sitting","running","flying","sleeping"]}',0.3,'phonics'),
 (101,'fill_in_blanks','The dog _____ in the park.',
- '{"beforeBlank":"The dog","afterBlank":"in the park.","correctAnswer":"plays","options":["plays","flies","swims","reads"]}','easy','phonics'),
+ '{"beforeBlank":"The dog","afterBlank":"in the park.","correctAnswer":"plays","options":["plays","flies","swims","reads"]}',0.3,'phonics'),
 (101,'fill_in_blanks','I _____ see the moon.',
- '{"beforeBlank":"I","afterBlank":"see the moon.","correctAnswer":"could","options":["could","cold","can''t","never"]}','easy','phonics'),
+ '{"beforeBlank":"I","afterBlank":"see the moon.","correctAnswer":"could","options":["could","cold","can''t","never"]}',0.3,'phonics'),
 (101,'fill_in_blanks','Please turn on the _____.',
- '{"beforeBlank":"Please turn on the","afterBlank":".","correctAnswer":"light","options":["light","right","night","bright"]}','easy','phonics'),
+ '{"beforeBlank":"Please turn on the","afterBlank":".","correctAnswer":"light","options":["light","right","night","bright"]}',0.3,'phonics'),
 (101,'fill_in_blanks','You should _____ wash your hands.',
- '{"beforeBlank":"You should","afterBlank":"wash your hands.","correctAnswer":"always","options":["always","away","also","after"]}','easy','phonics'),
+ '{"beforeBlank":"You should","afterBlank":"wash your hands.","correctAnswer":"always","options":["always","away","also","after"]}',0.3,'phonics'),
 
 -- Grammar: Fill-in-blanks content
 (301,'fill_in_blanks','The _____ is sleeping.',
- '{"beforeBlank":"The","afterBlank":"is sleeping.","correctAnswer":"cat","options":["cat","run","blue","fast"]}','easy','grammar'),
+ '{"beforeBlank":"The","afterBlank":"is sleeping.","correctAnswer":"cat","options":["cat","run","blue","fast"]}',0.3,'grammar'),
 (301,'fill_in_blanks','Birds _____ in the sky.',
- '{"beforeBlank":"Birds","afterBlank":"in the sky.","correctAnswer":"fly","options":["fly","big","happy","slowly"]}','easy','grammar'),
+ '{"beforeBlank":"Birds","afterBlank":"in the sky.","correctAnswer":"fly","options":["fly","big","happy","slowly"]}',0.3,'grammar'),
 (304,'fill_in_blanks','I am 8 years _____.',
- '{"beforeBlank":"I am 8 years","afterBlank":".","correctAnswer":"old","options":["old","new","big","tall"]}','easy','grammar'),
+ '{"beforeBlank":"I am 8 years","afterBlank":".","correctAnswer":"old","options":["old","new","big","tall"]}',0.3,'grammar'),
 (306,'fill_in_blanks','I like cats _____ I like dogs.',
- '{"beforeBlank":"I like cats","afterBlank":"I like dogs.","correctAnswer":"and","options":["and","but","or","so"]}','medium','grammar'),
+ '{"beforeBlank":"I like cats","afterBlank":"I like dogs.","correctAnswer":"and","options":["and","but","or","so"]}',0.5,'grammar'),
 (311,'fill_in_blanks','I wear a jacket _____ it is cold.',
- '{"beforeBlank":"I wear a jacket","afterBlank":"it is cold.","correctAnswer":"because","options":["because","but","and","when"]}','medium','grammar'),
+ '{"beforeBlank":"I wear a jacket","afterBlank":"it is cold.","correctAnswer":"because","options":["because","but","and","when"]}',0.5,'grammar'),
 
 -- Vocabulary: Fill-in-blanks content
 (201,'fill_in_blanks','She _____ my friend.',
- '{"beforeBlank":"She","afterBlank":"my friend.","correctAnswer":"is","options":["is","are","am","be"]}','easy','vocabulary'),
+ '{"beforeBlank":"She","afterBlank":"my friend.","correctAnswer":"is","options":["is","are","am","be"]}',0.3,'vocabulary'),
 (205,'fill_in_blanks','The boy _____ fast.',
- '{"beforeBlank":"The boy","afterBlank":"fast.","correctAnswer":"runs","options":["runs","run","ran","running"]}','easy','vocabulary'),
+ '{"beforeBlank":"The boy","afterBlank":"fast.","correctAnswer":"runs","options":["runs","run","ran","running"]}',0.3,'vocabulary'),
 (206,'fill_in_blanks','The _____ cat slept on the mat.',
- '{"beforeBlank":"The","afterBlank":"cat slept on the mat.","correctAnswer":"small","options":["small","run","quickly","is"]}','easy','vocabulary'),
+ '{"beforeBlank":"The","afterBlank":"cat slept on the mat.","correctAnswer":"small","options":["small","run","quickly","is"]}',0.3,'vocabulary'),
 (207,'fill_in_blanks','The opposite of hot is _____.',
- '{"beforeBlank":"The opposite of hot is","afterBlank":".","correctAnswer":"cold","options":["cold","warm","cool","hot"]}','medium','vocabulary'),
+ '{"beforeBlank":"The opposite of hot is","afterBlank":".","correctAnswer":"cold","options":["cold","warm","cool","hot"]}',0.5,'vocabulary'),
 (212,'fill_in_blanks','The root word of "playing" is _____.',
- '{"beforeBlank":"The root word of playing is","afterBlank":".","correctAnswer":"play","options":["play","playing","played","plays"]}','medium','vocabulary'),
+ '{"beforeBlank":"The root word of playing is","afterBlank":".","correctAnswer":"play","options":["play","playing","played","plays"]}',0.5,'vocabulary'),
 
 -- Comprehension: Fill-in-blanks content
 (401,'fill_in_blanks','The _____ tells us where the story happened.',
- '{"beforeBlank":"The","afterBlank":"tells us where the story happened.","correctAnswer":"setting","options":["setting","character","problem","solution"]}','medium','comprehension'),
+ '{"beforeBlank":"The","afterBlank":"tells us where the story happened.","correctAnswer":"setting","options":["setting","character","problem","solution"]}',0.5,'comprehension'),
 (405,'fill_in_blanks','Rain is the _____, and wet streets are the _____.',
- '{"beforeBlank":"Rain is the","afterBlank":"(effect/cause).","correctAnswer":"cause","options":["cause","effect","result","ending"]}','medium','comprehension'),
+ '{"beforeBlank":"Rain is the","afterBlank":"(effect/cause).","correctAnswer":"cause","options":["cause","effect","result","ending"]}',0.5,'comprehension'),
 (409,'fill_in_blanks','Quick and fast are _____ because they mean the same.',
- '{"beforeBlank":"Quick and fast are","afterBlank":"because they mean the same.","correctAnswer":"synonyms","options":["synonyms","antonyms","verbs","nouns"]}','medium','comprehension'),
+ '{"beforeBlank":"Quick and fast are","afterBlank":"because they mean the same.","correctAnswer":"synonyms","options":["synonyms","antonyms","verbs","nouns"]}',0.5,'comprehension'),
 (410,'fill_in_blanks','We use _____ from the text to make an inference.',
- '{"beforeBlank":"We use","afterBlank":"from the text to make an inference.","correctAnswer":"clues","options":["clues","colors","numbers","shapes"]}','medium','comprehension'),
+ '{"beforeBlank":"We use","afterBlank":"from the text to make an inference.","correctAnswer":"clues","options":["clues","colors","numbers","shapes"]}',0.5,'comprehension'),
 (412,'fill_in_blanks','A good summary should include the _____ idea.',
- '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}','medium','comprehension');
+ '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}',0.5,'comprehension');
 GO
 
 -- ── SUMMARY ──────────────────────────────────────────────────
