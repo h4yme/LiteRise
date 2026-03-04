@@ -144,34 +144,41 @@ try {
     // Configure recognition for 3GP (AMR-NB) audio
     $audio = (new RecognitionAudio())->setContent($audioContent);
 
-    // Create speech context with phrase hints to improve recognition
-    // Add phonetic variations to help with difficult words like "knife"
-    $phraseHints = [$targetPronunciation];
+    // Detect whether this is a passage (multiple words) or a single word.
+    // Google SpeechContext phrase hints are capped at 100 chars each, so we
+    // must never pass the full passage text as a hint.
+    $isPassage = str_word_count($targetPronunciation) > 3;
 
-    // Add common phonetic variations for better recognition
-    // For "knife" add "nife", for "write" add "rite", etc.
-    $phonetic = preg_replace('/^kn/', 'n', $targetPronunciation); // knife -> nife
-    $phonetic2 = preg_replace('/^wr/', 'r', $targetPronunciation); // write -> rite
-    if ($phonetic !== $targetPronunciation) {
-        $phraseHints[] = $phonetic;
-    }
-    if ($phonetic2 !== $targetPronunciation) {
-        $phraseHints[] = $phonetic2;
+    // Build phrase hints — single words only (≤ 100 chars each)
+    $phraseHints = [];
+    if (!$isPassage) {
+        // Single-word path: add the word and phonetic variants
+        $phraseHints[] = $targetPronunciation;
+        $phonetic = preg_replace('/^kn/', 'n', $targetPronunciation); // knife -> nife
+        $phonetic2 = preg_replace('/^wr/', 'r', $targetPronunciation); // write -> rite
+        if ($phonetic !== $targetPronunciation) $phraseHints[] = $phonetic;
+        if ($phonetic2 !== $targetPronunciation) $phraseHints[] = $phonetic2;
+    } else {
+        // Passage path: add each individual word as a hint (safe length)
+        foreach (explode(' ', $targetPronunciation) as $w) {
+            $w = trim(preg_replace('/[^a-zA-Z\'-]/', '', $w));
+            if ($w !== '' && strlen($w) <= 100) $phraseHints[] = $w;
+        }
     }
 
     $speechContext = (new SpeechContext())
         ->setPhrases($phraseHints)
-        ->setBoost(20.0); // Strong boost for expected words
+        ->setBoost($isPassage ? 10.0 : 20.0);
 
     $config = (new RecognitionConfig())
         ->setEncoding(AudioEncoding::AMR) // 3GP uses AMR-NB encoding
         ->setSampleRateHertz(8000) // AMR-NB sample rate
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
-        ->setSpeechContexts([$speechContext]) // Help API expect this word
-        ->setModel('phone_call') // Optimized for low-quality audio like phone calls
-        ->setUseEnhanced(true) // Use enhanced model for better accuracy
-        ->setMaxAlternatives(3); // Get top 3 alternatives to check against target
+        ->setSpeechContexts([$speechContext])
+        ->setModel($isPassage ? 'default' : 'phone_call') // phone_call only for short speech
+        ->setUseEnhanced(true)
+        ->setMaxAlternatives($isPassage ? 1 : 3); // passages: 1 alt is enough
 
     // Perform speech recognition
     error_log("INFO: Sending audio to Google Cloud Speech API...");
@@ -180,47 +187,59 @@ try {
     $recognizedText = '';
     $confidence = 0.0;
     $pronunciationScore = 0.0;
-    $bestMatch = null;
-    $bestScore = 0.0;
 
-    // Process results - check all alternatives for best match
+    // Process ALL result segments (Google returns one per sentence for passages)
     $results = $response->getResults();
+    error_log("INFO: Google returned " . count($results) . " result segment(s)");
+
     if (count($results) > 0) {
-        $alternatives = $results[0]->getAlternatives();
-
-        error_log("INFO: Checking " . count($alternatives) . " speech alternatives");
-
-        // Check each alternative to find the best match to target word
-        foreach ($alternatives as $idx => $alternative) {
-            $altText = strtolower(trim($alternative->getTranscript()));
-            $altConfidence = $alternative->getConfidence();
-
-            error_log("INFO: Alternative " . ($idx + 1) . ": '$altText' (confidence: " . $altConfidence . ")");
-
-            // Calculate score for this alternative
-            $altScore = calculatePronunciationScore(
-                $altText,
-                $targetPronunciation,
-                $altConfidence
-            );
-
-            // Keep the best matching alternative
-            if ($altScore > $bestScore || $bestMatch === null) {
-                $bestScore = $altScore;
-                $bestMatch = [
-                    'text' => $altText,
-                    'confidence' => $altConfidence,
-                    'score' => $altScore
-                ];
+        if ($isPassage) {
+            // --- Passage: concatenate transcript from every segment ---
+            $allSegments = [];
+            $totalConf = 0.0;
+            $segCount = 0;
+            foreach ($results as $seg) {
+                $alts = $seg->getAlternatives();
+                if (count($alts) > 0) {
+                    $t = strtolower(trim($alts[0]->getTranscript()));
+                    $c = $alts[0]->getConfidence();
+                    $allSegments[] = $t;
+                    $totalConf += $c;
+                    $segCount++;
+                    error_log("INFO: Segment transcript: '$t' (confidence: $c)");
+                }
             }
-        }
-
-        if ($bestMatch !== null) {
-            $recognizedText = $bestMatch['text'];
-            $confidence = $bestMatch['confidence'];
-            $pronunciationScore = $bestMatch['score'];
-
-            error_log("INFO: Best match selected - Recognized: '$recognizedText', Target: '$targetPronunciation', Score: " . $pronunciationScore);
+            $recognizedText = implode(' ', $allSegments);
+            $confidence = $segCount > 0 ? ($totalConf / $segCount) : 0.0;
+            $pronunciationScore = calculatePronunciationScore(
+                $recognizedText,
+                $targetPronunciation,
+                $confidence,
+                true // passage mode
+            );
+            error_log("INFO: Passage recognized: '$recognizedText', Score: $pronunciationScore");
+        } else {
+            // --- Single word: pick best-matching alternative ---
+            $bestMatch = null;
+            $bestScore = 0.0;
+            $alternatives = $results[0]->getAlternatives();
+            error_log("INFO: Checking " . count($alternatives) . " speech alternatives");
+            foreach ($alternatives as $idx => $alternative) {
+                $altText = strtolower(trim($alternative->getTranscript()));
+                $altConfidence = $alternative->getConfidence();
+                error_log("INFO: Alternative " . ($idx + 1) . ": '$altText' (confidence: $altConfidence)");
+                $altScore = calculatePronunciationScore($altText, $targetPronunciation, $altConfidence, false);
+                if ($altScore > $bestScore || $bestMatch === null) {
+                    $bestScore = $altScore;
+                    $bestMatch = ['text' => $altText, 'confidence' => $altConfidence, 'score' => $altScore];
+                }
+            }
+            if ($bestMatch !== null) {
+                $recognizedText = $bestMatch['text'];
+                $confidence = $bestMatch['confidence'];
+                $pronunciationScore = $bestMatch['score'];
+                error_log("INFO: Best match - Recognized: '$recognizedText', Target: '$targetPronunciation', Score: $pronunciationScore");
+            }
         }
     } else {
         // No speech detected
@@ -368,7 +387,7 @@ try {
  * Calculate pronunciation score based on text match and confidence
  * Uses multiple metrics for accurate pronunciation assessment
  */
-function calculatePronunciationScore($recognized, $target, $confidence) {
+function calculatePronunciationScore($recognized, $target, $confidence, $isPassage = false) {
     $recognized = strtolower(trim($recognized));
     $target = strtolower(trim($target));
 
@@ -377,49 +396,56 @@ function calculatePronunciationScore($recognized, $target, $confidence) {
         return 0.0;
     }
 
-    // Exact match gets excellent score
+    if ($isPassage) {
+        // Word-level accuracy: count target words found in recognized text
+        $targetWords = preg_split('/\s+/', preg_replace('/[^a-z\s]/', '', $target));
+        $recognizedWords = preg_split('/\s+/', preg_replace('/[^a-z\s]/', '', $recognized));
+        $targetCount = count(array_filter($targetWords));
+        if ($targetCount === 0) return 0.0;
+
+        $hits = 0;
+        $recognizedBag = array_count_values($recognizedWords);
+        foreach ($targetWords as $w) {
+            if ($w === '') continue;
+            if (isset($recognizedBag[$w]) && $recognizedBag[$w] > 0) {
+                $hits++;
+                $recognizedBag[$w]--;
+            }
+        }
+        $wordAccuracy = $hits / $targetCount;
+        // Word accuracy 70%, speech confidence 30%
+        return max(0.0, min(1.0, $wordAccuracy * 0.7 + $confidence * 0.3));
+    }
+
+    // --- Single word path ---
+
+    // Exact match
     if ($recognized === $target) {
-        // Return high score (at least 0.95) for exact matches
         return max($confidence, 0.95);
     }
 
-    // Check if target word is contained in recognized text
-    // (e.g., "the cat" contains "cat")
+    // Containment (e.g., "the cat" contains "cat")
     if (strpos($recognized, $target) !== false || strpos($target, $recognized) !== false) {
-        // Partial containment - good score
         return max($confidence * 0.9, 0.85);
     }
 
-    // Calculate similarity using Levenshtein distance
+    // Levenshtein similarity (safe for single words — always well under 255 chars)
     $maxLen = max(strlen($recognized), strlen($target));
     if ($maxLen === 0) return 0.0;
-
     $distance = levenshtein($recognized, $target);
     $textSimilarity = 1.0 - ($distance / $maxLen);
 
-    // Calculate similar_text percentage for additional comparison
     $similarTextPercent = 0;
     similar_text($recognized, $target, $similarTextPercent);
     $similarTextScore = $similarTextPercent / 100.0;
 
-    // Combine multiple similarity metrics with confidence
-    // - Text similarity (Levenshtein): 40%
-    // - Similar text percentage: 30%
-    // - Speech recognition confidence: 30%
-    $combinedScore = (
-        $textSimilarity * 0.4 +
-        $similarTextScore * 0.3 +
-        $confidence * 0.3
-    );
+    // Text similarity (Levenshtein): 40%, similar_text: 30%, confidence: 30%
+    $combinedScore = $textSimilarity * 0.4 + $similarTextScore * 0.3 + $confidence * 0.3;
 
-    // Ensure minimum score for close attempts
-    // If confidence is high but text doesn't match, student may have mispronounced
     if ($confidence > 0.8 && $textSimilarity < 0.5) {
-        // High confidence but wrong word - give partial credit
         $combinedScore = max($combinedScore, 0.4);
     }
 
-    // Ensure score is between 0 and 1
     return max(0.0, min(1.0, $combinedScore));
 }
 
