@@ -24,6 +24,8 @@ import com.example.literise.activities.games.SentenceScrambleActivity;
 import com.example.literise.activities.games.StorySequencingActivity;
 import com.example.literise.activities.games.TimedTrailActivity;
 import com.example.literise.activities.games.WordHuntActivity;
+import com.example.literise.activities.games.SynonymSprintActivity;
+import com.example.literise.activities.games.WordExplosionActivity;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
@@ -471,6 +473,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
         intent.putExtra("lesson_id", node.getNodeId()); // Some games expect lesson_id
         intent.putExtra("placement_level", placementLevel);
         intent.putExtra("game_type", gameType);
+        intent.putExtra("module_name", moduleName);
+        intent.putExtra("module_domain", moduleDomain);
+        // Pass module theme colors derived from module ID
+        String[] moduleColors = getModuleColors(moduleId);
+        intent.putExtra("module_color_start", moduleColors[0]);
+        intent.putExtra("module_color_end", moduleColors[1]);
 
         // Use launcher to refresh ladder on return
         gameLauncher.launch(intent);
@@ -480,45 +488,46 @@ public class ModuleLadderActivity extends AppCompatActivity {
      * Select appropriate game based on node and module characteristics
      */
     private String selectGameForNode(NodeView node) {
-        // Strategy: Vary games to keep engagement high
-        // Use node number modulo to cycle through available games
         int nodeNum = node.getNodeNumber();
 
-        // Final assessment gets a special game
+        // Final assessment: use comprehensive challenging game
         if (node.isFinalAssessment()) {
-            return "word_hunt"; // Challenging game for final assessment
+            return "timed_trail";
         }
 
-        // Rotate through games based on module domain and node number
+        // Rotate through games aligned to each module domain
         if (moduleDomain != null) {
             switch (moduleDomain.toLowerCase()) {
                 case "phonics":
-                    // Phonics benefits from word-focused games
-                    return (nodeNum % 3 == 0) ? "word_hunt" :
-                            (nodeNum % 3 == 1) ? "minimal_pairs" : "picture_match";
-
-                case "grammar":
-                    // Grammar benefits from sentence-focused games
-                    return (nodeNum % 2 == 0) ? "sentence_scramble" : "fill_in_blanks";
+                    // Phonics: sound recognition, word patterns, letter games
+                    String[] phonicsGames = {"minimal_pairs", "word_hunt", "word_explosion", "picture_match", "fill_in_blanks"};
+                    return phonicsGames[(nodeNum - 1) % phonicsGames.length];
 
                 case "vocabulary":
-                    // Vocabulary benefits from word association games
-                    return (nodeNum % 3 == 0) ? "word_hunt" :
-                            (nodeNum % 3 == 1) ? "picture_match" : "story_sequencing";
+                    // Vocabulary: word meanings, synonyms, matching
+                    String[] vocabGames = {"word_hunt", "synonym_sprint", "picture_match", "word_explosion", "fill_in_blanks"};
+                    return vocabGames[(nodeNum - 1) % vocabGames.length];
+
+                case "grammar":
+                    // Grammar: sentence structure, verb forms, punctuation
+                    String[] grammarGames = {"sentence_scramble", "fill_in_blanks", "timed_trail", "sentence_scramble", "fill_in_blanks"};
+                    return grammarGames[(nodeNum - 1) % grammarGames.length];
 
                 case "comprehending":
-                    // Comprehension benefits from reading games
-                    return (nodeNum % 2 == 0) ? "dialogue_reading" : "story_sequencing";
+                    // Comprehension: story reading, sequencing, analysis
+                    String[] compGames = {"story_sequencing", "dialogue_reading", "timed_trail", "fill_in_blanks", "story_sequencing"};
+                    return compGames[(nodeNum - 1) % compGames.length];
 
                 case "creating":
-                    // Writing benefits from sentence building
-                    return (nodeNum % 2 == 0) ? "sentence_scramble" : "fill_in_blanks";
+                    // Creating/Composing: sentence building, writing structures
+                    String[] creatingGames = {"sentence_scramble", "fill_in_blanks", "story_sequencing", "sentence_scramble", "fill_in_blanks"};
+                    return creatingGames[(nodeNum - 1) % creatingGames.length];
             }
         }
 
-        // Default rotation if domain unknown
-        String[] defaultGames = {"word_hunt", "sentence_scramble", "picture_match"};
-        return defaultGames[nodeNum % defaultGames.length];
+        // Default rotation covering key games
+        String[] defaultGames = {"word_hunt", "sentence_scramble", "fill_in_blanks", "picture_match", "timed_trail"};
+        return defaultGames[(nodeNum - 1) % defaultGames.length];
     }
 
     /**
@@ -542,6 +551,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 return MinimalPairsActivity.class;
             case "timed_trail":
                 return TimedTrailActivity.class;
+            case "synonym_sprint":
+                return SynonymSprintActivity.class;
+            case "word_explosion":
+                return WordExplosionActivity.class;
             default:
                 Log.w(TAG, "Unknown game type: " + gameType);
                 return null;
@@ -561,7 +574,23 @@ public class ModuleLadderActivity extends AppCompatActivity {
             case "story_sequencing": return "Story Sequencing";
             case "minimal_pairs": return "Minimal Pairs";
             case "timed_trail": return "Timed Trail";
+            case "synonym_sprint": return "Synonym Sprint";
+            case "word_explosion": return "Word Explosion";
             default: return gameType;
+        }
+    }
+
+    /**
+     * Get gradient colors for a module (matches DashboardActivity module colors)
+     */
+    private String[] getModuleColors(int modId) {
+        switch (modId) {
+            case 1: return new String[]{"#FF6B6B", "#FF8E53"}; // Phonics - Red/Orange
+            case 2: return new String[]{"#4ECDC4", "#44A08D"}; // Vocabulary - Teal/Green
+            case 3: return new String[]{"#A770EF", "#CF57A3"}; // Grammar - Purple/Pink
+            case 4: return new String[]{"#FFD93D", "#FFA93D"}; // Comprehending - Yellow/Orange
+            case 5: return new String[]{"#667EEA", "#764BA2"}; // Creating - Blue/Purple
+            default: return new String[]{"#667EEA", "#764BA2"};
         }
     }
 

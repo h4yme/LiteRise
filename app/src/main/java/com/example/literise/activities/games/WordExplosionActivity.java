@@ -69,6 +69,7 @@ public class WordExplosionActivity extends AppCompatActivity {
 
         initializeCategoryDatabase();
         initializeViews();
+        applyModuleTheme();
         setupListeners();
         startGame();
     }
@@ -138,6 +139,30 @@ public class WordExplosionActivity extends AppCompatActivity {
         // Set initial target category
         setNewTargetCategory();
         cardCombo.setVisibility(View.GONE);
+    }
+
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#4ECDC4";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#44A08D";
+            if (cardTargetCategory != null) {
+                android.graphics.drawable.GradientDrawable grad =
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
+                float r = 20 * getResources().getDisplayMetrics().density;
+                grad.setCornerRadius(r);
+                cardTargetCategory.setBackground(grad);
+            }
+            if (progressBar != null) {
+                progressBar.setProgressTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+            }
+        } catch (Exception ignored) {}
     }
 
     private void setupListeners() {

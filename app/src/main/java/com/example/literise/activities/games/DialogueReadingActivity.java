@@ -114,6 +114,7 @@ public class DialogueReadingActivity extends BaseGameActivity {
 
 
         initializeViews();
+        applyModuleTheme();
 
         setupDialogue();
 
@@ -183,7 +184,17 @@ public class DialogueReadingActivity extends BaseGameActivity {
         tvScore = findViewById(R.id.tvScore);
     }
 
-
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#4ECDC4";
+            if (btnComplete != null) {
+                btnComplete.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+            }
+        } catch (Exception ignored) {}
+    }
 
     private void setupDialogue() {
 

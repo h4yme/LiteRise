@@ -91,6 +91,7 @@ public class PictureMatchActivity extends BaseGameActivity {
         session = new SessionManager(this);
 
         initializeViews();
+        applyModuleTheme();
 
         setupMatchData();
 
@@ -122,7 +123,20 @@ public class PictureMatchActivity extends BaseGameActivity {
 
     }
 
-
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#4ECDC4";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#44A08D";
+            // Apply to check button as accent
+            if (btnCheckAnswer != null) {
+                btnCheckAnswer.setBackgroundTintList(
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+            }
+        } catch (Exception ignored) {}
+    }
 
     private void startTimer() {
 

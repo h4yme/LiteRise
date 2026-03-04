@@ -74,6 +74,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         session = new SessionManager(this);
 
         initializeViews();
+        applyModuleTheme();
         setupQuestions();
         setupListeners();
         startGame();
@@ -101,6 +102,26 @@ public class TimedTrailActivity extends BaseGameActivity {
         tvProgress.setText("0 / 100m");
         tvScore.setText("0m");
         tvStreak.setText("Streak: 0");
+    }
+
+    private void applyModuleTheme() {
+        try {
+            android.content.Intent intent = getIntent();
+            String colorStart = intent.getStringExtra("module_color_start");
+            String colorEnd = intent.getStringExtra("module_color_end");
+            if (colorStart == null || colorStart.isEmpty()) colorStart = "#3B82F6";
+            if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#6366F1";
+            android.view.View header = findViewById(R.id.header);
+            if (header != null) {
+                android.graphics.drawable.GradientDrawable grad =
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
+                grad.setCornerRadius(0f);
+                header.setBackground(grad);
+            }
+        } catch (Exception ignored) {}
     }
 
     private void setupQuestions() {
