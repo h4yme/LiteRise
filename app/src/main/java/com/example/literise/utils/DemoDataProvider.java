@@ -528,52 +528,65 @@ public class DemoDataProvider {
         String d = (domain == null) ? "" : domain.toLowerCase();
 
         if (d.contains("phonics")) {
-            questions.add(new FillQuestion("The cat ", " on the mat.", "sat", new String[]{"bit", "sit", "put"}, "phonics"));
-            questions.add(new FillQuestion("She can ", " her name clearly.", "spell", new String[]{"tell", "yell", "sell"}, "phonics"));
-            questions.add(new FillQuestion("The ", " shines bright in the sky.", "sun", new String[]{"son", "fun", "bun"}, "phonics"));
-            questions.add(new FillQuestion("The word 'bike' has a ", " vowel sound.", "long", new String[]{"short", "silent", "mixed"}, "phonics"));
-            questions.add(new FillQuestion("She ", " a song for her class.", "sang", new String[]{"singed", "sings", "singing"}, "phonics"));
-            questions.add(new FillQuestion("The bird ", " past the window.", "flew", new String[]{"fly", "flow", "flown"}, "phonics"));
-            questions.add(new FillQuestion("He ", " the ball very hard.", "hit", new String[]{"hot", "hat", "hut"}, "phonics"));
-            questions.add(new FillQuestion("Words like 'cat', 'bat', 'hat' all ", ".", "rhyme", new String[]{"blend", "match", "start"}, "phonics"));
-            questions.add(new FillQuestion("The frog ", " into the pond.", "jumped", new String[]{"swim", "flew", "ran"}, "phonics"));
-            questions.add(new FillQuestion("She ", " the book twice to understand it.", "read", new String[]{"reed", "red", "rid"}, "phonics"));
+            // Q1: CVCC/CCVC sight words
+            questions.add(new FillQuestion("I ", " see the moon from my window.", "could", new String[]{"cold", "can't", "must"}, "phonics"));
+            questions.add(new FillQuestion("Please turn on the ", " so we can see.", "light", new String[]{"right", "night", "might"}, "phonics"));
+            questions.add(new FillQuestion("You should ", " wash your hands.", "always", new String[]{"away", "also", "after"}, "phonics"));
+            questions.add(new FillQuestion("We ran ", " the playground.", "around", new String[]{"about", "above", "along"}, "phonics"));
+            questions.add(new FillQuestion("The sun is ", " today.", "bright", new String[]{"bring", "brink", "brand"}, "phonics"));
+            // Q2: Sight words / VCV pattern
+            questions.add(new FillQuestion("Please ", " your hands before eating.", "clean", new String[]{"carry", "drink", "small"}, "phonics"));
+            questions.add(new FillQuestion("I can ", " my own school bag.", "carry", new String[]{"clean", "drink", "full"}, "phonics"));
+            questions.add(new FillQuestion("The glass is ", " of fresh milk.", "full", new String[]{"small", "clean", "carry"}, "phonics"));
+            // Q3-Q4: Narrative/abstract sight words
+            questions.add(new FillQuestion("Be careful, or you might ", " on the wet floor.", "fall", new String[]{"full", "fill", "feel"}, "phonics"));
+            questions.add(new FillQuestion("We walked ", " the dark tunnel.", "through", new String[]{"though", "thought", "threw"}, "phonics"));
 
         } else if (d.contains("vocab")) {
-            questions.add(new FillQuestion("A word that means the same as 'happy' is ", ".", "glad", new String[]{"mad", "bad", "sad"}, "vocabulary"));
-            questions.add(new FillQuestion("The opposite of 'big' is ", ".", "small", new String[]{"tall", "fast", "soft"}, "vocabulary"));
-            questions.add(new FillQuestion("She was very ", " when she won the prize.", "excited", new String[]{"tired", "bored", "quiet"}, "vocabulary"));
-            questions.add(new FillQuestion("A young dog is called a ", ".", "puppy", new String[]{"kitten", "cub", "foal"}, "vocabulary"));
-            questions.add(new FillQuestion("He showed great ", " by helping others.", "kindness", new String[]{"anger", "sadness", "fear"}, "vocabulary"));
-            questions.add(new FillQuestion("The leaves turn ", " in autumn.", "colorful", new String[]{"heavy", "wet", "silent"}, "vocabulary"));
-            questions.add(new FillQuestion("She has a very ", " memory for facts.", "sharp", new String[]{"slow", "weak", "dim"}, "vocabulary"));
-            questions.add(new FillQuestion("The word 'enormous' means very ", ".", "big", new String[]{"small", "long", "old"}, "vocabulary"));
-            questions.add(new FillQuestion("A ", " is a place where books are kept.", "library", new String[]{"hospital", "market", "factory"}, "vocabulary"));
-            questions.add(new FillQuestion("The sky is ", " on a clear day.", "blue", new String[]{"green", "red", "black"}, "vocabulary"));
+            // Q1-Q2: Nouns, verbs, adjectives
+            questions.add(new FillQuestion("The boy ", " fast.", "runs", new String[]{"run", "ran", "running"}, "vocabulary"));
+            questions.add(new FillQuestion("Maria ", " a book every day.", "reads", new String[]{"read", "reading", "reader"}, "vocabulary"));
+            questions.add(new FillQuestion("The kitten is very ", " and soft.", "small", new String[]{"run", "eat", "jump"}, "vocabulary"));
+            questions.add(new FillQuestion("She wore a ", " dress to the party.", "red", new String[]{"run", "dog", "play"}, "vocabulary"));
+            // Q3: Synonyms/Antonyms
+            questions.add(new FillQuestion("Quick and fast are ", " because they mean the same.", "synonyms", new String[]{"antonyms", "verbs", "nouns"}, "vocabulary"));
+            questions.add(new FillQuestion("The opposite of hot is ", ".", "cold", new String[]{"warm", "cool", "hot"}, "vocabulary"));
+            questions.add(new FillQuestion("A word that means the same as 'glad' is ", ".", "happy", new String[]{"sad", "mad", "bad"}, "vocabulary"));
+            // Q4: Root words / spelling
+            questions.add(new FillQuestion("The root word of 'playing' is ", ".", "play", new String[]{"playing", "played", "plays"}, "vocabulary"));
+            questions.add(new FillQuestion("The root word of 'teacher' is ", ".", "teach", new String[]{"teacher", "teaches", "teaching"}, "vocabulary"));
+            questions.add(new FillQuestion("The root word of 'helpful' is ", ".", "help", new String[]{"helping", "helpful", "helps"}, "vocabulary"));
 
         } else if (d.contains("grammar")) {
-            questions.add(new FillQuestion("She ", " to school every morning.", "goes", new String[]{"go", "gone", "going"}, "grammar"));
-            questions.add(new FillQuestion("They ", " playing football yesterday.", "were", new String[]{"are", "is", "was"}, "grammar"));
-            questions.add(new FillQuestion("He ", " finished his homework already.", "has", new String[]{"have", "had", "is"}, "grammar"));
-            questions.add(new FillQuestion("The children ", " very happy today.", "are", new String[]{"is", "was", "am"}, "grammar"));
-            questions.add(new FillQuestion("I ", " a new book last week.", "bought", new String[]{"buy", "buying", "buys"}, "grammar"));
-            questions.add(new FillQuestion("She sings ", " in the choir.", "beautifully", new String[]{"beautiful", "beauty", "beautify"}, "grammar"));
-            questions.add(new FillQuestion("He runs ", " than his brother.", "faster", new String[]{"fast", "fastest", "fastly"}, "grammar"));
-            questions.add(new FillQuestion("The cat and the dog ", " friends.", "are", new String[]{"is", "was", "am"}, "grammar"));
-            questions.add(new FillQuestion("We ", " three apples left.", "have", new String[]{"has", "had", "is"}, "grammar"));
-            questions.add(new FillQuestion("She ", " eat vegetables every day.", "should", new String[]{"would", "could", "might"}, "grammar"));
+            // Q1: Sentences / word order
+            questions.add(new FillQuestion("A sentence starts with a ", " letter.", "capital", new String[]{"small", "bold", "silent"}, "grammar"));
+            questions.add(new FillQuestion("In 'The bird flies', the subject (doer) is ", ".", "bird", new String[]{"flies", "the", "sky"}, "grammar"));
+            questions.add(new FillQuestion("In 'Maria dances', the action word is ", ".", "dances", new String[]{"Maria", "the", "and"}, "grammar"));
+            // Q2: Sentence types
+            questions.add(new FillQuestion("I like milk ", " I like cake.", "and", new String[]{"but", "or", "so"}, "grammar"));
+            questions.add(new FillQuestion("A telling sentence ends with a ", ".", "period", new String[]{"comma", "question mark", "exclamation mark"}, "grammar"));
+            // Q3: Capitalization / discourse markers
+            questions.add(new FillQuestion("To start a procedure, use the word ", ".", "First", new String[]{"Finally", "Next", "Then"}, "grammar"));
+            questions.add(new FillQuestion("After 'First' comes ", ".", "Next", new String[]{"Last", "Finally", "Before"}, "grammar"));
+            // Q4: Because / intonation
+            questions.add(new FillQuestion("I wear a jacket ", " it is cold.", "because", new String[]{"but", "and", "when"}, "grammar"));
+            questions.add(new FillQuestion("A question usually has a ", " pitch at the end.", "rising", new String[]{"falling", "flat", "low"}, "grammar"));
+            questions.add(new FillQuestion("The word 'because' shows a ", ".", "reason", new String[]{"time", "place", "color"}, "grammar"));
 
         } else if (d.contains("compreh")) {
-            questions.add(new FillQuestion("The ", " of a story tells you what it is about.", "topic", new String[]{"setting", "character", "author"}, "comprehending"));
-            questions.add(new FillQuestion("Details in the story ", " the main idea.", "support", new String[]{"ignore", "change", "replace"}, "comprehending"));
-            questions.add(new FillQuestion("The ", " is where and when the story takes place.", "setting", new String[]{"plot", "theme", "character"}, "comprehending"));
-            questions.add(new FillQuestion("The ", " of a story is the lesson it teaches.", "theme", new String[]{"plot", "setting", "conflict"}, "comprehending"));
-            questions.add(new FillQuestion("You can ", " what will happen next from story clues.", "predict", new String[]{"read", "write", "ignore"}, "comprehending"));
-            questions.add(new FillQuestion("The beginning of a story usually ", " the characters.", "introduces", new String[]{"ends", "changes", "hides"}, "comprehending"));
-            questions.add(new FillQuestion("When you ", ", you tell the story in your own words.", "retell", new String[]{"copy", "memorize", "skip"}, "comprehending"));
-            questions.add(new FillQuestion("Good readers make ", " while they read.", "inferences", new String[]{"mistakes", "drawings", "lists"}, "comprehending"));
-            questions.add(new FillQuestion("A character's ", " tells you what kind of person they are.", "traits", new String[]{"clothes", "height", "name"}, "comprehending"));
-            questions.add(new FillQuestion("The ", " of a paragraph is usually the first sentence.", "main idea", new String[]{"detail", "example", "question"}, "comprehending"));
+            // Q1: Key details / sequencing / characters
+            questions.add(new FillQuestion("Ana has a small brown ", ".", "dog", new String[]{"cat", "bird", "fish"}, "comprehending"));
+            questions.add(new FillQuestion("The signal word for the first event is ", ".", "First", new String[]{"Next", "Finally", "Then"}, "comprehending"));
+            questions.add(new FillQuestion("The ", " is where the story takes place.", "setting", new String[]{"character", "problem", "solution"}, "comprehending"));
+            // Q2-Q3: Main idea / cause-effect / context clues
+            questions.add(new FillQuestion("The most important idea of a passage is the ", " idea.", "main", new String[]{"small", "detail", "extra"}, "comprehending"));
+            questions.add(new FillQuestion("Rain is the ", " of wet streets.", "cause", new String[]{"effect", "result", "ending"}, "comprehending"));
+            questions.add(new FillQuestion("Wet streets are the ", " of rain.", "effect", new String[]{"cause", "reason", "beginning"}, "comprehending"));
+            questions.add(new FillQuestion("Quick and fast are ", " because they mean the same thing.", "synonyms", new String[]{"antonyms", "verbs", "nouns"}, "comprehending"));
+            questions.add(new FillQuestion("Slow and fast are ", " because they have opposite meanings.", "antonyms", new String[]{"synonyms", "adjectives", "nouns"}, "comprehending"));
+            // Q4: Inference / summarizing
+            questions.add(new FillQuestion("An inference is a ", " based on clues from the text.", "guess", new String[]{"fact", "drawing", "copy"}, "comprehending"));
+            questions.add(new FillQuestion("A good summary includes the ", " idea and key details.", "main", new String[]{"long", "short", "funny"}, "comprehending"));
 
         } else {
             // Creating / Composing (default)
@@ -583,7 +596,7 @@ public class DemoDataProvider {
             questions.add(new FillQuestion("Sentences should start with a ", " letter.", "capital", new String[]{"small", "bold", "colored"}, "creating"));
             questions.add(new FillQuestion("Put a ", " at the end of a question.", "question mark", new String[]{"period", "comma", "apostrophe"}, "creating"));
             questions.add(new FillQuestion("Joining two sentences with 'and' or 'but' makes a ", " sentence.", "compound", new String[]{"simple", "complex", "short"}, "creating"));
-            questions.add(new FillQuestion("Good writers ", " their work to fix mistakes.", "proofread", new String[]{"delete", "copy", "skip"}, "creating"));
+            questions.add(new FillQuestion("I wear a jacket ", " it is cold outside.", "because", new String[]{"but", "and", "when"}, "creating"));
             questions.add(new FillQuestion("Using ", " makes your writing more interesting.", "adjectives", new String[]{"numbers", "symbols", "colors"}, "creating"));
             questions.add(new FillQuestion("The ", " sentence wraps up the paragraph.", "concluding", new String[]{"topic", "detail", "opening"}, "creating"));
             questions.add(new FillQuestion("A ", " is a group of sentences about one idea.", "paragraph", new String[]{"chapter", "word", "sentence"}, "creating"));
