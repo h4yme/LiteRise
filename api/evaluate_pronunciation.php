@@ -290,6 +290,8 @@ $phonemeDetails = generatePhonemeDetails($targetPronunciation, $recognizedText);
 $errorPhonemes = implode(',', array_column(array_filter($phonemeDetails, function($p) {
     return $p['accuracy'] < 0.7;
 }), 'phoneme'));
+// Strip non-ASCII characters (apostrophes, smart quotes, etc.) so SQL Server varchar columns accept the value
+$errorPhonemes = preg_replace('/[^\x20-\x7E]/', '', $errorPhonemes);
 
 // Get audio duration (in milliseconds)
 $audioDuration = null; // Would be extracted from audio file metadata
