@@ -516,8 +516,11 @@ function generatePhonemeDetails($target, $recognized) {
     $phonemes = [];
 
     // Simple character-by-character comparison
-    $targetChars = str_split(strtolower($target));
-    $recognizedChars = str_split(strtolower($recognized));
+    // mb_str_split handles multi-byte UTF-8 chars (e.g. U+2019 right-single-quote)
+    // so json_encode of the result is always valid; str_split would produce raw bytes
+    // that break json_encode and cause a silent 0-byte response.
+    $targetChars = mb_str_split(strtolower($target), 1, 'UTF-8');
+    $recognizedChars = mb_str_split(strtolower($recognized), 1, 'UTF-8');
 
     for ($i = 0; $i < count($targetChars); $i++) {
         $accuracy = 1.0;
