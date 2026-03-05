@@ -176,7 +176,7 @@ try {
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
         ->setSpeechContexts([$speechContext])
-        ->setModel($isPassage ? 'default' : 'phone_call') // phone_call only for short speech
+        ->setModel($isPassage ? 'latest_long' : 'phone_call') // latest_long for passages (returns confidence); phone_call for single words
         ->setUseEnhanced(true)
         ->setMaxAlternatives($isPassage ? 1 : 3); // passages: 1 alt is enough
 
@@ -211,6 +211,14 @@ try {
             }
             $recognizedText = implode(' ', $allSegments);
             $confidence = $segCount > 0 ? ($totalConf / $segCount) : 0.0;
+
+            // latest_long model can return 0.0 confidence even on a good transcript.
+            // Use a neutral fallback so the score isn't silently penalised.
+            if ($confidence === 0.0 && !empty($recognizedText)) {
+                $confidence = 0.80;
+                error_log("INFO: Passage confidence was 0.0 with non-empty transcript — using neutral 0.80");
+            }
+
             $pronunciationScore = calculatePronunciationScore(
                 $recognizedText,
                 $targetPronunciation,
@@ -397,24 +405,45 @@ function calculatePronunciationScore($recognized, $target, $confidence, $isPassa
     }
 
     if ($isPassage) {
-        // Word-level accuracy: count target words found in recognized text
-        $targetWords = preg_split('/\s+/', preg_replace('/[^a-z\s]/', '', $target));
-        $recognizedWords = preg_split('/\s+/', preg_replace('/[^a-z\s]/', '', $recognized));
-        $targetCount = count(array_filter($targetWords));
+        // Strip punctuation from both sides before comparing
+        $cleanTarget     = strtolower(preg_replace('/[^a-z\s]/i', '', $target));
+        $cleanRecognized = strtolower(preg_replace('/[^a-z\s]/i', '', $recognized));
+
+        $targetWords     = array_values(array_filter(preg_split('/\s+/', $cleanTarget)));
+        $recognizedWords = array_values(array_filter(preg_split('/\s+/', $cleanRecognized)));
+
+        $targetCount = count($targetWords);
         if ($targetCount === 0) return 0.0;
 
-        $hits = 0;
         $recognizedBag = array_count_values($recognizedWords);
+        $hits = 0;
+
         foreach ($targetWords as $w) {
-            if ($w === '') continue;
+            // Exact match
             if (isset($recognizedBag[$w]) && $recognizedBag[$w] > 0) {
                 $hits++;
                 $recognizedBag[$w]--;
+                continue;
+            }
+            // Fuzzy match: levenshtein ≤ 1 for words ≥ 4 chars (catches minor ASR mis-transcriptions)
+            if (strlen($w) >= 4) {
+                foreach ($recognizedBag as $rw => $cnt) {
+                    if ($cnt > 0 && levenshtein($w, $rw) <= 1) {
+                        $hits++;
+                        $recognizedBag[$rw]--;
+                        break;
+                    }
+                }
             }
         }
+
         $wordAccuracy = $hits / $targetCount;
-        // Word accuracy 70%, speech confidence 30%
-        return max(0.0, min(1.0, $wordAccuracy * 0.7 + $confidence * 0.3));
+
+        // If model returned no confidence, fall back to neutral rather than penalising the score.
+        $effectiveConf = ($confidence > 0.0) ? $confidence : 0.80;
+
+        // Word accuracy 85%, confidence 15%
+        return max(0.0, min(1.0, $wordAccuracy * 0.85 + $effectiveConf * 0.15));
     }
 
     // --- Single word path ---
