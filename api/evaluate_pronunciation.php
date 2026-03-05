@@ -184,7 +184,7 @@ try {
         ->setLanguageCode('en-US')
         ->setEnableAutomaticPunctuation(false)
         ->setSpeechContexts([$speechContext])
-        ->setModel($isPassage ? 'latest_long' : 'phone_call') // latest_long for passages (returns confidence); phone_call for single words
+        ->setModel('phone_call') // phone_call supports AMR/8kHz for both single words and passages; returns confidence scores
         ->setUseEnhanced(true)
         ->setMaxAlternatives($isPassage ? 1 : 3); // passages: 1 alt is enough
 
