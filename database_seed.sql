@@ -1004,6 +1004,155 @@ INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectA
 (212,'What is the root word of "kindness"?','multiple_choice','["kind","kindly","kindness"]','kind',0.3,'vocabulary',NULL);
 GO
 
+-- ── QUIZ QUESTIONS: CREATING AND COMPOSING MODULE (NodeIDs 501-513) ──────────
+-- Source: Creating and Composing Text PDF (DepEd MATATAG Grade 3)
+
+-- Node 501: Writing Simple Sentences
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(501,'Which sentence starts correctly?','multiple_choice','["the dog barks.","The dog barks.","THE dog barks."]','The dog barks.',0.1,'creating',NULL),
+(501,'Which sentence has the correct end punctuation?','multiple_choice','["I love to read","I love to read.","i love to read"]','I love to read.',0.1,'creating',NULL),
+(501,'Which of the following is a complete sentence?','multiple_choice','["Running fast.","The boy runs fast.","The fast boy."]','The boy runs fast.',0.2,'creating',NULL),
+(501,'Which sentence expresses a complete thought?','multiple_choice','["My dog.","The big tree.","My dog is brown."]','My dog is brown.',0.2,'creating',NULL),
+(501,'What punctuation mark ends a telling sentence?','multiple_choice','["?","!","."]','.',0.1,'creating',NULL),
+(501,'What does every sentence begin with?','multiple_choice','["A small letter","A capital letter","A number"]','A capital letter',0.1,'creating',NULL),
+(501,'Which sentence is written correctly?','multiple_choice','["she has a book","She has a book.","she has a book."]','She has a book.',0.1,'creating',NULL),
+(501,'Which sentence is NOT complete?','multiple_choice','["The flowers bloom.","Birds sing.","Under the tree."]','Under the tree.',0.2,'creating',NULL);
+
+-- Node 502: Describing with Adjectives
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(502,'Which word is an adjective in: "The tall tree swayed."?','multiple_choice','["tree","tall","swayed"]','tall',0.2,'creating',NULL),
+(502,'Which sentence uses an adjective to describe?','multiple_choice','["The dog barked.","The loud dog barked.","The dog ran away."]','The loud dog barked.',0.2,'creating',NULL),
+(502,'Which word best describes the taste of a mango?','multiple_choice','["runs","sweet","quickly"]','sweet',0.1,'creating',NULL),
+(502,'Which sentence uses a SENSORY adjective?','multiple_choice','["The cat sat.","The soft, fluffy cat sat.","The cat ran."]','The soft, fluffy cat sat.',0.2,'creating',NULL),
+(502,'What do adjectives describe?','multiple_choice','["Verbs","Nouns or pronouns","Other adjectives only"]','Nouns or pronouns',0.2,'creating',NULL),
+(502,'Which word is an adjective?','multiple_choice','["jump","slowly","beautiful"]','beautiful',0.1,'creating',NULL),
+(502,'Which sentence has TWO adjectives?','multiple_choice','["The cat is small.","The small, white cat sat.","The cat sat quietly."]','The small, white cat sat.',0.3,'creating',NULL),
+(502,'Which adjective describes how something FEELS?','multiple_choice','["bright","rough","loud"]','rough',0.2,'creating',NULL);
+
+-- Node 503: Writing a Simple Paragraph
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(503,'What is the FIRST sentence of a paragraph usually called?','multiple_choice','["Supporting sentence","Topic sentence","Concluding sentence"]','Topic sentence',0.2,'creating',NULL),
+(503,'What is the main job of a topic sentence?','multiple_choice','["To give details","To state the main idea","To end the paragraph"]','To state the main idea',0.2,'creating',NULL),
+(503,'What are supporting sentences used for?','multiple_choice','["To start the paragraph","To give details about the main idea","To change the topic"]','To give details about the main idea',0.2,'creating',NULL),
+(503,'Where should all sentences in a paragraph focus?','multiple_choice','["On different topics","On one main idea","On the weather"]','On one main idea',0.2,'creating',NULL),
+(503,'Which is a good topic sentence about dogs?','multiple_choice','["My bag is big.","Dogs are wonderful pets.","I like to swim."]','Dogs are wonderful pets.',0.2,'creating',NULL),
+(503,'What should you do to the first line of a paragraph?','multiple_choice','["Capitalize it only","Indent and capitalize it","Underline it"]','Indent and capitalize it',0.3,'creating',NULL),
+(503,'Which sentence is a SUPPORTING sentence for "I love mangoes."?','multiple_choice','["I like reading.","Mangoes are sweet and juicy.","The sky is blue."]','Mangoes are sweet and juicy.',0.2,'creating',NULL),
+(503,'How many main ideas should ONE paragraph have?','multiple_choice','["As many as possible","Only one","At least three"]','Only one',0.2,'creating',NULL);
+
+-- Node 504: Writing Questions and Commands
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(504,'Which sentence is a QUESTION?','multiple_choice','["Close the door.","Where is my bag?","I like to read."]','Where is my bag?',0.2,'creating',NULL),
+(504,'Which sentence is a COMMAND?','multiple_choice','["Who is there?","Please sit down.","I am happy."]','Please sit down.',0.2,'creating',NULL),
+(504,'What punctuation ends a question?','multiple_choice','[".",";","?"]','?',0.1,'creating',NULL),
+(504,'Which word BEGINS a question?','multiple_choice','["Run","Please","When"]','When',0.2,'creating',NULL),
+(504,'Which is a COMMAND sentence?','multiple_choice','["The dog is hungry.","Are you ready?","Feed the dog now."]','Feed the dog now.',0.2,'creating',NULL),
+(504,'What does an imperative sentence do?','multiple_choice','["Asks a question","Gives a command or request","States a fact"]','Gives a command or request',0.3,'creating',NULL),
+(504,'Which word is a question word?','multiple_choice','["Jump","Why","The"]','Why',0.1,'creating',NULL),
+(504,'Which sentence is a CORRECT question?','multiple_choice','["where is my pencil","Where is my pencil?","Where is my pencil."]','Where is my pencil?',0.2,'creating',NULL);
+
+-- Node 505: Writing with Joining Words
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(505,'Which word joins two ideas that are DIFFERENT?','multiple_choice','["and","but","or"]','but',0.2,'creating',NULL),
+(505,'Which word shows a CHOICE between two ideas?','multiple_choice','["and","but","or"]','or',0.2,'creating',NULL),
+(505,'Which word ADDS two ideas together?','multiple_choice','["and","but","or"]','and',0.2,'creating',NULL),
+(505,'Choose the correct joining word: "I am tired ___ I will study."','multiple_choice','["and","but","because"]','but',0.3,'creating',NULL),
+(505,'Choose the correct joining word: "We can go swimming ___ we can stay home."','multiple_choice','["and","but","or"]','or',0.3,'creating',NULL),
+(505,'Which sentence correctly uses "and"?','multiple_choice','["I like rice and I like bread.","I like rice and but I like bread.","And I like rice."]','I like rice and I like bread.',0.3,'creating',NULL),
+(505,'What are "and", "but", and "or" called?','multiple_choice','["Adjectives","Conjunctions","Nouns"]','Conjunctions',0.3,'creating',NULL),
+(505,'Which sentence uses a COMMA correctly before a conjunction?','multiple_choice','["I am happy, but she is sad.","I am happy but, she is sad.","I am happy but she, is sad."]','I am happy, but she is sad.',0.4,'creating',NULL);
+
+-- Node 506: Writing a Short Story
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(506,'What are the THREE parts of a story?','multiple_choice','["Title, body, ending","Beginning, middle, end","Introduction, paragraphs, conclusion"]','Beginning, middle, end',0.2,'creating',NULL),
+(506,'Where in a story do you introduce the characters and setting?','multiple_choice','["Middle","End","Beginning"]','Beginning',0.2,'creating',NULL),
+(506,'Where in a story is the main problem usually found?','multiple_choice','["Beginning","Middle","End"]','Middle',0.2,'creating',NULL),
+(506,'Where in a story is the problem SOLVED?','multiple_choice','["Beginning","Middle","End"]','End',0.2,'creating',NULL),
+(506,'Which time word is BEST for starting a story?','multiple_choice','["Finally","One day","In conclusion"]','One day',0.2,'creating',NULL),
+(506,'What does a story usually need?','multiple_choice','["A title and list","Characters, setting, and problem","Only a beginning"]','Characters, setting, and problem',0.2,'creating',NULL),
+(506,'Which sentence is a good BEGINNING for a story?','multiple_choice','["And she was happy.","One sunny day, Mia found a lost puppy.","The end."]','One sunny day, Mia found a lost puppy.',0.2,'creating',NULL),
+(506,'Which time word signals the END of a story?','multiple_choice','["First","Finally","Next"]','Finally',0.2,'creating',NULL);
+
+-- Node 507: Using Time-Order Words in Writing
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(507,'Which time-order word comes FIRST in a sequence?','multiple_choice','["Then","Next","First"]','First',0.2,'creating',NULL),
+(507,'Which time-order word signals the LAST step?','multiple_choice','["First","Then","Finally"]','Finally',0.2,'creating',NULL),
+(507,'Which word connects steps in the MIDDLE of a sequence?','multiple_choice','["First","Finally","Next"]','Next',0.2,'creating',NULL),
+(507,'Time-order words help us understand the ___ of events.','multiple_choice','["size","sequence","topic"]','sequence',0.3,'creating',NULL),
+(507,'Which sentence uses a time-order word correctly?','multiple_choice','["First I woke up then I ate.","First, I woke up. Then, I ate breakfast.","I woke up first, then, ate."]','First, I woke up. Then, I ate breakfast.',0.3,'creating',NULL),
+(507,'What type of writing often uses time-order words?','multiple_choice','["Only stories","Procedures and narratives","Only descriptions"]','Procedures and narratives',0.3,'creating',NULL),
+(507,'Which of these is a time-order word?','multiple_choice','["big","After that","because"]','After that',0.2,'creating',NULL),
+(507,'Arrange the steps: "___, peel the banana. ___, eat it. ___, wash your hands."','multiple_choice','["Finally, Then, First","First, Then, Finally","Then, First, Finally"]','First, Then, Finally',0.3,'creating',NULL);
+
+-- Node 508: Writing Explanations with Because
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(508,'What does "because" show in a sentence?','multiple_choice','["A question","A reason or cause","A comparison"]','A reason or cause',0.3,'creating',NULL),
+(508,'Complete: "I wear a jacket ___ it is cold."','multiple_choice','["and","because","but"]','because',0.3,'creating',NULL),
+(508,'Which part is the CAUSE? "The plants grow tall because they get sunlight."','multiple_choice','["The plants grow tall","they get sunlight","tall"]','they get sunlight',0.3,'creating',NULL),
+(508,'Which sentence correctly uses "because"?','multiple_choice','["I study hard, I pass.","I study hard because I want to pass.","Because I study hard."]','I study hard because I want to pass.',0.3,'creating',NULL),
+(508,'Complete: "She smiled ___ she received a gift."','multiple_choice','["and","because","but"]','because',0.3,'creating',NULL),
+(508,'What is the EFFECT in: "I drink water because it is hot."?','multiple_choice','["it is hot","I drink water","because"]','I drink water',0.3,'creating',NULL),
+(508,'Which sentence gives an EXPLANATION?','multiple_choice','["I am tired.","I am tired because I ran a lot.","I ran a lot."]','I am tired because I ran a lot.',0.3,'creating',NULL),
+(508,'What word signals a reason or explanation?','multiple_choice','["but","because","and"]','because',0.2,'creating',NULL);
+
+-- Node 509: Writing Comparative Sentences
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(509,'Which form compares TWO things?','multiple_choice','["big","bigger","biggest"]','bigger',0.3,'creating',NULL),
+(509,'Which form compares THREE or more things?','multiple_choice','["fast","faster","fastest"]','fastest',0.3,'creating',NULL),
+(509,'Which sentence correctly compares two things?','multiple_choice','["The cat is big.","The cat is bigger than the dog.","The cat is biggest."]','The cat is bigger than the dog.',0.3,'creating',NULL),
+(509,'Complete: "Maria is ___ than Ben." (smart)','multiple_choice','["smart","smarter","smartest"]','smarter',0.3,'creating',NULL),
+(509,'Complete: "This is the ___ mango I have ever tasted." (sweet)','multiple_choice','["sweet","sweeter","sweetest"]','sweetest',0.4,'creating',NULL),
+(509,'For long adjectives, we use ___ before the adjective to compare two things.','multiple_choice','["most","more","less"]','more',0.4,'creating',NULL),
+(509,'Which sentence uses a comparative adjective correctly?','multiple_choice','["She is more taller.","She is taller than him.","She is tallest of them."]','She is taller than him.',0.4,'creating',NULL),
+(509,'Which word shows two things are EQUAL?','multiple_choice','["bigger","fastest","both"]','both',0.3,'creating',NULL);
+
+-- Node 510: Writing About National Themes
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(510,'What does BAYANIHAN mean?','multiple_choice','["Being selfish","Community spirit and helping each other","Celebrating alone"]','Community spirit and helping each other',0.3,'creating',NULL),
+(510,'Which of these is a symbol of the Philippines?','multiple_choice','["Maple leaf","Philippine flag","Big Ben"]','Philippine flag',0.2,'creating',NULL),
+(510,'What are the THREE colors of the Philippine flag?','multiple_choice','["Red, white, green","Blue, red, white","Yellow, blue, red"]','Blue, red, white',0.3,'creating',NULL),
+(510,'Which word means "compatriots" or "fellow Filipinos"?','multiple_choice','["pamana","kababayan","bayanihan"]','kababayan',0.3,'creating',NULL),
+(510,'Which word means "heritage" or "inheritance"?','multiple_choice','["pamana","mabuhay","bayanihan"]','pamana',0.4,'creating',NULL),
+(510,'What does MABUHAY mean?','multiple_choice','["Goodbye","Long live! / Welcome!","Thank you"]','Long live! / Welcome!',0.3,'creating',NULL),
+(510,'Which sentence shows national pride?','multiple_choice','["I like pizza.","I am proud to be Filipino.","The sky is blue."]','I am proud to be Filipino.',0.2,'creating',NULL),
+(510,'Which theme shows COMMUNITY VALUES?','multiple_choice','["Shopping alone","Helping your neighbors","Ignoring others"]','Helping your neighbors',0.2,'creating',NULL);
+
+-- Node 511: Writing a Descriptive Paragraph
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(511,'What is the main purpose of a descriptive paragraph?','multiple_choice','["To tell a story","To paint a picture with words","To give instructions"]','To paint a picture with words',0.3,'creating',NULL),
+(511,'Which sentence uses the SENSE of SIGHT?','multiple_choice','["The music was loud.","The roses smelled sweet.","The sky was bright blue."]','The sky was bright blue.',0.3,'creating',NULL),
+(511,'Which sentence uses the SENSE of TOUCH?','multiple_choice','["The food tasted salty.","The pillow felt soft and warm.","The bird sang beautifully."]','The pillow felt soft and warm.',0.3,'creating',NULL),
+(511,'Which word is a SENSORY adjective for smell?','multiple_choice','["loud","fragrant","smooth"]','fragrant',0.3,'creating',NULL),
+(511,'What should a descriptive paragraph ALWAYS begin with?','multiple_choice','["A concluding thought","A topic sentence stating what is being described","A supporting detail"]','A topic sentence stating what is being described',0.3,'creating',NULL),
+(511,'Which sentence adds the MOST description?','multiple_choice','["The flower is nice.","The flower is beautiful.","The bright, fragrant yellow flower bloomed in the garden."]','The bright, fragrant yellow flower bloomed in the garden.',0.3,'creating',NULL),
+(511,'What are the FIVE senses used in descriptive writing?','multiple_choice','["Sight, smell, taste, touch, hearing","Sight, thought, speech, action, taste","Color, size, shape, weight, texture"]','Sight, smell, taste, touch, hearing',0.3,'creating',NULL),
+(511,'Which word describes SOUND?','multiple_choice','["colorful","humming","rough"]','humming',0.2,'creating',NULL);
+
+-- Node 512: Writing a Book Response
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(512,'What does a SUMMARY include?','multiple_choice','["Your opinion only","The main idea and key details","Your favorite character only"]','The main idea and key details',0.3,'creating',NULL),
+(512,'What is a TEXT-TO-SELF connection?','multiple_choice','["Connecting the text to another book","Relating the text to your own life","Connecting the text to world events"]','Relating the text to your own life',0.3,'creating',NULL),
+(512,'Which sentence starter is best for sharing an OPINION about a book?','multiple_choice','["The story is about...","I think this story is... because...","This reminds me of..."]','I think this story is... because...',0.3,'creating',NULL),
+(512,'Which sentence starter is best for SUMMARIZING a text?','multiple_choice','["I think...","This story is about...","This reminds me of..."]','This story is about...',0.3,'creating',NULL),
+(512,'What are the THREE parts of a book response?','multiple_choice','["Title, author, illustrator","Summary, connection, opinion","Beginning, middle, end"]','Summary, connection, opinion',0.3,'creating',NULL),
+(512,'Which sentence shows a TEXT-TO-SELF connection?','multiple_choice','["The book has 10 chapters.","This reminds me of when I helped my brother.","The author wrote other books too."]','This reminds me of when I helped my brother.',0.4,'creating',NULL),
+(512,'What does "I think this story is heartwarming because..." express?','multiple_choice','["A summary","An opinion with a reason","A connection"]','An opinion with a reason',0.3,'creating',NULL),
+(512,'Why do we include a PERSONAL CONNECTION in a book response?','multiple_choice','["To copy the author","To show how the text relates to your life","To rewrite the story"]','To show how the text relates to your life',0.3,'creating',NULL);
+
+-- Node 513: Creating and Composing Final Assessment
+INSERT INTO QuizQuestions (NodeID,QuestionText,QuestionType,OptionsJSON,CorrectAnswer,EstimatedDifficulty,SkillCategory,ReadingPassage) VALUES
+(513,'Which sentence is written CORRECTLY?','multiple_choice','["the sky is blue","The sky is blue.","The sky is blue"]','The sky is blue.',0.2,'creating',NULL),
+(513,'Which word in "The big, red apple is sweet." is an adjective?','multiple_choice','["apple","is","big"]','big',0.3,'creating',NULL),
+(513,'What is the first sentence of a paragraph called?','multiple_choice','["Supporting sentence","Topic sentence","Ending sentence"]','Topic sentence',0.3,'creating',NULL),
+(513,'Which sentence is a QUESTION?','multiple_choice','["Open the window.","Can you help me?","I am reading."]','Can you help me?',0.3,'creating',NULL),
+(513,'Which joining word shows CONTRAST?','multiple_choice','["and","but","or"]','but',0.3,'creating',NULL),
+(513,'What are the THREE parts of a story in order?','multiple_choice','["End, beginning, middle","Beginning, middle, end","Middle, end, beginning"]','Beginning, middle, end',0.3,'creating',NULL),
+(513,'Complete: "First, I woke up. ___, I brushed my teeth."','multiple_choice','["Finally","Then","Because"]','Then',0.3,'creating',NULL),
+(513,'Which sentence uses "because" CORRECTLY?','multiple_choice','["Because I am happy.","I am happy because it is my birthday.","I am happy, and because I smile."]','I am happy because it is my birthday.',0.4,'creating',NULL),
+(513,'Complete: "This mango is ___ than that one." (sweet)','multiple_choice','["sweet","sweetest","sweeter"]','sweeter',0.4,'creating',NULL),
+(513,'What does a book response include?','multiple_choice','["Only a list of characters","Summary, personal connection, and opinion","Only the plot"]','Summary, personal connection, and opinion',0.4,'creating',NULL);
+GO
+
 -- ── LESSONS (Lessons table, IDs mirror NodeIDs) ──────────────
 SET IDENTITY_INSERT Lessons ON;
 INSERT INTO Lessons (LessonID, LessonTitle, LessonDescription, LessonContent, RequiredAbility, GradeLevel, LessonType, IsActive) VALUES
@@ -1124,7 +1273,56 @@ INSERT INTO LessonGameContent (LessonID, GameType, ContentText, ContentData, Dif
 (410,'fill_in_blanks','We use _____ from the text to make an inference.',
  '{"beforeBlank":"We use","afterBlank":"from the text to make an inference.","correctAnswer":"clues","options":["clues","colors","numbers","shapes"]}',0.5,'comprehension'),
 (412,'fill_in_blanks','A good summary should include the _____ idea.',
- '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}',0.5,'comprehension');
+ '{"beforeBlank":"A good summary should include the","afterBlank":"idea.","correctAnswer":"main","options":["main","small","funny","boring"]}',0.5,'comprehension'),
+-- Creating and Composing: Fill-in-blanks game content
+(501,'fill_in_blanks','The bird _____ in the tree.',
+ '{"beforeBlank":"The bird","afterBlank":"in the tree.","correctAnswer":"sings","options":["sings","sing","blue","quickly"]}',0.2,'creating'),
+(501,'fill_in_blanks','Every sentence must begin with a _____ letter.',
+ '{"beforeBlank":"Every sentence must begin with a","afterBlank":"letter.","correctAnswer":"capital","options":["capital","small","long","funny"]}',0.2,'creating'),
+(502,'fill_in_blanks','The _____, fluffy cat slept on the sofa.',
+ '{"beforeBlank":"The","afterBlank":"fluffy cat slept on the sofa.","correctAnswer":"soft,","options":["soft,","run","quickly","is"]}',0.3,'creating'),
+(502,'fill_in_blanks','She wore a _____, colorful dress to the party.',
+ '{"beforeBlank":"She wore a","afterBlank":"colorful dress to the party.","correctAnswer":"bright,","options":["bright,","slowly,","is,","and,"]}',0.3,'creating'),
+(503,'fill_in_blanks','The _____ sentence tells the main idea of a paragraph.',
+ '{"beforeBlank":"The","afterBlank":"sentence tells the main idea of a paragraph.","correctAnswer":"topic","options":["topic","last","long","funny"]}',0.3,'creating'),
+(503,'fill_in_blanks','All sentences in a paragraph should be about _____ main idea.',
+ '{"beforeBlank":"All sentences in a paragraph should be about","afterBlank":"main idea.","correctAnswer":"one","options":["one","many","no","every"]}',0.3,'creating'),
+(504,'fill_in_blanks','_____ is your teacher?',
+ '{"beforeBlank":"","afterBlank":"is your teacher?","correctAnswer":"Who","options":["Who","Because","And","But"]}',0.2,'creating'),
+(504,'fill_in_blanks','Please _____ your desk.',
+ '{"beforeBlank":"Please","afterBlank":"your desk.","correctAnswer":"clean","options":["clean","cleaning","cleaner","cleaned"]}',0.2,'creating'),
+(505,'fill_in_blanks','I like cats _____ I like dogs.',
+ '{"beforeBlank":"I like cats","afterBlank":"I like dogs.","correctAnswer":"and","options":["and","but","because","when"]}',0.3,'creating'),
+(505,'fill_in_blanks','She is tired, _____ she will finish her homework.',
+ '{"beforeBlank":"She is tired,","afterBlank":"she will finish her homework.","correctAnswer":"but","options":["but","and","or","so"]}',0.3,'creating'),
+(506,'fill_in_blanks','_____ sunny day, Ana found a lost puppy.',
+ '{"beforeBlank":"","afterBlank":"sunny day, Ana found a lost puppy.","correctAnswer":"One","options":["One","Finally","Because","After"]}',0.3,'creating'),
+(506,'fill_in_blanks','The story has a beginning, a middle, and an _____.',
+ '{"beforeBlank":"The story has a beginning, a middle, and an","afterBlank":".","correctAnswer":"end","options":["end","start","title","cover"]}',0.2,'creating'),
+(507,'fill_in_blanks','_____, I wake up early. Next, I eat breakfast.',
+ '{"beforeBlank":"","afterBlank":"I wake up early. Next, I eat breakfast.","correctAnswer":"First,","options":["First,","Finally,","Last,","Because,"]}',0.3,'creating'),
+(507,'fill_in_blanks','Next, I brush my teeth. _____, I go to school.',
+ '{"beforeBlank":"Next, I brush my teeth.","afterBlank":"I go to school.","correctAnswer":"Finally,","options":["Finally,","First,","Next,","Then,"]}',0.3,'creating'),
+(508,'fill_in_blanks','I wear a jacket _____ it is cold.',
+ '{"beforeBlank":"I wear a jacket","afterBlank":"it is cold.","correctAnswer":"because","options":["because","but","and","or"]}',0.3,'creating'),
+(508,'fill_in_blanks','She studies hard _____ she wants to learn.',
+ '{"beforeBlank":"She studies hard","afterBlank":"she wants to learn.","correctAnswer":"because","options":["because","but","and","or"]}',0.3,'creating'),
+(509,'fill_in_blanks','The elephant is _____ than the cat.',
+ '{"beforeBlank":"The elephant is","afterBlank":"than the cat.","correctAnswer":"bigger","options":["bigger","big","biggest","more big"]}',0.3,'creating'),
+(509,'fill_in_blanks','This is the _____ mango I have ever tasted.',
+ '{"beforeBlank":"This is the","afterBlank":"mango I have ever tasted.","correctAnswer":"sweetest","options":["sweetest","sweeter","sweet","most sweet"]}',0.4,'creating'),
+(510,'fill_in_blanks','I am proud to be _____.',
+ '{"beforeBlank":"I am proud to be","afterBlank":".","correctAnswer":"Filipino","options":["Filipino","happy","running","fast"]}',0.2,'creating'),
+(510,'fill_in_blanks','Bayanihan means helping each other as a _____.',
+ '{"beforeBlank":"Bayanihan means helping each other as a","afterBlank":".","correctAnswer":"community","options":["community","stranger","enemy","student"]}',0.3,'creating'),
+(511,'fill_in_blanks','The flower smelled _____ and sweet.',
+ '{"beforeBlank":"The flower smelled","afterBlank":"and sweet.","correctAnswer":"fragrant","options":["fragrant","loud","rough","cold"]}',0.3,'creating'),
+(511,'fill_in_blanks','The five senses are sight, smell, taste, touch, and _____.',
+ '{"beforeBlank":"The five senses are sight, smell, taste, touch, and","afterBlank":".","correctAnswer":"hearing","options":["hearing","running","jumping","reading"]}',0.3,'creating'),
+(512,'fill_in_blanks','This story is _____ a girl who loved to read.',
+ '{"beforeBlank":"This story is","afterBlank":"a girl who loved to read.","correctAnswer":"about","options":["about","because","and","but"]}',0.3,'creating'),
+(512,'fill_in_blanks','This reminds me _____ when I helped my brother.',
+ '{"beforeBlank":"This reminds me","afterBlank":"when I helped my brother.","correctAnswer":"of","options":["of","because","and","but"]}',0.3,'creating');
 GO
 
 -- ── SUMMARY ──────────────────────────────────────────────────
@@ -1132,15 +1330,15 @@ GO
 --   5 Modules (Phonics, Vocabulary, Grammar, Comprehension, Creating)
 --  65 Nodes  (13 per module: 12 lesson nodes + 1 final assessment)
 --  65 Lessons (mirroring Nodes, IDs 101-513, for LessonGameContent FK)
--- ~470 QuizQuestions from 4 DepEd MATATAG Grade 3 PDFs
---  20 LessonGameContent rows for fill-in-blanks game data
+-- ~574 QuizQuestions from 5 DepEd MATATAG Grade 3 PDFs
+--  44 LessonGameContent rows for fill-in-blanks game data
 --
 -- Curriculum Sources:
 --   PDF 1: Phonics and Word Study (EN3PWS) — 12 lessons, 4 quarters
 --   PDF 2: Vocabulary and Word Knowledge (EN3VWK) — 12 lessons, 4 quarters
 --   PDF 3: Grammar Awareness (EN3GAGS) — 12 lessons, 4 quarters
 --   PDF 4: Comprehending and Analyzing Texts — 12 lessons, 4 quarters
---   Module 5 (Creating/Composing) — constructed from MATATAG curriculum framework
+--   PDF 5: Creating and Composing Text (EN3CCT) — 12 lessons, 4 quarters
 --
 -- Module Color Themes (for game UI):
 --   Phonics      (#FF6B6B → #FF8E53) warm red-orange
