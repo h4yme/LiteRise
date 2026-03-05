@@ -861,13 +861,6 @@ public class PlacementTestActivity extends AppCompatActivity {
                 // Start audio recording
                 pronunciationHelper.startRecording(recordingCallback);
 
-                // Auto-stop recording after 5 seconds
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    if (isRecording[0]) {
-                        pronunciationHelper.stopRecording(recordingCallback);
-                    }
-                }, 5000);
-
             } else {
                 // Stop recording manually
                 isRecording[0] = false;
