@@ -101,17 +101,25 @@ $category = 'Oral Language';
 
 try {
     $itemStmt = $conn->prepare("
-        SELECT TargetPronunciation, MinimumAccuracy, DifficultyParam, Category
+        SELECT QuestionType, CorrectAnswer, TargetPronunciation, MinimumAccuracy, DifficultyParam, Category
         FROM dbo.AssessmentItems
         WHERE ItemID = ?
     ");
     $itemStmt->execute([$itemID]);
     $item = $itemStmt->fetch(PDO::FETCH_ASSOC);
     if ($item) {
-        $targetPronunciation = $item['TargetPronunciation'] ?? $targetWord;
-        $minAccuracy        = $item['MinimumAccuracy']    ?? 65;
-        $itemDifficulty     = $item['DifficultyParam']    ?? 0.0;
-        $category           = $item['Category']           ?? 'Oral Language';
+        // For pronunciation_reading items, TargetPronunciation holds the context passage —
+        // the actual sentence the student reads is in CorrectAnswer.
+        // For single-word pronunciation items, TargetPronunciation is the word itself.
+        $questionType = $item['QuestionType'] ?? '';
+        if ($questionType === 'pronunciation_reading') {
+            $targetPronunciation = $item['CorrectAnswer'] ?? $targetWord;
+        } else {
+            $targetPronunciation = $item['TargetPronunciation'] ?? $targetWord;
+        }
+        $minAccuracy    = $item['MinimumAccuracy'] ?? 65;
+        $itemDifficulty = $item['DifficultyParam']  ?? 0.0;
+        $category       = $item['Category']         ?? 'Oral Language';
     } else {
         error_log("WARNING: ItemID $itemID not found in AssessmentItems — using POST target_word '$targetWord'");
     }
