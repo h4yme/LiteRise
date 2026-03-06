@@ -278,6 +278,18 @@ public class ModuleLadderActivity extends AppCompatActivity {
         Log.d(TAG, "Total nodes: " + nodesData.size());
 
         int currentNodeId = data.getCurrentNodeId();
+
+        // API may return null (parsed as 0) — fall back to first incomplete node
+        if (currentNodeId == 0) {
+            for (NodeData nd : nodesData) {
+                if (!(nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted())) {
+                    currentNodeId = nd.getNodeId();
+                    Log.d(TAG, "currentNodeId was null, resolved to first incomplete node: " + currentNodeId);
+                    break;
+                }
+            }
+        }
+
         List<NodeView> nodeViews = new ArrayList<>();
 
         for (int i = 0; i < nodesData.size(); i++) {
@@ -347,7 +359,15 @@ public class ModuleLadderActivity extends AppCompatActivity {
         pathView.setNodes(nodeViews);
 
         // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top)
-        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
+        // Use ViewTreeObserver to scroll only after the layout pass completes
+        ladderScrollView.getViewTreeObserver().addOnGlobalLayoutListener(
+                new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        ladderScrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        ladderScrollView.fullScroll(View.FOCUS_DOWN);
+                    }
+                });
 
         // Update progress
         int completedNodes = 0;

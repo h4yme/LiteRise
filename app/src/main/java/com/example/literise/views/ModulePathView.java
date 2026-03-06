@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -32,10 +31,10 @@ public class ModulePathView extends View {
 
     // ─── Dark theme colors (Duolingo-inspired + dashboard purple) ────────────
     private static final int BG_COLOR        = Color.parseColor("#1A1D2E");
-    private static final int LOCK_BOTTOM     = Color.parseColor("#1E2035");
-    private static final int LOCK_TOP        = Color.parseColor("#2E3158");
-    private static final int LOCK_BORDER_C   = Color.parseColor("#3D4070");
-    private static final int LOCK_ICON_COLOR = Color.parseColor("#5A5F8A");
+    private static final int LOCK_BOTTOM     = Color.parseColor("#363B5E");
+    private static final int LOCK_TOP        = Color.parseColor("#4A5078");
+    private static final int LOCK_BORDER_C   = Color.parseColor("#5C6490");
+    private static final int LOCK_ICON_COLOR = Color.parseColor("#8A90BE");
     private static final int CONN_TODO_COLOR = Color.parseColor("#2E3158");
     private static final int DIVIDER_COLOR   = Color.parseColor("#3D4070");
     private static final int GOLD_BOTTOM     = Color.parseColor("#B8860A");
@@ -138,8 +137,6 @@ public class ModulePathView extends View {
         pConnTodo.setStrokeWidth(connW);
         pConnTodo.setStrokeCap(Paint.Cap.ROUND);
         pConnTodo.setColor(CONN_TODO_COLOR);
-        // Dashed connector for unfinished path (Duolingo style)
-        pConnTodo.setPathEffect(new DashPathEffect(new float[]{12 * dp, 8 * dp}, 0));
 
         // ---- Coin shadow ----
         pCoinShadow.setStyle(Paint.Style.FILL);
