@@ -21,14 +21,25 @@ import java.util.List;
 public class ModulePathView extends View {
 
     // ─── Node positions ──────────────────────────────────────────────────────
-    // X = % of width, Y = % of height.  Node 1 is at bottom (96 %), node 13 at top (4 %).
-    private static final float[] NODE_X_PCT = {50, 67, 76, 67, 50, 33, 24, 33, 50, 67, 76, 60, 50};
-    private static final float[] NODE_Y_PCT = {91, 84, 77, 70, 63, 56, 49, 42, 35, 28, 21, 13, 6};
+    // Duolingo-style winding path: alternates left-center-right like a snake
+    // X = % of width, Y = % of height.  Node 1 is at bottom (94%), node 13 at top (4%).
+    private static final float[] NODE_X_PCT = {50, 65, 74, 65, 50, 35, 26, 35, 50, 65, 74, 57, 50};
+    private static final float[] NODE_Y_PCT = {92, 85, 78, 71, 64, 57, 50, 43, 36, 29, 22, 13, 5};
 
     // Quarter-divider horizontal rules drawn BETWEEN the node groups
-    // Q1 = nodes 1-3, Q2 = nodes 4-6, Q3 = nodes 7-9, Q4 = nodes 10-13
-    private static final float[] DIVIDER_Y_PCT  = {67f, 45.5f, 24.5f};
+    private static final float[] DIVIDER_Y_PCT  = {67.5f, 46f, 25f};
     private static final String[] DIVIDER_LABEL = {"Quarter 2", "Quarter 3", "Quarter 4"};
+
+    // ─── Dark theme colors (Duolingo-inspired + dashboard purple) ────────────
+    private static final int BG_COLOR        = Color.parseColor("#1A1D2E");
+    private static final int LOCK_BOTTOM     = Color.parseColor("#1E2035");
+    private static final int LOCK_TOP        = Color.parseColor("#2E3158");
+    private static final int LOCK_BORDER_C   = Color.parseColor("#3D4070");
+    private static final int LOCK_ICON_COLOR = Color.parseColor("#5A5F8A");
+    private static final int CONN_TODO_COLOR = Color.parseColor("#2E3158");
+    private static final int DIVIDER_COLOR   = Color.parseColor("#3D4070");
+    private static final int GOLD_BOTTOM     = Color.parseColor("#B8860A");
+    private static final int GOLD_TOP        = Color.parseColor("#FFD700");
 
     // ─── State ───────────────────────────────────────────────────────────────
     private List<NodeView> nodes = new ArrayList<>();
@@ -39,8 +50,9 @@ public class ModulePathView extends View {
 
     // ─── Sizing (set in init, dp → px) ───────────────────────────────────────
     private float nodeR;        // normal radius
+    private float currentR;     // larger radius for CURRENT node
     private float finalR;       // radius for FINAL_ASSESSMENT node
-    private float coinDy;       // y-offset for 3-D coin shadow
+    private float coinDy;       // y-offset for 3-D coin bottom
     private float connW;        // connector stroke width
     private float hitR;         // touch hit-zone radius
 
@@ -50,9 +62,9 @@ public class ModulePathView extends View {
     private final Paint pConnTodo  = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Node coin layers
-    private final Paint pCoinShadow  = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint pCoinBottom  = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint pCoinTop     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinShadow    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinBottom    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinTop       = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pCoinHighlight = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Lock node
@@ -69,13 +81,15 @@ public class ModulePathView extends View {
     private final Paint pNumber    = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pLockNum   = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pStarText  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pLockStar  = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    // Pulse ring
-    private final Paint pPulse = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // Pulse ring (dashboard purple glow)
+    private final Paint pPulse  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pPulse2 = new Paint(Paint.ANTI_ALIAS_FLAG);
 
-    // START tooltip
-    private final Paint pTipBg   = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint pTipText = new Paint(Paint.ANTI_ALIAS_FLAG);
+    // START tooltip (dark style)
+    private final Paint pTipBg     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pTipText   = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint pTipBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Quarter dividers
@@ -105,11 +119,15 @@ public class ModulePathView extends View {
     private void init() {
         float dp = getContext().getResources().getDisplayMetrics().density;
 
-        nodeR  = 30 * dp;
-        finalR = 38 * dp;
-        coinDy = 5  * dp;
-        connW  = 9  * dp;
-        hitR   = 46 * dp;
+        // Set dark background to match Duolingo aesthetic
+        setBackgroundColor(BG_COLOR);
+
+        nodeR    = 28 * dp;
+        currentR = 36 * dp;   // CURRENT node is bigger, like Duolingo's active node
+        finalR   = 38 * dp;
+        coinDy   = 5  * dp;
+        connW    = 8  * dp;
+        hitR     = 46 * dp;
 
         // ---- Connectors ----
         pConnDone.setStyle(Paint.Style.STROKE);
@@ -119,35 +137,37 @@ public class ModulePathView extends View {
         pConnTodo.setStyle(Paint.Style.STROKE);
         pConnTodo.setStrokeWidth(connW);
         pConnTodo.setStrokeCap(Paint.Cap.ROUND);
-        pConnTodo.setColor(Color.parseColor("#DDD7F0"));
+        pConnTodo.setColor(CONN_TODO_COLOR);
+        // Dashed connector for unfinished path (Duolingo style)
+        pConnTodo.setPathEffect(new DashPathEffect(new float[]{12 * dp, 8 * dp}, 0));
 
-        // ---- Coin shadow (light, not harsh) ----
+        // ---- Coin shadow ----
         pCoinShadow.setStyle(Paint.Style.FILL);
-        pCoinShadow.setColor(Color.parseColor("#22000000"));
+        pCoinShadow.setColor(Color.parseColor("#40000000"));
 
-        // ---- Coin top/bottom (set in draw per state) ----
+        // ---- Coin top/bottom (set per draw call) ----
         pCoinBottom.setStyle(Paint.Style.FILL);
         pCoinTop.setStyle(Paint.Style.FILL);
 
         // ---- Inner highlight ring ----
         pCoinHighlight.setStyle(Paint.Style.STROKE);
         pCoinHighlight.setStrokeWidth(2.5f * dp);
-        pCoinHighlight.setColor(Color.parseColor("#55FFFFFF"));
+        pCoinHighlight.setColor(Color.parseColor("#60FFFFFF"));
 
-        // ---- Locked node ----
+        // ---- Locked node (dark grey, barely visible — Duolingo style) ----
         pLockBottom.setStyle(Paint.Style.FILL);
-        pLockBottom.setColor(Color.parseColor("#C8BEE8"));
+        pLockBottom.setColor(LOCK_BOTTOM);
         pLockTop.setStyle(Paint.Style.FILL);
-        pLockTop.setColor(Color.parseColor("#E5DDF8"));
+        pLockTop.setColor(LOCK_TOP);
         pLockBorder.setStyle(Paint.Style.STROKE);
         pLockBorder.setStrokeWidth(2.5f * dp);
-        pLockBorder.setColor(Color.parseColor("#BFB3E0"));
+        pLockBorder.setColor(LOCK_BORDER_C);
 
         // ---- Gold (mastered) ----
         pGoldBottom.setStyle(Paint.Style.FILL);
-        pGoldBottom.setColor(Color.parseColor("#C8860A"));
+        pGoldBottom.setColor(GOLD_BOTTOM);
         pGoldTop.setStyle(Paint.Style.FILL);
-        pGoldTop.setColor(Color.parseColor("#FFD700"));
+        pGoldTop.setColor(GOLD_TOP);
 
         // ---- Number on active nodes ----
         pNumber.setStyle(Paint.Style.FILL);
@@ -156,11 +176,17 @@ public class ModulePathView extends View {
         pNumber.setFakeBoldText(true);
         pNumber.setTextSize(22 * dp);
 
-        // ---- Number on locked nodes ----
+        // ---- Number on locked nodes (darker, subtle) ----
         pLockNum.setStyle(Paint.Style.FILL);
-        pLockNum.setColor(Color.parseColor("#9B8DC0"));
+        pLockNum.setColor(LOCK_ICON_COLOR);
         pLockNum.setTextAlign(Paint.Align.CENTER);
         pLockNum.setTextSize(20 * dp);
+
+        // ---- Star icon on locked nodes (Duolingo grey star) ----
+        pLockStar.setStyle(Paint.Style.FILL);
+        pLockStar.setColor(LOCK_ICON_COLOR);
+        pLockStar.setTextAlign(Paint.Align.CENTER);
+        pLockStar.setFakeBoldText(true);
 
         // ---- Checkmark path ----
         pCheckPath.setStyle(Paint.Style.STROKE);
@@ -169,33 +195,38 @@ public class ModulePathView extends View {
         pCheckPath.setStrokeCap(Paint.Cap.ROUND);
         pCheckPath.setStrokeJoin(Paint.Join.ROUND);
 
-        // ---- Star text (mastered) ----
+        // ---- Star text (mastered — gold star) ----
         pStarText.setStyle(Paint.Style.FILL);
         pStarText.setColor(Color.WHITE);
         pStarText.setTextAlign(Paint.Align.CENTER);
         pStarText.setTextSize(24 * dp);
         pStarText.setFakeBoldText(true);
 
-        // ---- Pulse ring ----
+        // ---- Pulse ring (dashboard purple glow, two rings) ----
         pPulse.setStyle(Paint.Style.STROKE);
-        pPulse.setStrokeWidth(3f * dp);
+        pPulse.setStrokeWidth(4f * dp);
 
-        // ---- Tooltip ----
+        pPulse2.setStyle(Paint.Style.STROKE);
+        pPulse2.setStrokeWidth(2f * dp);
+
+        // ---- START Tooltip (dark style matching Duolingo) ----
         pTipBg.setStyle(Paint.Style.FILL);
-        pTipBg.setColor(Color.WHITE);
+        pTipBg.setColor(Color.parseColor("#2E2654")); // dark purple bg
 
         pTipBorder.setStyle(Paint.Style.STROKE);
         pTipBorder.setStrokeWidth(2f * dp);
+        pTipBorder.setColor(Color.parseColor("#7C3AED"));
 
         pTipText.setStyle(Paint.Style.FILL);
+        pTipText.setColor(Color.WHITE);
         pTipText.setTextAlign(Paint.Align.CENTER);
         pTipText.setFakeBoldText(true);
-        pTipText.setTextSize(14 * dp);
+        pTipText.setTextSize(13 * dp);
 
-        // ---- Quarter dividers ----
+        // ---- Quarter dividers (subtle on dark bg) ----
         pDivLine.setStyle(Paint.Style.STROKE);
         pDivLine.setStrokeWidth(1.5f * dp);
-        pDivLine.setColor(Color.parseColor("#C8BEE8"));
+        pDivLine.setColor(DIVIDER_COLOR);
 
         pPillBg.setStyle(Paint.Style.FILL);
 
@@ -207,8 +238,8 @@ public class ModulePathView extends View {
 
         // ---- Pulse animator ----
         pulseAnim = ValueAnimator.ofFloat(0f, 1f);
-        pulseAnim.setDuration(1400);
-        pulseAnim.setRepeatMode(ValueAnimator.REVERSE);
+        pulseAnim.setDuration(1600);
+        pulseAnim.setRepeatMode(ValueAnimator.RESTART);
         pulseAnim.setRepeatCount(ValueAnimator.INFINITE);
         pulseAnim.setInterpolator(new LinearInterpolator());
         pulseAnim.addUpdateListener(a -> {
@@ -217,8 +248,7 @@ public class ModulePathView extends View {
         });
         pulseAnim.start();
 
-        // Software layer is required for reliable custom drawing (text + translucent fills)
-        // across all API levels and devices. Hardware layer caused blank renders on some devices.
+        // Software layer required for reliable custom drawing across all API levels
         setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
@@ -245,7 +275,6 @@ public class ModulePathView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // View not yet measured — skip until we have real dimensions
         if (getWidth() == 0 || getHeight() == 0) return;
 
         if (nodes.isEmpty()) {
@@ -256,7 +285,7 @@ public class ModulePathView extends View {
         drawDividers(canvas);
         drawConnectors(canvas);
 
-        // Draw completed/locked nodes first, CURRENT on top
+        // Draw non-current nodes first, then CURRENT on top
         for (NodeView n : nodes) {
             if (n.getState() != NodeView.NodeState.CURRENT) drawNode(canvas, n);
         }
@@ -271,23 +300,20 @@ public class ModulePathView extends View {
         float w  = getWidth();
         float h  = getHeight();
         float dp = density();
-        float pH = 14 * dp;   // pill half-height
-        float pR = 12 * dp;   // pill corner radius
+        float pH = 13 * dp;
+        float pR = 12 * dp;
 
-        pPillBg.setColor(colorMain);
+        pPillBg.setColor(alphaColor(colorMain, 0.9f));
 
         for (int i = 0; i < DIVIDER_Y_PCT.length; i++) {
             float cy = DIVIDER_Y_PCT[i] / 100f * h;
 
-            // Measure pill width
             float textW = pPillText.measureText(DIVIDER_LABEL[i]);
-            float pW = textW / 2 + 18 * dp;   // half-width
+            float pW    = textW / 2 + 18 * dp;
 
-            // Lines either side of pill
             canvas.drawLine(32 * dp, cy, w / 2 - pW - 8 * dp, cy, pDivLine);
             canvas.drawLine(w / 2 + pW + 8 * dp, cy, w - 32 * dp, cy, pDivLine);
 
-            // Pill
             RectF pill = new RectF(w / 2 - pW, cy - pH, w / 2 + pW, cy + pH);
             canvas.drawRoundRect(pill, pR, pR, pPillBg);
             canvas.drawText(DIVIDER_LABEL[i], w / 2, cy + pPillText.getTextSize() * 0.35f, pPillText);
@@ -300,7 +326,7 @@ public class ModulePathView extends View {
         float w = getWidth();
         float h = getHeight();
 
-        pConnDone.setColor(alphaColor(colorMain, 0.45f));
+        pConnDone.setColor(alphaColor(colorMain, 0.75f));
 
         for (int i = 0; i < nodes.size() - 1; i++) {
             NodeView a = nodes.get(i);
@@ -323,23 +349,35 @@ public class ModulePathView extends View {
         float h  = getHeight();
         float cx = nx(node, w);
         float cy = ny(node, h);
-        float r  = node.isFinalAssessment() ? finalR : nodeR;
 
         NodeView.NodeState state = node.getState();
+        boolean isCurrent = state == NodeView.NodeState.CURRENT;
 
-        // 1. Pulse ring (CURRENT only)
-        if (state == NodeView.NodeState.CURRENT) {
-            float ext = r * 0.50f * pulsePhase;
-            int alpha = (int) (180 * (1f - pulsePhase));
-            pPulse.setColor(colorMain);
-            pPulse.setAlpha(alpha);
-            canvas.drawCircle(cx, cy, r + ext, pPulse);
+        // Use bigger radius for CURRENT node (Duolingo active node is larger)
+        float r = node.isFinalAssessment() ? finalR : (isCurrent ? currentR : nodeR);
+
+        // 1. Double pulse ring for CURRENT (dashboard purple glow)
+        if (isCurrent) {
+            // Outer ring — fades out as it expands
+            float ext1 = r * 0.65f * pulsePhase;
+            int alpha1 = (int) (120 * (1f - pulsePhase));
+            pPulse.setColor(Color.argb(alpha1,
+                    Color.red(colorMain), Color.green(colorMain), Color.blue(colorMain)));
+            canvas.drawCircle(cx, cy, r + ext1, pPulse);
+
+            // Inner ring — subtle constant glow
+            float ext2 = r * 0.25f * pulsePhase;
+            int alpha2 = (int) (80 * (1f - pulsePhase * 0.5f));
+            pPulse2.setColor(Color.argb(alpha2,
+                    Color.red(colorMain), Color.green(colorMain), Color.blue(colorMain)));
+            canvas.drawCircle(cx, cy, r + ext2, pPulse2);
         }
 
-        // 2. Coin shadow
-        canvas.drawCircle(cx + 1.5f, cy + 5, r, pCoinShadow);
+        // 2. Drop shadow
+        pCoinShadow.setColor(Color.parseColor("#50000000"));
+        canvas.drawCircle(cx + 2f, cy + 6, r, pCoinShadow);
 
-        // 3. Bottom (3-D edge)
+        // 3. Bottom face (3-D depth edge)
         Paint btm = coinBottomPaint(state);
         canvas.drawCircle(cx, cy + coinDy, r, btm);
 
@@ -347,41 +385,46 @@ public class ModulePathView extends View {
         Paint top = coinTopPaint(state);
         canvas.drawCircle(cx, cy, r, top);
 
-        // 5. Border / highlight
+        // 5. Border / highlight ring
         if (state == NodeView.NodeState.LOCKED) {
             canvas.drawCircle(cx, cy, r, pLockBorder);
+        } else if (isCurrent) {
+            // Bright white highlight on current node
+            pCoinHighlight.setColor(Color.parseColor("#80FFFFFF"));
+            canvas.drawCircle(cx, cy - r * 0.2f, r * 0.62f, pCoinHighlight);
         } else {
-            canvas.drawCircle(cx, cy - r * 0.2f, r * 0.65f, pCoinHighlight);
+            pCoinHighlight.setColor(Color.parseColor("#50FFFFFF"));
+            canvas.drawCircle(cx, cy - r * 0.2f, r * 0.60f, pCoinHighlight);
         }
 
         // 6. Icon
         drawIcon(canvas, node, cx, cy, r);
 
         // 7. START badge above CURRENT
-        if (state == NodeView.NodeState.CURRENT) {
+        if (isCurrent) {
             drawStartBadge(canvas, cx, cy - r);
         }
     }
 
     private Paint coinBottomPaint(NodeView.NodeState state) {
         switch (state) {
-            case LOCKED: return pLockBottom;
+            case LOCKED:   return pLockBottom;
             case MASTERED: return pGoldBottom;
             case COMPLETED:
-                pCoinBottom.setColor(dimColor(colorMain, 0.72f));
+                pCoinBottom.setColor(dimColor(colorMain, 0.68f));
                 return pCoinBottom;
             default:
-                pCoinBottom.setColor(dimColor(colorMain, 0.65f));
+                pCoinBottom.setColor(dimColor(colorMain, 0.60f));
                 return pCoinBottom;
         }
     }
 
     private Paint coinTopPaint(NodeView.NodeState state) {
         switch (state) {
-            case LOCKED: return pLockTop;
+            case LOCKED:   return pLockTop;
             case MASTERED: return pGoldTop;
             case COMPLETED:
-                pCoinTop.setColor(dimColor(colorMain, 0.82f));
+                pCoinTop.setColor(dimColor(colorMain, 0.80f));
                 return pCoinTop;
             default:
                 pCoinTop.setColor(colorMain);
@@ -390,18 +433,14 @@ public class ModulePathView extends View {
     }
 
     private void drawIcon(Canvas canvas, NodeView node, float cx, float cy, float r) {
-        float dp = density();
-
         switch (node.getState()) {
             case LOCKED:
-                // Node number in muted purple
-                pLockNum.setTextSize(r * 0.62f);
-                canvas.drawText(String.valueOf(node.getNodeNumber()),
-                        cx, cy + pLockNum.getTextSize() * 0.37f, pLockNum);
+                // Grey star (Duolingo-style locked node)
+                pLockStar.setTextSize(r * 0.70f);
+                canvas.drawText("★", cx, cy + pLockStar.getTextSize() * 0.36f, pLockStar);
                 break;
 
             case COMPLETED:
-                // Drawn checkmark — no emoji
                 drawCheckmark(canvas, cx, cy, r * 0.42f);
                 break;
 
@@ -412,7 +451,6 @@ public class ModulePathView extends View {
 
             default: // UNLOCKED / CURRENT
                 if (node.isFinalAssessment()) {
-                    // Trophy icon drawn
                     drawTrophy(canvas, cx, cy, r * 0.46f);
                 } else {
                     pNumber.setTextSize(r * 0.68f);
@@ -423,7 +461,6 @@ public class ModulePathView extends View {
         }
     }
 
-    /** Draw a simple ✓ checkmark using Path */
     private void drawCheckmark(Canvas canvas, float cx, float cy, float size) {
         Path p = new Path();
         p.moveTo(cx - size, cy);
@@ -434,41 +471,37 @@ public class ModulePathView extends View {
         canvas.drawPath(p, pCheckPath);
     }
 
-    /** Simple filled trophy silhouette */
     private void drawTrophy(Canvas canvas, float cx, float cy, float size) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
         p.setStyle(Paint.Style.FILL);
         p.setColor(Color.WHITE);
 
-        // Cup body: rounded rect
         RectF cup = new RectF(cx - size * 0.8f, cy - size * 0.9f,
                 cx + size * 0.8f, cy + size * 0.4f);
         canvas.drawRoundRect(cup, size * 0.3f, size * 0.3f, p);
 
-        // Stem
         RectF stem = new RectF(cx - size * 0.2f, cy + size * 0.4f,
                 cx + size * 0.2f, cy + size * 0.85f);
         canvas.drawRect(stem, p);
 
-        // Base
         RectF base = new RectF(cx - size * 0.55f, cy + size * 0.8f,
                 cx + size * 0.55f, cy + size * 1.0f);
         canvas.drawRoundRect(base, size * 0.1f, size * 0.1f, p);
     }
 
-    // ─── START tooltip ───────────────────────────────────────────────────────
+    // ─── START tooltip (Duolingo-style dark pill with arrow) ─────────────────
 
     private void drawStartBadge(Canvas canvas, float cx, float topEdge) {
         float dp   = density();
         float gap  = 10 * dp;
-        float padX = 16 * dp;
-        float padY =  7 * dp;
-        float cr   = 20 * dp;    // corner radius
-        float arrH =  9 * dp;    // arrow height
+        float padX = 18 * dp;
+        float padY =  8 * dp;
+        float cr   = 20 * dp;
+        float arrH = 10 * dp;
 
         String text = "START";
-        pTipText.setColor(colorMain);
         pTipText.setTextSize(13 * dp);
+        pTipText.setColor(Color.WHITE);
 
         float textW = pTipText.measureText(text);
         float bW    = textW + padX * 2;
@@ -479,21 +512,21 @@ public class ModulePathView extends View {
         float bL    = cx - bW / 2;
         float bR    = cx + bW / 2;
 
-        // Pill background
+        // Pill background (dark purple)
         RectF rect = new RectF(bL, bTop, bR, bBot);
         canvas.drawRoundRect(rect, cr, cr, pTipBg);
 
-        // Border in module colour
-        pTipBorder.setColor(alphaColor(colorMain, 0.5f));
+        // Purple border
         canvas.drawRoundRect(rect, cr, cr, pTipBorder);
 
-        // Arrow pointer
+        // Arrow pointer downward
         Path arrow = new Path();
-        arrow.moveTo(cx - 7 * dp, bBot);
-        arrow.lineTo(cx + 7 * dp, bBot);
+        arrow.moveTo(cx - 8 * dp, bBot);
+        arrow.lineTo(cx + 8 * dp, bBot);
         arrow.lineTo(cx, bBot + arrH);
         arrow.close();
         canvas.drawPath(arrow, pTipBg);
+        canvas.drawPath(arrow, pTipBorder);
 
         // Text
         float textY = bBot - padY - pTipText.descent();
@@ -540,7 +573,6 @@ public class ModulePathView extends View {
         return getContext().getResources().getDisplayMetrics().density;
     }
 
-    /** Darken/lighten a colour by factor (0 = black, 1 = original). */
     private int dimColor(int c, float f) {
         return Color.rgb(
                 Math.min(255, (int) (Color.red(c)   * f)),
@@ -548,7 +580,6 @@ public class ModulePathView extends View {
                 Math.min(255, (int) (Color.blue(c)  * f)));
     }
 
-    /** Apply alpha (0–1) to a colour. */
     private int alphaColor(int c, float alpha) {
         return Color.argb((int) (alpha * 255),
                 Color.red(c), Color.green(c), Color.blue(c));
@@ -556,7 +587,7 @@ public class ModulePathView extends View {
 
     private void drawEmptyState(Canvas canvas) {
         Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(Color.parseColor("#9B8DC0"));
+        p.setColor(Color.parseColor("#7C8BC0"));
         p.setTextAlign(Paint.Align.CENTER);
         p.setTextSize(16 * density());
         canvas.drawText("Loading lessons…", getWidth() / 2f, getHeight() / 2f, p);
