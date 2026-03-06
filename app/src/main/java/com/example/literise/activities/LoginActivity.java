@@ -16,10 +16,12 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.PlacementProgressResponse;
 import com.example.literise.models.Students;
 import com.example.literise.utils.CustomToast;
 import com.example.literise.utils.SessionLogger;
 
+import java.util.Map;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -319,27 +321,20 @@ public class LoginActivity extends AppCompatActivity {
                     android.util.Log.d("LoginActivity", "hasCompletedAssessment: " + sessionManager.hasCompletedAssessment());
 
                     // Navigate based on user's progress
-                    Intent intent;
                     if (!sessionManager.hasSeenWelcome()) {
-                        // First time - show welcome onboarding
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (not seen welcome)");
-                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                        navigateTo(WelcomeOnboardingActivity.class);
                     } else if (sessionManager.hasStartedAssessment() && !sessionManager.hasCompletedAssessment()) {
-                        // Assessment in progress - resume test
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to PlacementTestActivity (resume assessment)");
-                        intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
+                        navigateTo(PlacementTestActivity.class);
                     } else if (!sessionManager.hasCompletedAssessment()) {
-                        // Seen welcome but hasn't started placement test yet
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (assessment not started)");
-                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                        navigateTo(WelcomeOnboardingActivity.class);
                     } else {
-                        // Completed everything - go to Dashboard
-                        android.util.Log.d("LoginActivity", "NAVIGATION: Going to DashboardActivity (assessment completed)");
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                        // Assessment completed — fetch category scores from server before going to Dashboard
+                        android.util.Log.d("LoginActivity", "NAVIGATION: Fetching category scores then going to DashboardActivity");
+                        fetchCategoryScoresAndNavigate(apiService, sessionManager, s.getStudent_id());
                     }
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    finish();
                 } else {
                     CustomToast.showError(LoginActivity.this, "Invalid credentials");
                 }
@@ -351,6 +346,48 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+    private void navigateTo(Class<?> activityClass) {
+        startActivity(new Intent(LoginActivity.this, activityClass));
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
+    }
+
+    private void fetchCategoryScoresAndNavigate(ApiService apiService, SessionManager sessionManager, int studentId) {
+        apiService.getPlacementProgress(studentId).enqueue(new Callback<PlacementProgressResponse>() {
+            @Override
+            public void onResponse(Call<PlacementProgressResponse> call, Response<PlacementProgressResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                    PlacementProgressResponse.AssessmentResults results = response.body().getResults();
+                    if (results != null && results.getPre() != null) {
+                        Map<String, Double> scores = results.getPre().getCategoryScores();
+                        if (scores != null) {
+                            saveCategoryScore(sessionManager, scores, "category1", "Cat1_PhonicsWordStudy");
+                            saveCategoryScore(sessionManager, scores, "category2", "Cat2_VocabularyWordKnowledge");
+                            saveCategoryScore(sessionManager, scores, "category3", "Cat3_GrammarAwareness");
+                            saveCategoryScore(sessionManager, scores, "category4", "Cat4_ComprehendingText");
+                            saveCategoryScore(sessionManager, scores, "category5", "Cat5_CreatingComposing");
+                            android.util.Log.d("LoginActivity", "Category scores saved from server");
+                        }
+                    }
+                }
+                navigateTo(DashboardActivity.class);
+            }
+
+            @Override
+            public void onFailure(Call<PlacementProgressResponse> call, Throwable t) {
+                android.util.Log.w("LoginActivity", "Failed to fetch category scores: " + t.getMessage());
+                navigateTo(DashboardActivity.class);
+            }
+        });
+    }
+
+    private void saveCategoryScore(SessionManager sessionManager, Map<String, Double> scores, String apiKey, String sessionKey) {
+        Double value = scores.get(apiKey);
+        if (value != null) {
+            sessionManager.saveCategoryScore(sessionKey, (int) Math.round(value));
+        }
+    }
+
     /**
 
      * Demo mode login - bypass API and auto-login with demo user
