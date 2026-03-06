@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,14 +21,24 @@ import com.example.literise.R;
 import com.example.literise.activities.games.SynonymSprintActivity;
 import com.example.literise.activities.games.WordExplosionActivity;
 import com.example.literise.adapters.ModuleAdapter;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.CheckModulesCompleteResponse;
+import com.example.literise.models.CompleteTutorialRequest;
 import com.example.literise.models.LearningModule;
+import com.example.literise.models.ResponseModel;
+import com.example.literise.models.TutorialStatusResponse;
 import com.example.literise.utils.ModuleOrderingHelper;
 import com.example.literise.utils.ModulePriorityManager;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 
 public class DashboardActivity extends BaseActivity {
@@ -304,7 +315,7 @@ public class DashboardActivity extends BaseActivity {
 
             case 2: // Progress
                 activateNavItem(iconProgress, labelProgress, indicatorProgress, R.drawable.ic_chart_filled);
-                Toast.makeText(this, "Progress - Coming Soon!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ComparisonReportActivity.class));
                 break;
 
             case 3: // Profile
@@ -576,26 +587,51 @@ public class DashboardActivity extends BaseActivity {
         startActivity(intent);
 
     }
+    private static final String TUTORIAL_KEY = "dashboard_tutorial";
+
     private void showTutorialIfFirstTime() {
-
+        // Fast path: already seen locally
         android.content.SharedPreferences prefs = getSharedPreferences("LiteRisePrefs", MODE_PRIVATE);
-
-        boolean hasSeenTutorial = prefs.getBoolean("dashboard_tutorial_seen", false);
-
-
-
-        if (!hasSeenTutorial) {
-
-            currentTutorialStep = 0;
-
-            tutorialOverlay.setVisibility(View.VISIBLE);
-
-            setupStepIndicators();
-
-            showTutorialStep(0);
-
+        if (prefs.getBoolean("dashboard_tutorial_seen", false)) {
+            return;
         }
 
+        // Check server (authoritative source)
+        int studentId = session.getStudentId();
+        if (studentId > 0) {
+            ApiClient.getClient(this).create(ApiService.class).checkTutorial(studentId, TUTORIAL_KEY)
+                    .enqueue(new Callback<TutorialStatusResponse>() {
+                        @Override
+                        public void onResponse(Call<TutorialStatusResponse> call,
+                                               Response<TutorialStatusResponse> response) {
+                            boolean seen = response.isSuccessful()
+                                    && response.body() != null
+                                    && response.body().isSuccess()
+                                    && response.body().isSeen();
+                            if (seen) {
+                                // Sync locally so we skip the API next time
+                                prefs.edit().putBoolean("dashboard_tutorial_seen", true).apply();
+                            } else {
+                                showTutorialOverlay();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<TutorialStatusResponse> call, Throwable t) {
+                            // Offline fallback: show tutorial (will re-check next online session)
+                            showTutorialOverlay();
+                        }
+                    });
+        } else {
+            showTutorialOverlay();
+        }
+    }
+
+    private void showTutorialOverlay() {
+        currentTutorialStep = 0;
+        tutorialOverlay.setVisibility(View.VISIBLE);
+        setupStepIndicators();
+        showTutorialStep(0);
     }
 
 
@@ -755,33 +791,83 @@ public class DashboardActivity extends BaseActivity {
 
 
     private void dismissTutorial() {
-
         tutorialOverlay.setVisibility(View.GONE);
 
-
-
-        // Mark tutorial as seen
-
+        // Mark seen locally (immediate)
         android.content.SharedPreferences prefs = getSharedPreferences("LiteRisePrefs", MODE_PRIVATE);
-
         prefs.edit().putBoolean("dashboard_tutorial_seen", true).apply();
 
+        // Persist to server (fire-and-forget)
+        int studentId = session.getStudentId();
+        if (studentId > 0) {
+            ApiClient.getClient(this)
+                    .create(ApiService.class)
+                    .completeTutorial(new CompleteTutorialRequest(studentId, TUTORIAL_KEY))
+                    .enqueue(new Callback<ResponseModel>() {
+                        @Override
+                        public void onResponse(Call<ResponseModel> call, Response<ResponseModel> response) { }
+                        @Override
+                        public void onFailure(Call<ResponseModel> call, Throwable t) { }
+                    });
+        }
     }
     @Override
-
     protected void onResume() {
-
         super.onResume();
 
         // Refresh data when returning to dashboard
-
         loadUserData();
-
         loadModulesFromPlacementResults();
 
         // Always reset to Home tab when returning
         selectNavItem(0);
 
+        // Check if all nodes complete → prompt post-assessment
+        checkPostAssessmentTrigger();
+    }
+
+    private void checkPostAssessmentTrigger() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class).checkModulesComplete(studentId)
+                .enqueue(new Callback<CheckModulesCompleteResponse>() {
+                    @Override
+                    public void onResponse(Call<CheckModulesCompleteResponse> call,
+                                           Response<CheckModulesCompleteResponse> response) {
+                        if (response.isSuccessful()
+                                && response.body() != null
+                                && response.body().isSuccess()
+                                && response.body().isShouldTriggerPostAssessment()) {
+                            showPostAssessmentDialog(
+                                    response.body().getCompletedCount(),
+                                    response.body().getTotalCount()
+                            );
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckModulesCompleteResponse> call, Throwable t) {
+                        // Silently fail — do not interrupt the user
+                    }
+                });
+    }
+
+    private void showPostAssessmentDialog(int completed, int total) {
+        new AlertDialog.Builder(this)
+                .setTitle("All Lessons Complete!")
+                .setMessage(String.format(
+                        "Amazing work! You completed %d/%d lessons.\n\n"
+                                + "You are ready for the Post-Assessment to see how much you have grown!",
+                        completed, total))
+                .setPositiveButton("Take Post-Assessment", (dialog, which) -> {
+                    Intent intent = new Intent(this, PlacementIntroActivity.class);
+                    intent.putExtra("assessment_type", "POST");
+                    startActivity(intent);
+                })
+                .setNegativeButton("Later", null)
+                .setCancelable(true)
+                .show();
     }
 
 

@@ -293,6 +293,10 @@
             android:name=".activities.games.WordExplosionActivity"
             android:exported="false"/>
 
+        <activity
+            android:name=".activities.ComparisonReportActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
     </application>
 
 
