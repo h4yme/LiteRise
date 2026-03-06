@@ -2,48 +2,63 @@
 -- LiteRise Database Seed Script
 -- MATATAG Grade 3 English Curriculum
 -- Modules: Phonics, Vocabulary, Grammar, Comprehension, Creating
--- Generated from 4 lesson PDFs from h4yme/APIFINAL repo
+-- Generated from 5 lesson PDFs from h4yme/APIFINAL repo
 -- Run this on SQL Server (LiteRiseDB)
 -- =============================================================
 
 USE LiteRiseDB;
 GO
 
--- ── CLEANUP: delete in FK-safe order ─────────────────────────
+-- ── CLEANUP: delete content tables in FK-safe order ──────────
+-- Nodes/Modules are NOT deleted here because StudentNodeProgress may
+-- reference them (student progress is preserved). We use MERGE below
+-- to upsert Modules and Nodes without violating FK constraints.
 IF OBJECT_ID('QuizQuestions','U') IS NOT NULL
     DELETE FROM QuizQuestions WHERE NodeID BETWEEN 101 AND 513;
 IF OBJECT_ID('LessonGameContent','U') IS NOT NULL
     DELETE FROM LessonGameContent WHERE LessonID BETWEEN 101 AND 513;
 IF OBJECT_ID('Lessons','U') IS NOT NULL
     DELETE FROM Lessons WHERE LessonID BETWEEN 101 AND 513;
-IF OBJECT_ID('Nodes','U') IS NOT NULL
-    DELETE FROM Nodes WHERE ModuleID IN (1,2,3,4,5);
-IF OBJECT_ID('Modules','U') IS NOT NULL
-    DELETE FROM Modules WHERE ModuleID IN (1,2,3,4,5);
 GO
 
 -- ── FIX COLUMN TYPES ──────────────────────────────────────────
 ALTER TABLE QuizQuestions ALTER COLUMN CorrectAnswer NVARCHAR(500);
 GO
 
--- ── MODULES ──────────────────────────────────────────────────
+-- ── MODULES (MERGE = insert if missing, update if exists) ────
 SET IDENTITY_INSERT Modules ON;
-INSERT INTO Modules (ModuleID, ModuleName, ModuleCode, CategoryMapping, OrderIndex, TotalNodes, Description) VALUES
-(1, 'Phonics and Word Study', 'EN3PWS', 1, 1, 13,
- 'Learn letter-sound relationships, word patterns (CVCC, CCVC, VCV, VCCV), sight words, and syllable division across all four quarters.'),
-(2, 'Vocabulary and Word Knowledge', 'EN3VWK', 2, 2, 13,
- 'Build word knowledge through high-frequency words, regional themes, nouns, verbs, adjectives, synonyms, antonyms, word families, spelling patterns, and root words.'),
-(3, 'Grammar Awareness and Grammatical Structures', 'EN3GAGS', 3, 3, 13,
- 'Master sentence construction, types of sentences (declarative, interrogative, imperative, exclamatory), compound sentences, capitalization, punctuation, discourse markers, and intonation.'),
-(4, 'Comprehending and Analyzing Texts', 'EN3CAT', 4, 4, 13,
- 'Develop comprehension skills: key details, sequencing, characters and setting, main idea, cause and effect, problem and solution, compare and contrast, context clues, inference, and summarizing.'),
-(5, 'Creating and Composing Text', 'EN3CCT', 5, 5, 13,
- 'Express ideas through writing: simple sentences, descriptive paragraphs, narrative texts, informational writing, and creative compositions using correct grammar and structure.');
+MERGE Modules AS target
+USING (VALUES
+  (1,'Phonics and Word Study','EN3PWS',1,1,13,
+   'Learn letter-sound relationships, word patterns (CVCC, CCVC, VCV, VCCV), sight words, and syllable division across all four quarters.'),
+  (2,'Vocabulary and Word Knowledge','EN3VWK',2,2,13,
+   'Build word knowledge through high-frequency words, regional themes, nouns, verbs, adjectives, synonyms, antonyms, word families, spelling patterns, and root words.'),
+  (3,'Grammar Awareness and Grammatical Structures','EN3GAGS',3,3,13,
+   'Master sentence construction, types of sentences (declarative, interrogative, imperative, exclamatory), compound sentences, capitalization, punctuation, discourse markers, and intonation.'),
+  (4,'Comprehending and Analyzing Texts','EN3CAT',4,4,13,
+   'Develop comprehension skills: key details, sequencing, characters and setting, main idea, cause and effect, problem and solution, compare and contrast, context clues, inference, and summarizing.'),
+  (5,'Creating and Composing Text','EN3CCT',5,5,13,
+   'Express ideas through writing: simple sentences, descriptive paragraphs, narrative texts, informational writing, and creative compositions using correct grammar and structure.')
+) AS src(ModuleID,ModuleName,ModuleCode,CategoryMapping,OrderIndex,TotalNodes,Description)
+ON target.ModuleID = src.ModuleID
+WHEN MATCHED THEN UPDATE SET
+  ModuleName=src.ModuleName, ModuleCode=src.ModuleCode,
+  CategoryMapping=src.CategoryMapping, OrderIndex=src.OrderIndex,
+  TotalNodes=src.TotalNodes, Description=src.Description
+WHEN NOT MATCHED THEN INSERT
+  (ModuleID,ModuleName,ModuleCode,CategoryMapping,OrderIndex,TotalNodes,Description)
+  VALUES (src.ModuleID,src.ModuleName,src.ModuleCode,src.CategoryMapping,
+          src.OrderIndex,src.TotalNodes,src.Description);
 SET IDENTITY_INSERT Modules OFF;
 GO
 
--- ── NODES: PHONICS (ModuleID=1, NodeIDs 101-113) ─────────────
+-- ── NODES (MERGE via TRY/CATCH: insert if new, skip if exists) ──
+-- Each module's batch is wrapped in TRY/CATCH so re-runs are safe
+-- even when StudentNodeProgress references existing NodeIDs.
+
+-- NODES: PHONICS (ModuleID=1, NodeIDs 101-113)
 SET IDENTITY_INSERT Nodes ON;
+BEGIN TRY
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (101, 1, 'CORE_LESSON', 1, 1,
  'Sight Words and CVCC Patterns',
@@ -110,9 +125,11 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all phonics concepts: CVCC/CCVC patterns, syllable division (VCV/VCCV), and sight words across all four quarters.',
  '{"type":"cumulative","quarters":["Q1: CVCC/CCVC word patterns and diphthongs","Q2: VCV/VCCV syllable division rules","Q3: Narrative and descriptive sight words","Q4: Abstract and directional sight words"],"totalItems":20}',
  'phonics', 45, 100);
+END TRY BEGIN CATCH PRINT 'Phonics nodes already exist - skipped' END CATCH
 GO
 
--- ── NODES: VOCABULARY (ModuleID=2, NodeIDs 201-213) ──────────
+-- NODES: VOCABULARY (ModuleID=2, NodeIDs 201-213)
+BEGIN TRY
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (201, 2, 'CORE_LESSON', 1, 1,
  'High-Frequency Words',
@@ -179,9 +196,11 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all vocabulary concepts: high-frequency words, nouns, verbs, adjectives, synonyms, antonyms, word families, spelling patterns, and root words.',
  '{"type":"cumulative","quarters":["Q1: High-frequency words, regional/national vocabulary, content-specific words","Q2: Common/proper nouns, gender of nouns, verbs, adjectives","Q3: Verbs, adjectives, demonstrative pronouns, synonyms, antonyms","Q4: Word families, spelling patterns, root words"],"totalItems":20}',
  'vocabulary', 45, 100);
+END TRY BEGIN CATCH PRINT 'Vocabulary nodes already exist - skipped' END CATCH
 GO
 
--- ── NODES: GRAMMAR (ModuleID=3, NodeIDs 301-313) ─────────────
+-- NODES: GRAMMAR (ModuleID=3, NodeIDs 301-313)
+BEGIN TRY
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (301, 3, 'CORE_LESSON', 1, 1,
  'Sentences and Non-Sentences',
@@ -248,9 +267,11 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all grammar concepts: sentences, word order, subjects and predicates, sentence types, compound sentences, punctuation, discourse markers, and intonation.',
  '{"type":"cumulative","quarters":["Q1: Sentences vs non-sentences, word sequencing, subject and predicate","Q2: Types of sentences (declarative, interrogative, imperative, exclamatory), compound sentences","Q3: Capitalization, punctuation, time-order discourse markers, compound sentence analysis","Q4: National theme sentences, because (explanation), sentence intonation and pitch"],"totalItems":20}',
  'grammar', 45, 100);
+END TRY BEGIN CATCH PRINT 'Grammar nodes already exist - skipped' END CATCH
 GO
 
--- ── NODES: COMPREHENSION (ModuleID=4, NodeIDs 401-413) ───────
+-- NODES: COMPREHENSION (ModuleID=4, NodeIDs 401-413)
+BEGIN TRY
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (401, 4, 'CORE_LESSON', 1, 1,
  'Identifying Key Details: Who, What, Where, When',
@@ -317,9 +338,11 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all comprehension strategies: key details, sequencing, characters and setting, main idea, cause and effect, problem and solution, compare and contrast, context clues, inference, and summarizing.',
  '{"type":"cumulative","quarters":["Q1: Key details (who, what, where, when), sequencing, characters and setting","Q2: Main idea, cause and effect, predictions","Q3: Problem and solution, compare and contrast, context clues","Q4: Drawing conclusions, text-to-self connections, summarizing"],"totalItems":20}',
  'comprehension', 45, 100);
+END TRY BEGIN CATCH PRINT 'Comprehension nodes already exist - skipped' END CATCH
 GO
 
--- ── NODES: CREATING (ModuleID=5, NodeIDs 501-513) ────────────
+-- NODES: CREATING (ModuleID=5, NodeIDs 501-513)
+BEGIN TRY
 INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle, LearningObjectives, ContentJSON, SkillCategory, EstimatedDuration, XPReward) VALUES
 (501, 5, 'CORE_LESSON', 1, 1,
  'Writing Simple Sentences',
@@ -386,6 +409,7 @@ INSERT INTO Nodes (NodeID, ModuleID, NodeType, NodeNumber, Quarter, LessonTitle,
  'Demonstrate mastery of all composition skills: simple sentences, descriptive writing, narrative texts, explanatory writing, comparative sentences, and complete paragraphs.',
  '{"type":"cumulative","quarters":["Q1: Simple sentences, descriptive sentences, paragraph structure","Q2: Questions and commands, compound sentences, short stories","Q3: Time-order words, explanatory writing with because, comparative sentences","Q4: National theme writing, descriptive paragraphs, book responses"],"totalItems":20}',
  'creating', 45, 100);
+END TRY BEGIN CATCH PRINT 'Creating nodes already exist - skipped' END CATCH
 SET IDENTITY_INSERT Nodes OFF;
 GO
 
