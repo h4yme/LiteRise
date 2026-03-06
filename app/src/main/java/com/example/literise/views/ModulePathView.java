@@ -23,11 +23,11 @@ public class ModulePathView extends View {
     // ─── Node positions ──────────────────────────────────────────────────────
     // X = % of width, Y = % of height.  Node 1 is at bottom (96 %), node 13 at top (4 %).
     private static final float[] NODE_X_PCT = {50, 67, 76, 67, 50, 33, 24, 33, 50, 67, 76, 60, 50};
-    private static final float[] NODE_Y_PCT = {95, 88, 81, 74, 67, 60, 52, 45, 38, 30, 23, 14, 6};
+    private static final float[] NODE_Y_PCT = {91, 84, 77, 70, 63, 56, 49, 42, 35, 28, 21, 13, 6};
 
     // Quarter-divider horizontal rules drawn BETWEEN the node groups
     // Q1 = nodes 1-3, Q2 = nodes 4-6, Q3 = nodes 7-9, Q4 = nodes 10-13
-    private static final float[] DIVIDER_Y_PCT  = {71.5f, 49f, 27f};
+    private static final float[] DIVIDER_Y_PCT  = {67f, 45.5f, 24.5f};
     private static final String[] DIVIDER_LABEL = {"Quarter 2", "Quarter 3", "Quarter 4"};
 
     // ─── State ───────────────────────────────────────────────────────────────
@@ -216,6 +216,10 @@ public class ModulePathView extends View {
             invalidate();
         });
         pulseAnim.start();
+
+        // Software layer is required for reliable custom drawing (text + translucent fills)
+        // across all API levels and devices. Hardware layer caused blank renders on some devices.
+        setLayerType(LAYER_TYPE_SOFTWARE, null);
     }
 
     // ─── Public API ──────────────────────────────────────────────────────────
@@ -240,6 +244,9 @@ public class ModulePathView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        // View not yet measured — skip until we have real dimensions
+        if (getWidth() == 0 || getHeight() == 0) return;
 
         if (nodes.isEmpty()) {
             drawEmptyState(canvas);

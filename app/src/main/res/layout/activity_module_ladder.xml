@@ -114,8 +114,7 @@
         <com.example.literise.views.ModulePathView
             android:id="@+id/modulePathView"
             android:layout_width="match_parent"
-            android:layout_height="2200dp"
-            android:paddingBottom="80dp" />
+            android:layout_height="2200dp" />
 
     </ScrollView>
 
