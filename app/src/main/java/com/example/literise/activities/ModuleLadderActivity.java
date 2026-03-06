@@ -1,11 +1,13 @@
 package com.example.literise.activities;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
@@ -46,6 +48,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private static final String TAG = "ModuleLadderActivity";
 
     private ModulePathView pathView;
+    private ScrollView ladderScrollView;
     private TextView moduleTitle;
     private TextView progressText;
     private ProgressBar moduleProgress;
@@ -88,6 +91,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         // Initialize views
         pathView = findViewById(R.id.modulePathView);
+        ladderScrollView = findViewById(R.id.ladderScrollView);
         moduleTitle = findViewById(R.id.moduleTitle);
         progressText = findViewById(R.id.progressText);
         moduleProgress = findViewById(R.id.moduleProgress);
@@ -336,7 +340,14 @@ public class ModuleLadderActivity extends AppCompatActivity {
             return;
         }
 
+        // Apply module colors to path view
+        String[] colors = getModuleColors(moduleId);
+        pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
+
         pathView.setNodes(nodeViews);
+
+        // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top)
+        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
 
         // Update progress
         int completedNodes = 0;
@@ -679,7 +690,12 @@ public class ModuleLadderActivity extends AppCompatActivity {
             Log.d(TAG, "Dummy node " + (i + 1) + ": " + lessonTitles[i] + " at (" + PATH_X[i] + ", " + PATH_Y[i] + ")");
         }
 
+        String[] colors = getModuleColors(moduleId);
+        pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
+
         pathView.setNodes(dummyNodes);
+        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
+
         moduleProgress.setProgress(15);
         progressText.setText("15%");
 

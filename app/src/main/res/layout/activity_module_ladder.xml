@@ -2,48 +2,24 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#1C1C2E">
 
-    <!-- Background Image -->
-    <ImageView
-        android:id="@+id/backgroundImage"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/module_background"
-        android:scaleType="centerCrop"
-        android:contentDescription="Module background" />
-
-    <!-- Scrollable Module Path View -->
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:layout_below="@id/topBar">
-
-        <com.example.literise.views.ModulePathView
-            android:id="@+id/modulePathView"
-            android:layout_width="match_parent"
-            android:layout_height="1500dp"
-            android:paddingTop="80dp"
-            android:paddingBottom="60dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp" />
-
-
-    </ScrollView>
-
-    <!-- Top Bar with Module Info -->
+    <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:orientation="vertical"
-        android:background="@drawable/top_bar_gradient"
-        android:elevation="4dp"
-        android:padding="16dp">
+        android:background="#252540"
+        android:elevation="8dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
-        <!-- Back Button and Module Title -->
+        <!-- Back Button + Title Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -67,39 +43,68 @@
                 android:layout_marginStart="12dp"
                 android:text="Phonics and Word Study"
                 android:fontFamily="@font/visby_medium"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:ellipsize="end" />
 
         </LinearLayout>
 
-        <!-- Progress Bar -->
+        <!-- Section Banner with Lottie + Progress -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="10dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:background="#1A1A35"
+            android:padding="10dp">
 
-            <ProgressBar
-                android:id="@+id/moduleProgress"
-                style="?android:attr/progressBarStyleHorizontal"
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/sectionLottie"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                app:lottie_fileName="lottie_sparkle_stars.json"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true" />
+
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="8dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:progressDrawable="@drawable/progress_bar_drawable"
-                android:max="100"
-                android:progress="0" />
+                android:layout_marginStart="10dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/sectionLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="YOUR JOURNEY"
+                    android:fontFamily="@font/visby_medium"
+                    android:textSize="10sp"
+                    android:textColor="#9090B0"
+                    android:letterSpacing="0.15" />
+
+                <ProgressBar
+                    android:id="@+id/moduleProgress"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginTop="4dp"
+                    android:progressDrawable="@drawable/progress_bar_drawable"
+                    android:max="100"
+                    android:progress="0" />
+
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/progressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="10dp"
                 android:text="0%"
-                android:fontFamily="@font/visby_regular"
+                android:fontFamily="@font/visby_medium"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="@android:color/white" />
@@ -107,6 +112,23 @@
         </LinearLayout>
 
     </LinearLayout>
+
+    <!-- Scrollable Module Path View -->
+    <ScrollView
+        android:id="@+id/ladderScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/topBar"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none">
+
+        <com.example.literise.views.ModulePathView
+            android:id="@+id/modulePathView"
+            android:layout_width="match_parent"
+            android:layout_height="1600dp" />
+
+    </ScrollView>
 
     <!-- Loading Overlay -->
     <FrameLayout
