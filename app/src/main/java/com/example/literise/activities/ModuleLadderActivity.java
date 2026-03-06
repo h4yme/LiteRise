@@ -156,19 +156,18 @@ public class ModuleLadderActivity extends AppCompatActivity {
         lessonLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Log.d(TAG, "Returned from LessonContentActivity");
+                    Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
-                    if (isAutoProceedMode && currentNode != null) {
-                        // Automatically proceed to game phase
-                        Log.d(TAG, "Auto-proceeding to Game phase");
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                        // Lesson was genuinely completed — proceed to game
+                        Log.d(TAG, "Lesson completed (RESULT_OK) — Auto-proceeding to Game phase");
                         Toast.makeText(this, "✅ Lesson Complete! Now let's play! 🎮", Toast.LENGTH_SHORT).show();
-
-                        // Small delay for toast to show
                         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                             startGamePhase(currentNode);
                         }, 800);
                     } else {
-                        // User backed out or reviewing - refresh ladder
+                        // User backed out or lesson failed to load — refresh ladder, do NOT proceed
+                        Log.d(TAG, "Lesson not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
                     }
                 }

@@ -74,7 +74,10 @@ public class LessonContentActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> finish());
+        btnBack.setOnClickListener(v -> {
+            setResult(RESULT_CANCELED);
+            finish();
+        });
         btnComplete.setOnClickListener(v -> markLessonCompleted());
     }
 
@@ -92,8 +95,8 @@ public class LessonContentActivity extends AppCompatActivity {
                     displayLessonContent(response.body());
                     btnComplete.setEnabled(true);
                 } else {
-                    Toast.makeText(LessonContentActivity.this, "Failed to load lesson", Toast.LENGTH_SHORT).show();
-                    finish();
+                    Toast.makeText(LessonContentActivity.this, "Failed to load lesson. Please try again.", Toast.LENGTH_LONG).show();
+                    btnComplete.setEnabled(false);
                 }
             }
 
@@ -101,7 +104,7 @@ public class LessonContentActivity extends AppCompatActivity {
             public void onFailure(Call<LessonContentResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Toast.makeText(LessonContentActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                finish();
+                btnComplete.setEnabled(false);
             }
         });
     }
@@ -127,6 +130,7 @@ public class LessonContentActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     Toast.makeText(LessonContentActivity.this, "✅ Lesson Complete! Moving to Game...", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
                     finish();
                 } else {
                     Toast.makeText(LessonContentActivity.this, "Failed to save progress", Toast.LENGTH_SHORT).show();
