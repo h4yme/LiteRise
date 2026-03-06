@@ -37,6 +37,21 @@ public class Students {
     @SerializedName("AssessmentStatus")
     private String assessmentStatus;
 
+    @SerializedName("Cat1_PhonicsWordStudy")
+    private int cat1PhonicsWordStudy;
+
+    @SerializedName("Cat2_VocabularyWordKnowledge")
+    private int cat2VocabularyWordKnowledge;
+
+    @SerializedName("Cat3_GrammarAwareness")
+    private int cat3GrammarAwareness;
+
+    @SerializedName("Cat4_ComprehendingText")
+    private int cat4ComprehendingText;
+
+    @SerializedName("Cat5_CreatingComposing")
+    private int cat5CreatingComposing;
+
     // Getters and Setters
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
@@ -71,4 +86,10 @@ public class Students {
 
     public String getAssessmentStatus() { return assessmentStatus; }
     public void setAssessmentStatus(String assessmentStatus) { this.assessmentStatus = assessmentStatus; }
+
+    public int getCat1PhonicsWordStudy() { return cat1PhonicsWordStudy; }
+    public int getCat2VocabularyWordKnowledge() { return cat2VocabularyWordKnowledge; }
+    public int getCat3GrammarAwareness() { return cat3GrammarAwareness; }
+    public int getCat4ComprehendingText() { return cat4ComprehendingText; }
+    public int getCat5CreatingComposing() { return cat5CreatingComposing; }
 }
