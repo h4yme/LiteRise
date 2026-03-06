@@ -162,23 +162,27 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
     ");
     $stmt->execute([$studentId, $nodeId]);
     $exists = $stmt->fetchColumn();
-    
+
+    $scoreInt = (int)round($score);
+
     if ($exists) {
         $stmt = $conn->prepare("
             UPDATE StudentNodeProgress
             SET QuizCompleted = 1,
-                QuizScore = ?,
-                AdaptiveDecision = ?,
-                CompletedAt = GETDATE()
+                LatestQuizScore = ?,
+                BestQuizScore = CASE WHEN ISNULL(BestQuizScore, 0) < ? THEN ? ELSE BestQuizScore END,
+                NodeState = ?,
+                CompletedDate = GETDATE(),
+                AttemptCount = ISNULL(AttemptCount, 0) + 1
             WHERE StudentID = ? AND NodeID = ?
         ");
-        $stmt->execute([$score, $decision, $studentId, $nodeId]);
+        $stmt->execute([$scoreInt, $scoreInt, $scoreInt, $decision, $studentId, $nodeId]);
     } else {
         $stmt = $conn->prepare("
-            INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted, QuizScore, AdaptiveDecision, CompletedAt)
-            VALUES (?, ?, 1, 1, 1, ?, ?, GETDATE())
+            INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted, LatestQuizScore, BestQuizScore, NodeState, CompletedDate, AttemptCount)
+            VALUES (?, ?, 1, 1, 1, ?, ?, ?, GETDATE(), 1)
         ");
-        $stmt->execute([$studentId, $nodeId, $score, $decision]);
+        $stmt->execute([$studentId, $nodeId, $scoreInt, $scoreInt, $decision]);
     }
 }
 
@@ -197,73 +201,73 @@ function handleAdaptiveBranching($conn, $studentId, $nodeId, $decision) {
     switch ($decision) {
         case 'ADD_INTERVENTION':
             $stmt = $conn->prepare("
-                SELECT NodeID, Title
+                SELECT SupplementalNodeID, Title
                 FROM SupplementalNodes
-                WHERE AfterNodeID = ? AND NodeType = 'INTERVENTION'
+                WHERE AfterNodeID = ? AND NodeType = 'INTERVENTION' AND IsActive = 1
             ");
             $stmt->execute([$nodeId]);
             $interventions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             foreach ($interventions as $node) {
                 $stmt = $conn->prepare("
-                    IF NOT EXISTS (SELECT 1 FROM StudentNodeProgress WHERE StudentID = ? AND NodeID = ?)
-                    INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted)
-                    VALUES (?, ?, 0, 0, 0)
+                    IF NOT EXISTS (SELECT 1 FROM StudentSupplementalProgress WHERE StudentID = ? AND SupplementalNodeID = ?)
+                    INSERT INTO StudentSupplementalProgress (StudentID, SupplementalNodeID, IsVisible, TriggerReason, IsCompleted, CreatedDate)
+                    VALUES (?, ?, 1, 'score < 70 on node quiz', 0, GETDATE())
                 ");
-                $stmt->execute([$studentId, $node['NodeID'], $studentId, $node['NodeID']]);
+                $stmt->execute([$studentId, $node['SupplementalNodeID'], $studentId, $node['SupplementalNodeID']]);
                 $unlockedNodes[] = [
                     'type' => 'INTERVENTION',
-                    'node_id' => $node['NodeID'],
+                    'node_id' => $node['SupplementalNodeID'],
                     'title' => $node['Title'],
                     'mandatory' => true
                 ];
             }
             break;
-            
+
         case 'ADD_SUPPLEMENTAL':
             $stmt = $conn->prepare("
-                SELECT NodeID, Title
+                SELECT SupplementalNodeID, Title
                 FROM SupplementalNodes
-                WHERE AfterNodeID = ? AND NodeType = 'SUPPLEMENTAL'
+                WHERE AfterNodeID = ? AND NodeType = 'SUPPLEMENTAL' AND IsActive = 1
             ");
             $stmt->execute([$nodeId]);
             $supplementals = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             foreach ($supplementals as $node) {
                 $stmt = $conn->prepare("
-                    IF NOT EXISTS (SELECT 1 FROM StudentNodeProgress WHERE StudentID = ? AND NodeID = ?)
-                    INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted)
-                    VALUES (?, ?, 0, 0, 0)
+                    IF NOT EXISTS (SELECT 1 FROM StudentSupplementalProgress WHERE StudentID = ? AND SupplementalNodeID = ?)
+                    INSERT INTO StudentSupplementalProgress (StudentID, SupplementalNodeID, IsVisible, TriggerReason, IsCompleted, CreatedDate)
+                    VALUES (?, ?, 1, 'beginner level 70-79%', 0, GETDATE())
                 ");
-                $stmt->execute([$studentId, $node['NodeID'], $studentId, $node['NodeID']]);
+                $stmt->execute([$studentId, $node['SupplementalNodeID'], $studentId, $node['SupplementalNodeID']]);
                 $unlockedNodes[] = [
                     'type' => 'SUPPLEMENTAL',
-                    'node_id' => $node['NodeID'],
+                    'node_id' => $node['SupplementalNodeID'],
                     'title' => $node['Title'],
                     'mandatory' => false
                 ];
             }
             break;
-            
+
         case 'OFFER_ENRICHMENT':
             $stmt = $conn->prepare("
-                SELECT NodeID, Title
+                SELECT SupplementalNodeID, Title
                 FROM SupplementalNodes
-                WHERE AfterNodeID = ? AND NodeType = 'ENRICHMENT'
+                WHERE AfterNodeID = ? AND NodeType = 'ENRICHMENT' AND IsActive = 1
             ");
             $stmt->execute([$nodeId]);
             $enrichments = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            
+
             foreach ($enrichments as $node) {
                 $stmt = $conn->prepare("
-                    IF NOT EXISTS (SELECT 1 FROM StudentNodeProgress WHERE StudentID = ? AND NodeID = ?)
-                    INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted)
-                    VALUES (?, ?, 0, 0, 0)
+                    IF NOT EXISTS (SELECT 1 FROM StudentSupplementalProgress WHERE StudentID = ? AND SupplementalNodeID = ?)
+                    INSERT INTO StudentSupplementalProgress (StudentID, SupplementalNodeID, IsVisible, TriggerReason, IsCompleted, CreatedDate)
+                    VALUES (?, ?, 1, 'advanced level >= 90%', 0, GETDATE())
                 ");
-                $stmt->execute([$studentId, $node['NodeID'], $studentId, $node['NodeID']]);
+                $stmt->execute([$studentId, $node['SupplementalNodeID'], $studentId, $node['SupplementalNodeID']]);
                 $unlockedNodes[] = [
                     'type' => 'ENRICHMENT',
-                    'node_id' => $node['NodeID'],
+                    'node_id' => $node['SupplementalNodeID'],
                     'title' => $node['Title'],
                     'mandatory' => false
                 ];

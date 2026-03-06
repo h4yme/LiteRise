@@ -243,4 +243,24 @@ public interface ApiService {
             @Query("student_id") int studentId,
             @Query("module_id") int moduleId
     );
+
+    // ✅ Check if all 65 nodes are complete (post-assessment trigger)
+    @GET("check_modules_complete.php")
+    Call<com.example.literise.models.CheckModulesCompleteResponse> checkModulesComplete(
+            @Query("student_id") int studentId
+    );
+
+    // 📚 Tutorial progress - check if seen
+    @GET("check_tutorial.php")
+    Call<com.example.literise.models.TutorialStatusResponse> checkTutorial(
+            @Query("student_id") int studentId,
+            @Query("tutorial_key") String tutorialKey
+    );
+
+    // 📚 Tutorial progress - mark as complete
+    @Headers("Content-Type: application/json")
+    @POST("complete_tutorial.php")
+    Call<com.example.literise.models.ResponseModel> completeTutorial(
+            @Body com.example.literise.models.CompleteTutorialRequest request
+    );
 }
