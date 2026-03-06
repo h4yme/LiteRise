@@ -65,7 +65,7 @@
                 android:id="@+id/sectionLottie"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                app:lottie_fileName="lottie_sparkle_stars.json"
+                app:lottie_rawRes="@raw/lottie_sparkle_stars"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true" />
 
