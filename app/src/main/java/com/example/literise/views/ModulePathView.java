@@ -92,9 +92,6 @@ public class ModulePathView extends View {
         bgPaint.setColor(Color.parseColor("#2D2D2D"));
         bgPaint.setAlpha(240);
 
-        // Software layer required for setShadowLayer() on shapes
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
-
         Log.d(TAG, "ModulePathView initialized");
     }
 
