@@ -358,16 +358,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         pathView.setNodes(nodeViews);
 
-        // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top)
-        // Use ViewTreeObserver to scroll only after the layout pass completes
-        ladderScrollView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new android.view.ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        ladderScrollView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                        ladderScrollView.fullScroll(View.FOCUS_DOWN);
-                    }
-                });
+        // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top).
+        // post() queues the scroll after the current draw frame completes.
+        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
 
         // Update progress
         int completedNodes = 0;

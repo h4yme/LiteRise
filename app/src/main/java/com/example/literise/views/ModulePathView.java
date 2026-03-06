@@ -245,8 +245,9 @@ public class ModulePathView extends View {
         });
         pulseAnim.start();
 
-        // Software layer required for reliable custom drawing across all API levels
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
+        // LAYER_TYPE_NONE = default hardware rendering.
+        // LAYER_TYPE_SOFTWARE caused blank canvas on Pixel 6 / API 36.
+        setLayerType(LAYER_TYPE_NONE, null);
     }
 
     // ─── Public API ──────────────────────────────────────────────────────────
