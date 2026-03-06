@@ -216,9 +216,6 @@ public class ModulePathView extends View {
             invalidate();
         });
         pulseAnim.start();
-
-        // Hardware layer for smooth animation
-        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
     // ─── Public API ──────────────────────────────────────────────────────────

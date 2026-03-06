@@ -271,7 +271,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         if (nodesData == null || nodesData.isEmpty()) {
             Log.e(TAG, "No nodes data received!");
-            Toast.makeText(this, "No nodes found for this module", Toast.LENGTH_SHORT).show();
+            loadDummyData();
             return;
         }
 
@@ -347,7 +347,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         pathView.setNodes(nodeViews);
 
         // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top)
-        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
+        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
 
         // Update progress
         int completedNodes = 0;
@@ -694,7 +694,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
 
         pathView.setNodes(dummyNodes);
-        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
+        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
 
         moduleProgress.setProgress(15);
         progressText.setText("15%");
