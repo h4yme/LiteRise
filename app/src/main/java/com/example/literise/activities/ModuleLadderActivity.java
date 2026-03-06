@@ -1,13 +1,11 @@
 package com.example.literise.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.FrameLayout;
@@ -48,7 +46,6 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private static final String TAG = "ModuleLadderActivity";
 
     private ModulePathView pathView;
-    private ScrollView ladderScrollView;
     private TextView moduleTitle;
     private TextView progressText;
     private ProgressBar moduleProgress;
@@ -91,7 +88,6 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         // Initialize views
         pathView = findViewById(R.id.modulePathView);
-        ladderScrollView = findViewById(R.id.ladderScrollView);
         moduleTitle = findViewById(R.id.moduleTitle);
         progressText = findViewById(R.id.progressText);
         moduleProgress = findViewById(R.id.moduleProgress);
@@ -271,7 +267,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         if (nodesData == null || nodesData.isEmpty()) {
             Log.e(TAG, "No nodes data received!");
-            loadDummyData();
+            Toast.makeText(this, "No nodes found for this module", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -340,14 +336,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
             return;
         }
 
-        // Apply module colors to path view
-        String[] colors = getModuleColors(moduleId);
-        pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
-
         pathView.setNodes(nodeViews);
-
-        // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top)
-        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
 
         // Update progress
         int completedNodes = 0;
@@ -690,12 +679,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
             Log.d(TAG, "Dummy node " + (i + 1) + ": " + lessonTitles[i] + " at (" + PATH_X[i] + ", " + PATH_Y[i] + ")");
         }
 
-        String[] colors = getModuleColors(moduleId);
-        pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
-
         pathView.setNodes(dummyNodes);
-        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
-
         moduleProgress.setProgress(15);
         progressText.setText("15%");
 

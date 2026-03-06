@@ -2,24 +2,48 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#F0EBFF">
+    android:layout_height="match_parent">
 
-    <!-- Top Bar — purple gradient matching dashboard -->
+    <!-- Background Image -->
+    <ImageView
+        android:id="@+id/backgroundImage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/module_background"
+        android:scaleType="centerCrop"
+        android:contentDescription="Module background" />
+
+    <!-- Scrollable Module Path View -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:layout_below="@id/topBar">
+
+        <com.example.literise.views.ModulePathView
+            android:id="@+id/modulePathView"
+            android:layout_width="match_parent"
+            android:layout_height="1500dp"
+            android:paddingTop="80dp"
+            android:paddingBottom="60dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp" />
+
+
+    </ScrollView>
+
+    <!-- Top Bar with Module Info -->
     <LinearLayout
         android:id="@+id/topBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:orientation="vertical"
-        android:background="@drawable/bg_gradient_purple"
-        android:elevation="6dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="20dp">
+        android:background="@drawable/top_bar_gradient"
+        android:elevation="4dp"
+        android:padding="16dp">
 
-        <!-- Back + Title row -->
+        <!-- Back Button and Module Title -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -40,48 +64,30 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="12dp"
                 android:text="Phonics and Word Study"
-                android:fontFamily="@font/visby_bold"
+                android:fontFamily="@font/visby_medium"
                 android:textSize="20sp"
+                android:textStyle="bold"
                 android:textColor="@android:color/white"
-                android:maxLines="1"
+                android:maxLines="2"
                 android:ellipsize="end" />
-
-            <!-- Lottie sparkle decoration (top right) -->
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/sectionLottie"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                app:lottie_rawRes="@raw/lottie_sparkle_stars"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                android:alpha="0.85" />
 
         </LinearLayout>
 
-        <!-- Progress row -->
+        <!-- Progress Bar -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:orientation="horizontal"
             android:gravity="center_vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Progress"
-                android:fontFamily="@font/visby_regular"
-                android:textSize="12sp"
-                android:textColor="#E8DDFF"
-                android:layout_marginEnd="10dp" />
 
             <ProgressBar
                 android:id="@+id/moduleProgress"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="0dp"
-                android:layout_height="10dp"
+                android:layout_height="8dp"
                 android:layout_weight="1"
                 android:progressDrawable="@drawable/progress_bar_drawable"
                 android:max="100"
@@ -91,39 +97,23 @@
                 android:id="@+id/progressText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="8dp"
                 android:text="0%"
-                android:fontFamily="@font/visby_bold"
-                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textSize="14sp"
+                android:textStyle="bold"
                 android:textColor="@android:color/white" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <!-- Scrollable path -->
-    <ScrollView
-        android:id="@+id/ladderScrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/topBar"
-        android:overScrollMode="never"
-        android:scrollbars="none"
-        android:fillViewport="false">
-
-        <com.example.literise.views.ModulePathView
-            android:id="@+id/modulePathView"
-            android:layout_width="match_parent"
-            android:layout_height="2200dp" />
-
-    </ScrollView>
-
     <!-- Loading Overlay -->
     <FrameLayout
         android:id="@+id/loadingOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#80FFFFFF"
+        android:background="#80000000"
         android:visibility="gone"
         android:clickable="true">
 
@@ -131,7 +121,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:indeterminateTint="#7C3AED" />
+            android:indeterminateTint="@android:color/white" />
 
     </FrameLayout>
 
