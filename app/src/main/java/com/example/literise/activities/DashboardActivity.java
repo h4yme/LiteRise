@@ -599,7 +599,7 @@ public class DashboardActivity extends BaseActivity {
         // Check server (authoritative source)
         int studentId = session.getStudentId();
         if (studentId > 0) {
-            ApiClient.getApiService().checkTutorial(studentId, TUTORIAL_KEY)
+            ApiClient.getClient(this).create(ApiService.class).checkTutorial(studentId, TUTORIAL_KEY)
                     .enqueue(new Callback<TutorialStatusResponse>() {
                         @Override
                         public void onResponse(Call<TutorialStatusResponse> call,
@@ -800,7 +800,8 @@ public class DashboardActivity extends BaseActivity {
         // Persist to server (fire-and-forget)
         int studentId = session.getStudentId();
         if (studentId > 0) {
-            ApiClient.getApiService()
+            ApiClient.getClient(this)
+                    .create(ApiService.class)
                     .completeTutorial(new CompleteTutorialRequest(studentId, TUTORIAL_KEY))
                     .enqueue(new Callback<ResponseModel>() {
                         @Override
@@ -829,7 +830,7 @@ public class DashboardActivity extends BaseActivity {
         int studentId = session.getStudentId();
         if (studentId <= 0) return;
 
-        ApiClient.getApiService().checkModulesComplete(studentId)
+        ApiClient.getClient(this).create(ApiService.class).checkModulesComplete(studentId)
                 .enqueue(new Callback<CheckModulesCompleteResponse>() {
                     @Override
                     public void onResponse(Call<CheckModulesCompleteResponse> call,

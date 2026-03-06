@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
-import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
 import com.example.literise.models.PlacementProgressResponse;
 
@@ -91,9 +90,11 @@ public class ComparisonReportActivity extends BaseActivity {
         contentLayout.setVisibility(View.GONE);
 
         int studentId = session.getStudentId();
-        ApiService api = ApiClient.getApiService();
 
-        api.getPlacementProgress(studentId).enqueue(new Callback<PlacementProgressResponse>() {
+        ApiClient.getClient(this)
+                .create(com.example.literise.api.ApiService.class)
+                .getPlacementProgress(studentId)
+                .enqueue(new Callback<PlacementProgressResponse>() {
             @Override
             public void onResponse(Call<PlacementProgressResponse> call, Response<PlacementProgressResponse> response) {
                 progressBarLoading.setVisibility(View.GONE);
