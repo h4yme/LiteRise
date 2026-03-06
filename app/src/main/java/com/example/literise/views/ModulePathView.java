@@ -4,11 +4,11 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -19,417 +19,495 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ModulePathView extends View {
-    private static final String TAG = "ModulePathView";
 
-    // Zigzag node positions (index 0 = node 1, bottom of screen drawn last)
-    // X is percentage of width, Y is percentage of height — node 1 at bottom, node 13 at top
+    // ─── Node positions ──────────────────────────────────────────────────────
+    // X = % of width, Y = % of height.  Node 1 is at bottom (96 %), node 13 at top (4 %).
     private static final float[] NODE_X_PCT = {50, 67, 76, 67, 50, 33, 24, 33, 50, 67, 76, 60, 50};
-    private static final float[] NODE_Y_PCT = {93, 86, 78, 70, 63, 56, 48, 41, 34, 27, 20, 13, 6};
+    private static final float[] NODE_Y_PCT = {95, 88, 81, 74, 67, 60, 52, 45, 38, 30, 23, 14, 6};
 
-    // Quarter divider Y positions (between node groups)
-    // Q1=nodes 1-3, Q2=nodes 4-6, Q3=nodes 7-9, Q4=nodes 10-13
-    private static final float[] DIVIDER_Y_PCT = {74f, 52f, 30f};
-    private static final String[] DIVIDER_LABELS = {"Quarter 2", "Quarter 3", "Quarter 4"};
+    // Quarter-divider horizontal rules drawn BETWEEN the node groups
+    // Q1 = nodes 1-3, Q2 = nodes 4-6, Q3 = nodes 7-9, Q4 = nodes 10-13
+    private static final float[] DIVIDER_Y_PCT  = {71.5f, 49f, 27f};
+    private static final String[] DIVIDER_LABEL = {"Quarter 2", "Quarter 3", "Quarter 4"};
 
-    private List<NodeView> nodes;
-    private int moduleColorMain   = Color.parseColor("#667EEA");
-    private int moduleColorBottom = Color.parseColor("#4A5EC4");
+    // ─── State ───────────────────────────────────────────────────────────────
+    private List<NodeView> nodes = new ArrayList<>();
 
-    // Node sizing in px (set in init from dp)
-    private float nodeRadius;
-    private float nodeFinalRadius;
-    private float coinOffsetY;
-    private float connectorStroke;
-    private float touchRadius;
+    // Module colours (set from Activity via setModuleColor())
+    private int colorMain   = Color.parseColor("#7C3AED");
+    private int colorBottom = Color.parseColor("#5A189A");
 
-    // Paints
-    private Paint connectorDonePaint;
-    private Paint connectorTodoPaint;
-    private Paint nodeShadowPaint;
-    private Paint nodeBottomPaint;
-    private Paint nodeTopPaint;
-    private Paint lockedBottomPaint;
-    private Paint lockedTopPaint;
-    private Paint masteredBottomPaint;
-    private Paint masteredTopPaint;
-    private Paint checkPaint;
-    private Paint iconPaint;
-    private Paint numberPaint;
-    private Paint tooltipBgPaint;
-    private Paint tooltipTextPaint;
-    private Paint dividerLinePaint;
-    private Paint dividerTextPaint;
-    private Paint pulseRingPaint;
+    // ─── Sizing (set in init, dp → px) ───────────────────────────────────────
+    private float nodeR;        // normal radius
+    private float finalR;       // radius for FINAL_ASSESSMENT node
+    private float coinDy;       // y-offset for 3-D coin shadow
+    private float connW;        // connector stroke width
+    private float hitR;         // touch hit-zone radius
+
+    // ─── Paints ──────────────────────────────────────────────────────────────
+    // Connectors
+    private final Paint pConnDone  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pConnTodo  = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Node coin layers
+    private final Paint pCoinShadow  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinBottom  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinTop     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pCoinHighlight = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Lock node
+    private final Paint pLockBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pLockTop    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pLockBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Mastered (gold) node
+    private final Paint pGoldBottom = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pGoldTop    = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Icons drawn on nodes
+    private final Paint pCheckPath = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pNumber    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pLockNum   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pStarText  = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Pulse ring
+    private final Paint pPulse = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // START tooltip
+    private final Paint pTipBg   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pTipText = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pTipBorder = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+    // Quarter dividers
+    private final Paint pDivLine  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pPillBg   = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint pPillText = new Paint(Paint.ANTI_ALIAS_FLAG);
 
     // Pulse animation
-    private float pulseProgress = 0f;   // 0..1
-    private ValueAnimator pulseAnimator;
+    private float pulsePhase = 0f;
+    private ValueAnimator pulseAnim;
 
-    private OnNodeClickListener nodeClickListener;
+    // Click listener
+    private OnNodeClickListener clickListener;
 
     public interface OnNodeClickListener {
         void onNodeClick(NodeView node);
     }
 
-    // ─── Constructors ─────────────────────────────────────────────────────────
+    // ─── Constructors ────────────────────────────────────────────────────────
 
-    public ModulePathView(Context context) {
-        super(context);
-        init();
-    }
+    public ModulePathView(Context c) { super(c); init(); }
+    public ModulePathView(Context c, AttributeSet a) { super(c, a); init(); }
+    public ModulePathView(Context c, AttributeSet a, int d) { super(c, a, d); init(); }
 
-    public ModulePathView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init();
-    }
-
-    public ModulePathView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init();
-    }
-
-    // ─── Init ─────────────────────────────────────────────────────────────────
+    // ─── Init ────────────────────────────────────────────────────────────────
 
     private void init() {
-        nodes = new ArrayList<>();
         float dp = getContext().getResources().getDisplayMetrics().density;
 
-        nodeRadius      = 38 * dp;
-        nodeFinalRadius = 46 * dp;
-        coinOffsetY     = 5  * dp;
-        connectorStroke = 10 * dp;
-        touchRadius     = 56 * dp;
+        nodeR  = 30 * dp;
+        finalR = 38 * dp;
+        coinDy = 5  * dp;
+        connW  = 9  * dp;
+        hitR   = 46 * dp;
 
-        // Connector
-        connectorDonePaint = makePaint(0, Paint.Style.STROKE);
-        connectorDonePaint.setStrokeWidth(connectorStroke);
-        connectorDonePaint.setStrokeCap(Paint.Cap.ROUND);
+        // ---- Connectors ----
+        pConnDone.setStyle(Paint.Style.STROKE);
+        pConnDone.setStrokeWidth(connW);
+        pConnDone.setStrokeCap(Paint.Cap.ROUND);
 
-        connectorTodoPaint = makePaint(Color.parseColor("#3D3D5C"), Paint.Style.STROKE);
-        connectorTodoPaint.setStrokeWidth(connectorStroke);
-        connectorTodoPaint.setStrokeCap(Paint.Cap.ROUND);
+        pConnTodo.setStyle(Paint.Style.STROKE);
+        pConnTodo.setStrokeWidth(connW);
+        pConnTodo.setStrokeCap(Paint.Cap.ROUND);
+        pConnTodo.setColor(Color.parseColor("#DDD7F0"));
 
-        // Node shadow
-        nodeShadowPaint = makePaint(Color.parseColor("#33000000"), Paint.Style.FILL);
-        setLayerType(LAYER_TYPE_SOFTWARE, null);
+        // ---- Coin shadow (light, not harsh) ----
+        pCoinShadow.setStyle(Paint.Style.FILL);
+        pCoinShadow.setColor(Color.parseColor("#22000000"));
 
-        // Normal node
-        nodeBottomPaint = makePaint(0, Paint.Style.FILL);
-        nodeTopPaint    = makePaint(0, Paint.Style.FILL);
+        // ---- Coin top/bottom (set in draw per state) ----
+        pCoinBottom.setStyle(Paint.Style.FILL);
+        pCoinTop.setStyle(Paint.Style.FILL);
 
-        // Locked node
-        lockedBottomPaint = makePaint(Color.parseColor("#1E1E38"), Paint.Style.FILL);
-        lockedTopPaint    = makePaint(Color.parseColor("#2D2D47"), Paint.Style.FILL);
+        // ---- Inner highlight ring ----
+        pCoinHighlight.setStyle(Paint.Style.STROKE);
+        pCoinHighlight.setStrokeWidth(2.5f * dp);
+        pCoinHighlight.setColor(Color.parseColor("#55FFFFFF"));
 
-        // Mastered node (gold)
-        masteredBottomPaint = makePaint(Color.parseColor("#C8860A"), Paint.Style.FILL);
-        masteredTopPaint    = makePaint(Color.parseColor("#FFD700"), Paint.Style.FILL);
+        // ---- Locked node ----
+        pLockBottom.setStyle(Paint.Style.FILL);
+        pLockBottom.setColor(Color.parseColor("#C8BEE8"));
+        pLockTop.setStyle(Paint.Style.FILL);
+        pLockTop.setColor(Color.parseColor("#E5DDF8"));
+        pLockBorder.setStyle(Paint.Style.STROKE);
+        pLockBorder.setStrokeWidth(2.5f * dp);
+        pLockBorder.setColor(Color.parseColor("#BFB3E0"));
 
-        // Icon / number paints
-        checkPaint = makePaint(Color.WHITE, Paint.Style.FILL);
-        checkPaint.setTextSize(32 * dp);
-        checkPaint.setTextAlign(Paint.Align.CENTER);
-        checkPaint.setFakeBoldText(true);
+        // ---- Gold (mastered) ----
+        pGoldBottom.setStyle(Paint.Style.FILL);
+        pGoldBottom.setColor(Color.parseColor("#C8860A"));
+        pGoldTop.setStyle(Paint.Style.FILL);
+        pGoldTop.setColor(Color.parseColor("#FFD700"));
 
-        iconPaint = makePaint(Color.parseColor("#7070A0"), Paint.Style.FILL);
-        iconPaint.setTextSize(26 * dp);
-        iconPaint.setTextAlign(Paint.Align.CENTER);
+        // ---- Number on active nodes ----
+        pNumber.setStyle(Paint.Style.FILL);
+        pNumber.setColor(Color.WHITE);
+        pNumber.setTextAlign(Paint.Align.CENTER);
+        pNumber.setFakeBoldText(true);
+        pNumber.setTextSize(22 * dp);
 
-        numberPaint = makePaint(Color.WHITE, Paint.Style.FILL);
-        numberPaint.setTextSize(28 * dp);
-        numberPaint.setTextAlign(Paint.Align.CENTER);
-        numberPaint.setFakeBoldText(true);
+        // ---- Number on locked nodes ----
+        pLockNum.setStyle(Paint.Style.FILL);
+        pLockNum.setColor(Color.parseColor("#9B8DC0"));
+        pLockNum.setTextAlign(Paint.Align.CENTER);
+        pLockNum.setTextSize(20 * dp);
 
-        // Tooltip
-        tooltipBgPaint = makePaint(Color.WHITE, Paint.Style.FILL);
+        // ---- Checkmark path ----
+        pCheckPath.setStyle(Paint.Style.STROKE);
+        pCheckPath.setColor(Color.WHITE);
+        pCheckPath.setStrokeWidth(3.5f * dp);
+        pCheckPath.setStrokeCap(Paint.Cap.ROUND);
+        pCheckPath.setStrokeJoin(Paint.Join.ROUND);
 
-        tooltipTextPaint = makePaint(Color.parseColor("#1C1C2E"), Paint.Style.FILL);
-        tooltipTextPaint.setTextSize(20 * dp);
-        tooltipTextPaint.setTextAlign(Paint.Align.CENTER);
-        tooltipTextPaint.setFakeBoldText(true);
+        // ---- Star text (mastered) ----
+        pStarText.setStyle(Paint.Style.FILL);
+        pStarText.setColor(Color.WHITE);
+        pStarText.setTextAlign(Paint.Align.CENTER);
+        pStarText.setTextSize(24 * dp);
+        pStarText.setFakeBoldText(true);
 
-        // Quarter divider
-        dividerLinePaint = makePaint(Color.parseColor("#2D2F54"), Paint.Style.STROKE);
-        dividerLinePaint.setStrokeWidth(1.5f * dp);
+        // ---- Pulse ring ----
+        pPulse.setStyle(Paint.Style.STROKE);
+        pPulse.setStrokeWidth(3f * dp);
 
-        dividerTextPaint = makePaint(Color.parseColor("#A0A0C0"), Paint.Style.FILL);
-        dividerTextPaint.setTextSize(13 * dp);
-        dividerTextPaint.setTextAlign(Paint.Align.CENTER);
+        // ---- Tooltip ----
+        pTipBg.setStyle(Paint.Style.FILL);
+        pTipBg.setColor(Color.WHITE);
 
-        // Pulse ring
-        pulseRingPaint = makePaint(0, Paint.Style.STROKE);
-        pulseRingPaint.setStrokeWidth(3 * dp);
+        pTipBorder.setStyle(Paint.Style.STROKE);
+        pTipBorder.setStrokeWidth(2f * dp);
 
-        startPulse();
-    }
+        pTipText.setStyle(Paint.Style.FILL);
+        pTipText.setTextAlign(Paint.Align.CENTER);
+        pTipText.setFakeBoldText(true);
+        pTipText.setTextSize(14 * dp);
 
-    private Paint makePaint(int color, Paint.Style style) {
-        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        p.setColor(color);
-        p.setStyle(style);
-        return p;
-    }
+        // ---- Quarter dividers ----
+        pDivLine.setStyle(Paint.Style.STROKE);
+        pDivLine.setStrokeWidth(1.5f * dp);
+        pDivLine.setColor(Color.parseColor("#C8BEE8"));
 
-    // ─── Pulse animation ──────────────────────────────────────────────────────
+        pPillBg.setStyle(Paint.Style.FILL);
 
-    private void startPulse() {
-        pulseAnimator = ValueAnimator.ofFloat(0f, 1f);
-        pulseAnimator.setDuration(1500);
-        pulseAnimator.setRepeatMode(ValueAnimator.REVERSE);
-        pulseAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        pulseAnimator.setInterpolator(new LinearInterpolator());
-        pulseAnimator.addUpdateListener(a -> {
-            pulseProgress = (float) a.getAnimatedValue();
+        pPillText.setStyle(Paint.Style.FILL);
+        pPillText.setColor(Color.WHITE);
+        pPillText.setTextAlign(Paint.Align.CENTER);
+        pPillText.setFakeBoldText(true);
+        pPillText.setTextSize(11 * dp);
+
+        // ---- Pulse animator ----
+        pulseAnim = ValueAnimator.ofFloat(0f, 1f);
+        pulseAnim.setDuration(1400);
+        pulseAnim.setRepeatMode(ValueAnimator.REVERSE);
+        pulseAnim.setRepeatCount(ValueAnimator.INFINITE);
+        pulseAnim.setInterpolator(new LinearInterpolator());
+        pulseAnim.addUpdateListener(a -> {
+            pulsePhase = (float) a.getAnimatedValue();
             invalidate();
         });
-        pulseAnimator.start();
+        pulseAnim.start();
+
+        // Hardware layer for smooth animation
+        setLayerType(LAYER_TYPE_HARDWARE, null);
     }
 
-    // ─── Public API ───────────────────────────────────────────────────────────
+    // ─── Public API ──────────────────────────────────────────────────────────
 
-    public void setModuleColor(int mainColor, int bottomColor) {
-        moduleColorMain   = mainColor;
-        moduleColorBottom = bottomColor;
+    public void setModuleColor(int main, int bottom) {
+        colorMain   = main;
+        colorBottom = bottom;
         invalidate();
     }
 
-    public void setNodes(List<NodeView> nodes) {
-        this.nodes = nodes;
-        Log.d(TAG, "setNodes: " + (nodes != null ? nodes.size() : 0));
+    public void setNodes(List<NodeView> list) {
+        nodes = list != null ? list : new ArrayList<>();
         invalidate();
     }
 
     public void setOnNodeClickListener(OnNodeClickListener l) {
-        this.nodeClickListener = l;
+        clickListener = l;
     }
 
-    // ─── Draw ─────────────────────────────────────────────────────────────────
+    // ─── Draw ────────────────────────────────────────────────────────────────
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        if (nodes == null || nodes.isEmpty()) {
-            Paint msg = makePaint(Color.parseColor("#9090B0"), Paint.Style.FILL);
-            msg.setTextAlign(Paint.Align.CENTER);
-            msg.setTextSize(18 * getContext().getResources().getDisplayMetrics().density);
-            canvas.drawText("Loading lessons…", getWidth() / 2f, getHeight() / 2f, msg);
+        if (nodes.isEmpty()) {
+            drawEmptyState(canvas);
             return;
         }
 
-        drawQuarterDividers(canvas);
+        drawDividers(canvas);
         drawConnectors(canvas);
 
-        for (NodeView node : nodes) {
-            drawNode(canvas, node);
+        // Draw completed/locked nodes first, CURRENT on top
+        for (NodeView n : nodes) {
+            if (n.getState() != NodeView.NodeState.CURRENT) drawNode(canvas, n);
+        }
+        for (NodeView n : nodes) {
+            if (n.getState() == NodeView.NodeState.CURRENT) drawNode(canvas, n);
         }
     }
 
-    // ─── Quarter dividers ─────────────────────────────────────────────────────
+    // ─── Quarter dividers ────────────────────────────────────────────────────
 
-    private void drawQuarterDividers(Canvas canvas) {
-        float w = getWidth();
-        float h = getHeight();
-        float padH = 24 * getContext().getResources().getDisplayMetrics().density;
+    private void drawDividers(Canvas canvas) {
+        float w  = getWidth();
+        float h  = getHeight();
+        float dp = density();
+        float pH = 14 * dp;   // pill half-height
+        float pR = 12 * dp;   // pill corner radius
+
+        pPillBg.setColor(colorMain);
 
         for (int i = 0; i < DIVIDER_Y_PCT.length; i++) {
-            float y = DIVIDER_Y_PCT[i] / 100f * h;
+            float cy = DIVIDER_Y_PCT[i] / 100f * h;
 
-            // Dashed horizontal line
-            canvas.drawLine(padH, y, w - padH, y, dividerLinePaint);
+            // Measure pill width
+            float textW = pPillText.measureText(DIVIDER_LABEL[i]);
+            float pW = textW / 2 + 18 * dp;   // half-width
 
-            // Label centred
-            canvas.drawText(DIVIDER_LABELS[i], w / 2f, y - 6, dividerTextPaint);
+            // Lines either side of pill
+            canvas.drawLine(32 * dp, cy, w / 2 - pW - 8 * dp, cy, pDivLine);
+            canvas.drawLine(w / 2 + pW + 8 * dp, cy, w - 32 * dp, cy, pDivLine);
+
+            // Pill
+            RectF pill = new RectF(w / 2 - pW, cy - pH, w / 2 + pW, cy + pH);
+            canvas.drawRoundRect(pill, pR, pR, pPillBg);
+            canvas.drawText(DIVIDER_LABEL[i], w / 2, cy + pPillText.getTextSize() * 0.35f, pPillText);
         }
     }
 
-    // ─── Connectors ───────────────────────────────────────────────────────────
+    // ─── Connectors ──────────────────────────────────────────────────────────
 
     private void drawConnectors(Canvas canvas) {
         float w = getWidth();
         float h = getHeight();
 
+        pConnDone.setColor(alphaColor(colorMain, 0.45f));
+
         for (int i = 0; i < nodes.size() - 1; i++) {
-            NodeView from = nodes.get(i);
-            NodeView to   = nodes.get(i + 1);
+            NodeView a = nodes.get(i);
+            NodeView b = nodes.get(i + 1);
 
-            float x1 = nodeX(from, w);
-            float y1 = nodeY(from, h);
-            float x2 = nodeX(to, w);
-            float y2 = nodeY(to, h);
+            float x1 = nx(a, w), y1 = ny(a, h);
+            float x2 = nx(b, w), y2 = ny(b, h);
 
-            boolean done = from.getState() == NodeView.NodeState.COMPLETED
-                    || from.getState() == NodeView.NodeState.MASTERED;
+            boolean done = a.getState() == NodeView.NodeState.COMPLETED
+                    || a.getState() == NodeView.NodeState.MASTERED;
 
-            if (done) {
-                connectorDonePaint.setColor(dimColor(moduleColorMain, 0.7f));
-            }
-
-            Paint paint = done ? connectorDonePaint : connectorTodoPaint;
-            canvas.drawLine(x1, y1, x2, y2, paint);
+            canvas.drawLine(x1, y1, x2, y2, done ? pConnDone : pConnTodo);
         }
     }
 
-    // ─── Single node ──────────────────────────────────────────────────────────
+    // ─── Single node ─────────────────────────────────────────────────────────
 
     private void drawNode(Canvas canvas, NodeView node) {
-        float w = getWidth();
-        float h = getHeight();
-        float cx = nodeX(node, w);
-        float cy = nodeY(node, h);
-        float r  = node.isFinalAssessment() ? nodeFinalRadius : nodeRadius;
+        float w  = getWidth();
+        float h  = getHeight();
+        float cx = nx(node, w);
+        float cy = ny(node, h);
+        float r  = node.isFinalAssessment() ? finalR : nodeR;
 
-        // 1. Pulse ring for CURRENT node
-        if (node.getState() == NodeView.NodeState.CURRENT) {
-            float maxExtra = r * 0.7f;
-            float ringR = r + maxExtra * pulseProgress;
-            int alpha = (int) (160 * (1f - pulseProgress));
-            pulseRingPaint.setColor(moduleColorMain);
-            pulseRingPaint.setAlpha(alpha);
-            canvas.drawCircle(cx, cy, ringR, pulseRingPaint);
+        NodeView.NodeState state = node.getState();
+
+        // 1. Pulse ring (CURRENT only)
+        if (state == NodeView.NodeState.CURRENT) {
+            float ext = r * 0.50f * pulsePhase;
+            int alpha = (int) (180 * (1f - pulsePhase));
+            pPulse.setColor(colorMain);
+            pPulse.setAlpha(alpha);
+            canvas.drawCircle(cx, cy, r + ext, pPulse);
         }
 
-        // 2. Shadow
-        nodeShadowPaint.setShadowLayer(12, 0, 6, Color.parseColor("#55000000"));
-        canvas.drawCircle(cx + 2, cy + 4, r, nodeShadowPaint);
+        // 2. Coin shadow
+        canvas.drawCircle(cx + 1.5f, cy + 5, r, pCoinShadow);
 
-        // 3. Bottom (3D coin bottom)
-        Paint btm = getBottomPaint(node);
-        canvas.drawCircle(cx, cy + coinOffsetY, r, btm);
+        // 3. Bottom (3-D edge)
+        Paint btm = coinBottomPaint(state);
+        canvas.drawCircle(cx, cy + coinDy, r, btm);
 
-        // 4. Top circle
-        Paint top = getTopPaint(node);
+        // 4. Top face
+        Paint top = coinTopPaint(state);
         canvas.drawCircle(cx, cy, r, top);
 
-        // 5. Inner highlight ring
-        Paint highlight = makePaint(Color.parseColor("#33FFFFFF"), Paint.Style.STROKE);
-        highlight.setStrokeWidth(2 * getContext().getResources().getDisplayMetrics().density);
-        canvas.drawCircle(cx, cy - r * 0.25f, r * 0.6f, highlight);
+        // 5. Border / highlight
+        if (state == NodeView.NodeState.LOCKED) {
+            canvas.drawCircle(cx, cy, r, pLockBorder);
+        } else {
+            canvas.drawCircle(cx, cy - r * 0.2f, r * 0.65f, pCoinHighlight);
+        }
 
-        // 6. Icon / number
-        drawNodeIcon(canvas, node, cx, cy, r);
+        // 6. Icon
+        drawIcon(canvas, node, cx, cy, r);
 
-        // 7. START tooltip for CURRENT node
-        if (node.getState() == NodeView.NodeState.CURRENT) {
-            drawStartTooltip(canvas, cx, cy - r);
+        // 7. START badge above CURRENT
+        if (state == NodeView.NodeState.CURRENT) {
+            drawStartBadge(canvas, cx, cy - r);
         }
     }
 
-    private Paint getBottomPaint(NodeView node) {
-        switch (node.getState()) {
-            case LOCKED:    return lockedBottomPaint;
-            case MASTERED:  return masteredBottomPaint;
-            default:
-                nodeBottomPaint.setColor(dimColor(moduleColorMain, 0.65f));
-                return nodeBottomPaint;
-        }
-    }
-
-    private Paint getTopPaint(NodeView node) {
-        switch (node.getState()) {
-            case LOCKED:    return lockedTopPaint;
-            case MASTERED:  return masteredTopPaint;
+    private Paint coinBottomPaint(NodeView.NodeState state) {
+        switch (state) {
+            case LOCKED: return pLockBottom;
+            case MASTERED: return pGoldBottom;
             case COMPLETED:
-                nodeTopPaint.setColor(dimColor(moduleColorMain, 0.80f));
-                return nodeTopPaint;
-            default:        // UNLOCKED / CURRENT
-                nodeTopPaint.setColor(moduleColorMain);
-                return nodeTopPaint;
+                pCoinBottom.setColor(dimColor(colorMain, 0.72f));
+                return pCoinBottom;
+            default:
+                pCoinBottom.setColor(dimColor(colorMain, 0.65f));
+                return pCoinBottom;
         }
     }
 
-    private void drawNodeIcon(Canvas canvas, NodeView node, float cx, float cy, float r) {
-        float dp = getContext().getResources().getDisplayMetrics().density;
-        float textBaseY = cy + 10 * dp;
+    private Paint coinTopPaint(NodeView.NodeState state) {
+        switch (state) {
+            case LOCKED: return pLockTop;
+            case MASTERED: return pGoldTop;
+            case COMPLETED:
+                pCoinTop.setColor(dimColor(colorMain, 0.82f));
+                return pCoinTop;
+            default:
+                pCoinTop.setColor(colorMain);
+                return pCoinTop;
+        }
+    }
+
+    private void drawIcon(Canvas canvas, NodeView node, float cx, float cy, float r) {
+        float dp = density();
 
         switch (node.getState()) {
             case LOCKED:
-                iconPaint.setTextSize(24 * dp);
-                canvas.drawText("🔒", cx, textBaseY, iconPaint);
+                // Node number in muted purple
+                pLockNum.setTextSize(r * 0.62f);
+                canvas.drawText(String.valueOf(node.getNodeNumber()),
+                        cx, cy + pLockNum.getTextSize() * 0.37f, pLockNum);
                 break;
 
             case COMPLETED:
-                // Draw checkmark text
-                checkPaint.setTextSize(28 * dp);
-                canvas.drawText("✓", cx, textBaseY, checkPaint);
+                // Drawn checkmark — no emoji
+                drawCheckmark(canvas, cx, cy, r * 0.42f);
                 break;
 
             case MASTERED:
-                checkPaint.setTextSize(26 * dp);
-                canvas.drawText("★", cx, textBaseY, checkPaint);
+                pStarText.setTextSize(r * 0.72f);
+                canvas.drawText("★", cx, cy + pStarText.getTextSize() * 0.36f, pStarText);
                 break;
 
             default: // UNLOCKED / CURRENT
                 if (node.isFinalAssessment()) {
-                    iconPaint.setColor(Color.WHITE);
-                    iconPaint.setTextSize(26 * dp);
-                    canvas.drawText("⭐", cx, cy - 10 * dp, iconPaint);
-                    numberPaint.setTextSize(20 * dp);
-                    canvas.drawText(String.valueOf(node.getNodeNumber()), cx, textBaseY + 8 * dp, numberPaint);
+                    // Trophy icon drawn
+                    drawTrophy(canvas, cx, cy, r * 0.46f);
                 } else {
-                    numberPaint.setTextSize(26 * dp);
-                    canvas.drawText(String.valueOf(node.getNodeNumber()), cx, textBaseY, numberPaint);
+                    pNumber.setTextSize(r * 0.68f);
+                    canvas.drawText(String.valueOf(node.getNodeNumber()),
+                            cx, cy + pNumber.getTextSize() * 0.37f, pNumber);
                 }
                 break;
         }
     }
 
-    // ─── START tooltip ────────────────────────────────────────────────────────
-
-    private void drawStartTooltip(Canvas canvas, float cx, float topY) {
-        float dp = getContext().getResources().getDisplayMetrics().density;
-        float padX = 16 * dp;
-        float padY = 8  * dp;
-        float cornerR = 12 * dp;
-        float arrowH = 10 * dp;
-        float arrowW = 12 * dp;
-        float gap    = 8  * dp;
-
-        // Measure text
-        String text = "START";
-        float textW = tooltipTextPaint.measureText(text);
-        float boxW  = textW + padX * 2;
-        float boxH  = tooltipTextPaint.getTextSize() + padY * 2;
-
-        float boxBottom = topY - gap;
-        float boxTop    = boxBottom - boxH;
-        float boxLeft   = cx - boxW / 2f;
-        float boxRight  = cx + boxW / 2f;
-
-        // Rounded rect
-        RectF rect = new RectF(boxLeft, boxTop, boxRight, boxBottom);
-        canvas.drawRoundRect(rect, cornerR, cornerR, tooltipBgPaint);
-
-        // Down-pointing triangle
-        Path arrow = new Path();
-        arrow.moveTo(cx - arrowW, boxBottom);
-        arrow.lineTo(cx + arrowW, boxBottom);
-        arrow.lineTo(cx, boxBottom + arrowH);
-        arrow.close();
-        canvas.drawPath(arrow, tooltipBgPaint);
-
-        // Text
-        float textY = boxBottom - padY - (tooltipTextPaint.descent());
-        canvas.drawText(text, cx, textY, tooltipTextPaint);
+    /** Draw a simple ✓ checkmark using Path */
+    private void drawCheckmark(Canvas canvas, float cx, float cy, float size) {
+        Path p = new Path();
+        p.moveTo(cx - size, cy);
+        p.lineTo(cx - size * 0.2f, cy + size * 0.8f);
+        p.lineTo(cx + size, cy - size * 0.7f);
+        pCheckPath.setColor(Color.WHITE);
+        pCheckPath.setStrokeWidth(density() * 3.5f);
+        canvas.drawPath(p, pCheckPath);
     }
 
-    // ─── Touch ────────────────────────────────────────────────────────────────
+    /** Simple filled trophy silhouette */
+    private void drawTrophy(Canvas canvas, float cx, float cy, float size) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setStyle(Paint.Style.FILL);
+        p.setColor(Color.WHITE);
+
+        // Cup body: rounded rect
+        RectF cup = new RectF(cx - size * 0.8f, cy - size * 0.9f,
+                cx + size * 0.8f, cy + size * 0.4f);
+        canvas.drawRoundRect(cup, size * 0.3f, size * 0.3f, p);
+
+        // Stem
+        RectF stem = new RectF(cx - size * 0.2f, cy + size * 0.4f,
+                cx + size * 0.2f, cy + size * 0.85f);
+        canvas.drawRect(stem, p);
+
+        // Base
+        RectF base = new RectF(cx - size * 0.55f, cy + size * 0.8f,
+                cx + size * 0.55f, cy + size * 1.0f);
+        canvas.drawRoundRect(base, size * 0.1f, size * 0.1f, p);
+    }
+
+    // ─── START tooltip ───────────────────────────────────────────────────────
+
+    private void drawStartBadge(Canvas canvas, float cx, float topEdge) {
+        float dp   = density();
+        float gap  = 10 * dp;
+        float padX = 16 * dp;
+        float padY =  7 * dp;
+        float cr   = 20 * dp;    // corner radius
+        float arrH =  9 * dp;    // arrow height
+
+        String text = "START";
+        pTipText.setColor(colorMain);
+        pTipText.setTextSize(13 * dp);
+
+        float textW = pTipText.measureText(text);
+        float bW    = textW + padX * 2;
+        float bH    = pTipText.getTextSize() + padY * 2;
+
+        float bBot  = topEdge - gap;
+        float bTop  = bBot - bH;
+        float bL    = cx - bW / 2;
+        float bR    = cx + bW / 2;
+
+        // Pill background
+        RectF rect = new RectF(bL, bTop, bR, bBot);
+        canvas.drawRoundRect(rect, cr, cr, pTipBg);
+
+        // Border in module colour
+        pTipBorder.setColor(alphaColor(colorMain, 0.5f));
+        canvas.drawRoundRect(rect, cr, cr, pTipBorder);
+
+        // Arrow pointer
+        Path arrow = new Path();
+        arrow.moveTo(cx - 7 * dp, bBot);
+        arrow.lineTo(cx + 7 * dp, bBot);
+        arrow.lineTo(cx, bBot + arrH);
+        arrow.close();
+        canvas.drawPath(arrow, pTipBg);
+
+        // Text
+        float textY = bBot - padY - pTipText.descent();
+        canvas.drawText(text, cx, textY, pTipText);
+    }
+
+    // ─── Touch ───────────────────────────────────────────────────────────────
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN && nodeClickListener != null) {
-            float tx = event.getX();
-            float ty = event.getY();
-            float w  = getWidth();
-            float h  = getHeight();
-
-            for (NodeView node : nodes) {
-                float nx = nodeX(node, w);
-                float ny = nodeY(node, h);
-                float r  = node.isFinalAssessment() ? nodeFinalRadius : nodeRadius;
-                float dist = (float) Math.hypot(tx - nx, ty - ny);
-                if (dist <= Math.max(r, touchRadius)) {
-                    nodeClickListener.onNodeClick(node);
+        if (event.getAction() == MotionEvent.ACTION_DOWN && clickListener != null) {
+            float tx = event.getX(), ty = event.getY();
+            float w = getWidth(), h = getHeight();
+            for (NodeView n : nodes) {
+                float dist = dist(tx, ty, nx(n, w), ny(n, h));
+                float r    = n.isFinalAssessment() ? finalR : nodeR;
+                if (dist <= Math.max(r, hitR)) {
+                    clickListener.onNodeClick(n);
                     return true;
                 }
             }
@@ -437,31 +515,52 @@ public class ModulePathView extends View {
         return super.onTouchEvent(event);
     }
 
-    // ─── Helpers ──────────────────────────────────────────────────────────────
+    // ─── Helpers ─────────────────────────────────────────────────────────────
 
-    private float nodeX(NodeView node, float w) {
-        int idx = node.getNodeNumber() - 1;
-        if (idx < 0 || idx >= NODE_X_PCT.length) return w / 2f;
-        return NODE_X_PCT[idx] / 100f * w;
+    private float nx(NodeView n, float w) {
+        int i = n.getNodeNumber() - 1;
+        return (i >= 0 && i < NODE_X_PCT.length) ? NODE_X_PCT[i] / 100f * w : w / 2;
     }
 
-    private float nodeY(NodeView node, float h) {
-        int idx = node.getNodeNumber() - 1;
-        if (idx < 0 || idx >= NODE_Y_PCT.length) return h / 2f;
-        return NODE_Y_PCT[idx] / 100f * h;
+    private float ny(NodeView n, float h) {
+        int i = n.getNodeNumber() - 1;
+        return (i >= 0 && i < NODE_Y_PCT.length) ? NODE_Y_PCT[i] / 100f * h : h / 2;
     }
 
-    /** Return a darker/lighter version of a color by the given factor (0=black, 1=same). */
-    private int dimColor(int color, float factor) {
-        int r = (int) (Color.red(color)   * factor);
-        int g = (int) (Color.green(color) * factor);
-        int b = (int) (Color.blue(color)  * factor);
-        return Color.rgb(Math.min(r, 255), Math.min(g, 255), Math.min(b, 255));
+    private float dist(float x1, float y1, float x2, float y2) {
+        float dx = x1 - x2, dy = y1 - y2;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
+    private float density() {
+        return getContext().getResources().getDisplayMetrics().density;
+    }
+
+    /** Darken/lighten a colour by factor (0 = black, 1 = original). */
+    private int dimColor(int c, float f) {
+        return Color.rgb(
+                Math.min(255, (int) (Color.red(c)   * f)),
+                Math.min(255, (int) (Color.green(c) * f)),
+                Math.min(255, (int) (Color.blue(c)  * f)));
+    }
+
+    /** Apply alpha (0–1) to a colour. */
+    private int alphaColor(int c, float alpha) {
+        return Color.argb((int) (alpha * 255),
+                Color.red(c), Color.green(c), Color.blue(c));
+    }
+
+    private void drawEmptyState(Canvas canvas) {
+        Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
+        p.setColor(Color.parseColor("#9B8DC0"));
+        p.setTextAlign(Paint.Align.CENTER);
+        p.setTextSize(16 * density());
+        canvas.drawText("Loading lessons…", getWidth() / 2f, getHeight() / 2f, p);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if (pulseAnimator != null) pulseAnimator.cancel();
+        if (pulseAnim != null) pulseAnim.cancel();
     }
 }
