@@ -358,9 +358,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         pathView.setNodes(nodeViews);
 
-        // Scroll to bottom so node 1 is visible first (nodes are drawn bottom→top).
-        // post() queues the scroll after the current draw frame completes.
-        ladderScrollView.post(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN));
+        // Scroll to bottom so node 1 is visible first (nodes drawn bottom→top).
+        // 150ms delay lets the layout pass complete before scrolling.
+        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
 
         // Update progress
         int completedNodes = 0;

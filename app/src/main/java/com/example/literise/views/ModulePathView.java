@@ -269,6 +269,13 @@ public class ModulePathView extends View {
 
     // ─── Draw ────────────────────────────────────────────────────────────────
 
+    /** Force a redraw the moment the view gets its real dimensions. */
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        if (w > 0 && h > 0) invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
