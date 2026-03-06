@@ -408,7 +408,7 @@ VALUES
 -- Node 508: Writing with Because
 ('INTERVENTION', 508, 'score < 70',
  'Explanatory Writing Remediation: Using Because',
- '{"instruction":"Use BECAUSE to explain the REASON behind something you write.","structure":"[What happened / your opinion] + because + [the reason/evidence]","examples":["I love reading because it takes me to new worlds.","Plants need water because water helps them make food.","I wear a uniform because it shows I belong to my school."],"avoidFragments":"Never write BECAUSE alone as a sentence: Because it is fun. (WRONG) → I study because it is fun. (CORRECT)","practiceFrames":["I like _____ because _____.","We should _____ because _____.","The teacher smiled because _____."],"tip":"The REASON after because should be specific, not just 'it is good' or 'I like it.'"}',
+ '{"instruction":"Use BECAUSE to explain the REASON behind something you write.","structure":"[What happened / your opinion] + because + [the reason/evidence]","examples":["I love reading because it takes me to new worlds.","Plants need water because water helps them make food.","I wear a uniform because it shows I belong to my school."],"avoidFragments":"Never write BECAUSE alone as a sentence: Because it is fun. (WRONG) → I study because it is fun. (CORRECT)","practiceFrames":["I like _____ because _____.","We should _____ because _____.","The teacher smiled because _____."],"tip":"The REASON after because should be specific, not just ''it is good'' or ''I like it.''."}',
  'creating', 10, 30, 1, 1, GETDATE()),
 
 -- Node 509: Comparative Sentences Writing
