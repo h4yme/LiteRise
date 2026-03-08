@@ -25,6 +25,8 @@ import com.example.literise.models.RegisterResponse;
 import com.example.literise.utils.CustomToast;
 import com.google.android.material.button.MaterialButton;
 
+import com.google.gson.Gson;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -285,7 +287,19 @@ public class RegisterActivity extends AppCompatActivity {
                         CustomToast.showError(RegisterActivity.this, errorMessage);
                     }
                 } else {
-                    CustomToast.showError(RegisterActivity.this, "Registration failed. Please try again.");
+                    String errorMessage = "Registration failed. Please try again.";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorJson = response.errorBody().string();
+                            RegisterResponse errorResponse = new Gson().fromJson(errorJson, RegisterResponse.class);
+                            if (errorResponse != null && errorResponse.getError() != null) {
+                                errorMessage = errorResponse.getError();
+                            } else if (errorResponse != null && errorResponse.getMessage() != null) {
+                                errorMessage = errorResponse.getMessage();
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                    CustomToast.showError(RegisterActivity.this, errorMessage);
                 }
             }
 
