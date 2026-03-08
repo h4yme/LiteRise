@@ -342,7 +342,7 @@ public class WordHuntActivity extends BaseGameActivity {
 
     private void loadWords() {
 
-        // Use lesson words if the lesson content was forwarded from ModuleLadderActivity
+        // 1. Use lesson content passed directly from ModuleLadderActivity (same session)
         String lessonContent = getIntent().getStringExtra("lesson_content");
         if (lessonContent != null) {
             try {
@@ -355,7 +355,49 @@ public class WordHuntActivity extends BaseGameActivity {
             } catch (Exception ignored) {}
         }
 
-        // DEMO MODE: Use hardcoded words directly (no API)
+        // 2. Fetch lesson content from the API using node_id (lesson was completed in a
+        //    previous session, so lesson_content was not forwarded via intent)
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        int placementLevel = getIntent().getIntExtra("placement_level", 2);
+        if (nodeId > 0) {
+            loadingProgress.setVisibility(View.VISIBLE);
+            ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+            apiService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new retrofit2.Callback<com.example.literise.models.LessonContentResponse>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<com.example.literise.models.LessonContentResponse> call,
+                                               retrofit2.Response<com.example.literise.models.LessonContentResponse> response) {
+                            loadingProgress.setVisibility(View.GONE);
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                try {
+                                    List<WordHuntWord> lessonWords = extractWordsFromLessonContent(
+                                            response.body().getLesson().getContent());
+                                    if (!lessonWords.isEmpty()) {
+                                        words = lessonWords;
+                                        startGame();
+                                        return;
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                            // Lesson content empty or parse failed — fall through to demo words
+                            loadDemoWords();
+                            startGame();
+                        }
+                        @Override
+                        public void onFailure(retrofit2.Call<com.example.literise.models.LessonContentResponse> call,
+                                              Throwable t) {
+                            loadingProgress.setVisibility(View.GONE);
+                            android.util.Log.w("WordHunt", "Lesson content fetch failed — using demo words");
+                            loadDemoWords();
+                            startGame();
+                        }
+                    });
+            return;
+        }
+
+        // 3. DEMO MODE: Use hardcoded words directly (no API)
 
         if (AppConfig.DEMO_MODE) {
 
