@@ -56,6 +56,7 @@ import androidx.core.content.ContextCompat;
 
 
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.api.ApiClient;
@@ -133,6 +134,8 @@ public class WordHuntActivity extends BaseGameActivity {
     private MaterialButton btnHint, btnShuffle;
 
     private CardView cardDefinition;
+
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
 
 
@@ -324,6 +327,10 @@ public class WordHuntActivity extends BaseGameActivity {
 
         cardDefinition = (CardView) findViewById(R.id.cardDefinition);
 
+        lottieCorrect = (LottieAnimationView) findViewById(R.id.lottieCorrect);
+
+        lottieComplete = (LottieAnimationView) findViewById(R.id.lottieComplete);
+
     }
 
 
@@ -342,7 +349,62 @@ public class WordHuntActivity extends BaseGameActivity {
 
     private void loadWords() {
 
-        // DEMO MODE: Use hardcoded words directly (no API)
+        // 1. Use lesson content passed directly from ModuleLadderActivity (same session)
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        if (lessonContent != null) {
+            try {
+                List<WordHuntWord> lessonWords = extractWordsFromLessonContent(lessonContent);
+                if (!lessonWords.isEmpty()) {
+                    words = lessonWords;
+                    startGame();
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+
+        // 2. Fetch lesson content from the API using node_id (lesson was completed in a
+        //    previous session, so lesson_content was not forwarded via intent)
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        int placementLevel = getIntent().getIntExtra("placement_level", 2);
+        if (nodeId > 0) {
+            loadingProgress.setVisibility(View.VISIBLE);
+            ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+            apiService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new retrofit2.Callback<com.example.literise.models.LessonContentResponse>() {
+                        @Override
+                        public void onResponse(retrofit2.Call<com.example.literise.models.LessonContentResponse> call,
+                                               retrofit2.Response<com.example.literise.models.LessonContentResponse> response) {
+                            loadingProgress.setVisibility(View.GONE);
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                try {
+                                    List<WordHuntWord> lessonWords = extractWordsFromLessonContent(
+                                            response.body().getLesson().getContent());
+                                    if (!lessonWords.isEmpty()) {
+                                        words = lessonWords;
+                                        startGame();
+                                        return;
+                                    }
+                                } catch (Exception ignored) {}
+                            }
+                            // Lesson content empty or parse failed — fall through to demo words
+                            loadDemoWords();
+                            startGame();
+                        }
+                        @Override
+                        public void onFailure(retrofit2.Call<com.example.literise.models.LessonContentResponse> call,
+                                              Throwable t) {
+                            loadingProgress.setVisibility(View.GONE);
+                            android.util.Log.w("WordHunt", "Lesson content fetch failed — using demo words");
+                            loadDemoWords();
+                            startGame();
+                        }
+                    });
+            return;
+        }
+
+        // 3. DEMO MODE: Use hardcoded words directly (no API)
 
         if (AppConfig.DEMO_MODE) {
 
@@ -440,35 +502,31 @@ public class WordHuntActivity extends BaseGameActivity {
 
                         } else {
 
-                            showErrorAndExit("No words found for your grade level. Please contact administrator.");
+                            android.util.Log.w("WordHunt", "API returned no words — using demo words");
+
+                            loadDemoWords();
+
+                            startGame();
 
                         }
 
                     } else {
 
-                        showErrorAndExit("API Error: " + response.body().getMessage());
+                        android.util.Log.w("WordHunt", "API error — using demo words: " + response.body().getMessage());
+
+                        loadDemoWords();
+
+                        startGame();
 
                     }
 
                 } else {
 
-                    String errorMsg = "Failed to load words";
+                    android.util.Log.w("WordHunt", "HTTP " + response.code() + " — using demo words");
 
-                    try {
+                    loadDemoWords();
 
-                        if (response.errorBody() != null) {
-
-                            errorMsg = response.errorBody().string();
-
-                        }
-
-                    } catch (Exception e) {
-
-                        errorMsg = "HTTP " + response.code();
-
-                    }
-
-                    showErrorAndExit("Server Error: " + errorMsg);
+                    startGame();
 
                 }
 
@@ -482,9 +540,11 @@ public class WordHuntActivity extends BaseGameActivity {
 
                 loadingProgress.setVisibility(View.GONE);
 
-                android.util.Log.e("WordHunt", "API call failed", t);
+                android.util.Log.w("WordHunt", "API call failed — using demo words: " + t.getMessage());
 
-                showErrorAndExit("Network Error: " + t.getMessage());
+                loadDemoWords();
+
+                startGame();
 
             }
 
@@ -513,6 +573,41 @@ public class WordHuntActivity extends BaseGameActivity {
     }
 
 
+
+    /** Extracts lesson words from the JSON string passed from the lesson. */
+    private List<WordHuntWord> extractWordsFromLessonContent(String json) throws Exception {
+        List<WordHuntWord> result = new ArrayList<>();
+        org.json.JSONObject obj = new org.json.JSONObject(json);
+        org.json.JSONArray arr = null;
+        for (String field : new String[]{"keyWords","words","themeWords","sightWords",
+                "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
+            if (obj.has(field)) { arr = obj.getJSONArray(field); break; }
+        }
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                String w = arr.getString(i).trim().toUpperCase();
+                if (!w.isEmpty()) {
+                    WordHuntWord ww = new WordHuntWord();
+                    ww.setWord(w);
+                    result.add(ww);
+                }
+            }
+        }
+        // Fall back to example words if no dedicated word list
+        if (result.isEmpty() && obj.has("examples")) {
+            org.json.JSONArray exs = obj.getJSONArray("examples");
+            for (int i = 0; i < exs.length() && result.size() < 10; i++) {
+                String raw = exs.getString(i).trim();
+                String w = raw.contains(" - ") ? raw.split(" - ")[0].trim() : raw;
+                if (!w.isEmpty()) {
+                    WordHuntWord ww = new WordHuntWord();
+                    ww.setWord(w.toUpperCase());
+                    result.add(ww);
+                }
+            }
+        }
+        return result;
+    }
 
     private void loadDemoWords() {
 
@@ -1210,7 +1305,8 @@ public class WordHuntActivity extends BaseGameActivity {
 
         playSound(SOUND_CORRECT);
 
-
+        // Lottie sparkle on each word found
+        playLottieOnce(lottieCorrect);
 
         CustomToast.showSuccess(this, "Found: " + word.getWord() + " +" + points + " XP");
 
@@ -1224,6 +1320,21 @@ public class WordHuntActivity extends BaseGameActivity {
 
         }
 
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
 
@@ -1614,11 +1725,23 @@ public class WordHuntActivity extends BaseGameActivity {
 
         float accuracy = words.size() > 0 ? ((float) wordsFound / words.size()) * 100 : 0;
 
-
-
         saveGameResults(accuracy, totalTime);
 
-        showResultDialog(accuracy, totalTime);
+        // Celebrate if all words found, then show result
+        if (wordsFound >= words.size() && lottieComplete != null) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            final float finalAccuracy = accuracy;
+            final long finalTime = totalTime;
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog(finalAccuracy, finalTime);
+                }
+            });
+        } else {
+            showResultDialog(accuracy, totalTime);
+        }
 
     }
 

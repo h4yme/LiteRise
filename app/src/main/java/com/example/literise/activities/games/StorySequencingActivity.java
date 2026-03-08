@@ -29,6 +29,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
@@ -69,6 +70,8 @@ public class StorySequencingActivity extends BaseGameActivity {
 
     private int hintsUsed = 0;
 
+    private LottieAnimationView lottieCorrect, lottieComplete;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,6 +106,10 @@ public class StorySequencingActivity extends BaseGameActivity {
         btnHint = findViewById(R.id.btnHint);
 
         btnShuffle = findViewById(R.id.btnShuffle);
+
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+
+        lottieComplete = findViewById(R.id.lottieComplete);
 
     }
 
@@ -486,6 +493,16 @@ public class StorySequencingActivity extends BaseGameActivity {
             }
         }
 
+        // Fire Lottie based on result
+        if (isCorrect) {
+            if (lottieComplete != null) {
+                lottieComplete.setVisibility(View.VISIBLE);
+                lottieComplete.playAnimation();
+            }
+        } else if (correctCount >= storyEvents.size() / 2 && lottieCorrect != null) {
+            playLottieOnce(lottieCorrect);
+        }
+
         // Calculate XP based on correctness with star rating, time bonus, and hint penalty
 
         int xpEarned = 0;
@@ -657,6 +674,21 @@ public class StorySequencingActivity extends BaseGameActivity {
         });
 
         dialog.show();
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void resetGame() {

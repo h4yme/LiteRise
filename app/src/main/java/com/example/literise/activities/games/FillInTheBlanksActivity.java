@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -76,6 +77,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     private int nodeId;
     private String moduleDomain;
 
+    // Lottie
+    private LottieAnimationView lottieCorrect, lottieComplete;
+
     // Module theming
     private String colorStart = "#7C3AED";
     private String colorEnd = "#4F46E5";
@@ -116,6 +120,8 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         tvQuestionAfter = findViewById(R.id.tvQuestionAfter);
         recyclerWordOptions = findViewById(R.id.recyclerWordOptions);
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+        lottieComplete = findViewById(R.id.lottieComplete);
 
         btnBack.setOnClickListener(v -> {
             if (countDownTimer != null) countDownTimer.cancel();
@@ -161,11 +167,106 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void loadQuestions() {
+        // Try to generate questions from the lesson the student just completed
+        try {
+            String lessonContent = getIntent().getStringExtra("lesson_content");
+            if (lessonContent != null) {
+                List<DemoDataProvider.FillQuestion> lessonQs = generateQuestionsFromLesson(lessonContent);
+                if (lessonQs != null && !lessonQs.isEmpty()) {
+                    questions = lessonQs;
+                    loadQuestion(0);
+                    return;
+                }
+            }
+        } catch (Exception ignored) {}
+
+        // Fall back to domain-based demo questions
         questions = DemoDataProvider.getFillQuestions(moduleDomain, 10);
         if (questions == null || questions.isEmpty()) {
             questions = DemoDataProvider.getFillQuestions("creating", 10);
         }
         loadQuestion(0);
+    }
+
+    /**
+     * Generates fill-in-the-blank questions from lesson sentences.
+     * For each sentence we pick one lesson keyword as the blank; other lesson
+     * words (and common fillers) serve as wrong options.
+     */
+    private List<DemoDataProvider.FillQuestion> generateQuestionsFromLesson(String lessonJson) throws Exception {
+        org.json.JSONObject obj = new org.json.JSONObject(lessonJson);
+
+        // Collect all lesson words for blanks + distractors
+        List<String> lessonWords = new ArrayList<>();
+        for (String f : new String[]{"keyWords","words","themeWords","sightWords",
+                "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
+            if (obj.has(f)) {
+                org.json.JSONArray a = obj.getJSONArray(f);
+                for (int i = 0; i < a.length(); i++) lessonWords.add(a.getString(i).trim().toLowerCase());
+                break;
+            }
+        }
+
+        // Get practice sentences
+        org.json.JSONArray sentArr = null;
+        for (String f : new String[]{"contextSentences","sentencePractice","sentenceFrames"}) {
+            if (obj.has(f)) { sentArr = obj.getJSONArray(f); break; }
+        }
+        if (sentArr == null || sentArr.length() == 0) return null;
+
+        List<String> fillers = Arrays.asList("the","and","but","run","cat","big","red","play");
+        List<DemoDataProvider.FillQuestion> result = new ArrayList<>();
+
+        for (int i = 0; i < sentArr.length(); i++) {
+            String sentence = sentArr.getString(i).trim();
+            // Remove trailing punctuation to avoid matching issues
+            String clean = sentence.replaceAll("[.!?]$", "").trim();
+            String[] parts = clean.split("\\s+");
+
+            // Find the best word to blank: prefer a lesson word found in the sentence
+            int blankIdx = -1;
+            String answer = null;
+            for (int j = 0; j < parts.length; j++) {
+                String norm = parts[j].toLowerCase().replaceAll("[^a-z]", "");
+                if (lessonWords.contains(norm) && norm.length() > 2) {
+                    blankIdx = j; answer = norm; break;
+                }
+            }
+            // If no lesson word matched, pick the longest word (most content-rich)
+            if (blankIdx < 0) {
+                int maxLen = 0;
+                for (int j = 0; j < parts.length; j++) {
+                    String norm = parts[j].replaceAll("[^a-zA-Z]", "");
+                    if (norm.length() > maxLen && norm.length() > 2) {
+                        maxLen = norm.length(); blankIdx = j; answer = norm.toLowerCase();
+                    }
+                }
+            }
+            if (blankIdx < 0 || answer == null) continue;
+
+            String before = blankIdx > 0
+                    ? String.join(" ", Arrays.copyOfRange(parts, 0, blankIdx)) + " "
+                    : "";
+            String after = blankIdx < parts.length - 1
+                    ? " " + String.join(" ", Arrays.copyOfRange(parts, blankIdx + 1, parts.length))
+                    : "";
+
+            // Build 3 wrong options from other lesson words, pad with fillers if needed
+            List<String> pool = new ArrayList<>(lessonWords);
+            pool.remove(answer);
+            java.util.Collections.shuffle(pool);
+            List<String> wrongs = new ArrayList<>();
+            for (String w : pool) { if (!w.equals(answer) && wrongs.size() < 3) wrongs.add(w); }
+            for (String f : fillers) { if (wrongs.size() >= 3) break; if (!f.equals(answer)) wrongs.add(f); }
+            while (wrongs.size() < 3) wrongs.add("---");
+
+            result.add(new DemoDataProvider.FillQuestion(
+                    before, after, answer,
+                    new String[]{wrongs.get(0), wrongs.get(1), wrongs.get(2)},
+                    moduleDomain != null ? moduleDomain : "lesson"
+            ));
+        }
+        return result.isEmpty() ? null : result;
     }
 
     private void loadQuestion(int index) {
@@ -233,8 +334,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
             score += 10;
             tvScore.setText(String.valueOf(score));
             try { tvBlank.setBackgroundResource(R.drawable.bg_blank_correct); } catch (Exception ignored) {}
-            tvBlank.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150)
-                    .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(150).start()).start();
+            tvBlank.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200)
+                    .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(200).start()).start();
+            playLottieOnce(lottieCorrect);
         } else {
             try { tvBlank.setBackgroundResource(R.drawable.bg_blank_wrong); } catch (Exception ignored) {}
             tvBlank.setText(q.correctAnswer);
@@ -269,7 +371,35 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         int accuracy = total > 0 ? (int)((correctAnswers * 100.0) / total) : 0;
         int timeUsed = (int)((System.currentTimeMillis() - gameStartTime) / 1000);
         saveGameResult(score, accuracy, timeUsed);
-        showResultDialog(correctAnswers, total, accuracy, score);
+
+        // Celebrate then show dialog
+        if (lottieComplete != null && accuracy >= 70) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog(correctAnswers, total, accuracy, score);
+                }
+            });
+        } else {
+            showResultDialog(correctAnswers, total, accuracy, score);
+        }
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void saveGameResult(int xpEarned, int accuracy, int timeSeconds) {

@@ -70,6 +70,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     // Track current node for auto-progression
     private NodeView currentNode;
     private boolean isAutoProceedMode = true; // Auto-proceed through phases
+    private String lastLessonContent; // lesson JSON forwarded to the following game
 
     // Path coordinates
     // Better coordinates that follow the actual background path
@@ -152,11 +153,14 @@ public class ModuleLadderActivity extends AppCompatActivity {
         lessonLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Log.d(TAG, "Returned from LessonContentActivity");
+                    Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
-                    if (isAutoProceedMode && currentNode != null) {
-                        // Automatically proceed to game phase
-                        Log.d(TAG, "Auto-proceeding to Game phase");
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                        // Capture lesson content so the game can use lesson words/sentences
+                        android.content.Intent data = result.getData();
+                        lastLessonContent = (data != null) ? data.getStringExtra("lesson_content") : null;
+                        // Lesson was genuinely completed — proceed to game
+                        Log.d(TAG, "Lesson completed (RESULT_OK) — Auto-proceeding to Game phase");
                         Toast.makeText(this, "✅ Lesson Complete! Now let's play! 🎮", Toast.LENGTH_SHORT).show();
 
                         // Small delay for toast to show
@@ -164,7 +168,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
                             startGamePhase(currentNode);
                         }, 800);
                     } else {
-                        // User backed out or reviewing - refresh ladder
+                        // User backed out or lesson failed to load — refresh ladder, do NOT proceed
+                        Log.d(TAG, "Lesson not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
                     }
                 }
@@ -274,6 +279,18 @@ public class ModuleLadderActivity extends AppCompatActivity {
         Log.d(TAG, "Total nodes: " + nodesData.size());
 
         int currentNodeId = data.getCurrentNodeId();
+
+        // API may return null (parsed as 0) — fall back to first incomplete node
+        if (currentNodeId == 0) {
+            for (NodeData nd : nodesData) {
+                if (!(nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted())) {
+                    currentNodeId = nd.getNodeId();
+                    Log.d(TAG, "currentNodeId was null, resolved to first incomplete node: " + currentNodeId);
+                    break;
+                }
+            }
+        }
+
         List<NodeView> nodeViews = new ArrayList<>();
 
         for (int i = 0; i < nodesData.size(); i++) {
@@ -479,6 +496,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
         String[] moduleColors = getModuleColors(moduleId);
         intent.putExtra("module_color_start", moduleColors[0]);
         intent.putExtra("module_color_end", moduleColors[1]);
+        // Forward lesson content so games can use actual lesson words/sentences
+        if (lastLessonContent != null) {
+            intent.putExtra("lesson_content", lastLessonContent);
+        }
 
         // Use launcher to refresh ladder on return
         gameLauncher.launch(intent);
@@ -680,6 +701,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
         }
 
         pathView.setNodes(dummyNodes);
+
         moduleProgress.setProgress(15);
         progressText.setText("15%");
 

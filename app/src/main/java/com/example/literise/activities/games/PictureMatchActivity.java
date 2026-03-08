@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.database.SessionManager;
@@ -71,6 +72,8 @@ public class PictureMatchActivity extends BaseGameActivity {
     private int comboCount = 0;
 
     private SessionManager session;
+
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
     private Handler timerHandler = new Handler();
 
@@ -120,6 +123,10 @@ public class PictureMatchActivity extends BaseGameActivity {
         recyclerWords = findViewById(R.id.recyclerWords);
 
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
+
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+
+        lottieComplete = findViewById(R.id.lottieComplete);
 
     }
 
@@ -370,7 +377,8 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         animateMatch(wordView);
 
-
+        // Lottie sparkle on each match
+        playLottieOnce(lottieCorrect);
 
         selectedPicture = null;
 
@@ -378,6 +386,21 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         wordAdapter.notifyDataSetChanged();
 
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
 
@@ -515,6 +538,12 @@ public class PictureMatchActivity extends BaseGameActivity {
 
 
         if (allMatched) {
+
+            // Lottie full celebration for perfect match
+            if (lottieComplete != null) {
+                lottieComplete.setVisibility(View.VISIBLE);
+                lottieComplete.playAnimation();
+            }
 
             xpEarned = 50;
 

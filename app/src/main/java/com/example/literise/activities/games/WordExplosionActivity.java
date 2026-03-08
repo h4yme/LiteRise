@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.google.android.material.button.MaterialButton;
 
@@ -36,6 +37,7 @@ public class WordExplosionActivity extends AppCompatActivity {
     private CardView cardTargetCategory, cardCombo;
     private MaterialButton btnPause;
     private ImageView[] heartIcons = new ImageView[3];
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
     // Game State
     private int score = 0;
@@ -52,11 +54,11 @@ public class WordExplosionActivity extends AppCompatActivity {
     private CountDownTimer gameTimer;
     private CountDownTimer spawnTimer;
 
-    // Constants
-    private static final int BASE_SPAWN_INTERVAL = 1500; // 1.5 seconds
-    private static final int MIN_SPAWN_INTERVAL = 800;
-    private static final float BASE_RISE_SPEED = 4000f; // 4 seconds to rise
-    private static final float MIN_RISE_SPEED = 2000f;
+    // Constants — grade-3-friendly (slower, more time to react)
+    private static final int BASE_SPAWN_INTERVAL = 2500; // 2.5 seconds between bubbles
+    private static final int MIN_SPAWN_INTERVAL = 1500;  // never faster than 1.5 s
+    private static final float BASE_RISE_SPEED = 7000f;  // 7 seconds to rise
+    private static final float MIN_RISE_SPEED   = 4000f; // never faster than 4 s
 
     // Word Categories
     private Map<String, CategoryData> categoryDatabase;
@@ -119,6 +121,32 @@ public class WordExplosionActivity extends AppCompatActivity {
                 "#44A08D"
         ));
         availableCategories.add("NATURE");
+
+        // If lesson content was provided, inject lesson words as the first target category
+        // so the game immediately reinforces what the student just learned.
+        try {
+            String lessonContent = getIntent().getStringExtra("lesson_content");
+            if (lessonContent != null) {
+                org.json.JSONObject obj = new org.json.JSONObject(lessonContent);
+                List<String> lessonWords = new ArrayList<>();
+                for (String field : new String[]{"keyWords","words","themeWords","sightWords",
+                        "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
+                    if (obj.has(field)) {
+                        org.json.JSONArray arr = obj.getJSONArray(field);
+                        for (int i = 0; i < arr.length(); i++) {
+                            String w = arr.getString(i).trim().toLowerCase();
+                            if (!w.isEmpty()) lessonWords.add(w);
+                        }
+                        break;
+                    }
+                }
+                if (!lessonWords.isEmpty()) {
+                    categoryDatabase.put("LESSON WORDS", new CategoryData(lessonWords, "#7C3AED"));
+                    availableCategories.add(0, "LESSON WORDS"); // first so it's targeted first
+                    targetCategory = "LESSON WORDS";
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     private void initializeViews() {
@@ -135,6 +163,8 @@ public class WordExplosionActivity extends AppCompatActivity {
         heartIcons[0] = findViewById(R.id.heart1);
         heartIcons[1] = findViewById(R.id.heart2);
         heartIcons[2] = findViewById(R.id.heart3);
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+        lottieComplete = findViewById(R.id.lottieComplete);
 
         // Set initial target category
         setNewTargetCategory();
@@ -261,9 +291,12 @@ public class WordExplosionActivity extends AppCompatActivity {
         if (combo >= 3) {
             cardCombo.setVisibility(View.VISIBLE);
             tvCombo.setText(combo + "x COMBO!");
-            cardCombo.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100)
-                    .withEndAction(() -> cardCombo.animate().scaleX(1f).scaleY(1f).setDuration(100));
+            cardCombo.animate().scaleX(1.2f).scaleY(1.2f).setDuration(180)
+                    .withEndAction(() -> cardCombo.animate().scaleX(1f).scaleY(1f).setDuration(180));
         }
+
+        // Lottie sparkle on every correct pop
+        playLottieOnce(lottieCorrect);
 
         // Change category every 5 correct pops
         if (combo > 0 && combo % 5 == 0) {
@@ -271,6 +304,21 @@ public class WordExplosionActivity extends AppCompatActivity {
         }
 
         updateUI();
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void onWrongPop(WordBubble bubble) {
@@ -335,11 +383,22 @@ public class WordExplosionActivity extends AppCompatActivity {
         }
         activeBubbles.clear();
 
-        // Show results
-        String message = String.format("Game Over!\nScore: %d\nMax Combo: %dx", score, maxCombo);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-        finish();
+        // Lottie celebration then finish
+        if (lottieComplete != null) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    String message = String.format("Great job!\nScore: %d\nBest Combo: %dx", score, maxCombo);
+                    Toast.makeText(WordExplosionActivity.this, message, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            });
+        } else {
+            String message = String.format("Great job!\nScore: %d\nBest Combo: %dx", score, maxCombo);
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
@@ -366,31 +425,34 @@ public class WordExplosionActivity extends AppCompatActivity {
             this.category = category;
             this.color = color;
 
-            // Create CardView bubble
+            // Create CardView bubble — bigger and rounder for grade 3
             cardView = new CardView(WordExplosionActivity.this);
-            cardView.setCardElevation(8);
-            cardView.setRadius(50);
+            cardView.setCardElevation(12);
+            cardView.setRadius(56);
             cardView.setCardBackgroundColor(android.graphics.Color.parseColor(color));
 
-            // Create TextView
+            // Create TextView — larger font so kids can read easily
             textView = new TextView(WordExplosionActivity.this);
             textView.setText(word);
-            textView.setTextSize(16);
+            textView.setTextSize(19);
+            android.graphics.Typeface bold = android.graphics.Typeface.DEFAULT_BOLD;
+            textView.setTypeface(bold);
             textView.setTextColor(0xFFFFFFFF);
-            textView.setPadding(30, 20, 30, 20);
+            textView.setPadding(24, 20, 24, 20);
             textView.setGravity(android.view.Gravity.CENTER);
 
             cardView.addView(textView);
 
             // Random X position
             int screenWidth = gameContainer.getWidth();
-            int bubbleWidth = 150;
+            int bubbleWidth = 180; // larger bubbles
             int randomX = random.nextInt(Math.max(1, screenWidth - bubbleWidth));
 
             FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                     bubbleWidth,
                     bubbleWidth
             );
+            // noinspection deprecation — using px intentionally here
             cardView.setLayoutParams(params);
             cardView.setX(randomX);
             cardView.setY(gameContainer.getHeight() + 100); // Start below screen
@@ -434,12 +496,12 @@ public class WordExplosionActivity extends AppCompatActivity {
             // Create particle effect
             createParticles();
 
-            // Pop animation
+            // Grade-3 friendly: slower, more satisfying pop
             cardView.animate()
-                    .scaleX(2f)
-                    .scaleY(2f)
+                    .scaleX(2.5f)
+                    .scaleY(2.5f)
                     .alpha(0f)
-                    .setDuration(300)
+                    .setDuration(700)
                     .withEndAction(() -> {
                         if (cardView.getParent() != null) {
                             gameContainer.removeView(cardView);
@@ -448,27 +510,34 @@ public class WordExplosionActivity extends AppCompatActivity {
         }
 
         void createParticles() {
-            // Create 8 small particles flying outward
-            for (int i = 0; i < 8; i++) {
+            // 10 larger, slower particles so kids can see the explosion clearly
+            int bubbleCenterX = (int) (cardView.getX() + 85);
+            int bubbleCenterY = (int) (cardView.getY() + 85);
+            for (int i = 0; i < 10; i++) {
                 View particle = new View(WordExplosionActivity.this);
                 particle.setBackgroundColor(android.graphics.Color.parseColor(color));
-                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(20, 20);
+                FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(36, 36);
                 particle.setLayoutParams(params);
-                particle.setX(cardView.getX() + 65);
-                particle.setY(cardView.getY() + 65);
+                particle.setX(bubbleCenterX);
+                particle.setY(bubbleCenterY);
                 gameContainer.addView(particle);
 
-                // Calculate outward direction
-                double angle = (i * 45) * Math.PI / 180;
-                float targetX = (float) (cardView.getX() + Math.cos(angle) * 200);
-                float targetY = (float) (cardView.getY() + Math.sin(angle) * 200);
+                // Spread at 36° intervals for 10 particles
+                double angle = (i * 36) * Math.PI / 180;
+                float targetX = (float) (bubbleCenterX + Math.cos(angle) * 280);
+                float targetY = (float) (bubbleCenterY + Math.sin(angle) * 280);
 
                 particle.animate()
                         .x(targetX)
                         .y(targetY)
+                        .scaleX(0f)
+                        .scaleY(0f)
                         .alpha(0f)
-                        .setDuration(500)
-                        .withEndAction(() -> gameContainer.removeView(particle));
+                        .setDuration(900)
+                        .setInterpolator(new android.view.animation.DecelerateInterpolator())
+                        .withEndAction(() -> {
+                            if (particle.getParent() != null) gameContainer.removeView(particle);
+                        });
             }
         }
     }

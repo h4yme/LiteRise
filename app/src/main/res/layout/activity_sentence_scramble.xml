@@ -598,6 +598,34 @@
 
 
 
+    <!-- Lottie: correct sentence sparkle -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieCorrect"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Lottie: game complete celebration -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieComplete"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/lottie_result_celebrate"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Bottom Buttons -->
 
     <LinearLayout

@@ -597,4 +597,28 @@
 
     </LinearLayout>
 
+    <!-- Lottie: match sparkle -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieCorrect"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:elevation="60dp"
+        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"/>
+
+    <!-- Lottie: all matched celebration -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieComplete"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:elevation="60dp"
+        app:lottie_rawRes="@raw/lottie_result_celebrate"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"/>
+
 </FrameLayout>

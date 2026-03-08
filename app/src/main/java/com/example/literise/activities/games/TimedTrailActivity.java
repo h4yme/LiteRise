@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.example.literise.database.SessionManager;
 import com.google.android.material.button.MaterialButton;
@@ -45,6 +46,7 @@ public class TimedTrailActivity extends BaseGameActivity {
     private LinearLayout optionsContainer;
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4;
     private CardView cardQuestion;
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
     // Game State
     private int currentQuestionIndex = 0;
@@ -95,6 +97,8 @@ public class TimedTrailActivity extends BaseGameActivity {
         btnOption3 = findViewById(R.id.btn_option_3);
         btnOption4 = findViewById(R.id.btn_option_4);
         cardQuestion = findViewById(R.id.card_question);
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+        lottieComplete = findViewById(R.id.lottieComplete);
 
         // Initial setup
         progressTrack.setMax(100); // 100 meters to finish
@@ -308,6 +312,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         moveAvatarForward(distanceGained);
         updateScoreDisplay();
         updateStreakDisplay();
+        playLottieOnce(lottieCorrect);
 
         // Show distance gained
         String message = currentStreak >= 3
@@ -425,24 +430,52 @@ public class TimedTrailActivity extends BaseGameActivity {
 
         long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
         int accuracy = (totalQuestions > 0) ? (correctAnswers * 100 / totalQuestions) : 0;
-
-        // Calculate XP based on distance and accuracy
         int xpEarned = distanceTraveled + (accuracy / 2);
 
+        // Play celebration then show dialog
+        if (lottieComplete != null) {
+            lottieComplete.setVisibility(android.view.View.VISIBLE);
+            lottieComplete.playAnimation();
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    lottieComplete.setVisibility(android.view.View.GONE);
+                    showEndDialog(accuracy, xpEarned);
+                }
+            });
+        } else {
+            showEndDialog(accuracy, xpEarned);
+        }
+    }
+
+    private void showEndDialog(int accuracy, int xpEarned) {
         new AlertDialog.Builder(this)
-                .setTitle("Race Complete!")
+                .setTitle("Race Complete! 🏁")
                 .setMessage(
-                        "Distance Traveled: " + distanceTraveled + "m\n" +
-                                "Correct Answers: " + correctAnswers + " / " + totalQuestions + "\n" +
+                        "Distance: " + distanceTraveled + "m\n" +
+                                "Correct: " + correctAnswers + " / " + totalQuestions + "\n" +
                                 "Accuracy: " + accuracy + "%\n" +
-                                "Max Streak: " + maxStreak + "\n" +
-                                "Time: " + timeTaken + "s\n\n" +
+                                "Best Streak: " + maxStreak + "\n\n" +
                                 "XP Earned: +" + xpEarned
                 )
                 .setPositiveButton("Finish", (d, w) -> finish())
                 .setNegativeButton("Play Again", (d, w) -> restartGame())
                 .setCancelable(false)
                 .show();
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(android.view.View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(android.view.View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void restartGame() {
