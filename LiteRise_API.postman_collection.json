@@ -1,0 +1,573 @@
+{
+  "info": {
+    "name": "LiteRise API",
+    "description": "Full API test collection for LiteRise. Base URL: http://192.168.1.13/api\n\nHow to use:\n1. Import this file into Postman\n2. Set the 'base_url' collection variable if your IP changes\n3. Run '01 Auth > Register' then '01 Auth > Login' first — the login request auto-saves {{token}} and {{student_id}}",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",   "value": "http://192.168.1.13/api" },
+    { "key": "token",      "value": "" },
+    { "key": "student_id", "value": "1" },
+    { "key": "node_id",    "value": "1" },
+    { "key": "module_id",  "value": "1" }
+  ],
+  "item": [
+
+    {
+      "name": "01 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/register.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"first_name\": \"Maria\",\n  \"last_name\": \"Santos\",\n  \"email\": \"maria.santos@test.com\",\n  \"password\": \"Test1234!\",\n  \"grade_level\": 3\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.success && res.token) {",
+                  "  pm.collectionVariables.set('token', res.token);",
+                  "  pm.collectionVariables.set('student_id', res.student?.student_id ?? res.student_id ?? '');",
+                  "  console.log('Token saved:', res.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/login.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.santos@test.com\",\n  \"password\": \"Test1234!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/forgot_password.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"maria.santos@test.com\"\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "02 Student Profile",
+      "item": [
+        {
+          "name": "Save Nickname",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/save_nickname.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"nickname\": \"Mari\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Student Progress",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_student_progress.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Check Student Ability",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/check_student_ability.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "03 Placement / Pre-Assessment",
+      "item": [
+        {
+          "name": "Get Pre-Assessment Items",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_preassessment_items.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Next Question (IRT)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/get_next_question.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"current_theta\": 0.0,\n  \"answered_items\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Placement Result",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/save_placement_result.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"final_theta\": 0.3,\n  \"placement_level\": 2,\n  \"level_name\": \"Intermediate\",\n  \"total_questions\": 25,\n  \"correct_answers\": 15,\n  \"accuracy_percentage\": 60.0,\n  \"assessment_type\": \"PreAssessment\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Placement Progress",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_placement_progress.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "04 Modules & Lessons",
+      "item": [
+        {
+          "name": "Get Lessons",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_lessons.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Module Ladder",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_module_ladder.php?student_id={{student_id}}&module_id={{module_id}}",
+              "query": [
+                { "key": "student_id", "value": "{{student_id}}" },
+                { "key": "module_id",  "value": "{{module_id}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Lesson Content",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_lesson_content.php?node_id={{node_id}}&student_id={{student_id}}",
+              "query": [
+                { "key": "node_id",    "value": "{{node_id}}" },
+                { "key": "student_id", "value": "{{student_id}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Node Progress",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_node_progress.php?student_id={{student_id}}&node_id={{node_id}}",
+              "query": [
+                { "key": "student_id", "value": "{{student_id}}" },
+                { "key": "node_id",    "value": "{{node_id}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Lesson Progress",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_lesson_progress.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Update Node Progress",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/update_node_progress.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"node_id\": {{node_id}},\n  \"lesson_completed\": true,\n  \"game_completed\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Check Modules Complete",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/check_modules_complete.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "05 Quiz",
+      "item": [
+        {
+          "name": "Get Quiz Questions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_quiz_questions.php?node_id={{node_id}}&student_id={{student_id}}",
+              "query": [
+                { "key": "node_id",    "value": "{{node_id}}" },
+                { "key": "student_id", "value": "{{student_id}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Quiz (Pass — 80%)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/submit_quiz.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"node_id\": {{node_id}},\n  \"placement_level\": 2,\n  \"answers\": {\n    \"1\": 1,\n    \"2\": 2,\n    \"3\": 3,\n    \"4\": 4,\n    \"5\": 1,\n    \"6\": 2,\n    \"7\": 3,\n    \"8\": 4,\n    \"9\": 1,\n    \"10\": 2\n  }\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Quiz (Fail — 40%)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/submit_quiz.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"node_id\": {{node_id}},\n  \"placement_level\": 2,\n  \"answers\": {\n    \"1\": 99,\n    \"2\": 99,\n    \"3\": 99,\n    \"4\": 99,\n    \"5\": 99,\n    \"6\": 99,\n    \"7\": 1,\n    \"8\": 1,\n    \"9\": 1,\n    \"10\": 1\n  }\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "06 Games",
+      "item": [
+        {
+          "name": "Get Game Data",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_game_data.php?node_id={{node_id}}&student_id={{student_id}}",
+              "query": [
+                { "key": "node_id",    "value": "{{node_id}}" },
+                { "key": "student_id", "value": "{{student_id}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Save Game Results",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/save_game_results.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"node_id\": {{node_id}},\n  \"game_type\": \"picture_match\",\n  \"score\": 85,\n  \"accuracy_percentage\": 85.0,\n  \"time_spent_seconds\": 120\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Scramble Sentences",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_scramble_sentences.php?node_id={{node_id}}",
+              "query": [{ "key": "node_id", "value": "{{node_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Get Word Hunt",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_word_hunt.php?node_id={{node_id}}",
+              "query": [{ "key": "node_id", "value": "{{node_id}}" }]
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "07 Generate Game Content (AI)",
+      "item": [
+        {
+          "name": "minimal_pairs",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 101,\n  \"game_type\": \"minimal_pairs\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "timed_trail",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 102,\n  \"game_type\": \"timed_trail\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "picture_match",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 103,\n  \"game_type\": \"picture_match\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "story_sequencing",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 104,\n  \"game_type\": \"story_sequencing\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "synonym_sprint",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 105,\n  \"game_type\": \"synonym_sprint\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "dialogue_reading",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 106,\n  \"game_type\": \"dialogue_reading\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "fill_in_blanks",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 107,\n  \"game_type\": \"fill_in_blanks\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "sentence_scramble",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 108,\n  \"game_type\": \"sentence_scramble\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "word_explosion",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 109,\n  \"game_type\": \"word_explosion\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "word_hunt",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 110,\n  \"game_type\": \"word_hunt\",\n  \"lesson_content\": \"{\\\"topic\\\":\\\"CVCC Words\\\",\\\"keywords\\\":[\\\"frog\\\",\\\"lamp\\\",\\\"milk\\\",\\\"drum\\\",\\\"stop\\\"]}\"\n}" }
+          }
+        },
+        {
+          "name": "❌ Bad game_type (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 1,\n  \"game_type\": \"nonexistent\",\n  \"lesson_content\": \"test\"\n}" }
+          }
+        },
+        {
+          "name": "❌ Missing lesson_content (expect 400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/generate_game_content.php",
+            "body": { "mode": "raw", "raw": "{\n  \"node_id\": 1,\n  \"game_type\": \"picture_match\"\n}" }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "08 Badges",
+      "item": [
+        {
+          "name": "Get Badges (all + earned status)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/get_badges.php?student_id={{student_id}}",
+              "query": [{ "key": "student_id", "value": "{{student_id}}" }]
+            }
+          }
+        },
+        {
+          "name": "Award Badge (after node completion)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/award_badge.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"node_id\": {{node_id}}\n}"
+            }
+          }
+        },
+        {
+          "name": "❌ Missing student_id (expect 400)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/get_badges.php"
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "09 Sessions",
+      "item": [
+        {
+          "name": "Create Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/create_session.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"session_type\": \"lesson\",\n  \"node_id\": {{node_id}}\n}"
+            }
+          }
+        },
+        {
+          "name": "Log Session",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/log_session.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"activity_type\": \"lesson_view\",\n  \"node_id\": {{node_id}}\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "10 Tutorial",
+      "item": [
+        {
+          "name": "Check Tutorial",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/check_tutorial.php?student_id={{student_id}}&tutorial_name=welcome_onboarding",
+              "query": [
+                { "key": "student_id",    "value": "{{student_id}}" },
+                { "key": "tutorial_name", "value": "welcome_onboarding" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Tutorial",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{base_url}}/complete_tutorial.php",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"student_id\": {{student_id}},\n  \"tutorial_name\": \"welcome_onboarding\",\n  \"skipped\": false\n}"
+            }
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "11 DB / Health Check",
+      "item": [
+        {
+          "name": "Test DB Connection",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/test_db.php"
+          }
+        },
+        {
+          "name": "Index / API Info",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/index.php"
+          }
+        }
+      ]
+    }
+
+  ]
+}
