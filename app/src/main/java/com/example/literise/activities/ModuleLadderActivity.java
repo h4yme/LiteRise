@@ -166,6 +166,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
                         // Lesson was genuinely completed — proceed to game
                         Log.d(TAG, "Lesson completed (RESULT_OK) — Auto-proceeding to Game phase");
                         Toast.makeText(this, "✅ Lesson Complete! Now let's play! 🎮", Toast.LENGTH_SHORT).show();
+
+                        // Small delay for toast to show
                         new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
                             startGamePhase(currentNode);
                         }, 800);
@@ -274,7 +276,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         if (nodesData == null || nodesData.isEmpty()) {
             Log.e(TAG, "No nodes data received!");
-            loadDummyData();
+            Toast.makeText(this, "No nodes found for this module", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -361,9 +363,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         pathView.setNodes(nodeViews);
 
-        // Scroll to bottom so node 1 is visible first (nodes drawn bottom→top).
-        // 150ms delay lets the layout pass complete before scrolling.
-        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
+        // Scroll to bottom so node 1 is visible first (nodes drawn bottom→top)
+        if (ladderScrollView != null) {
+            ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
+        }
 
         // Update progress
         int completedNodes = 0;
@@ -714,7 +717,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
         pathView.setModuleColor(Color.parseColor(colors[0]), Color.parseColor(colors[1]));
 
         pathView.setNodes(dummyNodes);
-        ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
+
+        if (ladderScrollView != null) {
+            ladderScrollView.postDelayed(() -> ladderScrollView.fullScroll(View.FOCUS_DOWN), 150);
+        }
 
         moduleProgress.setProgress(15);
         progressText.setText("15%");
