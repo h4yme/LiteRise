@@ -353,11 +353,11 @@ public class DashboardActivity extends BaseActivity {
                 .scaleY(1.25f)
                 .setDuration(150)
                 .withEndAction(() ->
-                    icon.animate()
-                        .scaleX(1f)
-                        .scaleY(1f)
-                        .setDuration(150)
-                        .start()
+                        icon.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(150)
+                                .start()
                 )
                 .start();
 
@@ -858,7 +858,7 @@ public class DashboardActivity extends BaseActivity {
                 .setTitle("All Lessons Complete!")
                 .setMessage(String.format(
                         "Amazing work! You completed %d/%d lessons.\n\n"
-                        + "You are ready for the Post-Assessment to see how much you have grown!",
+                                + "You are ready for the Post-Assessment to see how much you have grown!",
                         completed, total))
                 .setPositiveButton("Take Post-Assessment", (dialog, which) -> {
                     Intent intent = new Intent(this, PlacementIntroActivity.class);

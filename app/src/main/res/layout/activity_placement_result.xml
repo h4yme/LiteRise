@@ -6,637 +6,653 @@
     android:layout_height="match_parent"
     android:background="#F0EBFF">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
-        <!-- ═══════════════════════════════════════════ -->
-        <!--              HERO SECTION                   -->
-        <!-- ═══════════════════════════════════════════ -->
-        <FrameLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_gradient_purple"
-            android:paddingBottom="36dp">
+            android:orientation="vertical">
 
-            <com.airbnb.lottie.LottieAnimationView
-                android:id="@+id/lottieResultCelebrate"
-                android:layout_width="match_parent"
-                android:layout_height="160dp"
-                android:alpha="0.72"
-                app:lottie_rawRes="@raw/lottie_result_celebrate"
-                app:lottie_autoPlay="true"
-                app:lottie_loop="true"
-                app:lottie_speed="0.85"/>
-
-            <LinearLayout
+            <!-- ═══════════════════════════════════════════ -->
+            <!--              HERO SECTION                   -->
+            <!-- ═══════════════════════════════════════════ -->
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center_horizontal"
-                android:paddingTop="14dp"
-                android:paddingStart="24dp"
-                android:paddingEnd="24dp"
-                android:paddingBottom="6dp">
+                android:background="@drawable/bg_gradient_purple"
+                android:paddingBottom="60dp">
 
-                <FrameLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal">
+                <!-- NEW celebration Lottie — full bleed, behind Leo -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieResultCelebrate"
+                    android:layout_width="match_parent"
+                    android:layout_height="340dp"
+                    android:alpha="0.72"
+                    app:lottie_rawRes="@raw/lottie_result_celebrate"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_speed="0.85"/>
 
-                    <View
-                        android:layout_width="120dp"
-                        android:layout_height="120dp"
-                        android:layout_gravity="center"
-                        android:background="@drawable/leo_glow_circle"
-                        android:alpha="0.28"/>
-
-                    <ImageView
-                        android:id="@+id/ivLeoResult"
-                        android:layout_width="108dp"
-                        android:layout_height="108dp"
-                        android:layout_gravity="center"
-                        android:src="@drawable/leo_success_confetti"
-                        android:scaleType="fitCenter"
-                        android:contentDescription="Leo celebrating your achievement"/>
-
-                </FrameLayout>
-
-                <TextView
-                    android:id="@+id/tvCongrats"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Amazing Work!"
-                    android:textSize="22sp"
-                    android:textColor="#FFFFFF"
-                    android:fontFamily="@font/visby_bold"
-                    android:gravity="center"
-                    android:shadowColor="#40000000"
-                    android:shadowDx="0"
-                    android:shadowDy="2"
-                    android:shadowRadius="6"
-                    android:layout_marginTop="4dp"/>
-
+                <!-- Hero content stack -->
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="8dp">
+                    android:orientation="vertical"
+                    android:gravity="center_horizontal"
+                    android:paddingTop="48dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:paddingBottom="16dp">
 
+                    <!-- Glow ring + Leo stacked -->
+                    <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal">
+
+                        <View
+                            android:layout_width="196dp"
+                            android:layout_height="196dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/leo_glow_circle"
+                            android:alpha="0.28"/>
+
+                        <!-- Leo — export at 800 × 800 px as leo_result_celebrate.png
+                             then change src to @drawable/leo_result_celebrate -->
+                        <ImageView
+                            android:id="@+id/ivLeoResult"
+                            android:layout_width="180dp"
+                            android:layout_height="180dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/leo_result_celebrate"
+                            android:scaleType="fitCenter"
+                            android:contentDescription="Leo celebrating your achievement"/>
+
+                    </FrameLayout>
+
+                    <!-- Title -->
+                    <TextView
+                        android:id="@+id/tvCongrats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Amazing Work!"
+                        android:textSize="30sp"
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:shadowColor="#40000000"
+                        android:shadowDx="0"
+                        android:shadowDy="2"
+                        android:shadowRadius="6"
+                        android:layout_marginTop="10dp"/>
+
+                    <!-- Level badge pill + sparkle -->
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:background="@drawable/bg_dialog_rounded"
-                        android:paddingStart="14dp"
-                        android:paddingEnd="18dp"
-                        android:paddingTop="6dp"
-                        android:paddingBottom="6dp"
-                        android:elevation="8dp">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:src="@drawable/ic_trophy"
-                            app:tint="#FFD700"
-                            android:contentDescription="Trophy"
-                            android:layout_marginEnd="8dp"/>
+                        android:layout_marginTop="18dp">
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical">
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:background="@drawable/bg_dialog_rounded"
+                            android:paddingStart="14dp"
+                            android:paddingEnd="18dp"
+                            android:paddingTop="9dp"
+                            android:paddingBottom="9dp"
+                            android:elevation="8dp">
 
-                            <TextView
-                                android:id="@+id/tvLevelName"
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:src="@drawable/ic_trophy"
+                                app:tint="#FFD700"
+                                android:contentDescription="Trophy"
+                                android:layout_marginEnd="10dp"/>
+
+                            <LinearLayout
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Developing Reader"
-                                android:textSize="12sp"
-                                android:textColor="#1A1A2E"
-                                android:fontFamily="@font/visby_bold"/>
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/tvLevelNumber"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Level 3"
-                                android:textSize="10sp"
-                                android:textColor="#7C3AED"
-                                android:fontFamily="@font/poppins_semibold"/>
+                                <TextView
+                                    android:id="@+id/tvLevelName"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Developing Reader"
+                                    android:textSize="14sp"
+                                    android:textColor="#1A1A2E"
+                                    android:fontFamily="@font/visby_bold"/>
 
+                                <TextView
+                                    android:id="@+id/tvLevelNumber"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Level 3"
+                                    android:textSize="11sp"
+                                    android:textColor="#7C3AED"
+                                    android:fontFamily="@font/poppins_semibold"/>
+
+                            </LinearLayout>
                         </LinearLayout>
+
+                        <com.airbnb.lottie.LottieAnimationView
+                            android:id="@+id/lottieBadgeSparkle"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:layout_marginStart="4dp"
+                            app:lottie_rawRes="@raw/onboarding_lottie_3"
+                            app:lottie_autoPlay="true"
+                            app:lottie_loop="true"
+                            app:lottie_speed="0.75"/>
+
                     </LinearLayout>
 
+                </LinearLayout>
+            </FrameLayout>
+
+            <!-- ═══════════════════════════════════════════ -->
+            <!--          WHITE CONTENT CARD                 -->
+            <!-- ═══════════════════════════════════════════ -->
+            <LinearLayout
+                android:id="@+id/contentSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_top_round_result"
+                android:layout_marginTop="-36dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="14dp"
+                android:paddingBottom="48dp">
+
+                <!-- Drag handle -->
+                <View
+                    android:layout_width="36dp"
+                    android:layout_height="4dp"
+                    android:background="#DDD6F3"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"/>
+
+                <!-- ── STATS ROW ── -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="24dp">
+
+                    <!-- Accuracy card -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_modern"
+                        android:padding="18dp"
+                        android:elevation="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_star"
+                            app:tint="#7C3AED"
+                            android:contentDescription="Accuracy"
+                            android:layout_marginBottom="6dp"/>
+
+                        <TextView
+                            android:id="@+id/tvAccuracy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="85%"
+                            android:textSize="32sp"
+                            android:textColor="#7C3AED"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Accuracy"
+                            android:textSize="11sp"
+                            android:textColor="#9CA3AF"
+                            android:fontFamily="@font/visby_medium"
+                            android:layout_marginTop="2dp"/>
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="12dp"
+                        android:layout_height="1dp"/>
+
+                    <!-- Questions card -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_card_modern"
+                        android:padding="18dp"
+                        android:elevation="4dp">
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_check_circle"
+                            app:tint="#F97316"
+                            android:contentDescription="Questions"
+                            android:layout_marginBottom="6dp"/>
+
+                        <TextView
+                            android:id="@+id/tvQuestionsAnswered"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="25/25"
+                            android:textSize="32sp"
+                            android:textColor="#F97316"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Questions"
+                            android:textSize="11sp"
+                            android:textColor="#9CA3AF"
+                            android:fontFamily="@font/visby_medium"
+                            android:layout_marginTop="2dp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- ── CATEGORY BREAKDOWN HEADER ── -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Category Breakdown"
+                        android:textSize="15sp"
+                        android:textColor="#1A1A2E"
+                        android:fontFamily="@font/visby_bold"/>
+
                     <com.airbnb.lottie.LottieAnimationView
-                        android:id="@+id/lottieBadgeSparkle"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:layout_marginStart="4dp"
+                        android:id="@+id/lottieResultsSparkle"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
                         app:lottie_rawRes="@raw/lottie_sparkle_stars"
                         app:lottie_autoPlay="true"
                         app:lottie_loop="true"
-                        app:lottie_speed="0.75"/>
+                        app:lottie_speed="0.8"/>
 
                 </LinearLayout>
 
-            </LinearLayout>
-        </FrameLayout>
-
-        <!-- ═══════════════════════════════════════════ -->
-        <!--          WHITE CONTENT CARD                 -->
-        <!-- ═══════════════════════════════════════════ -->
-        <LinearLayout
-            android:id="@+id/contentSection"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:background="@drawable/bg_white_top_round_result"
-            android:layout_marginTop="-36dp"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:paddingTop="10dp"
-            android:paddingBottom="12dp">
-
-            <!-- Drag handle -->
-            <View
-                android:layout_width="36dp"
-                android:layout_height="4dp"
-                android:background="#DDD6F3"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="10dp"/>
-
-            <!-- ── STATS ROW ── -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
-
+                <!-- Category 1: Phonics & Word Study -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/rowCategory1"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:background="@drawable/bg_card_modern"
-                    android:padding="10dp"
-                    android:elevation="4dp">
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#4ECDC4"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_star"
-                        app:tint="#7C3AED"
-                        android:contentDescription="Accuracy"
-                        android:layout_marginBottom="3dp"/>
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_mic"
+                        app:tint="#4ECDC4"
+                        android:contentDescription="Phonics"
+                        android:layout_marginEnd="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Phonics &amp; Word Study"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory1"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#4ECDC4"
+                            android:progressBackgroundTint="#D0F4F2"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/tvAccuracy"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCategory1Score"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:text="85%"
-                        android:textSize="22sp"
-                        android:textColor="#7C3AED"
-                        android:fontFamily="@font/visby_bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Accuracy"
-                        android:textSize="10sp"
-                        android:textColor="#9CA3AF"
-                        android:fontFamily="@font/visby_medium"/>
+                        android:text="0%"
+                        android:textSize="13sp"
+                        android:textColor="#4ECDC4"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <View
-                    android:layout_width="10dp"
-                    android:layout_height="1dp"/>
-
+                <!-- Category 2: Vocabulary -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/rowCategory2"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
                     android:background="@drawable/bg_card_modern"
-                    android:padding="10dp"
-                    android:elevation="4dp">
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#60A5FA"
+                        android:layout_marginEnd="12dp"/>
 
                     <ImageView
-                        android:layout_width="16dp"
-                        android:layout_height="16dp"
-                        android:src="@drawable/ic_check_circle"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_book_reading"
+                        app:tint="#60A5FA"
+                        android:contentDescription="Vocabulary"
+                        android:layout_marginEnd="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Vocabulary"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory2"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#60A5FA"
+                            android:progressBackgroundTint="#DBEAFE"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/tvCategory2Score"
+                        android:layout_width="36dp"
+                        android:layout_height="wrap_content"
+                        android:text="0%"
+                        android:textSize="13sp"
+                        android:textColor="#60A5FA"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
+
+                </LinearLayout>
+
+                <!-- Category 3: Grammar -->
+                <LinearLayout
+                    android:id="@+id/rowCategory3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#F97316"
+                        android:layout_marginEnd="12dp"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_edit"
                         app:tint="#F97316"
-                        android:contentDescription="Questions"
-                        android:layout_marginBottom="3dp"/>
+                        android:contentDescription="Grammar"
+                        android:layout_marginEnd="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Grammar"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory3"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#F97316"
+                            android:progressBackgroundTint="#FFEDD5"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:id="@+id/tvQuestionsAnswered"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCategory3Score"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:text="25/25"
-                        android:textSize="22sp"
+                        android:text="0%"
+                        android:textSize="13sp"
                         android:textColor="#F97316"
-                        android:fontFamily="@font/visby_bold"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Questions"
-                        android:textSize="10sp"
-                        android:textColor="#9CA3AF"
-                        android:fontFamily="@font/visby_medium"/>
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-            </LinearLayout>
-
-            <!-- ── CATEGORY BREAKDOWN HEADER ── -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginBottom="6dp">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Category Breakdown"
-                    android:textSize="13sp"
-                    android:textColor="#1A1A2E"
-                    android:fontFamily="@font/visby_bold"/>
-
-                <com.airbnb.lottie.LottieAnimationView
-                    android:id="@+id/lottieResultsSparkle"
-                    android:layout_width="28dp"
-                    android:layout_height="28dp"
-                    app:lottie_rawRes="@raw/lottie_sparkle_stars"
-                    app:lottie_autoPlay="true"
-                    app:lottie_loop="true"
-                    app:lottie_speed="0.8"/>
-
-            </LinearLayout>
-
-            <!-- Category 1 -->
-            <LinearLayout
-                android:id="@+id/rowCategory1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_modern"
-                android:padding="9dp"
-                android:elevation="2dp"
-                android:layout_marginBottom="5dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="28dp"
-                    android:background="#4ECDC4"
-                    android:layout_marginEnd="8dp"/>
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_mic"
-                    app:tint="#4ECDC4"
-                    android:contentDescription="Phonics"
-                    android:layout_marginEnd="7dp"/>
-
+                <!-- Category 4: Comprehending -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/rowCategory4"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="10dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#FBBF24"
+                        android:layout_marginEnd="12dp"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_lightbulb"
+                        app:tint="#FBBF24"
+                        android:contentDescription="Comprehending"
+                        android:layout_marginEnd="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Comprehending"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory4"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#FBBF24"
+                            android:progressBackgroundTint="#FEF3C7"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCategory4Score"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:text="Phonics &amp; Word Study"
-                        android:textSize="11sp"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_medium"/>
-
-                    <ProgressBar
-                        android:id="@+id/pbCategory1"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#4ECDC4"
-                        android:progressBackgroundTint="#D0F4F2"
-                        android:layout_marginTop="4dp"/>
+                        android:text="0%"
+                        android:textSize="13sp"
+                        android:textColor="#FBBF24"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvCategory1Score"
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textSize="11sp"
-                    android:textColor="#4ECDC4"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:gravity="end"
-                    android:layout_marginStart="6dp"/>
-
-            </LinearLayout>
-
-            <!-- Category 2 -->
-            <LinearLayout
-                android:id="@+id/rowCategory2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_modern"
-                android:padding="9dp"
-                android:elevation="2dp"
-                android:layout_marginBottom="5dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="28dp"
-                    android:background="#60A5FA"
-                    android:layout_marginEnd="8dp"/>
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_book_reading"
-                    app:tint="#60A5FA"
-                    android:contentDescription="Vocabulary"
-                    android:layout_marginEnd="7dp"/>
-
+                <!-- Category 5: Creating & Composing -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:id="@+id/rowCategory5"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_card_modern"
+                    android:padding="14dp"
+                    android:elevation="2dp"
+                    android:layout_marginBottom="32dp">
+
+                    <View
+                        android:layout_width="4dp"
+                        android:layout_height="40dp"
+                        android:background="#F472B6"
+                        android:layout_marginEnd="12dp"/>
+
+                    <ImageView
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:src="@drawable/ic_pen"
+                        app:tint="#F472B6"
+                        android:contentDescription="Composing"
+                        android:layout_marginEnd="10dp"/>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Creating &amp; Composing"
+                            android:textSize="12sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium"/>
+
+                        <ProgressBar
+                            android:id="@+id/pbCategory5"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="8dp"
+                            android:max="100"
+                            android:progress="0"
+                            android:progressTint="#F472B6"
+                            android:progressBackgroundTint="#FCE7F3"
+                            android:layout_marginTop="7dp"/>
+
+                    </LinearLayout>
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvCategory5Score"
+                        android:layout_width="36dp"
                         android:layout_height="wrap_content"
-                        android:text="Vocabulary"
-                        android:textSize="11sp"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_medium"/>
-
-                    <ProgressBar
-                        android:id="@+id/pbCategory2"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#60A5FA"
-                        android:progressBackgroundTint="#DBEAFE"
-                        android:layout_marginTop="4dp"/>
+                        android:text="0%"
+                        android:textSize="13sp"
+                        android:textColor="#F472B6"
+                        android:fontFamily="@font/poppins_semibold"
+                        android:gravity="end"
+                        android:layout_marginStart="8dp"/>
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/tvCategory2Score"
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textSize="11sp"
-                    android:textColor="#60A5FA"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:gravity="end"
-                    android:layout_marginStart="6dp"/>
+                <!-- ── CONTINUE BUTTON ── -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnContinueToDashboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="58dp"
+                    android:text="Let's Start Learning!"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.01"
+                    app:backgroundTint="#7C3AED"
+                    app:cornerRadius="18dp"
+                    app:icon="@drawable/ic_arrow_right"
+                    app:iconGravity="end"
+                    app:iconTint="@color/white"
+                    app:elevation="6dp"/>
 
             </LinearLayout>
-
-            <!-- Category 3 -->
-            <LinearLayout
-                android:id="@+id/rowCategory3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_modern"
-                android:padding="9dp"
-                android:elevation="2dp"
-                android:layout_marginBottom="5dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="28dp"
-                    android:background="#F97316"
-                    android:layout_marginEnd="8dp"/>
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_edit"
-                    app:tint="#F97316"
-                    android:contentDescription="Grammar"
-                    android:layout_marginEnd="7dp"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Grammar"
-                        android:textSize="11sp"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_medium"/>
-
-                    <ProgressBar
-                        android:id="@+id/pbCategory3"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#F97316"
-                        android:progressBackgroundTint="#FFEDD5"
-                        android:layout_marginTop="4dp"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvCategory3Score"
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textSize="11sp"
-                    android:textColor="#F97316"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:gravity="end"
-                    android:layout_marginStart="6dp"/>
-
-            </LinearLayout>
-
-            <!-- Category 4 -->
-            <LinearLayout
-                android:id="@+id/rowCategory4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_modern"
-                android:padding="9dp"
-                android:elevation="2dp"
-                android:layout_marginBottom="5dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="28dp"
-                    android:background="#FBBF24"
-                    android:layout_marginEnd="8dp"/>
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_lightbulb"
-                    app:tint="#FBBF24"
-                    android:contentDescription="Comprehending"
-                    android:layout_marginEnd="7dp"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Comprehending"
-                        android:textSize="11sp"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_medium"/>
-
-                    <ProgressBar
-                        android:id="@+id/pbCategory4"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#FBBF24"
-                        android:progressBackgroundTint="#FEF3C7"
-                        android:layout_marginTop="4dp"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvCategory4Score"
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textSize="11sp"
-                    android:textColor="#FBBF24"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:gravity="end"
-                    android:layout_marginStart="6dp"/>
-
-            </LinearLayout>
-
-            <!-- Category 5 -->
-            <LinearLayout
-                android:id="@+id/rowCategory5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:background="@drawable/bg_card_modern"
-                android:padding="9dp"
-                android:elevation="2dp"
-                android:layout_marginBottom="12dp">
-
-                <View
-                    android:layout_width="4dp"
-                    android:layout_height="28dp"
-                    android:background="#F472B6"
-                    android:layout_marginEnd="8dp"/>
-
-                <ImageView
-                    android:layout_width="14dp"
-                    android:layout_height="14dp"
-                    android:src="@drawable/ic_pen"
-                    app:tint="#F472B6"
-                    android:contentDescription="Composing"
-                    android:layout_marginEnd="7dp"/>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Creating &amp; Composing"
-                        android:textSize="11sp"
-                        android:textColor="#2D3436"
-                        android:fontFamily="@font/visby_medium"/>
-
-                    <ProgressBar
-                        android:id="@+id/pbCategory5"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="6dp"
-                        android:max="100"
-                        android:progress="0"
-                        android:progressTint="#F472B6"
-                        android:progressBackgroundTint="#FCE7F3"
-                        android:layout_marginTop="4dp"/>
-
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/tvCategory5Score"
-                    android:layout_width="36dp"
-                    android:layout_height="wrap_content"
-                    android:text="0%"
-                    android:textSize="11sp"
-                    android:textColor="#F472B6"
-                    android:fontFamily="@font/poppins_semibold"
-                    android:gravity="end"
-                    android:layout_marginStart="6dp"/>
-
-            </LinearLayout>
-
-            <!-- ── CONTINUE BUTTON ── -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnContinueToDashboard"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:text="Let's Start Learning!"
-                android:textAllCaps="false"
-                android:textColor="@color/white"
-                android:textSize="15sp"
-                android:fontFamily="@font/visby_bold"
-                android:letterSpacing="0.01"
-                app:backgroundTint="#7C3AED"
-                app:cornerRadius="18dp"
-                app:icon="@drawable/ic_arrow_right"
-                app:iconGravity="end"
-                app:iconTint="@color/white"
-                app:elevation="6dp"/>
 
         </LinearLayout>
-
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

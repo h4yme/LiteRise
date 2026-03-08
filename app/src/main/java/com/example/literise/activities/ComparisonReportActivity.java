@@ -95,25 +95,25 @@ public class ComparisonReportActivity extends BaseActivity {
                 .create(com.example.literise.api.ApiService.class)
                 .getPlacementProgress(studentId)
                 .enqueue(new Callback<PlacementProgressResponse>() {
-            @Override
-            public void onResponse(Call<PlacementProgressResponse> call, Response<PlacementProgressResponse> response) {
-                progressBarLoading.setVisibility(View.GONE);
-                contentLayout.setVisibility(View.VISIBLE);
+                    @Override
+                    public void onResponse(Call<PlacementProgressResponse> call, Response<PlacementProgressResponse> response) {
+                        progressBarLoading.setVisibility(View.GONE);
+                        contentLayout.setVisibility(View.VISIBLE);
 
-                if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    populateUI(response.body());
-                } else {
-                    showFallbackFromSession();
-                }
-            }
+                        if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
+                            populateUI(response.body());
+                        } else {
+                            showFallbackFromSession();
+                        }
+                    }
 
-            @Override
-            public void onFailure(Call<PlacementProgressResponse> call, Throwable t) {
-                progressBarLoading.setVisibility(View.GONE);
-                contentLayout.setVisibility(View.VISIBLE);
-                showFallbackFromSession();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<PlacementProgressResponse> call, Throwable t) {
+                        progressBarLoading.setVisibility(View.GONE);
+                        contentLayout.setVisibility(View.VISIBLE);
+                        showFallbackFromSession();
+                    }
+                });
     }
 
     private void populateUI(PlacementProgressResponse data) {
@@ -176,7 +176,7 @@ public class ComparisonReportActivity extends BaseActivity {
                 tvComparisonStatus.setText(status);
                 tvComparisonStatus.setBackgroundColor(
                         status.equals("IMPROVED") ? 0xFF059669 :
-                        status.equals("MAINTAINED") ? 0xFFD97706 : 0xFFDC2626
+                                status.equals("MAINTAINED") ? 0xFFD97706 : 0xFFDC2626
                 );
             }
         }

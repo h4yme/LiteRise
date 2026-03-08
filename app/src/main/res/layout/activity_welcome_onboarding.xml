@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".activities.WelcomeOnboardingActivity">
+    android:background="#2D1B6B">
 
-    <!-- Sound Toggle Button (Top Left) -->
+    <!-- Sound Toggle (Top Left) -->
     <ImageButton
         android:id="@+id/btnSound"
         android:layout_width="44dp"
@@ -16,12 +14,12 @@
         android:layout_alignParentTop="true"
         android:layout_marginStart="20dp"
         android:layout_marginTop="44dp"
-        android:background="@drawable/bg_circle_orange"
+        android:background="@drawable/bg_circle_white_alpha"
         android:contentDescription="Toggle music"
         android:padding="10dp"
         android:src="@drawable/ic_volume_up" />
 
-    <!-- Skip Button (Top Right) -->
+    <!-- Skip (Top Right) -->
     <TextView
         android:id="@+id/tvSkip"
         android:layout_width="wrap_content"
@@ -36,18 +34,18 @@
         android:fontFamily="@font/visby_medium"
         android:padding="10dp"
         android:text="Skip"
-        android:textColor="#636E72"
+        android:textColor="#CCFFFFFF"
         android:textSize="16sp" />
 
-    <!-- ViewPager for slides -->
+    <!-- ViewPager -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/viewPager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottomContainer"
         android:layout_below="@id/tvSkip"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="8dp" />
 
     <!-- Bottom Container -->
     <LinearLayout
@@ -59,15 +57,15 @@
         android:orientation="vertical"
         android:paddingStart="28dp"
         android:paddingEnd="28dp"
-        android:paddingBottom="36dp"
-        android:paddingTop="8dp">
+        android:paddingBottom="38dp"
+        android:paddingTop="4dp">
 
         <!-- Animated Pill Indicators -->
         <LinearLayout
             android:id="@+id/indicatorContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="18dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -90,10 +88,9 @@
                 android:layout_width="10dp"
                 android:layout_height="8dp"
                 android:background="@drawable/indicator_dot_inactive" />
-
         </LinearLayout>
 
-        <!-- Continue / Get Started Button -->
+        <!-- Continue Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnContinue"
             style="@style/Widget.MaterialComponents.Button"
@@ -106,8 +103,7 @@
             android:textSize="17sp"
             app:backgroundTint="#FF8C42"
             app:cornerRadius="20dp"
-            app:elevation="4dp" />
-
+            app:elevation="6dp" />
     </LinearLayout>
 
 </RelativeLayout>

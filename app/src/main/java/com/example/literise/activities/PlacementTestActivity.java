@@ -482,37 +482,37 @@ public class PlacementTestActivity extends AppCompatActivity {
         String hint;
         if (apiQuestion.getDifficulty() < -0.5) {
             String[] hints = {
-                "This one is nice and easy! Take your time! 🌟",
-                "You know this one — show what you've got! ⭐",
-                "Warm up time! You've totally got this! 😊",
-                "Easy peasy! Let's go! 🎈"
+                    "This one is nice and easy! Take your time! 🌟",
+                    "You know this one — show what you've got! ⭐",
+                    "Warm up time! You've totally got this! 😊",
+                    "Easy peasy! Let's go! 🎈"
             };
             hint = hints[rng.nextInt(hints.length)];
         } else if (apiQuestion.getDifficulty() < 0.5) {
             String[] hints = {
-                "You can do this! Think carefully! 💡",
-                "Take a deep breath — you know this! 🧠",
-                "Read it again slowly — trust yourself! 👀",
-                "Almost there — don't rush, you've got it! ✨",
-                "Leo believes in you! Give it your best! 🦁"
+                    "You can do this! Think carefully! 💡",
+                    "Take a deep breath — you know this! 🧠",
+                    "Read it again slowly — trust yourself! 👀",
+                    "Almost there — don't rush, you've got it! ✨",
+                    "Leo believes in you! Give it your best! 🦁"
             };
             hint = hints[rng.nextInt(hints.length)];
         } else if (apiQuestion.getDifficulty() < 1.5) {
             String[] hints = {
-                "This is a bit challenging — you've got this! 💪",
-                "Challenge accepted! Give it your best shot! 🚀",
-                "Tough one, but Leo knows you can do it! 🦁",
-                "Think it through — you're smarter than you think! 🎯",
-                "Take your time and make your best guess! 🤔"
+                    "This is a bit challenging — you've got this! 💪",
+                    "Challenge accepted! Give it your best shot! 🚀",
+                    "Tough one, but Leo knows you can do it! 🦁",
+                    "Think it through — you're smarter than you think! 🎯",
+                    "Take your time and make your best guess! 🤔"
             };
             hint = hints[rng.nextInt(hints.length)];
         } else {
             String[] hints = {
-                "Wow, a tough one! Do your best! 🎯",
-                "Super challenge mode — go for it! 🏆",
-                "Even hard questions have answers you can find! 🔍",
-                "Leo's cheering for you — you've got this! 📣",
-                "Deep breaths. Read carefully. You can crack this! 🧩"
+                    "Wow, a tough one! Do your best! 🎯",
+                    "Super challenge mode — go for it! 🏆",
+                    "Even hard questions have answers you can find! 🔍",
+                    "Leo's cheering for you — you've got this! 📣",
+                    "Deep breaths. Read carefully. You can crack this! 🧩"
             };
             hint = hints[rng.nextInt(hints.length)];
         }

@@ -43,10 +43,9 @@ public class RegisterStep3Fragment extends Fragment {
     private void setupSchoolSpinner() {
         String[] schools = {
                 "Select School",
-                "Tandang Sora Elementary School",
-                "Quezon City Elementary School",
-                "Manila Central School",
-                "Other School"
+                "Holy Spirit Elementary School",
+                "Doña Juana Elementary School"
+
         };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, schools);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

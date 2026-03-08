@@ -1,66 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:background="#2D1B6B">
 
-    <!-- Top Colored Section with Lottie Animation -->
-    <FrameLayout
-        android:id="@+id/topSection"
+    <!-- Full-screen Lottie (elements float across whole canvas) -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieAnimation"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1.1">
+        android:layout_height="match_parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_speed="1.0" />
 
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/lottieAnimation"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
-            android:layout_gravity="center"
-            app:lottie_autoPlay="true"
-            app:lottie_loop="true"
-            app:lottie_speed="1.0" />
-
-    </FrameLayout>
-
-    <!-- Bottom White Text Section -->
+    <!-- Gradient + text pinned to bottom -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.9"
-        android:background="@color/white"
-        android:gravity="center_horizontal"
+        android:layout_height="210dp"
+        android:layout_gravity="bottom"
+        android:background="@drawable/gradient_slide_bottom"
+        android:gravity="bottom"
         android:orientation="vertical"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:paddingTop="32dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="28dp"
+        android:paddingEnd="28dp"
+        android:paddingBottom="18dp">
 
-        <!-- Slide Title -->
         <TextView
             android:id="@+id/tvSlideTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/visby_bold"
-            android:gravity="center"
             android:lineSpacingExtra="2dp"
-            android:text="Rise Up with English!"
-            android:textColor="#1A1A2E"
-            android:textSize="22sp"
-            android:layout_marginBottom="14dp" />
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:layout_marginBottom="8dp" />
 
-        <!-- Slide Description -->
         <TextView
             android:id="@+id/tvSlideDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/visby_regular"
-            android:gravity="center"
-            android:lineSpacingExtra="5dp"
-            android:text="Join Leo on a fun journey to boost your reading, vocabulary, and grammar — made for kids just like you!"
-            android:textColor="#636E72"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#CCB8FF"
             android:textSize="14sp" />
-
     </LinearLayout>
 
-</LinearLayout>
+</FrameLayout>

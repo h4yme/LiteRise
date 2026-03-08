@@ -248,7 +248,7 @@ public class PlacementResultActivity extends AppCompatActivity {
      */
     private void playResultVoiceOver() {
         try {
-            resultVoicePlayer = MediaPlayer.create(this, R.raw.result_voiceover);
+            resultVoicePlayer = MediaPlayer.create(this, R.raw.step1);
             if (resultVoicePlayer != null) {
                 resultVoicePlayer.start();
                 resultVoicePlayer.setOnCompletionListener(mp -> {

@@ -215,7 +215,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginEnd="10dp"
-                    android:src="@drawable/leo_happy" />
+                    android:src="@drawable/leo_explain" />
 
                 <TextView
                     android:id="@+id/tvLeoHint"
@@ -227,11 +227,7 @@
                     android:textColor="#92640B"
                     android:textSize="13sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="💡"
-                    android:textSize="18sp" />
+
 
             </LinearLayout>
 
