@@ -1,13 +1,20 @@
 package com.example.literise.activities;
 
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,8 +45,8 @@ public class LessonContentActivity extends AppCompatActivity {
     private ImageView btnBack;
     private TextView tvLessonTitle;
     private TextView tvLessonNumber;
-    private TextView tvLessonContent;
     private TextView tvScaffolding;
+    private LinearLayout llContentSections;
     private ProgressBar progressBar;
     private MaterialButton btnComplete;
 
@@ -47,6 +54,18 @@ public class LessonContentActivity extends AppCompatActivity {
     private int lessonNumber;
     private int placementLevel;
     private SessionManager sessionManager;
+
+    // Chip colors cycling through a fun kid-friendly palette
+    private static final int[] CHIP_COLORS = {
+            0xFFE91E63, // pink
+            0xFF9C27B0, // purple
+            0xFF3F51B5, // indigo
+            0xFF2196F3, // blue
+            0xFF009688, // teal
+            0xFF4CAF50, // green
+            0xFFFF9800, // orange
+            0xFFF44336, // red
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +87,8 @@ public class LessonContentActivity extends AppCompatActivity {
         btnBack = findViewById(R.id.btnBack);
         tvLessonTitle = findViewById(R.id.tvLessonTitle);
         tvLessonNumber = findViewById(R.id.tvLessonNumber);
-        tvLessonContent = findViewById(R.id.tvLessonContent);
         tvScaffolding = findViewById(R.id.tvScaffolding);
+        llContentSections = findViewById(R.id.llContentSections);
         progressBar = findViewById(R.id.progressBar);
         btnComplete = findViewById(R.id.btnComplete);
 
@@ -114,170 +133,395 @@ public class LessonContentActivity extends AppCompatActivity {
 
     private void displayLessonContent(LessonContentResponse data) {
         tvLessonTitle.setText(data.getLesson().getTitle());
-        tvLessonContent.setText(formatLessonContent(
-                data.getLesson().getObjective(),
-                data.getLesson().getContent()));
         tvScaffolding.setText(data.getPacing().getDescription());
+        buildKidFriendlyContent(data.getLesson().getObjective(), data.getLesson().getContent());
     }
 
-    /**
-     * Parses the ContentJSON string from the API into human-readable sections.
-     * Handles all domain shapes: phonics, vocabulary, grammar, comprehension, writing.
-     */
-    private String formatLessonContent(String objective, String rawJson) {
-        StringBuilder sb = new StringBuilder();
+    // ─────────────────────────────────────────────────────────────────────────
+    // Kid-friendly content builder
+    // ─────────────────────────────────────────────────────────────────────────
 
-        // Always show the learning objective first
+    private void buildKidFriendlyContent(String objective, String rawJson) {
+        llContentSections.removeAllViews();
+
+        // Learning objective
         if (objective != null && !objective.trim().isEmpty()) {
-            sb.append("🎯 WHAT TO LEARN\n").append(objective.trim()).append("\n\n");
+            addTextCard("🎯", "TODAY'S GOAL", objective.trim(), 0xFFE3F2FD, 0xFF1565C0);
         }
 
-        if (rawJson == null || rawJson.trim().isEmpty()) return sb.toString().trim();
+        if (rawJson == null || rawJson.trim().isEmpty()) return;
 
         try {
             JSONObject json = new JSONObject(rawJson);
 
-            // ── RULE / INSTRUCTION ──────────────────────────────────────
+            // Rule / instruction
             String rule = json.optString("rule", null);
             if (rule == null) rule = json.optString("instruction", null);
             if (rule != null && !rule.isEmpty()) {
-                sb.append("📏 RULE\n").append(rule).append("\n\n");
+                addTextCard("📏", "THE RULE", rule, 0xFFFFF3E0, 0xFFBF360C);
             }
 
-            // ── KEY WORDS (all possible field names) ────────────────────
+            // Key words as colorful chips
             String[] wordFields = {"keyWords", "words", "themeWords", "sightWords",
-                    "practiceWords", "verbList", "adjectives", "mathWords",
-                    "scienceWords", "antonymPairs", "synonymPairs"};
+                    "practiceWords", "verbList", "adjectives", "mathWords", "scienceWords"};
             for (String field : wordFields) {
                 if (json.has(field)) {
-                    sb.append("📖 KEY WORDS\n");
-                    appendArrayOrPairs(sb, json.get(field));
-                    sb.append("\n");
+                    Object val = json.get(field);
+                    if (val instanceof JSONArray) {
+                        JSONArray arr = (JSONArray) val;
+                        if (arr.length() > 0 && arr.get(0) instanceof JSONArray) {
+                            addPairsChipsCard("📖", "TODAY'S WORDS", arr);
+                        } else {
+                            addWordChipsCard("📖", "TODAY'S WORDS", arr);
+                        }
+                    }
                     break;
                 }
             }
 
-            // ── PATTERNS ────────────────────────────────────────────────
+            // Patterns as chips
             if (json.has("patterns")) {
-                sb.append("🔤 PATTERNS\n");
-                appendJsonArray(sb, json.getJSONArray("patterns"));
-                sb.append("\n");
+                addWordChipsCard("🔤", "PATTERNS", json.getJSONArray("patterns"));
             }
+
+            // Clusters
             if (json.has("clusters")) {
-                sb.append("🔤 CLUSTERS\n");
-                JSONObject clusters = json.getJSONObject("clusters");
-                java.util.Iterator<String> keys = clusters.keys();
-                while (keys.hasNext()) {
-                    String k = keys.next();
-                    sb.append("  ").append(k.toUpperCase()).append(": ");
-                    sb.append(jsonArrayToLine(clusters.getJSONArray(k))).append("\n");
-                }
-                sb.append("\n");
+                addClustersCard(json.getJSONObject("clusters"));
             }
 
-            // ── EXAMPLES ────────────────────────────────────────────────
+            // Examples
             if (json.has("examples")) {
-                Object ex = json.get("examples");
-                sb.append("💡 EXAMPLES\n");
-                if (ex instanceof JSONArray) {
-                    JSONArray arr = (JSONArray) ex;
-                    if (arr.length() > 0 && arr.get(0) instanceof JSONObject) {
-                        // Array of objects e.g. [{word, division, vowelSound}]
-                        for (int i = 0; i < arr.length(); i++) {
-                            JSONObject item = arr.getJSONObject(i);
-                            String word = item.optString("word", "");
-                            String div  = item.optString("division", "");
-                            String sound = item.optString("vowelSound", "");
-                            sb.append("  • ").append(word);
-                            if (!div.isEmpty()) sb.append(" → ").append(div);
-                            if (!sound.isEmpty()) sb.append("  (").append(sound).append(")");
-                            sb.append("\n");
-                        }
-                    } else {
-                        appendJsonArray(sb, arr);
-                    }
-                } else if (ex instanceof JSONObject) {
-                    // Object with sub-arrays e.g. {math: [...], science: [...]}
-                    JSONObject exObj = (JSONObject) ex;
-                    java.util.Iterator<String> keys = exObj.keys();
-                    while (keys.hasNext()) {
-                        String k = keys.next();
-                        sb.append("  ").append(capitalize(k)).append(": ");
-                        sb.append(jsonArrayToLine(exObj.getJSONArray(k))).append("\n");
-                    }
-                }
-                sb.append("\n");
+                addExamplesCard(json.get("examples"));
             }
 
-            // ── CONTEXT SENTENCES ───────────────────────────────────────
+            // Context sentences / practice
             String[] sentenceFields = {"contextSentences", "sentencePractice", "sentenceFrames"};
             for (String field : sentenceFields) {
                 if (json.has(field)) {
-                    sb.append("📝 SENTENCES\n");
-                    appendJsonArray(sb, json.getJSONArray(field));
-                    sb.append("\n");
+                    addSentencesCard("📝", "PRACTICE SENTENCES", json.getJSONArray(field));
                     break;
                 }
             }
 
-            // ── TIP ─────────────────────────────────────────────────────
+            // Tip
             String tip = json.optString("tip", null);
             if (tip == null) tip = json.optString("memoryTrick", null);
             if (tip == null) tip = json.optString("selfCheck", null);
             if (tip == null) tip = json.optString("trick", null);
             if (tip != null && !tip.isEmpty()) {
-                sb.append("⭐ TIP\n").append(tip).append("\n\n");
-            }
-
-            // ── CURRICULUM CODE ──────────────────────────────────────────
-            String code = json.optString("curriculumCode", null);
-            if (code != null && !code.isEmpty()) {
-                sb.append("📌 ").append(code);
+                addTextCard("⭐", "REMEMBER THIS!", tip, 0xFFFFFDE7, 0xFFF57F17);
             }
 
         } catch (Exception e) {
-            // Not valid JSON — show as-is (plain text lessons)
-            sb.append(rawJson);
-        }
-
-        return sb.toString().trim();
-    }
-
-    private void appendJsonArray(StringBuilder sb, JSONArray arr) throws Exception {
-        for (int i = 0; i < arr.length(); i++) {
-            sb.append("  • ").append(arr.getString(i)).append("\n");
+            // Not valid JSON — plain text fallback
+            addTextCard("📖", "LESSON", rawJson, 0xFFFFFFFF, 0xFF333333);
         }
     }
 
-    private String jsonArrayToLine(JSONArray arr) throws Exception {
-        StringBuilder line = new StringBuilder();
-        for (int i = 0; i < arr.length(); i++) {
-            if (i > 0) line.append(", ");
-            line.append(arr.getString(i));
-        }
-        return line.toString();
+    // ── Plain text section card ──────────────────────────────────────────────
+
+    private void addTextCard(String emoji, String label, String body, int bgColor, int labelColor) {
+        CardView card = makeCard(bgColor);
+        LinearLayout inner = makeCardInner(card);
+
+        inner.addView(makeSectionHeader(emoji + "  " + label, labelColor));
+
+        TextView tv = new TextView(this);
+        tv.setText(body);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        tv.setTextColor(0xFF333333);
+        tv.setLineSpacing(0f, 1.45f);
+        inner.addView(tv);
     }
 
-    private void appendArrayOrPairs(StringBuilder sb, Object value) throws Exception {
-        if (value instanceof JSONArray) {
-            JSONArray arr = (JSONArray) value;
-            if (arr.length() > 0 && arr.get(0) instanceof JSONArray) {
-                // Synonym/antonym pairs [[a,b],[c,d]]
-                for (int i = 0; i < arr.length(); i++) {
-                    JSONArray pair = arr.getJSONArray(i);
-                    sb.append("  • ").append(pair.getString(0))
-                      .append(" ↔ ").append(pair.getString(1)).append("\n");
-                }
-            } else {
-                appendJsonArray(sb, arr);
+    // ── Word chips card ──────────────────────────────────────────────────────
+
+    private void addWordChipsCard(String emoji, String label, JSONArray words) throws Exception {
+        CardView card = makeCard(0xFFF3E5F5);
+        LinearLayout inner = makeCardInner(card);
+
+        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF6A1B9A));
+
+        // Chips in rows of 3
+        final int PER_ROW = 3;
+        LinearLayout row = null;
+        for (int i = 0; i < words.length(); i++) {
+            if (i % PER_ROW == 0) {
+                row = new LinearLayout(this);
+                row.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT);
+                rp.setMargins(0, 0, 0, dp(10));
+                row.setLayoutParams(rp);
+                inner.addView(row);
+            }
+            row.addView(makeWordChip(words.getString(i), CHIP_COLORS[i % CHIP_COLORS.length]));
+        }
+
+        // Pad remaining cells so chips align left
+        if (words.length() % PER_ROW != 0 && row != null) {
+            int spare = PER_ROW - (words.length() % PER_ROW);
+            for (int i = 0; i < spare; i++) {
+                View spacer = new View(this);
+                spacer.setLayoutParams(new LinearLayout.LayoutParams(0,
+                        LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+                row.addView(spacer);
             }
         }
+    }
+
+    // ── Synonym / antonym pairs card ─────────────────────────────────────────
+
+    private void addPairsChipsCard(String emoji, String label, JSONArray pairs) throws Exception {
+        CardView card = makeCard(0xFFF3E5F5);
+        LinearLayout inner = makeCardInner(card);
+        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF6A1B9A));
+
+        for (int i = 0; i < pairs.length(); i++) {
+            JSONArray pair = pairs.getJSONArray(i);
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            rp.setMargins(0, 0, 0, dp(10));
+            row.setLayoutParams(rp);
+
+            row.addView(makeWordChip(pair.getString(0), CHIP_COLORS[i * 2 % CHIP_COLORS.length]));
+            TextView arrow = new TextView(this);
+            arrow.setText("  ↔  ");
+            arrow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            arrow.setTextColor(0xFF555555);
+            row.addView(arrow);
+            row.addView(makeWordChip(pair.getString(1), CHIP_COLORS[(i * 2 + 1) % CHIP_COLORS.length]));
+            inner.addView(row);
+        }
+    }
+
+    // ── Examples card ────────────────────────────────────────────────────────
+
+    private void addExamplesCard(Object examples) throws Exception {
+        CardView card = makeCard(0xFFE8F5E9);
+        LinearLayout inner = makeCardInner(card);
+        inner.addView(makeSectionHeader("💡  LOOK AT THESE", 0xFF2E7D32));
+
+        if (examples instanceof JSONArray) {
+            JSONArray arr = (JSONArray) examples;
+            for (int i = 0; i < arr.length(); i++) {
+                if (arr.get(i) instanceof JSONObject) {
+                    // Object shape: {word, division, vowelSound}
+                    JSONObject item = arr.getJSONObject(i);
+                    String word  = item.optString("word", "");
+                    String div   = item.optString("division", "");
+                    String sound = item.optString("vowelSound", "");
+                    StringBuilder line = new StringBuilder(word);
+                    if (!div.isEmpty())   line.append("  →  ").append(div);
+                    if (!sound.isEmpty()) line.append("  (").append(sound).append(")");
+                    inner.addView(makeExampleRow(line.toString(), i));
+                } else {
+                    inner.addView(makeExampleRow(arr.getString(i), i));
+                }
+            }
+        } else if (examples instanceof JSONObject) {
+            JSONObject exObj = (JSONObject) examples;
+            java.util.Iterator<String> keys = exObj.keys();
+            int i = 0;
+            while (keys.hasNext()) {
+                String k = keys.next();
+                JSONArray sub = exObj.getJSONArray(k);
+                TextView subHeader = new TextView(this);
+                subHeader.setText(capitalize(k));
+                subHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                subHeader.setTypeface(null, Typeface.BOLD);
+                subHeader.setTextColor(0xFF555555);
+                subHeader.setPadding(0, dp(4), 0, dp(4));
+                inner.addView(subHeader);
+                for (int j = 0; j < sub.length(); j++) {
+                    inner.addView(makeExampleRow(sub.getString(j), i++));
+                }
+            }
+        }
+    }
+
+    // ── Sentences card ───────────────────────────────────────────────────────
+
+    private void addSentencesCard(String emoji, String label, JSONArray sentences) throws Exception {
+        CardView card = makeCard(0xFFE8EAF6);
+        LinearLayout inner = makeCardInner(card);
+        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF283593));
+
+        for (int i = 0; i < sentences.length(); i++) {
+            TextView tv = new TextView(this);
+            tv.setText((i + 1) + ".  " + sentences.getString(i));
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+            tv.setTextColor(0xFF333333);
+            tv.setLineSpacing(0f, 1.4f);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, 0, 0, dp(10));
+            tv.setLayoutParams(lp);
+            inner.addView(tv);
+        }
+    }
+
+    // ── Clusters card ────────────────────────────────────────────────────────
+
+    private void addClustersCard(JSONObject clusters) throws Exception {
+        CardView card = makeCard(0xFFF3E5F5);
+        LinearLayout inner = makeCardInner(card);
+        inner.addView(makeSectionHeader("🔤  CLUSTERS", 0xFF6A1B9A));
+
+        java.util.Iterator<String> keys = clusters.keys();
+        int colorIdx = 0;
+        while (keys.hasNext()) {
+            String k = keys.next();
+            JSONArray arr = clusters.getJSONArray(k);
+
+            LinearLayout row = new LinearLayout(this);
+            row.setOrientation(LinearLayout.HORIZONTAL);
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            rp.setMargins(0, 0, 0, dp(10));
+            row.setLayoutParams(rp);
+
+            TextView keyTv = new TextView(this);
+            keyTv.setText(k.toUpperCase() + ":");
+            keyTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            keyTv.setTypeface(null, Typeface.BOLD);
+            keyTv.setTextColor(0xFF555555);
+            keyTv.setMinWidth(dp(56));
+            row.addView(keyTv);
+
+            for (int j = 0; j < arr.length(); j++) {
+                row.addView(makeWordChip(arr.getString(j), CHIP_COLORS[colorIdx++ % CHIP_COLORS.length]));
+            }
+            inner.addView(row);
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // View factory helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private CardView makeCard(int bgColor) {
+        CardView card = new CardView(this);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        cp.setMargins(0, 0, 0, dp(16));
+        card.setLayoutParams(cp);
+        card.setRadius(dp(18));
+        card.setCardElevation(dp(4));
+        card.setCardBackgroundColor(bgColor);
+        return card;
+    }
+
+    /** Creates the inner LinearLayout, adds it to the card, and returns it. */
+    private LinearLayout makeCardInner(CardView card) {
+        LinearLayout inner = new LinearLayout(this);
+        inner.setOrientation(LinearLayout.VERTICAL);
+        inner.setPadding(dp(20), dp(16), dp(20), dp(18));
+        card.addView(inner);
+        llContentSections.addView(card);
+        return inner;
+    }
+
+    private TextView makeSectionHeader(String text, int color) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTextColor(color);
+        tv.setAllCaps(true);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, dp(12));
+        tv.setLayoutParams(lp);
+        return tv;
+    }
+
+    private TextView makeWordChip(String word, int color) {
+        TextView chip = new TextView(this);
+        chip.setText(word);
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        chip.setTypeface(null, Typeface.BOLD);
+        chip.setTextColor(Color.WHITE);
+        chip.setGravity(Gravity.CENTER);
+        chip.setPadding(dp(10), dp(12), dp(10), dp(12));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(color);
+        bg.setCornerRadius(dp(24));
+        chip.setBackground(bg);
+
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        lp.setMargins(dp(4), 0, dp(4), 0);
+        chip.setLayoutParams(lp);
+        return chip;
+    }
+
+    private View makeExampleRow(String text, int index) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        rp.setMargins(0, 0, 0, dp(10));
+        row.setLayoutParams(rp);
+
+        // Colored left dot / number bubble
+        TextView num = new TextView(this);
+        num.setText(String.valueOf(index + 1));
+        num.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        num.setTypeface(null, Typeface.BOLD);
+        num.setTextColor(Color.WHITE);
+        num.setGravity(Gravity.CENTER);
+        num.setPadding(dp(6), dp(6), dp(6), dp(6));
+        int bubbleColor = CHIP_COLORS[index % CHIP_COLORS.length];
+        GradientDrawable bubble = new GradientDrawable();
+        bubble.setColor(bubbleColor);
+        bubble.setShape(GradientDrawable.OVAL);
+        num.setBackground(bubble);
+        LinearLayout.LayoutParams np = new LinearLayout.LayoutParams(dp(32), dp(32));
+        np.setMargins(0, 0, dp(12), 0);
+        np.gravity = Gravity.TOP;
+        num.setLayoutParams(np);
+        row.addView(num);
+
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        tv.setTextColor(0xFF333333);
+        tv.setLineSpacing(0f, 1.35f);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(
+                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+        row.addView(tv);
+        return row;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Utilities
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private int dp(int value) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, value,
+                getResources().getDisplayMetrics());
     }
 
     private String capitalize(String s) {
         if (s == null || s.isEmpty()) return s;
         return Character.toUpperCase(s.charAt(0)) + s.substring(1);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
 
     private void markLessonCompleted() {
         progressBar.setVisibility(View.VISIBLE);
