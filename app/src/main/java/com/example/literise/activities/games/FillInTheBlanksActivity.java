@@ -189,13 +189,53 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     /**
-     * Generates fill-in-the-blank questions from lesson sentences.
-     * For each sentence we pick one lesson keyword as the blank; other lesson
-     * words (and common fillers) serve as wrong options.
+     * Generates fill-in-the-blank questions from lesson JSON.
+     *
+     * Branch A — phonics/rule lessons with an "examples" array
+     *   e.g. VCV: ["Ti-ger","Pa-per","Ba-sin",...] → syllable-splitting questions
+     *
+     * Branch B — vocabulary lessons with a word list + practice sentences
      */
     private List<DemoDataProvider.FillQuestion> generateQuestionsFromLesson(String lessonJson) throws Exception {
         org.json.JSONObject obj = new org.json.JSONObject(lessonJson);
 
+        // ── BRANCH A: phonics lessons with "examples" array ───────────────────
+        if (obj.has("examples")) {
+            org.json.JSONArray exArr = obj.getJSONArray("examples");
+            String ruleHint = obj.optString("rule", "");
+            // Trim long rule to one readable clause
+            if (ruleHint.contains(".")) ruleHint = ruleHint.substring(0, ruleHint.indexOf(".")).trim();
+            if (ruleHint.length() > 60) ruleHint = ruleHint.substring(0, 60).trim();
+
+            List<DemoDataProvider.FillQuestion> result = new ArrayList<>();
+            for (int i = 0; i < exArr.length(); i++) {
+                String hyphenated = exArr.getString(i).trim(); // e.g. "Ti-ger"
+                if (!hyphenated.contains("-")) continue;
+                String baseWord = hyphenated.replace("-", "").toLowerCase(); // "tiger"
+                String correct  = hyphenated;                                // "Ti-ger"
+
+                // Wrong splits: shift hyphen left/right
+                List<String> wrongs = buildWrongSplits(hyphenated);
+                // Pad with sibling examples if still short
+                for (int j = 0; j < exArr.length() && wrongs.size() < 3; j++) {
+                    String other = exArr.getString(j).trim();
+                    if (!other.equalsIgnoreCase(hyphenated) && !wrongs.contains(other))
+                        wrongs.add(other);
+                }
+                while (wrongs.size() < 3) wrongs.add("---");
+
+                String before = "Divide '" + baseWord + "':";
+                String after  = ruleHint.isEmpty() ? "" : "  (" + ruleHint + ")";
+                result.add(new DemoDataProvider.FillQuestion(
+                        before, after, correct,
+                        new String[]{wrongs.get(0), wrongs.get(1), wrongs.get(2)},
+                        moduleDomain != null ? moduleDomain : "phonics"
+                ));
+            }
+            if (!result.isEmpty()) return result;
+        }
+
+        // ── BRANCH B: vocabulary lessons with a word list + sentences ─────────
         // Collect all lesson words for blanks + distractors
         List<String> lessonWords = new ArrayList<>();
         for (String f : new String[]{"keyWords","words","themeWords","sightWords",
@@ -267,6 +307,31 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
             ));
         }
         return result.isEmpty() ? null : result;
+    }
+
+    /**
+     * Given a correctly hyphenated example like "Ti-ger", produces up to 3
+     * wrong splits by shifting the hyphen position left and right.
+     * e.g. "Ti-ger" → ["Tig-er", "T-iger", "Tige-r"]
+     */
+    private List<String> buildWrongSplits(String hyphenated) {
+        List<String> wrongs = new ArrayList<>();
+        int hyphenPos = hyphenated.indexOf('-');
+        String raw = hyphenated.replace("-", ""); // letters only, original case
+        int len = raw.length();
+        // rawPos = index in raw[] where hyphen currently sits (= chars before hyphen)
+        int rawPos = hyphenPos; // chars before the '-' in the original
+        for (int offset = -2; offset <= 2; offset++) {
+            if (offset == 0) continue;
+            int newRawPos = rawPos + offset;
+            if (newRawPos < 1 || newRawPos >= len) continue;
+            String wrong = raw.substring(0, newRawPos) + "-" + raw.substring(newRawPos);
+            if (!wrong.equalsIgnoreCase(hyphenated) && !wrongs.contains(wrong)) {
+                wrongs.add(wrong);
+                if (wrongs.size() == 3) break;
+            }
+        }
+        return wrongs;
     }
 
     private void loadQuestion(int index) {
