@@ -10,83 +10,122 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
-        app:cardElevation="1dp"
+        app:cardElevation="4dp"
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Purple Top Accent Bar -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="#6C5CE7" />
+
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:scrollbars="none"
+                android:fillViewport="true">
 
-                <!-- Birthday Icon -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🎂"
-                    android:textSize="56dp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dp" />
-
-                <!-- Birthday Label -->
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Birthday *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <!-- Birthday Input -->
-                <EditText
-                    android:id="@+id/etBirthday"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:hint="YYYY-MM-DD"
-                    android:textColorHint="#B2BEC3"
-                    android:textColor="#2D3436"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/visby_regular"
-                    android:inputType="none"
-                    android:focusable="false"
-                    android:clickable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp"
-                    android:drawableEnd="@android:drawable/ic_menu_my_calendar"
-                    android:drawablePadding="12dp" />
+                    <!-- Birthday Icon with soft purple container -->
+                    <TextView
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:text="🎂"
+                        android:textSize="36sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="24dp" />
 
-                <!-- Gender Label -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gender *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    <!-- Birthday Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Birthday"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-                <!-- Gender Spinner -->
-                <Spinner
-                    android:id="@+id/spinnerGender"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
+                    <!-- Birthday Input -->
+                    <EditText
+                        android:id="@+id/etBirthday"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="YYYY-MM-DD"
+                        android:textColorHint="#B2BEC3"
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:inputType="none"
+                        android:focusable="false"
+                        android:clickable="true"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp"
+                        android:drawableEnd="@android:drawable/ic_menu_my_calendar"
+                        android:drawablePadding="12dp" />
 
-            </LinearLayout>
+                    <!-- Gender Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Gender"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-        </ScrollView>
+                    <!-- Gender Spinner -->
+                    <Spinner
+                        android:id="@+id/spinnerGender"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

@@ -10,77 +10,104 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
-        app:cardElevation="1dp"
+        app:cardElevation="4dp"
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Purple Top Accent Bar -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="#6C5CE7" />
+
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:scrollbars="none"
+                android:fillViewport="true">
 
-                <!-- School Illustration -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🏫"
-                    android:textSize="56sp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dp" />
-
-                <!-- School Label -->
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="School *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <!-- School Spinner -->
-                <Spinner
-                    android:id="@+id/spinnerSchool"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp" />
+                    <!-- School Icon with soft purple container -->
+                    <TextView
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:text="🏫"
+                        android:textSize="36sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="24dp" />
 
-                <!-- Grade Level Label -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Grade Level"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    <!-- School Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="School"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-                <!-- Grade Level Display (Fixed) -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:text="Grade 3"
-                    android:textColor="#2D3436"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/visby_medium"
-                    android:gravity="center_vertical"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp" />
+                    <!-- School Spinner -->
+                    <Spinner
+                        android:id="@+id/spinnerSchool"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
 
-            </LinearLayout>
+                    <!-- Grade Level Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Grade Level"
+                        android:textSize="14sp"
+                        android:textColor="#2D3436"
+                        android:fontFamily="@font/visby_medium"
+                        android:layout_marginBottom="8dp" />
 
-        </ScrollView>
+                    <!-- Grade Level Display (Fixed) -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:text="Grade 3"
+                        android:textColor="#6C5CE7"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/visby_medium"
+                        android:gravity="center_vertical"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 

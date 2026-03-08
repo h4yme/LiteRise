@@ -10,141 +10,192 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:cardCornerRadius="20dp"
-        app:cardElevation="1dp"
+        app:cardElevation="4dp"
         app:cardBackgroundColor="#FFFFFF"
         android:layout_gravity="center">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="none"
-            android:fillViewport="true">
+            android:orientation="vertical">
 
-            <LinearLayout
+            <!-- Purple Top Accent Bar -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="5dp"
+                android:background="#6C5CE7" />
+
+            <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:scrollbars="none"
+                android:fillViewport="true">
 
-                <!-- Lock Icon -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🔐"
-                    android:textSize="56sp"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dp" />
-
-                <!-- Email Label -->
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Email Address *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    android:orientation="vertical"
+                    android:padding="20dp">
 
-                <!-- Email Input -->
-                <EditText
-                    android:id="@+id/etEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:hint="yourname@example.com"
-                    android:textColorHint="#B2BEC3"
-                    android:textColor="#2D3436"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/visby_regular"
-                    android:inputType="textEmailAddress"
-                    android:imeOptions="actionNext"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:clickable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp" />
+                    <!-- Lock Icon with soft purple container -->
+                    <TextView
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        android:text="🔐"
+                        android:textSize="36sp"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="24dp" />
 
-                <!-- Password Label -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Password *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    <!-- Email Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email Address"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-                <!-- Password Input -->
-                <EditText
-                    android:id="@+id/etPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:hint="Minimum 6 characters"
-                    android:textColorHint="#B2BEC3"
-                    android:textColor="#2D3436"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/visby_regular"
-                    android:inputType="textPassword"
-                    android:imeOptions="actionNext"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:clickable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp" />
+                    <!-- Email Input -->
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="yourname@example.com"
+                        android:textColorHint="#B2BEC3"
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:inputType="textEmailAddress"
+                        android:imeOptions="actionNext"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
 
-                <!-- Confirm Password Label -->
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Confirm Password *"
-                    android:textSize="14sp"
-                    android:textColor="#2D3436"
-                    android:fontFamily="@font/visby_medium"
-                    android:layout_marginBottom="8dp" />
+                    <!-- Password Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Password"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-                <!-- Confirm Password Input -->
-                <EditText
-                    android:id="@+id/etConfirmPassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
-                    android:background="@drawable/bg_input_modern"
-                    android:hint="Re-enter your password"
-                    android:textColorHint="#B2BEC3"
-                    android:textColor="#2D3436"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/visby_regular"
-                    android:inputType="textPassword"
-                    android:imeOptions="actionDone"
-                    android:singleLine="true"
-                    android:maxLines="1"
-                    android:focusable="true"
-                    android:focusableInTouchMode="true"
-                    android:clickable="true"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:layout_marginBottom="16dp" />
+                    <!-- Password Input -->
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="Minimum 6 characters"
+                        android:textColorHint="#B2BEC3"
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionNext"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
 
-                <!-- Parent Permission Checkbox -->
-                <CheckBox
-                    android:id="@+id/cbParentPermission"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="My parent allows me to use this app"
-                    android:textSize="14sp"
-                    android:textColor="#636E72"
-                    android:fontFamily="@font/visby_regular"
-                    android:buttonTint="#6C5CE7" />
+                    <!-- Confirm Password Label -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginBottom="8dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Confirm Password"
+                            android:textSize="14sp"
+                            android:textColor="#2D3436"
+                            android:fontFamily="@font/visby_medium" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=" *"
+                            android:textSize="14sp"
+                            android:textColor="#E53935"
+                            android:fontFamily="@font/visby_medium" />
+                    </LinearLayout>
 
-            </LinearLayout>
+                    <!-- Confirm Password Input -->
+                    <EditText
+                        android:id="@+id/etConfirmPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:background="@drawable/bg_input_modern"
+                        android:hint="Re-enter your password"
+                        android:textColorHint="#B2BEC3"
+                        android:textColor="#2D3436"
+                        android:textSize="15sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:inputType="textPassword"
+                        android:imeOptions="actionDone"
+                        android:singleLine="true"
+                        android:maxLines="1"
+                        android:focusable="true"
+                        android:focusableInTouchMode="true"
+                        android:clickable="true"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:layout_marginBottom="16dp" />
 
-        </ScrollView>
+                    <!-- Parent Permission Checkbox -->
+                    <CheckBox
+                        android:id="@+id/cbParentPermission"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="My parent allows me to use this app"
+                        android:textSize="14sp"
+                        android:textColor="#636E72"
+                        android:fontFamily="@font/visby_regular"
+                        android:buttonTint="#6C5CE7" />
+
+                </LinearLayout>
+
+            </ScrollView>
+
+        </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
