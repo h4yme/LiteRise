@@ -319,27 +319,26 @@ public class LoginActivity extends AppCompatActivity {
                     android.util.Log.d("LoginActivity", "hasCompletedAssessment: " + sessionManager.hasCompletedAssessment());
 
                     // Navigate based on user's progress
-                    Intent intent;
                     if (!sessionManager.hasSeenWelcome()) {
-                        // First time - show welcome onboarding
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (not seen welcome)");
-                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                        navigateTo(WelcomeOnboardingActivity.class);
                     } else if (sessionManager.hasStartedAssessment() && !sessionManager.hasCompletedAssessment()) {
-                        // Assessment in progress - resume test
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to PlacementTestActivity (resume assessment)");
-                        intent = new Intent(LoginActivity.this, PlacementTestActivity.class);
+                        navigateTo(PlacementTestActivity.class);
                     } else if (!sessionManager.hasCompletedAssessment()) {
-                        // Seen welcome but hasn't started placement test yet
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to WelcomeOnboardingActivity (assessment not started)");
-                        intent = new Intent(LoginActivity.this, WelcomeOnboardingActivity.class);
+                        navigateTo(WelcomeOnboardingActivity.class);
                     } else {
-                        // Completed everything - go to Dashboard
+                        // Save category scores from login response
+                        sessionManager.saveCategoryScore("Cat1_PhonicsWordStudy", s.getCat1PhonicsWordStudy());
+                        sessionManager.saveCategoryScore("Cat2_VocabularyWordKnowledge", s.getCat2VocabularyWordKnowledge());
+                        sessionManager.saveCategoryScore("Cat3_GrammarAwareness", s.getCat3GrammarAwareness());
+                        sessionManager.saveCategoryScore("Cat4_ComprehendingText", s.getCat4ComprehendingText());
+                        sessionManager.saveCategoryScore("Cat5_CreatingComposing", s.getCat5CreatingComposing());
                         android.util.Log.d("LoginActivity", "NAVIGATION: Going to DashboardActivity (assessment completed)");
-                        intent = new Intent(LoginActivity.this, DashboardActivity.class);
+                        android.util.Log.d("LoginActivity", "Category scores — Cat1:" + s.getCat1PhonicsWordStudy() + " Cat2:" + s.getCat2VocabularyWordKnowledge() + " Cat3:" + s.getCat3GrammarAwareness() + " Cat4:" + s.getCat4ComprehendingText() + " Cat5:" + s.getCat5CreatingComposing());
+                        navigateTo(DashboardActivity.class);
                     }
-                    startActivity(intent);
-                    overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                    finish();
                 } else {
                     CustomToast.showError(LoginActivity.this, "Invalid credentials");
                 }
@@ -351,6 +350,12 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+    private void navigateTo(Class<?> activityClass) {
+        startActivity(new Intent(LoginActivity.this, activityClass));
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+        finish();
+    }
+
     /**
 
      * Demo mode login - bypass API and auto-login with demo user

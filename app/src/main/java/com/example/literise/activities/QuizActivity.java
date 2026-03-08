@@ -70,7 +70,7 @@ public class QuizActivity extends AppCompatActivity {
 
     // Quiz State
     private List<QuizQuestionsResponse.Question> questions = new ArrayList<>();
-    private Map<Integer, Integer> selectedAnswers = new HashMap<>();
+    private Map<Integer, String> selectedAnswers = new HashMap<>(); // questionId → answer text
     private int currentQuestionIndex = 0;
     private int totalQuestions = 5;
 
@@ -175,10 +175,12 @@ public class QuizActivity extends AppCompatActivity {
         tvQuestionNumber.setText("🤔 Question " + (currentQuestionIndex + 1) + " of " + totalQuestions);
         tvProgress.setText((currentQuestionIndex + 1) + "/" + totalQuestions);
         tvQuestionText.setText(question.getQuestionText());
-        rbOption1.setText("A) " + question.getOptionA());
-        rbOption2.setText("B) " + question.getOptionB());
-        rbOption3.setText("C) " + question.getOptionC());
-        rbOption4.setText("D) " + question.getOptionD());
+
+        // Show only options that have content
+        setOption(rbOption1, question.getOptionA(), "A");
+        setOption(rbOption2, question.getOptionB(), "B");
+        setOption(rbOption3, question.getOptionC(), "C");
+        setOption(rbOption4, question.getOptionD(), "D");
 
         // Clear previous selection
         radioGroupOptions.clearCheck();
@@ -196,22 +198,29 @@ public class QuizActivity extends AppCompatActivity {
      * Handle next button click
      */
     private void handleNextButton() {
-        // Save selected answer
         int selectedId = radioGroupOptions.getCheckedRadioButtonId();
-        int selectedOptionIndex = 0;
-
-        if (selectedId == R.id.rbOption1) selectedOptionIndex = 1;
-        else if (selectedId == R.id.rbOption2) selectedOptionIndex = 2;
-        else if (selectedId == R.id.rbOption3) selectedOptionIndex = 3;
-        else if (selectedId == R.id.rbOption4) selectedOptionIndex = 4;
-
-        // Store answer with question ID as key
         QuizQuestionsResponse.Question currentQuestion = questions.get(currentQuestionIndex);
-        selectedAnswers.put(currentQuestion.getQuestionId(), selectedOptionIndex);
 
-        // Move to next question or submit
+        // Store answer text (matches CorrectAnswer in DB)
+        String answerText = "";
+        if (selectedId == R.id.rbOption1) answerText = currentQuestion.getOptionA();
+        else if (selectedId == R.id.rbOption2) answerText = currentQuestion.getOptionB();
+        else if (selectedId == R.id.rbOption3) answerText = currentQuestion.getOptionC();
+        else if (selectedId == R.id.rbOption4) answerText = currentQuestion.getOptionD();
+
+        selectedAnswers.put(currentQuestion.getQuestionId(), answerText);
+
         currentQuestionIndex++;
         displayCurrentQuestion();
+    }
+
+    private void setOption(RadioButton rb, String text, String label) {
+        if (text != null && !text.isEmpty()) {
+            rb.setText(label + ") " + text);
+            rb.setVisibility(View.VISIBLE);
+        } else {
+            rb.setVisibility(View.GONE);
+        }
     }
 
     /**

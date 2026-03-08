@@ -14,9 +14,9 @@ public class QuizSubmitRequest {
     private int placementLevel;
 
     @SerializedName("answers")
-    private Map<Integer, Integer> answers;
+    private Map<Integer, String> answers; // questionId → answer text
 
-    public QuizSubmitRequest(int studentId, int nodeId, int placementLevel, Map<Integer, Integer> answers) {
+    public QuizSubmitRequest(int studentId, int nodeId, int placementLevel, Map<Integer, String> answers) {
         this.studentId = studentId;
         this.nodeId = nodeId;
         this.placementLevel = placementLevel;
