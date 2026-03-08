@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.material.card.MaterialCardView;
 
@@ -52,6 +53,11 @@ public class LessonContentActivity extends AppCompatActivity {
 
     private int nodeId, lessonNumber, placementLevel;
     private SessionManager sessionManager;
+
+    // ── Custom fonts ─────────────────────────────────────────────────────────
+    private Typeface fVisbyBold;      // headings, chips, tiles
+    private Typeface fPoppinsSemi;    // pills, labels, badges
+    private Typeface fPoppinsRegular; // body text, instructions
 
     // ── Palette (matches dashboard/colors.xml) ───────────────────────────────
     // Section label pill: pastel bg + dark accent text
@@ -93,6 +99,10 @@ public class LessonContentActivity extends AppCompatActivity {
         nodeId           = getIntent().getIntExtra("node_id", 1);
         lessonNumber     = getIntent().getIntExtra("lesson_number", 1);
         placementLevel   = convertPlacementLevelToInt(sessionManager.getPlacementLevel());
+
+        fVisbyBold      = ResourcesCompat.getFont(this, R.font.visby_bold);
+        fPoppinsSemi    = ResourcesCompat.getFont(this, R.font.poppins_semibold);
+        fPoppinsRegular = ResourcesCompat.getFont(this, R.font.poppins_regular);
 
         initViews();
         setupListeners();
@@ -251,7 +261,7 @@ public class LessonContentActivity extends AppCompatActivity {
         box.setBackground(bg);
         box.setPadding(dp(16), dp(14), dp(16), dp(14));
         TextView tv = makeBodyText(rule, 18);
-        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTypeface(fVisbyBold);
         tv.setTextColor(TEXT_PRIMARY);
         box.addView(tv);
         body.addView(box);
@@ -311,6 +321,7 @@ public class LessonContentActivity extends AppCompatActivity {
             TextView arrow = new TextView(this);
             arrow.setText("  ↔  ");
             arrow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
+            arrow.setTypeface(fPoppinsRegular);
             arrow.setTextColor(TEXT_SECONDARY);
             row.addView(arrow);
             row.addView(makeWordChip(pair.getString(1), CHIP_COLORS[(i * 2 + 1) % CHIP_COLORS.length]));
@@ -335,7 +346,7 @@ public class LessonContentActivity extends AppCompatActivity {
             TextView keyTv = new TextView(this);
             keyTv.setText(k.toUpperCase());
             keyTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            keyTv.setTypeface(null, Typeface.BOLD);
+            keyTv.setTypeface(fPoppinsSemi);
             keyTv.setTextColor(PILL_GREEN_TEXT);
             keyTv.setMinWidth(dp(40));
             row.addView(keyTv);
@@ -395,7 +406,7 @@ public class LessonContentActivity extends AppCompatActivity {
                 TextView subLabel = new TextView(this);
                 subLabel.setText(capitalize(k));
                 subLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                subLabel.setTypeface(null, Typeface.BOLD);
+                subLabel.setTypeface(fPoppinsSemi);
                 subLabel.setTextColor(TEXT_SECONDARY);
                 subLabel.setPadding(0, dp(4), 0, dp(6));
                 body.addView(subLabel);
@@ -421,7 +432,8 @@ public class LessonContentActivity extends AppCompatActivity {
         // Self-paced instruction
         TextView inst = makeBodyText("Read each sentence out loud 3 times.", 13);
         inst.setTextColor(TEXT_SECONDARY);
-        inst.setTypeface(null, Typeface.ITALIC);
+        // poppins_regular already set by makeBodyText; keep as italic style
+        inst.setTypeface(fPoppinsRegular, Typeface.ITALIC);
         LinearLayout.LayoutParams ip = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         ip.setMargins(0, dp(4), 0, dp(14));
@@ -468,7 +480,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView wordTv = new TextView(this);
         wordTv.setText(word);
         wordTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 28);
-        wordTv.setTypeface(null, Typeface.BOLD);
+        wordTv.setTypeface(fVisbyBold);
         wordTv.setTextColor(CHIP_COLORS[index % CHIP_COLORS.length]);
         wordTv.setGravity(Gravity.CENTER);
         LinearLayout.LayoutParams wp = new LinearLayout.LayoutParams(
@@ -488,7 +500,7 @@ public class LessonContentActivity extends AppCompatActivity {
             check.setText("Cover the tiles. Can you read the word?");
             check.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
             check.setTextColor(TEXT_SECONDARY);
-            check.setTypeface(null, Typeface.ITALIC);
+            check.setTypeface(fPoppinsRegular, Typeface.ITALIC);
             check.setGravity(Gravity.CENTER);
             LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -520,7 +532,7 @@ public class LessonContentActivity extends AppCompatActivity {
             TextView tile = new TextView(this);
             tile.setText(seg.toUpperCase());
             tile.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            tile.setTypeface(null, Typeface.BOLD);
+            tile.setTypeface(fVisbyBold);
             tile.setTextColor(Color.WHITE);
             tile.setGravity(Gravity.CENTER);
 
@@ -569,6 +581,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        tv.setTypeface(fPoppinsRegular);
         tv.setTextColor(TEXT_SECONDARY);
         return tv;
     }
@@ -608,7 +621,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTypeface(fPoppinsSemi);
         tv.setTextColor(textColor);
         tv.setLetterSpacing(0.04f);
         tv.setPadding(dp(10), dp(6), dp(10), dp(6));
@@ -623,6 +636,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, spSize);
+        tv.setTypeface(fPoppinsRegular);
         tv.setTextColor(TEXT_PRIMARY);
         tv.setLineSpacing(0f, 1.5f);
         return tv;
@@ -632,7 +646,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView chip = new TextView(this);
         chip.setText(word);
         chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        chip.setTypeface(null, Typeface.BOLD);
+        chip.setTypeface(fVisbyBold);
         chip.setTextColor(Color.WHITE);
         chip.setGravity(Gravity.CENTER);
         chip.setPadding(dp(8), dp(12), dp(8), dp(12));
@@ -649,7 +663,7 @@ public class LessonContentActivity extends AppCompatActivity {
         TextView tv = new TextView(this);
         tv.setText(text);
         tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, spSize);
-        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTypeface(fPoppinsSemi);
         tv.setTextColor(Color.WHITE);
         tv.setGravity(Gravity.CENTER);
         GradientDrawable bg = new GradientDrawable();
