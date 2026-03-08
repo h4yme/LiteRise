@@ -98,23 +98,37 @@ try {
     
     // Update node progress
     updateNodeProgress($conn, $studentId, $nodeId, $scorePercent, $adaptiveDecision);
-    
+
     // Award XP
     awardXP($conn, $studentId, $xpAwarded);
-    
+
     // Handle adaptive branching
     $unlockedNodes = handleAdaptiveBranching($conn, $studentId, $nodeId, $adaptiveDecision);
-    
+
+    // Check badge unlocks on any quiz pass (score >= 70)
+    $newBadges       = [];
+    $moduleCompleted = false;
+    $moduleId        = null;
+    if ($scorePercent >= 70) {
+        $badgeResult     = checkAndAwardBadges($conn, $studentId, $nodeId);
+        $newBadges       = $badgeResult['new_badges'];
+        $moduleCompleted = $badgeResult['module_completed'];
+        $moduleId        = $badgeResult['module_id'];
+    }
+
     http_response_code(200);
     echo json_encode([
         'success' => true,
         'result' => [
-            'score_percent' => round($scorePercent, 2),
-            'correct_count' => $correctCount,
-            'total_questions' => $totalQuestions,
-            'adaptive_decision' => $adaptiveDecision,
-            'xp_awarded' => $xpAwarded,
-            'unlocked_nodes' => $unlockedNodes
+            'score_percent'    => round($scorePercent, 2),
+            'correct_count'    => $correctCount,
+            'total_questions'  => $totalQuestions,
+            'adaptive_decision'=> $adaptiveDecision,
+            'xp_awarded'       => $xpAwarded,
+            'unlocked_nodes'   => $unlockedNodes,
+            'new_badges'       => $newBadges,
+            'module_completed' => $moduleCompleted,
+            'module_id'        => $moduleId
         ]
     ]);
     
@@ -134,6 +148,98 @@ try {
     ]);
 }
 
+
+function checkAndAwardBadges($conn, $studentId, $nodeId) {
+    $newBadges       = [];
+    $moduleCompleted = false;
+    $moduleId        = null;
+
+    // Module completion check
+    $stmt = $conn->prepare("SELECT ModuleID FROM Nodes WHERE NodeID = ?");
+    $stmt->execute([$nodeId]);
+    $moduleId = $stmt->fetchColumn();
+
+    if ($moduleId) {
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM Nodes WHERE ModuleID = ? AND IsActive = 1");
+        $stmt->execute([$moduleId]);
+        $totalNodes = (int)$stmt->fetchColumn();
+
+        $stmt = $conn->prepare("
+            SELECT COUNT(*)
+            FROM StudentNodeProgress snp
+            INNER JOIN Nodes n ON snp.NodeID = n.NodeID
+            WHERE snp.StudentID = ? AND n.ModuleID = ? AND snp.QuizCompleted = 1 AND n.IsActive = 1
+        ");
+        $stmt->execute([$studentId, $moduleId]);
+        $completedNodes = (int)$stmt->fetchColumn();
+
+        if ($totalNodes > 0 && $completedNodes >= $totalNodes) {
+            $moduleCompleted = true;
+
+            $stmt = $conn->prepare("
+                SELECT BadgeID, BadgeName, BadgeDescription, BadgeIconURL, XPReward, BadgeCategory
+                FROM Badges WHERE UnlockCondition = ?
+            ");
+            $stmt->execute(["Module:$moduleId"]);
+            $moduleBadge = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($moduleBadge) {
+                $stmt = $conn->prepare("
+                    IF NOT EXISTS (SELECT 1 FROM StudentBadges WHERE StudentID = ? AND BadgeID = ?)
+                        INSERT INTO StudentBadges (StudentID, BadgeID, DateEarned) VALUES (?, ?, GETDATE())
+                ");
+                $stmt->execute([
+                    $studentId, $moduleBadge['BadgeID'],
+                    $studentId, $moduleBadge['BadgeID']
+                ]);
+
+                if ($stmt->rowCount() > 0) {
+                    if ((int)$moduleBadge['XPReward'] > 0) {
+                        $stmt = $conn->prepare(
+                            "UPDATE Students SET TotalXP = ISNULL(TotalXP,0) + ? WHERE StudentID = ?"
+                        );
+                        $stmt->execute([$moduleBadge['XPReward'], $studentId]);
+                    }
+                    $newBadges[] = [
+                        'badge_id'          => (int)$moduleBadge['BadgeID'],
+                        'badge_name'        => $moduleBadge['BadgeName'],
+                        'badge_description' => $moduleBadge['BadgeDescription'],
+                        'badge_icon_url'    => $moduleBadge['BadgeIconURL'],
+                        'xp_reward'         => (int)$moduleBadge['XPReward'],
+                        'badge_category'    => $moduleBadge['BadgeCategory'],
+                        'date_earned'       => date('Y-m-d H:i:s')
+                    ];
+                }
+            }
+        }
+    }
+
+    // SP_CheckBadgeUnlock handles XP / Streak / Games / Lessons / Perfect
+    try {
+        $stmt = $conn->prepare("EXEC SP_CheckBadgeUnlock ?");
+        $stmt->execute([$studentId]);
+        $spBadges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($spBadges as $b) {
+            $newBadges[] = [
+                'badge_id'          => (int)$b['BadgeID'],
+                'badge_name'        => $b['BadgeName'],
+                'badge_description' => $b['BadgeDescription'],
+                'badge_icon_url'    => $b['BadgeIconURL'],
+                'xp_reward'         => (int)$b['XPReward'],
+                'badge_category'    => $b['BadgeCategory'],
+                'date_earned'       => $b['DateEarned']
+            ];
+        }
+    } catch (Exception $e) {
+        error_log('SP_CheckBadgeUnlock failed: ' . $e->getMessage());
+    }
+
+    return [
+        'new_badges'       => $newBadges,
+        'module_completed' => $moduleCompleted,
+        'module_id'        => $moduleId ? (int)$moduleId : null
+    ];
+}
 
 function determineAdaptiveDecision($scorePercent, $placementLevel) {
     if ($scorePercent < 70) {
