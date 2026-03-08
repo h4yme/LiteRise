@@ -453,35 +453,31 @@ public class WordHuntActivity extends BaseGameActivity {
 
                         } else {
 
-                            showErrorAndExit("No words found for your grade level. Please contact administrator.");
+                            android.util.Log.w("WordHunt", "API returned no words — using demo words");
+
+                            loadDemoWords();
+
+                            startGame();
 
                         }
 
                     } else {
 
-                        showErrorAndExit("API Error: " + response.body().getMessage());
+                        android.util.Log.w("WordHunt", "API error — using demo words: " + response.body().getMessage());
+
+                        loadDemoWords();
+
+                        startGame();
 
                     }
 
                 } else {
 
-                    String errorMsg = "Failed to load words";
+                    android.util.Log.w("WordHunt", "HTTP " + response.code() + " — using demo words");
 
-                    try {
+                    loadDemoWords();
 
-                        if (response.errorBody() != null) {
-
-                            errorMsg = response.errorBody().string();
-
-                        }
-
-                    } catch (Exception e) {
-
-                        errorMsg = "HTTP " + response.code();
-
-                    }
-
-                    showErrorAndExit("Server Error: " + errorMsg);
+                    startGame();
 
                 }
 
@@ -495,9 +491,11 @@ public class WordHuntActivity extends BaseGameActivity {
 
                 loadingProgress.setVisibility(View.GONE);
 
-                android.util.Log.e("WordHunt", "API call failed", t);
+                android.util.Log.w("WordHunt", "API call failed — using demo words: " + t.getMessage());
 
-                showErrorAndExit("Network Error: " + t.getMessage());
+                loadDemoWords();
+
+                startGame();
 
             }
 
