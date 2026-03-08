@@ -2,20 +2,15 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <!-- Soft page background -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="#F0F4FF" />
+    android:layout_height="match_parent"
+    android:background="@color/background_light">
 
     <!-- Main Content -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Top Bar with Cute Design -->
+        <!-- Top Bar — matches dashboard purple header -->
         <LinearLayout
             android:id="@+id/topBar"
             android:layout_width="match_parent"
@@ -24,7 +19,7 @@
             android:padding="16dp"
             android:background="@drawable/bg_gradient_purple_blue"
             android:gravity="center_vertical"
-            android:elevation="8dp">
+            android:elevation="4dp">
 
             <ImageView
                 android:id="@+id/btnBack"
@@ -40,9 +35,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="📖 Lesson 1"
+                android:text="Lesson 1"
                 android:textColor="@color/white"
-                android:textSize="20sp"
+                android:textSize="18sp"
                 android:fontFamily="@font/visby_bold"
                 android:gravity="center" />
 
@@ -52,68 +47,64 @@
 
         </LinearLayout>
 
-        <!-- Main Scroll Content -->
+        <!-- Scrollable content -->
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_below="@id/topBar"
             android:layout_above="@id/bottomBar"
             android:fillViewport="true"
-            android:padding="16dp">
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="8dp"
+            android:clipToPadding="false">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Pacing badge -->
-                <androidx.cardview.widget.CardView
+                <!-- Pacing pill — matches dashboard stat badge style -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_horizontal"
-                    android:layout_marginBottom="20dp"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_light_purple"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
 
-                    <LinearLayout
+                    <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:background="@drawable/bg_gradient_purple_blue"
-                        android:paddingStart="20dp"
-                        android:paddingEnd="20dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:text="⭐  "
+                        android:textSize="13sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="⭐"
-                            android:textSize="16sp" />
+                    <TextView
+                        android:id="@+id/tvScaffolding"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="BEGINNER MODE"
+                        android:textColor="@color/purple_600"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:letterSpacing="0.06" />
 
-                        <TextView
-                            android:id="@+id/tvScaffolding"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:text="BEGINNER MODE"
-                            android:textColor="@color/white"
-                            android:textSize="13sp"
-                            android:fontFamily="@font/visby_bold"
-                            android:letterSpacing="0.08" />
+                </LinearLayout>
 
-                    </LinearLayout>
-
-                </androidx.cardview.widget.CardView>
-
-                <!-- Lesson Title Card -->
-                <androidx.cardview.widget.CardView
+                <!-- Lesson title card -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="20dp"
                     app:cardCornerRadius="20dp"
-                    app:cardElevation="6dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="0dp"
                     app:cardBackgroundColor="@color/white">
 
                     <LinearLayout
@@ -122,37 +113,37 @@
                         android:orientation="vertical"
                         android:padding="20dp">
 
-                        <!-- Emoji Header -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="📚"
-                            android:textSize="48sp"
+                            android:textSize="40sp"
                             android:layout_gravity="center"
-                            android:layout_marginBottom="12dp" />
+                            android:layout_marginBottom="10dp" />
 
                         <TextView
                             android:id="@+id/tvLessonTitle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Reading Comprehension Basics"
-                            android:textColor="@color/color_charcoal"
-                            android:textSize="24sp"
+                            android:text="Reading Comprehension"
+                            android:textColor="#2D3436"
+                            android:textSize="22sp"
                             android:fontFamily="@font/visby_bold"
                             android:gravity="center"
-                            android:layout_marginBottom="8dp" />
+                            android:layout_marginBottom="12dp" />
 
+                        <!-- Solid accent divider — no rainbow gradient -->
                         <View
-                            android:layout_width="60dp"
+                            android:layout_width="48dp"
                             android:layout_height="4dp"
-                            android:background="@drawable/bg_gradient_rainbow"
+                            android:background="@color/purple_600"
                             android:layout_gravity="center" />
 
                     </LinearLayout>
 
-                </androidx.cardview.widget.CardView>
+                </com.google.android.material.card.MaterialCardView>
 
-                <!-- Progress Bar (shown while loading) -->
+                <!-- Loading spinner -->
                 <ProgressBar
                     android:id="@+id/progressBar"
                     android:layout_width="wrap_content"
@@ -161,41 +152,40 @@
                     android:layout_marginBottom="16dp"
                     android:visibility="gone" />
 
-                <!-- Kid-Friendly Lesson Content Cards (populated programmatically) -->
+                <!-- Programmatic lesson section cards -->
                 <LinearLayout
                     android:id="@+id/llContentSections"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:layout_marginBottom="4dp" />
+                    android:layout_marginBottom="8dp" />
 
             </LinearLayout>
 
         </ScrollView>
 
-        <!-- Bottom Bar with Fun Complete Button -->
+        <!-- Bottom bar -->
         <LinearLayout
             android:id="@+id/bottomBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:orientation="vertical"
             android:padding="16dp"
             android:background="@color/white"
-            android:elevation="12dp">
+            android:elevation="8dp">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnComplete"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:text="✅ I Finished Reading!"
+                android:layout_height="56dp"
+                android:text="Mark as Complete"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:fontFamily="@font/visby_bold"
                 android:textAllCaps="false"
-                app:backgroundTint="@color/success_green"
-                app:cornerRadius="20dp"
+                app:backgroundTint="@color/purple_600"
+                app:cornerRadius="16dp"
                 app:icon="@drawable/ic_arrow_right"
                 app:iconGravity="end"
                 app:iconTint="@color/white"
