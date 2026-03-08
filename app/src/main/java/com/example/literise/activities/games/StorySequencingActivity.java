@@ -32,17 +32,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
+import com.example.literise.api.ApiClient;
+
+import com.example.literise.api.ApiService;
+
 import com.example.literise.database.SessionManager;
+
+import com.example.literise.models.GameContentRequest;
+
+import com.example.literise.models.GameContentResponse;
 
 import com.google.android.material.button.MaterialButton;
 
 import com.google.android.material.card.MaterialCardView;
+
+import com.google.gson.JsonArray;
+
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
 import java.util.Collections;
 
 import java.util.List;
+
+import retrofit2.Call;
+
+import retrofit2.Callback;
+
+import retrofit2.Response;
 
 
 
@@ -80,11 +98,67 @@ public class StorySequencingActivity extends BaseGameActivity {
         session = new SessionManager(this);
         initializeViews();
         applyModuleTheme();
-        setupStoryData();
-        setupRecyclerView();
         setupListeners();
-        startTimer();
 
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            setupStoryData();
+            setupRecyclerView();
+            startTimer();
+        }
+
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "story_sequencing", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        String storyTitle = response.body().content.has("title")
+                                ? response.body().content.get("title").getAsString() : null;
+                        JsonArray eventsArray = response.body().content.getAsJsonArray("events");
+                        List<StoryEvent> aiEvents = new ArrayList<>();
+                        for (int i = 0; i < eventsArray.size(); i++) {
+                            JsonObject obj = eventsArray.get(i).getAsJsonObject();
+                            int order = obj.get("order").getAsInt();
+                            String text = obj.get("text").getAsString();
+                            aiEvents.add(new StoryEvent(order, text));
+                        }
+                        if (!aiEvents.isEmpty()) {
+                            storyEvents = aiEvents;
+                            if (storyTitle != null && !storyTitle.isEmpty() && tvStoryTitle != null) {
+                                tvStoryTitle.setText(storyTitle);
+                            }
+                            Collections.shuffle(storyEvents);
+                            for (int i = 0; i < storyEvents.size(); i++) {
+                                storyEvents.get(i).displayNumber = i + 1;
+                            }
+                            setupRecyclerView();
+                            startTimer();
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                setupStoryData();
+                setupRecyclerView();
+                startTimer();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                setupStoryData();
+                setupRecyclerView();
+                startTimer();
+            }
+        });
     }
 
 

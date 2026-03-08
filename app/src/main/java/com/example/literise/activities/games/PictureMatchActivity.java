@@ -31,17 +31,35 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
+import com.example.literise.api.ApiClient;
+
+import com.example.literise.api.ApiService;
+
 import com.example.literise.database.SessionManager;
+
+import com.example.literise.models.GameContentRequest;
+
+import com.example.literise.models.GameContentResponse;
 
 import com.google.android.material.button.MaterialButton;
 
 import com.google.android.material.card.MaterialCardView;
+
+import com.google.gson.JsonArray;
+
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 
 import java.util.Collections;
 
 import java.util.List;
+
+import retrofit2.Call;
+
+import retrofit2.Callback;
+
+import retrofit2.Response;
 
 
 
@@ -96,14 +114,63 @@ public class PictureMatchActivity extends BaseGameActivity {
         initializeViews();
         applyModuleTheme();
 
-        setupMatchData();
-
-        setupRecyclerViews();
-
         setupListeners();
 
-        startTimer();
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
 
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            setupMatchData();
+            setupRecyclerViews();
+            startTimer();
+        }
+
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "picture_match", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray itemsArray = response.body().content.getAsJsonArray("items");
+                        List<MatchItem> aiPictures = new ArrayList<>();
+                        List<MatchItem> aiWords = new ArrayList<>();
+                        for (int i = 0; i < itemsArray.size(); i++) {
+                            JsonObject obj = itemsArray.get(i).getAsJsonObject();
+                            String word = obj.get("word").getAsString();
+                            String emoji = obj.has("emoji") ? obj.get("emoji").getAsString() : "❓";
+                            int id = i + 1;
+                            aiPictures.add(new MatchItem(id, emoji, word));
+                            aiWords.add(new MatchItem(id, emoji, word));
+                        }
+                        if (!aiPictures.isEmpty()) {
+                            pictures = aiPictures;
+                            words = aiWords;
+                            Collections.shuffle(words);
+                            setupRecyclerViews();
+                            startTimer();
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                setupMatchData();
+                setupRecyclerViews();
+                startTimer();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                setupMatchData();
+                setupRecyclerViews();
+                startTimer();
+            }
+        });
     }
 
 

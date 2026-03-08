@@ -21,13 +21,23 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Minimal Pairs - Pronunciation Challenge Game
@@ -79,11 +89,56 @@ public class MinimalPairsActivity extends BaseGameActivity {
 
         initializeViews();
         applyModuleTheme();
-        setupMinimalPairs();
         setupTextToSpeech();
         setupSpeechRecognition();
         setupListeners();
         checkMicrophonePermission();
+
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            setupMinimalPairs();
+        }
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "minimal_pairs", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray pairsArray = response.body().content.getAsJsonArray("pairs");
+                        List<MinimalPair> aiPairs = new ArrayList<>();
+                        for (int i = 0; i < pairsArray.size(); i++) {
+                            JsonObject obj = pairsArray.get(i).getAsJsonObject();
+                            String targetWord = obj.get("targetWord").getAsString();
+                            String contrastWord = obj.get("contrastWord").getAsString();
+                            String hint = obj.has("hint") ? obj.get("hint").getAsString() : "";
+                            aiPairs.add(new MinimalPair(targetWord, contrastWord, hint, R.drawable.ic_mouth_i));
+                        }
+                        if (!aiPairs.isEmpty()) {
+                            minimalPairs = aiPairs;
+                            Collections.shuffle(minimalPairs);
+                            totalPairs = minimalPairs.size();
+                            loadCurrentPair();
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                setupMinimalPairs();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                setupMinimalPairs();
+            }
+        });
     }
 
     private void initializeViews() {

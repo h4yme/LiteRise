@@ -47,6 +47,8 @@ import com.example.literise.models.AdaptiveQuestionRequest;
 import com.example.literise.models.AdaptiveQuestionResponse;
 import com.example.literise.models.SubmitAnswerRequest;
 import com.example.literise.models.SubmitAnswerResponse;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
 import java.util.List;
 
 import java.util.Map;
@@ -263,4 +265,9 @@ public interface ApiService {
     Call<com.example.literise.models.ResponseModel> completeTutorial(
             @Body com.example.literise.models.CompleteTutorialRequest request
     );
+
+    // 🤖 AI-generated game content from lesson JSON (Claude API via backend)
+    @Headers("Content-Type: application/json")
+    @POST("generate_game_content.php")
+    Call<GameContentResponse> generateGameContent(@Body GameContentRequest request);
 }

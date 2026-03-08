@@ -519,8 +519,27 @@ public class ModuleLadderActivity extends AppCompatActivity {
         if (moduleDomain != null) {
             switch (moduleDomain.toLowerCase()) {
                 case "phonics":
-                    // Phonics: sound recognition, word patterns, letter games
-                    String[] phonicsGames = {"minimal_pairs", "word_hunt", "word_explosion", "picture_match", "fill_in_blanks"};
+                    // Phonics: content-appropriate rotation based on LessonsUpdated.csv
+                    // 1→word_hunt(CVCC sight words), 2→minimal_pairs(CCVC sounds),
+                    // 3→fill_in_blanks(VCV+VCCV syllable), 4→sentence_scramble(sight words in sentences),
+                    // 5→fill_in_blanks(VCV open syllable), 6→fill_in_blanks(VCCV closed),
+                    // 7→sentence_scramble(action stories), 8→minimal_pairs(antonyms),
+                    // 9→timed_trail(MCQ comparison), 10→sentence_scramble(abstract),
+                    // 11→timed_trail(definitions), 12→sentence_scramble(spatial)
+                    String[] phonicsGames = {
+                        "word_hunt",         // 1: CVCC sight words (find them in a grid)
+                        "minimal_pairs",     // 2: CCVC clusters (sound discrimination)
+                        "fill_in_blanks",    // 3: VCV+VCCV syllable division
+                        "sentence_scramble", // 4: Q2 sight words in sentences
+                        "fill_in_blanks",    // 5: VCV open syllable (Pi-lot, Si-lent)
+                        "fill_in_blanks",    // 6: VCCV closed syllable (Bas-ket)
+                        "sentence_scramble", // 7: Action sight words in stories
+                        "minimal_pairs",     // 8: Antonym pairs (near-far, cold-hot)
+                        "timed_trail",       // 9: Comparison MCQ (better/best)
+                        "sentence_scramble", // 10: Abstract words in sentences
+                        "timed_trail",       // 11: Definitions MCQ
+                        "sentence_scramble"  // 12: Spatial direction sentences
+                    };
                     return phonicsGames[(nodeNum - 1) % phonicsGames.length];
 
                 case "vocabulary":
