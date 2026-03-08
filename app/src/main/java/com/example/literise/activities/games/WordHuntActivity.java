@@ -1786,6 +1786,9 @@ public class WordHuntActivity extends BaseGameActivity {
 
         saveGameResults(accuracy, totalTime);
 
+        // Mark game phase complete in StudentNodeProgress so quiz phase can unlock
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Celebrate if all words found, then show result
         if (wordsFound >= words.size() && lottieComplete != null) {
             lottieComplete.setVisibility(View.VISIBLE);

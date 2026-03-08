@@ -67,8 +67,23 @@ try {
     }
 
     // Remove correct answers (validated server-side); parse OptionsJSON into option_a..d
+    // Supports two OptionsJSON formats from the database:
+    //   Object: {"A":"could","B":"cold","C":"cat","D":"can"}
+    //   Array:  ["could","cold"]  (imported from QuizQuestions.csv)
     $questionsForClient = array_map(function($q) {
-        $opts = json_decode($q['OptionsJSON'] ?? '{}', true) ?: [];
+        $raw  = $q['OptionsJSON'] ?? '{}';
+        $opts = json_decode($raw, true) ?: [];
+
+        if (array_values($opts) === $opts) {
+            // Numeric/sequential array — map index 0→A, 1→B, 2→C, 3→D
+            $keys   = ['A', 'B', 'C', 'D'];
+            $mapped = [];
+            foreach ($opts as $i => $val) {
+                if (isset($keys[$i])) $mapped[$keys[$i]] = $val;
+            }
+            $opts = $mapped;
+        }
+
         return [
             'question_id'   => $q['QuestionID'],
             'question_text' => $q['QuestionText'],
