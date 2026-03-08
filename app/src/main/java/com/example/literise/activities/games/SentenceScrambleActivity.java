@@ -56,6 +56,7 @@ import androidx.core.content.ContextCompat;
 
 
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.api.ApiClient;
@@ -125,6 +126,8 @@ public class SentenceScrambleActivity extends BaseGameActivity {
     private CardView cardStreak;
 
     private View streakIndicator;
+
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
 
 
@@ -319,6 +322,10 @@ public class SentenceScrambleActivity extends BaseGameActivity {
         cardStreak = findViewById(R.id.cardStreak);
 
         streakIndicator = findViewById(R.id.streakIndicator);
+
+        lottieCorrect = (LottieAnimationView) findViewById(R.id.lottieCorrect);
+
+        lottieComplete = (LottieAnimationView) findViewById(R.id.lottieComplete);
 
 
 
@@ -1023,7 +1030,8 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
         animateCorrectFeedback();
 
-
+        // Lottie sparkle
+        playLottieOnce(lottieCorrect);
 
         // Show feedback
 
@@ -1387,10 +1395,36 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
         saveGameResults(accuracy, totalTime);
 
+        // Celebrate then show dialog
+        if (accuracy >= 70f && lottieComplete != null) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            final float fa = accuracy; final long ft = totalTime;
+            lottieComplete.addAnimatorListener(new AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(Animator animation) {
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog(fa, ft);
+                }
+            });
+        } else {
+            showResultDialog(accuracy, totalTime);
+        }
 
+    }
 
-        showResultDialog(accuracy, totalTime);
-
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
 

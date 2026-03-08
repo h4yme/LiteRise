@@ -56,6 +56,7 @@ import androidx.core.content.ContextCompat;
 
 
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
 import com.example.literise.api.ApiClient;
@@ -133,6 +134,8 @@ public class WordHuntActivity extends BaseGameActivity {
     private MaterialButton btnHint, btnShuffle;
 
     private CardView cardDefinition;
+
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
 
 
@@ -323,6 +326,10 @@ public class WordHuntActivity extends BaseGameActivity {
 
 
         cardDefinition = (CardView) findViewById(R.id.cardDefinition);
+
+        lottieCorrect = (LottieAnimationView) findViewById(R.id.lottieCorrect);
+
+        lottieComplete = (LottieAnimationView) findViewById(R.id.lottieComplete);
 
     }
 
@@ -1298,7 +1305,8 @@ public class WordHuntActivity extends BaseGameActivity {
 
         playSound(SOUND_CORRECT);
 
-
+        // Lottie sparkle on each word found
+        playLottieOnce(lottieCorrect);
 
         CustomToast.showSuccess(this, "Found: " + word.getWord() + " +" + points + " XP");
 
@@ -1312,6 +1320,21 @@ public class WordHuntActivity extends BaseGameActivity {
 
         }
 
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
 
@@ -1702,11 +1725,23 @@ public class WordHuntActivity extends BaseGameActivity {
 
         float accuracy = words.size() > 0 ? ((float) wordsFound / words.size()) * 100 : 0;
 
-
-
         saveGameResults(accuracy, totalTime);
 
-        showResultDialog(accuracy, totalTime);
+        // Celebrate if all words found, then show result
+        if (wordsFound >= words.size() && lottieComplete != null) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            final float finalAccuracy = accuracy;
+            final long finalTime = totalTime;
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog(finalAccuracy, finalTime);
+                }
+            });
+        } else {
+            showResultDialog(accuracy, totalTime);
+        }
 
     }
 

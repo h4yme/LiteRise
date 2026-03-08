@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -76,6 +77,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     private int nodeId;
     private String moduleDomain;
 
+    // Lottie
+    private LottieAnimationView lottieCorrect, lottieComplete;
+
     // Module theming
     private String colorStart = "#7C3AED";
     private String colorEnd = "#4F46E5";
@@ -116,6 +120,8 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         tvQuestionAfter = findViewById(R.id.tvQuestionAfter);
         recyclerWordOptions = findViewById(R.id.recyclerWordOptions);
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+        lottieComplete = findViewById(R.id.lottieComplete);
 
         btnBack.setOnClickListener(v -> {
             if (countDownTimer != null) countDownTimer.cancel();
@@ -328,8 +334,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
             score += 10;
             tvScore.setText(String.valueOf(score));
             try { tvBlank.setBackgroundResource(R.drawable.bg_blank_correct); } catch (Exception ignored) {}
-            tvBlank.animate().scaleX(1.2f).scaleY(1.2f).setDuration(150)
-                    .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(150).start()).start();
+            tvBlank.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200)
+                    .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(200).start()).start();
+            playLottieOnce(lottieCorrect);
         } else {
             try { tvBlank.setBackgroundResource(R.drawable.bg_blank_wrong); } catch (Exception ignored) {}
             tvBlank.setText(q.correctAnswer);
@@ -364,7 +371,35 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         int accuracy = total > 0 ? (int)((correctAnswers * 100.0) / total) : 0;
         int timeUsed = (int)((System.currentTimeMillis() - gameStartTime) / 1000);
         saveGameResult(score, accuracy, timeUsed);
-        showResultDialog(correctAnswers, total, accuracy, score);
+
+        // Celebrate then show dialog
+        if (lottieComplete != null && accuracy >= 70) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog(correctAnswers, total, accuracy, score);
+                }
+            });
+        } else {
+            showResultDialog(correctAnswers, total, accuracy, score);
+        }
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void saveGameResult(int xpEarned, int accuracy, int timeSeconds) {

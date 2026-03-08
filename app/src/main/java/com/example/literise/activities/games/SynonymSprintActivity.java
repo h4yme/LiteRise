@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GestureDetectorCompat;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 import com.google.android.material.button.MaterialButton;
 
@@ -40,6 +41,7 @@ public class SynonymSprintActivity extends AppCompatActivity {
     private MaterialButton btnPause;
     private ImageView[] heartIcons = new ImageView[3];
     private View characterView;
+    private LottieAnimationView lottieCorrect, lottieComplete;
 
     // Game State
     private int score = 0;
@@ -63,10 +65,10 @@ public class SynonymSprintActivity extends AppCompatActivity {
     private CountDownTimer spawnTimer;
     private GestureDetectorCompat gestureDetector;
 
-    // Constants
-    private static final int GAME_DURATION = 120000; // 2 minutes
-    private static final int BASE_SPAWN_INTERVAL = 1500; // 1.5 seconds
-    private static final int WORD_SPEED = 15; // pixels per frame
+    // Constants — grade-3-friendly (slower words, more time between spawns)
+    private static final int GAME_DURATION = 150000;      // 2.5 minutes (more time)
+    private static final int BASE_SPAWN_INTERVAL = 3000;  // 3 s between words
+    private static final int WORD_SPEED = 6;              // px per frame (was 15)
 
     // Word data
     private Map<String, WordData> wordDatabase;
@@ -152,6 +154,8 @@ public class SynonymSprintActivity extends AppCompatActivity {
         heartIcons[1] = findViewById(R.id.heart2);
         heartIcons[2] = findViewById(R.id.heart3);
         characterView = findViewById(R.id.characterView);
+        lottieCorrect = findViewById(R.id.lottieCorrect);
+        lottieComplete = findViewById(R.id.lottieComplete);
 
         // Set target word
         tvTargetWord.setText(targetWord.toUpperCase());
@@ -377,19 +381,39 @@ public class SynonymSprintActivity extends AppCompatActivity {
         if (combo >= 3) {
             cardCombo.setVisibility(View.VISIBLE);
             tvCombo.setText(combo + "x STREAK!");
-            cardCombo.animate().scaleX(1.2f).scaleY(1.2f).setDuration(100)
-                    .withEndAction(() -> cardCombo.animate().scaleX(1f).scaleY(1f).setDuration(100));
+            cardCombo.animate().scaleX(1.2f).scaleY(1.2f).setDuration(180)
+                    .withEndAction(() -> cardCombo.animate().scaleX(1f).scaleY(1f).setDuration(180));
         }
 
-        // Animate word collection
+        // Lottie sparkle
+        playLottieOnce(lottieCorrect);
+
+        // Animate word collection — slightly slower so child sees it
         word.textView.animate()
                 .scaleX(0f)
                 .scaleY(0f)
                 .alpha(0f)
-                .setDuration(200)
-                .withEndAction(() -> gameContainer.removeView(word.textView));
+                .setDuration(350)
+                .withEndAction(() -> {
+                    if (word.textView.getParent() != null) gameContainer.removeView(word.textView);
+                });
 
         updateUI();
+    }
+
+    /** Plays a Lottie animation once, hiding it when done. */
+    private void playLottieOnce(LottieAnimationView view) {
+        if (view == null) return;
+        view.cancelAnimation();
+        view.setProgress(0f);
+        view.setVisibility(View.VISIBLE);
+        view.playAnimation();
+        view.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(android.animation.Animator animation) {
+                view.setVisibility(View.GONE);
+                view.removeAllAnimatorListeners();
+            }
+        });
     }
 
     private void onAntonymHit(RunningWord word) {
@@ -403,20 +427,23 @@ public class SynonymSprintActivity extends AppCompatActivity {
             heartIcons[lives].setVisibility(View.INVISIBLE);
         }
 
-        // Shake screen effect
+        // Grade-3 friendly screen shake (gentler — 3 bounces, 80ms each)
         gameContainer.animate()
-                .translationX(-20f).setDuration(50)
-                .withEndAction(() -> gameContainer.animate().translationX(20f).setDuration(50)
-                        .withEndAction(() -> gameContainer.animate().translationX(0f).setDuration(50)));
+                .translationX(-18f).setDuration(80)
+                .withEndAction(() -> gameContainer.animate().translationX(18f).setDuration(80)
+                .withEndAction(() -> gameContainer.animate().translationX(-10f).setDuration(80)
+                .withEndAction(() -> gameContainer.animate().translationX(0f).setDuration(80))));
 
-        // Animate word explosion
+        // Animate word explosion — slower so child sees the feedback
         word.textView.animate()
-                .scaleX(2f)
-                .scaleY(2f)
+                .scaleX(2.2f)
+                .scaleY(2.2f)
                 .alpha(0f)
                 .rotation(360f)
-                .setDuration(300)
-                .withEndAction(() -> gameContainer.removeView(word.textView));
+                .setDuration(600)
+                .withEndAction(() -> {
+                    if (word.textView.getParent() != null) gameContainer.removeView(word.textView);
+                });
 
         updateUI();
 
@@ -446,16 +473,28 @@ public class SynonymSprintActivity extends AppCompatActivity {
 
         // Clear all words
         for (RunningWord word : activeWords) {
-            gameContainer.removeView(word.textView);
+            if (word.textView.getParent() != null) gameContainer.removeView(word.textView);
         }
         activeWords.clear();
 
-        // Show results
-        String message = String.format("Game Over!\nScore: %d\nDistance: %dm\nMax Streak: %dx",
-                score, distance, maxCombo);
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-
-        finish();
+        // Lottie celebration then finish
+        if (lottieComplete != null) {
+            lottieComplete.setVisibility(View.VISIBLE);
+            lottieComplete.playAnimation();
+            lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
+                @Override public void onAnimationEnd(android.animation.Animator animation) {
+                    String message = String.format("Great job!\nScore: %d\nDistance: %dm\nBest Streak: %dx",
+                            score, distance, maxCombo);
+                    Toast.makeText(SynonymSprintActivity.this, message, Toast.LENGTH_LONG).show();
+                    finish();
+                }
+            });
+        } else {
+            String message = String.format("Great job!\nScore: %d\nDistance: %dm",
+                    score, distance);
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            finish();
+        }
     }
 
     @Override
@@ -480,12 +519,14 @@ public class SynonymSprintActivity extends AppCompatActivity {
             this.isSynonym = isSynonym;
             this.lane = lane;
 
-            // Create TextView
+            // Create TextView — larger text for grade 3 readability
             textView = new TextView(SynonymSprintActivity.this);
             textView.setText(word);
-            textView.setTextSize(18);
+            textView.setTextSize(22);
+            textView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
             textView.setTextColor(0xFFFFFFFF);
-            textView.setPadding(24, 16, 24, 16);
+            textView.setPadding(32, 20, 32, 20);
+            textView.setGravity(android.view.Gravity.CENTER);
             textView.setBackgroundResource(isSynonym ?
                     R.drawable.word_card_synonym : R.drawable.word_card_antonym);
 
