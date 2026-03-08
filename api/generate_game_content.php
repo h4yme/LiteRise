@@ -34,12 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-// ─── CONFIG ──────────────────────────────────────────────────────────────────
-// Set ANTHROPIC_API_KEY in your server's environment variables or .env file.
-// Never commit the actual key to git.
-$anthropicApiKey = getenv('ANTHROPIC_API_KEY') ?: '';
-
 require_once __DIR__ . '/src/db.php';
+// $anthropicApiKey is set by db.php via ANTHROPIC_API_KEY in .env or Azure App Settings
 
 // ─── INPUT ───────────────────────────────────────────────────────────────────
 $body = json_decode(file_get_contents('php://input'), true);

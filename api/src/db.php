@@ -75,11 +75,12 @@ if ($envFile) {
 }
 
 // DB config (NO insecure local defaults for production)
-$serverName = envv('DB_SERVER', 'literise.database.windows.net'); // e.g. literise.database.windows.net
-$database   = envv('DB_NAME',   'literisedb');
-$username   = envv('DB_USER',   'SAliterise'); // e.g. SAliterise (or admin user)
-$password   = envv('DB_PASSWORD', 'p@ssw0rd'); // MUST set in env vars or Azure App Service config
-$debugMode  = strtolower((string)envv('DEBUG_MODE', 'false')) === 'true';
+$serverName      = envv('DB_SERVER',        'literise.database.windows.net');
+$database        = envv('DB_NAME',          'literisedb');
+$username        = envv('DB_USER',          'SAliterise');
+$password        = envv('DB_PASSWORD',      'p@ssw0rd');
+$debugMode       = strtolower((string)envv('DEBUG_MODE', 'false')) === 'true';
+$anthropicApiKey = envv('ANTHROPIC_API_KEY', '');
 
 // Basic validation (helps catch misconfig early)
 if ($username === '' || $password === '') {
