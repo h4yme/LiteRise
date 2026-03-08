@@ -353,71 +353,18 @@ public class WordHuntActivity extends BaseGameActivity {
 
 
     private void loadWords() {
-
-        // 1. Use AI-generated words when lesson context is available
         String lessonContent = getIntent().getStringExtra("lesson_content");
         int nodeId = getIntent().getIntExtra("node_id", -1);
-        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
-            ApiService svc = ApiClient.getClient(this).create(ApiService.class);
-            svc.generateGameContent(new GameContentRequest(nodeId, "word_hunt", lessonContent))
-                    .enqueue(new retrofit2.Callback<GameContentResponse>() {
-                @Override
-                public void onResponse(retrofit2.Call<GameContentResponse> call,
-                                       retrofit2.Response<GameContentResponse> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().success
-                            && response.body().content != null) {
-                        try {
-                            JsonArray arr = response.body().content.getAsJsonArray("words");
-                            List<WordHuntWord> aiWords = new ArrayList<>();
-                            for (int i = 0; i < arr.size(); i++) {
-                                JsonObject obj = arr.get(i).getAsJsonObject();
-                                String word       = obj.get("word").getAsString().toLowerCase();
-                                String hint       = obj.has("hint") ? obj.get("hint").getAsString() : "";
-                                String definition = obj.has("definition") ? obj.get("definition").getAsString() : "";
-                                WordHuntWord w = new WordHuntWord(i + 1, word, definition, 1.0f);
-                                w.setHint(hint);
-                                aiWords.add(w);
-                            }
-                            if (!aiWords.isEmpty()) {
-                                words = aiWords;
-                                startGame();
-                                return;
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                    loadLocalOrDemoWords(lessonContent);
-                }
 
-                @Override
-                public void onFailure(retrofit2.Call<GameContentResponse> call, Throwable t) {
-                    loadLocalOrDemoWords(lessonContent);
-                }
-            });
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            // Have lesson content already — call AI directly
+            generateWithAI(nodeId, lessonContent);
             return;
         }
 
-        loadLocalOrDemoWords(lessonContent);
-    }
-
-    private void loadLocalOrDemoWords(String lessonContent) {
-
-        // Use lesson content passed directly from ModuleLadderActivity (same session)
-        if (lessonContent != null) {
-            try {
-                List<WordHuntWord> lessonWords = extractWordsFromLessonContent(lessonContent);
-                if (!lessonWords.isEmpty()) {
-                    words = lessonWords;
-                    startGame();
-                    return;
-                }
-            } catch (Exception ignored) {}
-        }
-
-        // 2. Fetch lesson content from the API using node_id (lesson was completed in a
-        //    previous session, so lesson_content was not forwarded via intent)
-        int nodeId = getIntent().getIntExtra("node_id", -1);
-        int placementLevel = getIntent().getIntExtra("placement_level", 2);
         if (nodeId > 0) {
+            // No lesson content in intent (e.g. Replay Game path) — fetch it first, then AI
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
             loadingProgress.setVisibility(View.VISIBLE);
             ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
             apiService.getLessonContent(nodeId, placementLevel)
@@ -429,19 +376,12 @@ public class WordHuntActivity extends BaseGameActivity {
                             if (response.isSuccessful() && response.body() != null
                                     && response.body().getLesson() != null
                                     && response.body().getLesson().getContent() != null) {
-                                try {
-                                    List<WordHuntWord> lessonWords = extractWordsFromLessonContent(
-                                            response.body().getLesson().getContent());
-                                    if (!lessonWords.isEmpty()) {
-                                        words = lessonWords;
-                                        startGame();
-                                        return;
-                                    }
-                                } catch (Exception ignored) {}
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                android.util.Log.w("WordHunt", "Lesson content fetch returned empty — using demo words");
+                                loadDemoWords();
+                                startGame();
                             }
-                            // Lesson content empty or parse failed — fall through to demo words
-                            loadDemoWords();
-                            startGame();
                         }
                         @Override
                         public void onFailure(retrofit2.Call<com.example.literise.models.LessonContentResponse> call,
@@ -453,6 +393,74 @@ public class WordHuntActivity extends BaseGameActivity {
                         }
                     });
             return;
+        }
+
+        loadLocalOrDemoWords(null);
+    }
+
+    /**
+     * Call the AI generate endpoint. Falls back to extracting words from the lesson JSON,
+     * and then to demo words if extraction also fails.
+     */
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService svc = ApiClient.getClient(this).create(ApiService.class);
+        svc.generateGameContent(new GameContentRequest(nodeId, "word_hunt", lessonContent))
+                .enqueue(new retrofit2.Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(retrofit2.Call<GameContentResponse> call,
+                                   retrofit2.Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray arr = response.body().content.getAsJsonArray("words");
+                        List<WordHuntWord> aiWords = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            String word       = obj.get("word").getAsString().toLowerCase();
+                            String hint       = obj.has("hint") ? obj.get("hint").getAsString() : "";
+                            String definition = obj.has("definition") ? obj.get("definition").getAsString() : "";
+                            WordHuntWord w = new WordHuntWord(i + 1, word, definition, 1.0f);
+                            w.setHint(hint);
+                            aiWords.add(w);
+                        }
+                        if (!aiWords.isEmpty()) {
+                            words = aiWords;
+                            startGame();
+                            return;
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.w("WordHunt", "AI response parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("WordHunt", "AI generate failed: success="
+                            + (response.body() != null ? response.body().success : "null")
+                            + " code=" + response.code()
+                            + (response.body() != null ? " msg=" + response.body().message : ""));
+                }
+                // AI failed — fall back to lesson JSON extraction
+                loadLocalOrDemoWords(lessonContent);
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("WordHunt", "AI generate network error: " + t.getMessage());
+                loadLocalOrDemoWords(lessonContent);
+            }
+        });
+    }
+
+    private void loadLocalOrDemoWords(String lessonContent) {
+
+        // Fallback 1: extract key words directly from lesson JSON
+        if (lessonContent != null) {
+            try {
+                List<WordHuntWord> lessonWords = extractWordsFromLessonContent(lessonContent);
+                if (!lessonWords.isEmpty()) {
+                    words = lessonWords;
+                    startGame();
+                    return;
+                }
+            } catch (Exception ignored) {}
         }
 
         // 3. DEMO MODE: Use hardcoded words directly (no API)
