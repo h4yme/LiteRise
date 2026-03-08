@@ -20,9 +20,13 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
 import com.example.literise.models.SaveGameResultRequest;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.utils.DemoDataProvider;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
@@ -167,7 +171,58 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void loadQuestions() {
-        // Try to generate questions from the lesson the student just completed
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            loadFallbackQuestions();
+        }
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        apiService.generateGameContent(new GameContentRequest(nodeId, "fill_in_blanks", lessonContent))
+                .enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray arr = response.body().content.getAsJsonArray("questions");
+                        List<DemoDataProvider.FillQuestion> aiQs = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            String before  = obj.get("beforeBlank").getAsString();
+                            String after   = obj.has("afterBlank") ? obj.get("afterBlank").getAsString() : "";
+                            String correct = obj.get("correctAnswer").getAsString();
+                            JsonArray opts = obj.getAsJsonArray("options");
+                            List<String> wrongList = new ArrayList<>();
+                            for (int j = 0; j < opts.size(); j++) {
+                                String opt = opts.get(j).getAsString();
+                                if (!opt.equalsIgnoreCase(correct)) wrongList.add(opt);
+                            }
+                            aiQs.add(new DemoDataProvider.FillQuestion(
+                                    before, after, correct,
+                                    wrongList.toArray(new String[0]), moduleDomain));
+                        }
+                        if (!aiQs.isEmpty()) {
+                            questions = aiQs;
+                            loadQuestion(0);
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                loadFallbackQuestions();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                loadFallbackQuestions();
+            }
+        });
+    }
+
+    private void loadFallbackQuestions() {
+        // Try to generate questions from the lesson JSON if available
         try {
             String lessonContent = getIntent().getStringExtra("lesson_content");
             if (lessonContent != null) {

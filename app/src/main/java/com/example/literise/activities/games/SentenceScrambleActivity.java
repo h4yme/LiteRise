@@ -65,6 +65,11 @@ import com.example.literise.api.ApiService;
 
 import com.example.literise.database.SessionManager;
 
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import com.example.literise.models.SaveGameResultRequest;
 
 import com.example.literise.models.SaveGameResultResponse;
@@ -421,9 +426,47 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
     private void loadSentences() {
 
-        // Use lesson sentences if the lesson content was forwarded
+        // Use AI-generated sentences when lesson context is available
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+            apiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
+                    .enqueue(new Callback<GameContentResponse>() {
+                @Override
+                public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().success
+                            && response.body().content != null) {
+                        try {
+                            JsonArray arr = response.body().content.getAsJsonArray("sentences");
+                            List<ScrambleSentence> aiSentences = new ArrayList<>();
+                            for (int i = 0; i < arr.size(); i++) {
+                                JsonObject obj = arr.get(i).getAsJsonObject();
+                                String sentence = obj.get("sentence").getAsString();
+                                aiSentences.add(new ScrambleSentence(i + 1, sentence, 1.0f));
+                            }
+                            if (!aiSentences.isEmpty()) {
+                                sentences = aiSentences;
+                                startGame();
+                                return;
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    loadFallbackSentences();
+                    startGame();
+                }
+
+                @Override
+                public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                    loadFallbackSentences();
+                    startGame();
+                }
+            });
+            return;
+        }
+
+        // Use lesson sentences if the lesson content was forwarded (local parsing)
         try {
-            String lessonContent = getIntent().getStringExtra("lesson_content");
             if (lessonContent != null) {
                 List<ScrambleSentence> lessonSentences = extractSentencesFromLesson(lessonContent);
                 if (!lessonSentences.isEmpty()) {

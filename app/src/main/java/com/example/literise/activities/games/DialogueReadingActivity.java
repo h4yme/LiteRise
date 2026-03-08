@@ -43,7 +43,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.literise.R;
 
 import com.example.literise.activities.BaseActivity;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -115,10 +125,15 @@ public class DialogueReadingActivity extends BaseGameActivity {
 
         initializeViews();
         applyModuleTheme();
-
-        setupDialogue();
-
         setupListeners();
+
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            setupDialogue();
+        }
 
         checkAudioPermission();
 
@@ -194,6 +209,44 @@ public class DialogueReadingActivity extends BaseGameActivity {
                     android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
             }
         } catch (Exception ignored) {}
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "dialogue_reading", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray linesArray = response.body().content.getAsJsonArray("lines");
+                        List<DialogueLine> aiLines = new ArrayList<>();
+                        for (int i = 0; i < linesArray.size(); i++) {
+                            JsonObject obj = linesArray.get(i).getAsJsonObject();
+                            String speaker = obj.get("speaker").getAsString();
+                            String avatar  = obj.has("avatar") ? obj.get("avatar").getAsString() : "🙂";
+                            String text    = obj.get("text").getAsString();
+                            aiLines.add(new DialogueLine(speaker, avatar, text));
+                        }
+                        if (!aiLines.isEmpty()) {
+                            dialogueLines = aiLines;
+                            adapter = new DialogueAdapter(dialogueLines);
+                            recyclerDialogue.setLayoutManager(new LinearLayoutManager(DialogueReadingActivity.this));
+                            recyclerDialogue.setAdapter(adapter);
+                            updateProgress();
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                setupDialogue();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                setupDialogue();
+            }
+        });
     }
 
     private void setupDialogue() {

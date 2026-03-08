@@ -65,6 +65,11 @@ import com.example.literise.api.ApiService;
 
 import com.example.literise.database.SessionManager;
 
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import com.example.literise.models.SaveGameResultRequest;
 
 import com.example.literise.models.SaveGameResultResponse;
@@ -349,8 +354,54 @@ public class WordHuntActivity extends BaseGameActivity {
 
     private void loadWords() {
 
-        // 1. Use lesson content passed directly from ModuleLadderActivity (same session)
+        // 1. Use AI-generated words when lesson context is available
         String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            ApiService svc = ApiClient.getClient(this).create(ApiService.class);
+            svc.generateGameContent(new GameContentRequest(nodeId, "word_hunt", lessonContent))
+                    .enqueue(new retrofit2.Callback<GameContentResponse>() {
+                @Override
+                public void onResponse(retrofit2.Call<GameContentResponse> call,
+                                       retrofit2.Response<GameContentResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && response.body().success
+                            && response.body().content != null) {
+                        try {
+                            JsonArray arr = response.body().content.getAsJsonArray("words");
+                            List<WordHuntWord> aiWords = new ArrayList<>();
+                            for (int i = 0; i < arr.size(); i++) {
+                                JsonObject obj = arr.get(i).getAsJsonObject();
+                                String word       = obj.get("word").getAsString().toLowerCase();
+                                String hint       = obj.has("hint") ? obj.get("hint").getAsString() : "";
+                                String definition = obj.has("definition") ? obj.get("definition").getAsString() : "";
+                                WordHuntWord w = new WordHuntWord(i + 1, word, definition, 1.0f);
+                                w.setHint(hint);
+                                aiWords.add(w);
+                            }
+                            if (!aiWords.isEmpty()) {
+                                words = aiWords;
+                                startGame();
+                                return;
+                            }
+                        } catch (Exception ignored) {}
+                    }
+                    loadLocalOrDemoWords(lessonContent);
+                }
+
+                @Override
+                public void onFailure(retrofit2.Call<GameContentResponse> call, Throwable t) {
+                    loadLocalOrDemoWords(lessonContent);
+                }
+            });
+            return;
+        }
+
+        loadLocalOrDemoWords(lessonContent);
+    }
+
+    private void loadLocalOrDemoWords(String lessonContent) {
+
+        // Use lesson content passed directly from ModuleLadderActivity (same session)
         if (lessonContent != null) {
             try {
                 List<WordHuntWord> lessonWords = extractWordsFromLessonContent(lessonContent);

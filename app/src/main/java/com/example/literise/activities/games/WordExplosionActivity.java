@@ -15,7 +15,16 @@ import androidx.cardview.widget.CardView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,7 +82,57 @@ public class WordExplosionActivity extends AppCompatActivity {
         initializeViews();
         applyModuleTheme();
         setupListeners();
-        startGame();
+
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            loadAiContent(nodeId, lessonContent);
+        } else {
+            startGame();
+        }
+    }
+
+    private void loadAiContent(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.generateGameContent(new GameContentRequest(nodeId, "word_explosion", lessonContent))
+                .enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray cats = response.body().content.getAsJsonArray("categories");
+                        for (int i = 0; i < cats.size(); i++) {
+                            JsonObject obj = cats.get(i).getAsJsonObject();
+                            String name  = obj.get("name").getAsString().toUpperCase();
+                            String color = obj.has("color") ? obj.get("color").getAsString() : "#7C3AED";
+                            JsonArray wordsArr = obj.getAsJsonArray("words");
+                            List<String> wordList = new ArrayList<>();
+                            for (int j = 0; j < wordsArr.size(); j++) {
+                                wordList.add(wordsArr.get(j).getAsString().toLowerCase());
+                            }
+                            if (!wordList.isEmpty()) {
+                                categoryDatabase.put(name, new CategoryData(wordList, color));
+                                if (!availableCategories.contains(name)) {
+                                    availableCategories.add(0, name);
+                                }
+                            }
+                        }
+                        // Set first AI category as target
+                        if (cats.size() > 0) {
+                            String firstName = cats.get(0).getAsJsonObject().get("name").getAsString().toUpperCase();
+                            targetCategory = firstName;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                startGame();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                startGame();
+            }
+        });
     }
 
     private void initializeCategoryDatabase() {
@@ -122,31 +181,6 @@ public class WordExplosionActivity extends AppCompatActivity {
         ));
         availableCategories.add("NATURE");
 
-        // If lesson content was provided, inject lesson words as the first target category
-        // so the game immediately reinforces what the student just learned.
-        try {
-            String lessonContent = getIntent().getStringExtra("lesson_content");
-            if (lessonContent != null) {
-                org.json.JSONObject obj = new org.json.JSONObject(lessonContent);
-                List<String> lessonWords = new ArrayList<>();
-                for (String field : new String[]{"keyWords","words","themeWords","sightWords",
-                        "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
-                    if (obj.has(field)) {
-                        org.json.JSONArray arr = obj.getJSONArray(field);
-                        for (int i = 0; i < arr.length(); i++) {
-                            String w = arr.getString(i).trim().toLowerCase();
-                            if (!w.isEmpty()) lessonWords.add(w);
-                        }
-                        break;
-                    }
-                }
-                if (!lessonWords.isEmpty()) {
-                    categoryDatabase.put("LESSON WORDS", new CategoryData(lessonWords, "#7C3AED"));
-                    availableCategories.add(0, "LESSON WORDS"); // first so it's targeted first
-                    targetCategory = "LESSON WORDS";
-                }
-            }
-        } catch (Exception ignored) {}
     }
 
     private void initializeViews() {
