@@ -20,8 +20,8 @@
  *   "new_badges":   [
  *     {
  *       "badge_id":          1,
- *       "badge_name":        "Grammar Starter",
- *       "badge_description": "Completed Module 1: Grammar Fundamentals",
+ *       "badge_name":        "Phonics Pioneer",
+ *       "badge_description": "Completed Module 1: Phonics and Word Study",
  *       "badge_icon_url":    "badge_module1",
  *       "xp_reward":         100,
  *       "badge_category":    "module",

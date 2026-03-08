@@ -17,11 +17,11 @@ BEGIN
     -- ── Module completion badges (1 per module) ──────────────────
     INSERT INTO Badges (BadgeName, BadgeDescription, BadgeIconURL, UnlockCondition, XPReward, BadgeCategory)
     VALUES
-    ('Grammar Starter',    'Completed Module 1: Grammar Fundamentals',   'badge_module1', 'Module:1', 100, 'module'),
-    ('Word Wizard',        'Completed Module 2: Vocabulary Building',     'badge_module2', 'Module:2', 100, 'module'),
-    ('Reading Champion',   'Completed Module 3: Reading Comprehension',   'badge_module3', 'Module:3', 100, 'module'),
-    ('Writing Star',       'Completed Module 4: Writing Skills',          'badge_module4', 'Module:4', 100, 'module'),
-    ('Speaking Hero',      'Completed Module 5: Listening & Speaking',    'badge_module5', 'Module:5', 100, 'module'),
+    ('Phonics Pioneer',      'Completed Module 1: Phonics and Word Study',                        'badge_module1', 'Module:1', 100, 'module'),
+    ('Word Scholar',         'Completed Module 2: Vocabulary and Word Knowledge',                 'badge_module2', 'Module:2', 100, 'module'),
+    ('Grammar Guardian',     'Completed Module 3: Grammar Awareness and Grammatical Structures',  'badge_module3', 'Module:3', 100, 'module'),
+    ('Text Explorer',        'Completed Module 4: Comprehending and Analyzing Texts',             'badge_module4', 'Module:4', 100, 'module'),
+    ('Creative Composer',    'Completed Module 5: Creating and Composing Text',                   'badge_module5', 'Module:5', 100, 'module'),
 
     -- ── XP milestone badges ───────────────────────────────────────
     ('First Steps',        'Earned your first 100 XP',                   'badge_xp100',   'XP:100',   0, 'xp'),
