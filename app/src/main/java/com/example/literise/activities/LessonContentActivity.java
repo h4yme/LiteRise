@@ -53,6 +53,7 @@ public class LessonContentActivity extends AppCompatActivity {
 
     private int nodeId, lessonNumber, placementLevel;
     private SessionManager sessionManager;
+    private String cachedLessonContent; // forwarded to games so they use lesson words/sentences
 
     // ── Custom fonts ─────────────────────────────────────────────────────────
     private Typeface fVisbyBold;      // headings, chips, tiles
@@ -160,7 +161,8 @@ public class LessonContentActivity extends AppCompatActivity {
     private void displayLessonContent(LessonContentResponse data) {
         tvLessonTitle.setText(data.getLesson().getTitle());
         tvScaffolding.setText(data.getPacing().getDescription());
-        buildContent(data.getLesson().getObjective(), data.getLesson().getContent());
+        cachedLessonContent = data.getLesson().getContent(); // cache for forwarding to games
+        buildContent(data.getLesson().getObjective(), cachedLessonContent);
     }
 
     // ── Content builder ───────────────────────────────────────────────────────
@@ -730,7 +732,11 @@ public class LessonContentActivity extends AppCompatActivity {
                         && response.body().isSuccess()) {
                     Toast.makeText(LessonContentActivity.this,
                             "Lesson complete! Moving to game...", Toast.LENGTH_SHORT).show();
-                    setResult(RESULT_OK);
+                    android.content.Intent resultData = new android.content.Intent();
+                    if (cachedLessonContent != null) {
+                        resultData.putExtra("lesson_content", cachedLessonContent);
+                    }
+                    setResult(RESULT_OK, resultData);
                     finish();
                 } else {
                     Toast.makeText(LessonContentActivity.this,

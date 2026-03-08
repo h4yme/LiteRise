@@ -119,6 +119,32 @@ public class WordExplosionActivity extends AppCompatActivity {
                 "#44A08D"
         ));
         availableCategories.add("NATURE");
+
+        // If lesson content was provided, inject lesson words as the first target category
+        // so the game immediately reinforces what the student just learned.
+        try {
+            String lessonContent = getIntent().getStringExtra("lesson_content");
+            if (lessonContent != null) {
+                org.json.JSONObject obj = new org.json.JSONObject(lessonContent);
+                List<String> lessonWords = new ArrayList<>();
+                for (String field : new String[]{"keyWords","words","themeWords","sightWords",
+                        "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
+                    if (obj.has(field)) {
+                        org.json.JSONArray arr = obj.getJSONArray(field);
+                        for (int i = 0; i < arr.length(); i++) {
+                            String w = arr.getString(i).trim().toLowerCase();
+                            if (!w.isEmpty()) lessonWords.add(w);
+                        }
+                        break;
+                    }
+                }
+                if (!lessonWords.isEmpty()) {
+                    categoryDatabase.put("LESSON WORDS", new CategoryData(lessonWords, "#7C3AED"));
+                    availableCategories.add(0, "LESSON WORDS"); // first so it's targeted first
+                    targetCategory = "LESSON WORDS";
+                }
+            }
+        } catch (Exception ignored) {}
     }
 
     private void initializeViews() {

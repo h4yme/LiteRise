@@ -342,6 +342,19 @@ public class WordHuntActivity extends BaseGameActivity {
 
     private void loadWords() {
 
+        // Use lesson words if the lesson content was forwarded from ModuleLadderActivity
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        if (lessonContent != null) {
+            try {
+                List<WordHuntWord> lessonWords = extractWordsFromLessonContent(lessonContent);
+                if (!lessonWords.isEmpty()) {
+                    words = lessonWords;
+                    startGame();
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+
         // DEMO MODE: Use hardcoded words directly (no API)
 
         if (AppConfig.DEMO_MODE) {
@@ -513,6 +526,41 @@ public class WordHuntActivity extends BaseGameActivity {
     }
 
 
+
+    /** Extracts lesson words from the JSON string passed from the lesson. */
+    private List<WordHuntWord> extractWordsFromLessonContent(String json) throws Exception {
+        List<WordHuntWord> result = new ArrayList<>();
+        org.json.JSONObject obj = new org.json.JSONObject(json);
+        org.json.JSONArray arr = null;
+        for (String field : new String[]{"keyWords","words","themeWords","sightWords",
+                "practiceWords","verbList","adjectives","mathWords","scienceWords"}) {
+            if (obj.has(field)) { arr = obj.getJSONArray(field); break; }
+        }
+        if (arr != null) {
+            for (int i = 0; i < arr.length(); i++) {
+                String w = arr.getString(i).trim().toUpperCase();
+                if (!w.isEmpty()) {
+                    WordHuntWord ww = new WordHuntWord();
+                    ww.setWord(w);
+                    result.add(ww);
+                }
+            }
+        }
+        // Fall back to example words if no dedicated word list
+        if (result.isEmpty() && obj.has("examples")) {
+            org.json.JSONArray exs = obj.getJSONArray("examples");
+            for (int i = 0; i < exs.length() && result.size() < 10; i++) {
+                String raw = exs.getString(i).trim();
+                String w = raw.contains(" - ") ? raw.split(" - ")[0].trim() : raw;
+                if (!w.isEmpty()) {
+                    WordHuntWord ww = new WordHuntWord();
+                    ww.setWord(w.toUpperCase());
+                    result.add(ww);
+                }
+            }
+        }
+        return result;
+    }
 
     private void loadDemoWords() {
 

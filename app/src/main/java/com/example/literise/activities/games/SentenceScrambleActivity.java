@@ -414,6 +414,19 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
     private void loadSentences() {
 
+        // Use lesson sentences if the lesson content was forwarded
+        try {
+            String lessonContent = getIntent().getStringExtra("lesson_content");
+            if (lessonContent != null) {
+                List<ScrambleSentence> lessonSentences = extractSentencesFromLesson(lessonContent);
+                if (!lessonSentences.isEmpty()) {
+                    sentences = lessonSentences;
+                    startGame();
+                    return;
+                }
+            }
+        } catch (Exception ignored) {}
+
         // DEMO MODE: Use hardcoded sentences directly (no API)
 
         if (AppConfig.DEMO_MODE) {
@@ -540,7 +553,23 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
     }
 
-
+    /** Extracts practice sentences from the lesson JSON and wraps them as ScrambleSentences. */
+    private List<ScrambleSentence> extractSentencesFromLesson(String json) throws Exception {
+        List<ScrambleSentence> result = new ArrayList<>();
+        org.json.JSONObject obj = new org.json.JSONObject(json);
+        org.json.JSONArray arr = null;
+        for (String f : new String[]{"contextSentences","sentencePractice","sentenceFrames"}) {
+            if (obj.has(f)) { arr = obj.getJSONArray(f); break; }
+        }
+        if (arr == null) return result;
+        for (int i = 0; i < arr.length(); i++) {
+            String sentence = arr.getString(i).trim().replaceAll("[.!?]$", "");
+            if (!sentence.isEmpty()) {
+                result.add(new ScrambleSentence(i + 1, sentence, 1.0f));
+            }
+        }
+        return result;
+    }
 
     private void startGame() {
 

@@ -73,6 +73,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     // Track current node for auto-progression
     private NodeView currentNode;
     private boolean isAutoProceedMode = true; // Auto-proceed through phases
+    private String lastLessonContent; // lesson JSON forwarded to the following game
 
     // Path coordinates
     // Better coordinates that follow the actual background path
@@ -159,6 +160,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
                     if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                        // Capture lesson content so the game can use lesson words/sentences
+                        android.content.Intent data = result.getData();
+                        lastLessonContent = (data != null) ? data.getStringExtra("lesson_content") : null;
                         // Lesson was genuinely completed — proceed to game
                         Log.d(TAG, "Lesson completed (RESULT_OK) — Auto-proceeding to Game phase");
                         Toast.makeText(this, "✅ Lesson Complete! Now let's play! 🎮", Toast.LENGTH_SHORT).show();
@@ -502,6 +506,10 @@ public class ModuleLadderActivity extends AppCompatActivity {
         String[] moduleColors = getModuleColors(moduleId);
         intent.putExtra("module_color_start", moduleColors[0]);
         intent.putExtra("module_color_end", moduleColors[1]);
+        // Forward lesson content so games can use actual lesson words/sentences
+        if (lastLessonContent != null) {
+            intent.putExtra("lesson_content", lastLessonContent);
+        }
 
         // Use launcher to refresh ladder on return
         gameLauncher.launch(intent);
