@@ -1,0 +1,576 @@
+﻿1227,101,I ____ see the moon from my window.,multiple_choice,"[""could"",""cold""]",could,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1228,101,Please turn on the ____ so we can see.,multiple_choice,"[""right"",""light""]",light,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1229,101,You should ____ wash your hands.,multiple_choice,"[""always"",""away""]",always,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1230,101,We ran ____ the playground.,multiple_choice,"[""around"",""about""]",around,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1231,101,The sun is ____ today.,multiple_choice,"[""bright"",""bring""]",bright,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1232,101,Which word ends with two consonants? (CVCC pattern),multiple_choice,"[""Cat"",""Lamp""]",Lamp,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1233,101,Which word is a CVCC word?,multiple_choice,"[""Best"",""Blue""]",Best,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1234,101,"Choose the correct ending for ""Ma__""",multiple_choice,"[""sk"",""oo""]",sk,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1235,101,Which word fits the CVCC pattern?,multiple_choice,"[""See"",""Pink""]",Pink,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1236,101,"Identify the CVCC word in this sentence: ""The sand is warm.""",multiple_choice,"[""sand"",""warm""]",sand,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:26.993
+1237,102,Which word starts with a consonant blend?,multiple_choice,"[""Apple"",""Frog""]",Frog,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1238,102,"Fill in the blank: ""The ___ar is in the sky.""",multiple_choice,"[""St"",""Pl""]",St,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1239,102,Which word is CCVC?,multiple_choice,"[""Drum"",""Red""]",Drum,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1240,102,Choose the word that starts like Clap:,multiple_choice,"[""Clip"",""Cap""]",Clip,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1241,102,What is the cluster in the word ST-O-P?,multiple_choice,"[""ST"",""OP""]",ST,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1242,102,"Which word has a ""boiling"" vowel sound (diphthong)?",multiple_choice,"[""Coin"",""Cone""]",Coin,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1243,102,Pick the CCVC word:,multiple_choice,"[""Spot"",""Pots""]",Spot,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1244,102,"Which word starts with ""Gr""?",multiple_choice,"[""Grab"",""Bag""]",Grab,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1245,102,Choose the correct CCVC word for a heavy object:,multiple_choice,"[""Rock"",""Brick""]",Brick,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1246,102,Which word rhymes with Trip?,multiple_choice,"[""Skip"",""Tip""]",Skip,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.000
+1247,103,"In the word Rabbit, where do we split the syllables?",multiple_choice,"[""Ra-bbit"",""Rab-bit""]",Rab-bit,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1248,103,Is Robot a VCV or VCCV word?,multiple_choice,"[""VCV"",""VCCV""]",VCV,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1249,103,Which word follows the VCCV pattern?,multiple_choice,"[""Kitten"",""Tiger""]",Kitten,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1250,103,Choose the VCV word:,multiple_choice,"[""Music"",""Basket""]",Music,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1251,103,The word Muffin is:,multiple_choice,"[""VCV"",""VCCV""]",VCCV,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1252,103,"Which word has a long ""o"" sound in a VCV pattern?",multiple_choice,"[""Open"",""Often""]",Open,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1253,103,Divide the word Napkin:,multiple_choice,"[""Nap-kin"",""Na-pkin""]",Nap-kin,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1254,103,Which word is a VCV pattern?,multiple_choice,"[""Paper"",""Pepper""]",Paper,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1255,103,Fill in the missing VCCV letters for a small dog: Pu__y,multiple_choice,"[""pp"",""b""]",pp,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1256,103,Which word fits the VCV pattern?,multiple_choice,"[""Seven"",""Summer""]",Seven,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.007
+1257,104,Please ________ your hands before eating.,fill_blank,"[""clean"",""carry"",""drink"",""full"",""small""]",clean,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1258,104,I can ________ my own school bag.,fill_blank,"[""clean"",""carry"",""drink"",""full"",""small""]",carry,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1259,104,The glass is ________ of fresh milk.,fill_blank,"[""clean"",""carry"",""drink"",""full"",""small""]",full,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1260,104,The ________ kitten is sleeping under the tree.,fill_blank,"[""clean"",""carry"",""drink"",""full"",""small""]",small,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1261,104,We should ________ plenty of water every day.,fill_blank,"[""clean"",""carry"",""drink"",""full"",""small""]",drink,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1262,104,Choose the correctly spelled word for the number after seven:,multiple_choice,"[""eight"",""eyght""]",eight,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1263,104,Choose the correctly spelled word: The sun is very _____.,multiple_choice,"[""bright"",""brite""]",bright,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1264,104,Choose the correctly spelled word: Please _____ the dishes.,multiple_choice,"[""wash"",""wush""]",wash,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1265,104,Choose the correctly spelled word: _____ are my favorite shoes.,multiple_choice,"[""those"",""thos""]",those,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1266,104,Choose the correctly spelled word: Plants _____ in the garden.,multiple_choice,"[""grow"",""gro""]",grow,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.013
+1267,105,Which word follows the VCV pattern?,multiple_choice,"[""Apple"",""Music""]",Music,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1268,105,How do you divide the word PILOT?,multiple_choice,"[""Pi-lot"",""Pil-ot""]",Pi-lot,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1269,105,"In the word ROBOT, the first vowel 'O' sounds:",multiple_choice,"[""Short"",""Long""]",Long,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1270,105,Choose the VCV word that is a fruit:,multiple_choice,"[""Melon"",""Cherry""]",Melon,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1271,105,Divide the word SILENT:,multiple_choice,"[""Si-lent"",""Sil-ent""]",Si-lent,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1272,105,Which word is a VCV word?,multiple_choice,"[""Tulip"",""Button""]",Tulip,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1273,105,What is the first syllable of BABY?,multiple_choice,"[""Ba"",""Bab""]",Ba,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1274,105,"In EVIL, the division is:",multiple_choice,"[""E-vil"",""Ev-il""]",E-vil,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1275,105,Which word fits the pattern V-C-V?,multiple_choice,"[""Hotel"",""Hammer""]",Hotel,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1276,105,"In a VCV word, the first vowel usually sounds:",multiple_choice,"[""Long (says its name)"",""Short""]",Long (says its name),0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.020
+1277,106,How many syllables are in the word HAPPEN?,multiple_choice,"[""1"",""2"",""3""]",2,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1278,106,Divide the word BASKET:,multiple_choice,"[""Bas-ket"",""Ba-sket""]",Bas-ket,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1279,106,Which word follows the VCCV pattern?,multiple_choice,"[""Puppy"",""Tiger""]",Puppy,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1280,106,Divide the word MARKET:,multiple_choice,"[""Mar-ket"",""Mark-et""]",Mar-ket,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1281,106,"In a VCCV word, the first vowel is usually:",multiple_choice,"[""Short"",""Long""]",Short,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1282,106,Which word follows VCCV? (Vowel-Consonant-Consonant-Vowel),multiple_choice,"[""Basket"",""Bacon""]",Basket,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1283,106,Divide the word CANTEEN:,multiple_choice,"[""Can-teen"",""Ca-nteen""]",Can-teen,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1284,106,Which VCV word has a long vowel?,multiple_choice,"[""Open"",""Often""]",Open,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1285,106,The word DINNER divides as:,multiple_choice,"[""Din-ner"",""Di-nner""]",Din-ner,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1286,106,The word JACKET divides as:,multiple_choice,"[""Jack-et"",""Ja-cket""]",Jack-et,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.023
+1287,107,Please _______ your umbrella because it might rain.,multiple_choice,"[""bring"",""drink""]",bring,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1288,107,The little boy can _______ a heavy box.,multiple_choice,"[""carry"",""clean""]",carry,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1289,107,I love to _______ pictures of my family.,multiple_choice,"[""drink"",""draw""]",draw,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1290,107,"Be careful, or you might _______ on the wet floor.",multiple_choice,"[""fall"",""full""]",fall,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1291,107,Did you _______ enough water after the race?,multiple_choice,"[""draw"",""drink""]",drink,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1292,107,Which word is spelled correctly?,multiple_choice,"[""carry"",""karey""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1293,107,"""I will _______ my lunch to school.""",multiple_choice,"[""bring"",""bring""]",bring,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1294,107,"Choose the correct word: ""The leaves _______ in Autumn.""",multiple_choice,"[""fall"",""feel""]",fall,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1295,107,"""Can you _______ a straight line?""",multiple_choice,"[""draw"",""drow""]",draw,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1296,107,"""Help me _______ these groceries.""",multiple_choice,"[""carry"",""curry""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1297,108,There are _______ pupils sitting in the front row.,multiple_choice,"[""eight"",""even""]",eight,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1298,108,The sun is too _______ to play outside today.,multiple_choice,"[""hot"",""hat""]",hot,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1299,108,The stars are very _______ away in the sky.,multiple_choice,"[""for"",""far""]",far,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1300,108,My stomach is _______ after eating dinner.,multiple_choice,"[""fall"",""full""]",full,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1301,108,Turn on the _______ so we can read the book.,multiple_choice,"[""light"",""night""]",light,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1302,108,Choose the number 8 in words:,multiple_choice,"[""eight"",""height""]",eight,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1303,108,"The opposite of ""near"" is _______.",multiple_choice,"[""far"",""for""]",far,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1304,108,"The opposite of ""cold"" is _______.",multiple_choice,"[""hat"",""hot""]",hot,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1305,108,"""The bag is _______ of toys.""",multiple_choice,"[""full"",""fool""]",full,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1306,108,"""The sun gives us _______.""",multiple_choice,"[""light"",""lite""]",light,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.037
+1307,109,I feel _______ today than I did yesterday.,multiple_choice,"[""better"",""best""]",better,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1308,109,This is the _______ drawing I have ever made!,multiple_choice,"[""better"",""best""]",best,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1309,109,_______ of my hands are clean.,multiple_choice,"[""Both"",""But""]",Both,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1310,109,Please keep your desk _______ and tidy.,multiple_choice,"[""clean"",""carry""]",clean,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1311,109,The ant is very _______ compared to the dog.,multiple_choice,"[""small"",""shall""]",small,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1312,109,"Which word is the ""top"" or highest level?",multiple_choice,"[""better"",""best""]",best,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1313,109,"""I like _______ chocolate and vanilla.""",multiple_choice,"[""Both"",""Birth""]",Both,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1314,109,"""My shirt is _______.""",multiple_choice,"[""clean"",""clen""]",clean,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1315,109,"The opposite of ""big"" is _______.",multiple_choice,"[""small"",""smell""]",small,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1316,109,"""This apple tastes _______ than that one.""",multiple_choice,"[""better"",""bitter""]",better,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.040
+1317,110,We walked _______ the dark tunnel to get to the other side.,multiple_choice,"[""though"",""through""]",through,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1318,110,"I _______ it would rain, so I brought my umbrella.",multiple_choice,"[""thought"",""through""]",thought,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1319,110,You _______ always tell the truth to your parents.,multiple_choice,"[""should"",""shall""]",should,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1320,110,The team won the game _______ they practiced every day.,multiple_choice,"[""because"",""before""]",because,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1321,110,"When we work _______, the task becomes much easier.",multiple_choice,"[""together"",""today""]",together,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1322,110,"Which word best completes: ""I am tired _______ I slept late.""",multiple_choice,"[""because"",""should""]",because,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1323,110,"Identify the correctly spelled word for ""past thinking"":",multiple_choice,"[""thought"",""thout""]",thought,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1324,110,"""The river flows _______ the valley.""",multiple_choice,"[""through"",""thought""]",through,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1325,110,"""We _______ be kind to animals.""",multiple_choice,"[""should"",""sound""]",should,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1326,110,"""They went to the market _______.""",multiple_choice,"[""together"",""gather""]",together,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.047
+1327,111,Do we have _______ rice to feed all the guests?,multiple_choice,"[""enough"",""several""]",enough,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1328,111,There are _______ ways to solve this math problem.,multiple_choice,"[""several"",""seven""]",several,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1329,111,You must lean the ladder _______ the wall.,multiple_choice,"[""around"",""against""]",against,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1330,111,This new medicine made me feel much _______.,multiple_choice,"[""better"",""best""]",better,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1331,111,It is _______ better to be early than to be late.,multiple_choice,"[""always"",""only""]",always,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1332,111,"Which word means ""sufficient"" or ""just the right amount""?",multiple_choice,"[""enough"",""much""]",enough,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1333,111,"""The basketball players played _______ each other.""",multiple_choice,"[""around"",""against""]",against,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1334,111,"""He read _______ books during the summer break.""",multiple_choice,"[""several"",""small""]",several,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1335,111,"""I hope the weather gets _______ tomorrow.""",multiple_choice,"[""better"",""best""]",better,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1336,111,"""I _______ do my best in every school activity.""",multiple_choice,"[""always"",""almost""]",always,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.057
+1337,112,The two brothers are very _______ in their hobbies.,multiple_choice,"[""different"",""difficult""]",different,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1338,112,The cat ran _______ the street to catch the mouse.,multiple_choice,"[""across"",""around""]",across,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1339,112,"Walk _______ the big tree, and then turn left.",multiple_choice,"[""toward"",""today""]",toward,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1340,112,The secret is hidden _______ the two old boxes.,multiple_choice,"[""between"",""before""]",between,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1341,112,Strong winds can _______ the seeds to far places.,multiple_choice,"[""carry"",""hurry""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1342,112,Which word describes things that are not the same?,multiple_choice,"[""different"",""during""]",different,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1343,112,"""The bridge goes _______ the wide river.""",multiple_choice,"[""across"",""against""]",across,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1344,112,"""The puppy is walking _______ its mother.""",multiple_choice,"[""toward"",""through""]",toward,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1345,112,"""There is a small space _______ the desk and the wall.""",multiple_choice,"[""between"",""because""]",between,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1346,112,"""Can you _______ this message to the principal?""",multiple_choice,"[""carry"",""show""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.063
+1347,113,Which word follows the CVCC pattern?,multiple_choice,"[""Frog"",""Milk""]",Milk,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1348,113,Choose the CCVC word that starts with a consonant blend:,multiple_choice,"[""Stop"",""Step""]",Stop,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1349,113,"In the word ""Plant"", what is the final consonant blend?",multiple_choice,"[""Pl"",""nt""]",nt,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1350,113,Which word contains a diphthong (vowel team sound)?,multiple_choice,"[""Coin"",""Cone""]",Coin,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1351,113,"Identify the CCVC word in this sentence: ""The drum is loud.""",multiple_choice,"[""drum"",""loud""]",drum,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1352,113,Where is the correct syllable division for the VCV word TIGER?,multiple_choice,"[""Tig-er"",""Ti-ger""]",Ti-ger,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1353,113,Which word follows the VCCV pattern?,multiple_choice,"[""Button"",""Bacon""]",Button,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1354,113,"In a VCV pattern like ""Paper"", the first vowel usually sounds:",multiple_choice,"[""Long (says its name)"",""Short""]",Long (says its name),0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1355,113,Divide the VCCV word WINDOW:,multiple_choice,"[""Win-dow"",""Wind-ow""]",Win-dow,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1356,113,Which word is a VCV word used to describe music?,multiple_choice,"[""Solo"",""Supper""]",Solo,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1357,113,Which sight word tells us the total amount of something?,multiple_choice,"[""Full"",""Fall""]",Full,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1358,113,"Complete the sentence: ""The mountain is too ______ to climb today.""",multiple_choice,"[""far"",""for""]",far,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1359,113,"Complete the sentence: ""I will ______ my bag to the car.""",multiple_choice,"[""bring"",""drink""]",bring,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1360,113,"Which word is the opposite of ""worst""?",multiple_choice,"[""Better"",""Best""]",Best,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1361,113,"Use the correct word: ""I saw ______ ducks in the pond.""",multiple_choice,"[""eight"",""height""]",eight,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1362,113,"""We walked ______ the forest to find the hidden lake.""",multiple_choice,"[""thought"",""through""]",through,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1363,113,"Choose the word that means ""all the time"":",multiple_choice,"[""always"",""never""]",always,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1364,113,"""The two shirts have ______ colors; one is red and one is blue.""",multiple_choice,"[""different"",""between""]",different,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1365,113,"Which word means ""sufficient""? ""We have ______ food for everyone.""",multiple_choice,"[""several"",""enough""]",enough,0.4,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1366,113,"Complete the direction: ""The bridge goes ______ the river.""",multiple_choice,"[""across"",""against""]",across,0.5,phonics,NULL,NULL,1,2026-03-06 00:06:27.070
+1367,301,Which is a complete sentence?,multiple_choice,"[""The cat."",""The cat is sleeping.""]",The cat is sleeping.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1368,301,"Is ""in the garden"" a sentence?",multiple_choice,"[""Yes"",""No""]",No,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1369,301,Choose the sentence:,multiple_choice,"[""I love apples."",""Running fast.""]",I love apples.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1370,301,"""the sun is hot"" needs a:",multiple_choice,"[""Capital letter"",""Small letter""]",Capital letter,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1371,301,A sentence ends with a:,multiple_choice,"[""Period"",""Comma""]",Period,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1372,301,"""Red ball"" is a:",multiple_choice,"[""Sentence"",""Non-sentence""]",Non-sentence,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1373,301,Which is a sentence?,multiple_choice,"[""Birds fly."",""Blue sky.""]",Birds fly.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1374,301,Does a sentence make sense?,multiple_choice,"[""Yes"",""No""]",Yes,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1375,301,"""Under the table"" is a:",multiple_choice,"[""Sentence"",""Non-sentence""]",Non-sentence,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1376,301,"""She is happy."" is a:",multiple_choice,"[""Sentence"",""Non-sentence""]",Sentence,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
+1377,302,Arrange these words into a sentence: is / Manila / big,sentence_arrange,"[""is"",""Manila"",""big""]",Manila is big.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1378,302,Arrange these words: mango / The / sweet / is,sentence_arrange,"[""mango"",""The"",""sweet"",""is""]",The mango is sweet.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1379,302,Choose the correct order:,multiple_choice,"[""I my town love."",""I love my town.""]",I love my town.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1380,302,"Fix this sentence: ""plants / The / rice / farmer""",sentence_arrange,"[""plants"",""The"",""rice"",""farmer""]",The farmer plants rice.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1381,302,Which makes sense?,multiple_choice,"[""We see Mayon."",""Mayon we see.""]",We see Mayon.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1382,302,Arrange: colorful / festival / The / is,sentence_arrange,"[""colorful"",""festival"",""The"",""is""]",The festival is colorful.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1383,302,"Is ""Red the apple is"" correct word order?",multiple_choice,"[""Yes"",""No""]",No,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1384,302,Arrange: teacher / My / kind / is,sentence_arrange,"[""teacher"",""My"",""kind"",""is""]",My teacher is kind.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1385,302,Arrange: swim / Fish / water / in,sentence_arrange,"[""swim"",""Fish"",""water"",""in""]",Fish swim in water.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1386,302,Fix: play / We / the / park / in,sentence_arrange,"[""play"",""We"",""the"",""park"",""in""]",We play in the park.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1387,303,"In ""The bird flies,"" who is the doer?",multiple_choice,"[""bird"",""flies""]",bird,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1388,303,"What is the action in ""Maria dances""?",multiple_choice,"[""Maria"",""dances""]",dances,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1389,303,"In ""The car stopped,"" what is the subject?",multiple_choice,"[""car"",""stopped""]",car,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1390,303,"Identify the action part: ""The boy eats.""",multiple_choice,"[""boy"",""eats""]",eats,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1391,303,"""Lito runs."" Who is running?",multiple_choice,"[""Lito"",""runs""]",Lito,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1392,303,"Subject of ""The water is cold"":",multiple_choice,"[""water"",""cold""]",water,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1393,303,"Action in ""Students study"":",multiple_choice,"[""students"",""study""]",study,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1394,303,"""My mother cooks."" Who is the subject?",multiple_choice,"[""mother"",""cooks""]",mother,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1395,303,"Action in ""The dog barked"":",multiple_choice,"[""dog"",""barked""]",barked,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1396,303,"Subject of ""The sun shines"":",multiple_choice,"[""sun"",""shines""]",sun,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
+1397,304,"""Where is Ben"" needs which end mark?",multiple_choice,"[""."",""?""]",?,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1398,304,"""I am 8 years old"" is:",multiple_choice,"[""Telling"",""Asking""]",Telling,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1399,304,Which asks a question?,multiple_choice,"[""What is it?"",""It is a cat.""]",What is it?,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1400,304,A telling sentence ends with:,multiple_choice,"[""."",""/""]",.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1401,304,"""Can you run"" is:",multiple_choice,"[""Declarative"",""Interrogative""]",Interrogative,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1402,304,"""The sun is hot"" is:",multiple_choice,"[""Declarative"",""Interrogative""]",Declarative,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1403,304,Which needs a question mark?,multiple_choice,"[""Who are you"",""I am Sam""]",Who are you,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1404,304,"Is ""How are you"" a telling sentence?",multiple_choice,"[""Yes"",""No""]",No,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1405,304,"""It is raining"" is:",multiple_choice,"[""Telling"",""Asking""]",Telling,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1406,304,"Use ""?"" for:",multiple_choice,"[""Asking"",""Telling""]",Asking,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.150
+1407,305,"""Please sit"" is a:",multiple_choice,"[""Request"",""Feeling""]",Request,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1408,305,"""Wow!"" ends with:",multiple_choice,"[""!"",""?""]",!,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1409,305,Which is a command?,multiple_choice,"[""Close the door."",""The door is blue.""]",Close the door.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1410,305,"""I am so happy!"" is:",multiple_choice,"[""Exclamatory"",""Imperative""]",Exclamatory,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1411,305,"""Ouch!"" shows:",multiple_choice,"[""Command"",""Feeling""]",Feeling,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1412,305,"""Clean your desk"" is:",multiple_choice,"[""Imperative"",""Declarative""]",Imperative,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1413,305,"Which needs ""!""?",multiple_choice,"[""Fire"",""I like bread""]",Fire,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1414,305,"""Kindly help me"" is:",multiple_choice,"[""Request"",""Question""]",Request,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1415,305,"""We won!"" is:",multiple_choice,"[""Exclamatory"",""Asking""]",Exclamatory,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1416,305,Imperative sentences give:,multiple_choice,"[""Orders"",""Questions""]",Orders,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.153
+1417,306,"Join with: ""I like milk ___ I like cake.""",multiple_choice,"[""and"",""but""]",and,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1418,306,A compound sentence has ___ ideas.,multiple_choice,"[""one"",""two""]",two,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1419,306,"Joining word in ""The sun rose and birds sang"":",multiple_choice,"[""sun"",""and""]",and,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1420,306,"""I ran, but I fell."" What is the joining word?",multiple_choice,"[""but"",""fell""]",but,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1421,306,Which is compound?,multiple_choice,"[""I like red and blue."",""I like red.""]",I like red and blue.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1422,306,"Use ""or"" for:",multiple_choice,"[""Choice"",""Adding""]",Choice,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1423,306,"""Cats purr and dogs bark."" Who barks?",multiple_choice,"[""cats"",""dogs""]",dogs,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1424,306,Joining word for opposite ideas:,multiple_choice,"[""and"",""but""]",but,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1425,306,"""Eat now or later."" What is the joining word?",multiple_choice,"[""or"",""now""]",or,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1426,306,Does a compound sentence use a joining word?,multiple_choice,"[""Yes"",""No""]",Yes,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.160
+1427,307,Which is correct?,multiple_choice,"[""my name is anna."",""My name is Anna.""]",My name is Anna.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1428,307,Which is right?,multiple_choice,"[""I live in Cebu."",""i live in cebu.""]",I live in Cebu.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1429,307,"The name ""luis"" in a sentence should be:",multiple_choice,"[""luis"",""Luis""]",Luis,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1430,307,"Fix: ""do you like milk.""",multiple_choice,"[""do you like milk."",""Do you like milk?""]",Do you like milk?,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1431,307,Which word needs a capital letter?,multiple_choice,"[""friday"",""book""]",friday,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1432,307,"Start of sentence: ""___ is big.""",multiple_choice,"[""it"",""It""]",It,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1433,307,"Is ""happy birthday"" correct capitalization?",multiple_choice,"[""Yes"",""No""]",No,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1434,307,"""we love the philippines."" - what needs a capital?",multiple_choice,"[""we + philippines"",""nothing""]",we + philippines,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1435,307,Which ends with a period?,multiple_choice,"[""I am eating"",""Who is he""]",I am eating,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1436,307,"Fix: ""help i am lost!""",multiple_choice,"[""Help i am lost!"",""Help! I am lost!""]",Help! I am lost!,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.167
+1437,308,"To start a story or process, use:",multiple_choice,"[""Finally"",""First""]",First,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1438,308,The last step word is:,multiple_choice,"[""Next"",""Finally""]",Finally,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1439,308,"""___, wash your hands. Next, use soap.""",multiple_choice,"[""First"",""Then""]",First,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1440,308,Which is a time order word?,multiple_choice,"[""Small"",""Then""]",Then,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1441,308,"Put these in order: Finally, First, Next",sequence,"[""First"",""Next"",""Finally""]","First, Next, Finally",0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1442,308,"""Next"" shows:",multiple_choice,"[""First step"",""Following step""]",Following step,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1443,308,Which shows sequence?,multiple_choice,"[""And"",""Second""]",Second,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1444,308,"""I ate, ___ I slept.""",multiple_choice,"[""Then"",""Before""]",Then,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1445,308,Procedure words help us follow:,multiple_choice,"[""Steps"",""Colors""]",Steps,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1446,308,"After ""First"" comes:",multiple_choice,"[""Next"",""Last""]",Next,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1447,309,"""Ben eats and Lea drinks."" Who are the doers?",multiple_choice,"[""Ben/Lea"",""eats/drinks""]",Ben/Lea,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1448,309,"Action in 2nd part: ""Birds fly but fish swim.""",multiple_choice,"[""fly"",""swim""]",swim,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1449,309,"Doer in 2nd part: ""I ran, but he walked.""",multiple_choice,"[""I"",""he""]",he,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1450,309,"First action: ""The sun shines and wind blows.""",multiple_choice,"[""shines"",""blows""]",shines,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1451,309,"""Mom cooks and Dad cleans."" How many doers?",multiple_choice,"[""1"",""2""]",2,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1452,309,"Who barked: ""The dog barked and cat ran""?",multiple_choice,"[""dog"",""cat""]",dog,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1453,309,"Action of the cat in ""The dog barked and cat ran"":",multiple_choice,"[""barked"",""ran""]",ran,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1454,309,"Joining word: ""She sang, but I danced.""",multiple_choice,"[""but"",""danced""]",but,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1455,309,Are there 2 actions in a compound sentence?,multiple_choice,"[""Yes"",""No""]",Yes,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1456,309,"2nd doer: ""Liza wrote and Mark read.""",multiple_choice,"[""Liza"",""Mark""]",Mark,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.180
+1457,310,"""The Philippines is my ____.""",multiple_choice,"[""Country"",""Room"",""Bag""]",Country,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1458,310,"""I love my flag"" is what type of sentence?",multiple_choice,"[""Asking"",""Telling"",""Command""]",Telling,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1459,310,Which is a national theme sentence?,multiple_choice,"[""I have a pen."",""The people are kind."",""The cat is fat.""]",The people are kind.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1460,310,"Subject in: ""The flag has three colors.""",multiple_choice,"[""flag"",""colors"",""three""]",flag,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1461,310,Which is in correct word order?,multiple_choice,"[""Flag our is beautiful."",""Our flag is beautiful."",""Beautiful our flag is.""]",Our flag is beautiful.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1462,310,"""Respect the elders"" is a:",multiple_choice,"[""Question"",""Command"",""Exclamation""]",Command,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1463,310,"Is ""Mabuhay!"" an exclamatory sentence?",multiple_choice,"[""Yes"",""No""]",Yes,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1464,310,"""Is the sun yellow"" needs which mark?",multiple_choice,"[""."",""!"",""?""]",?,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1465,310,Which is a national theme word?,multiple_choice,"[""Small"",""National"",""Fast""]",National,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1466,310,"Subject in: ""We are Filipinos.""",multiple_choice,"[""We"",""Filipinos"",""are""]",We,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.183
+1467,311,"Which word is used to show ""why""?",multiple_choice,"[""because"",""first"",""next""]",because,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1468,311,"""The grass is green"" is a:",multiple_choice,"[""Explanation"",""Description"",""Command""]",Description,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1469,311,"""I am happy ___ it is my birthday.""",multiple_choice,"[""but"",""or"",""because""]",because,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1470,311,Which sentence explains a result?,multiple_choice,"[""I fell because it was wet."",""I fell on the floor."",""The floor is wet.""]",I fell because it was wet.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1471,311,"""The sun is hot."" This is a:",multiple_choice,"[""Description"",""Action"",""Reason""]",Description,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1472,311,"""It is raining ___ there are clouds.""",multiple_choice,"[""so"",""because"",""but""]",because,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1473,311,"""It stopped ___ it had no gas.""",multiple_choice,"[""or"",""and"",""because""]",because,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1474,311,"The word ""Because"" shows a:",multiple_choice,"[""Time"",""Reason"",""Place""]",Reason,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1475,311,"""The dog barked because it saw a cat."" This shows:",multiple_choice,"[""Choice"",""Reason"",""Order""]",Reason,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1476,311,"""Wash hands ___ they are dirty.""",multiple_choice,"[""because"",""and"",""but""]",because,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.190
+1477,312,A question usually has a ____ pitch at the end.,multiple_choice,"[""Rising"",""Falling"",""Flat""]",Rising,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1478,312,A telling sentence has a ____ pitch at the end.,multiple_choice,"[""Rising"",""Falling"",""High""]",Falling,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1479,312,"Does ""Go!"" sound the same as ""Go?""",multiple_choice,"[""Yes"",""No""]",No,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1480,312,A high pitch often shows:,multiple_choice,"[""Sleepiness"",""Boredom"",""Excitement""]",Excitement,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1481,312,"In ""Who are you?"", your voice goes:",multiple_choice,"[""Up"",""Down"",""Nowhere""]",Up,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1482,312,"""I am here."" (Falling pitch) is a:",multiple_choice,"[""Question"",""Statement"",""Command""]",Statement,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1483,312,Which word shows surprise?,multiple_choice,"[""The"",""Oh!"",""And""]",Oh!,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1484,312,Sentence rhythm is most like:,multiple_choice,"[""Music"",""A stone"",""A wall""]",Music,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1485,312,"""Can I eat?"" (Rising pitch) is a:",multiple_choice,"[""Command"",""Question"",""Statement""]",Question,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1486,312,Intonation helps us ____ each other better.,multiple_choice,"[""See"",""Hear"",""Understand""]",Understand,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.197
+1487,313,Which of these is a non-sentence?,multiple_choice,"[""Running fast"",""The boy is running."",""She sits down.""]",Running fast,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1488,313,Choose the correct sentence sequence:,multiple_choice,"[""Philippines the I love."",""I love the Philippines."",""Love Philippines the I.""]",I love the Philippines.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1489,313,"Identify the action (predicate) in: ""The cat jumps.""",multiple_choice,"[""cat"",""the"",""jumps""]",jumps,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1490,313,"What is the subject (doer) in: ""The teacher is kind.""",multiple_choice,"[""teacher"",""kind"",""is""]",teacher,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1491,313,"Is ""Blue the sky is"" a correctly sequenced sentence?",multiple_choice,"[""Yes"",""No"",""Maybe""]",No,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1492,313,"What type of sentence is: ""Where is my bag?""",multiple_choice,"[""Telling (Declarative)"",""Asking (Interrogative)"",""Command (Imperative)""]",Asking (Interrogative),0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1493,313,Correct end mark for a telling sentence:,multiple_choice,"[""."",""?"","",""]",.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1494,313,"Correct joining word: ""I like red ___ I like blue.""",multiple_choice,"[""and"",""or"",""but""]",and,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1495,313,"What type of sentence is: ""Wow, it's huge!""",multiple_choice,"[""Imperative"",""Exclamatory"",""Interrogative""]",Exclamatory,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1496,313,"Join: ""I am hungry"" and ""I ate.""",multiple_choice,"[""I am hungry and I ate."",""I am hungry or I ate."",""I am hungry but I ate.""]",I am hungry and I ate.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1497,313,Which shows correct capitalization?,multiple_choice,"[""my name is lito"",""My name is lito."",""My name is Lito.""]",My name is Lito.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1498,313,Procedure word used for the very START of a task:,multiple_choice,"[""Finally"",""Next"",""First""]",First,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1499,313,"Doer in 2nd part: ""I cook and she cleans.""",multiple_choice,"[""I"",""she"",""cleans""]",she,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1500,313,A declarative sentence usually ends with:,multiple_choice,"""[\"".\"",\""?\"",\""!\""]""",.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1501,313,Sentences always start with:,multiple_choice,"[""Capital letter"",""Small letter"",""Number""]",Capital letter,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1502,313,Word used for explanation or giving reason:,multiple_choice,"[""then"",""because"",""first""]",because,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1503,313,"""The sun is yellow."" This is a:",multiple_choice,"[""Description"",""Explanation"",""Command""]",Description,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1504,313,"Voice pitch for asking ""Are you okay?"":",multiple_choice,"[""Falling"",""Rising"",""Flat""]",Rising,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1505,313,"Best punctuation for strong feeling ""Help!"":",multiple_choice,"[""!"",""?"","".""]",!,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1506,313,Word used for the LAST step of a process:,multiple_choice,"[""Next"",""First"",""Finally""]",Finally,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.203
+1507,401,Who has a dog?,multiple_choice,"[""Ben"",""Ana"",""Mia""]",Ana,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1508,401,What animal does Ana have?,multiple_choice,"[""Cat"",""Dog"",""Bird""]",Dog,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1509,401,What color is the dog?,multiple_choice,"[""Brown"",""Black"",""White""]",Brown,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1510,401,Where do they play?,multiple_choice,"[""School"",""Park"",""Mall""]",Park,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1511,401,When do they play?,multiple_choice,"[""Morning"",""Afternoon"",""Night""]",Afternoon,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1512,401,What size is the dog?,multiple_choice,"[""Big"",""Small"",""Tall""]",Small,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1513,401,Who plays with the dog?,multiple_choice,"[""Teacher"",""Ana"",""Guard""]",Ana,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1514,401,The story is mostly about:,multiple_choice,"[""A cat"",""A dog"",""A park""]",A dog,0.3,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1515,401,What is Ana's pet?,multiple_choice,"[""Fish"",""Dog"",""Bird""]",Dog,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1516,401,The dog is:,multiple_choice,"[""Brown"",""Blue"",""Green""]",Brown,0.2,comprehension,NULL,Ana has a small brown dog. They play in the park every afternoon.,1,2026-03-06 00:06:27.260
+1517,402,What did Tom do first?,multiple_choice,"[""Ate breakfast"",""Woke up"",""Played""]",Woke up,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1518,402,What did Tom do next?,multiple_choice,"[""Brushed teeth"",""Slept"",""Ran""]",Brushed teeth,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1519,402,What did Tom do last?,multiple_choice,"[""Ate breakfast"",""Brushed teeth"",""Woke up""]",Ate breakfast,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1520,402,Which word shows the first action?,multiple_choice,"[""Next"",""Last"",""First""]",First,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1521,402,Which word shows the final action?,multiple_choice,"[""Next"",""Last"",""First""]",Last,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1522,402,Tom brushed his teeth before:,multiple_choice,"[""Sleeping"",""Eating"",""Running""]",Eating,0.3,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1523,402,Tom ate breakfast after:,multiple_choice,"[""Waking up"",""Brushing teeth"",""Sleeping""]",Brushing teeth,0.3,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1524,402,The events are arranged in:,multiple_choice,"[""Order"",""Random"",""Reverse""]",Order,0.3,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1525,402,What happened second?,multiple_choice,"[""Ate breakfast"",""Brushed teeth"",""Woke up""]",Brushed teeth,0.3,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1526,402,Sequencing means putting events in:,multiple_choice,"[""Size"",""Color"",""Order""]",Order,0.2,comprehension,NULL,"First, Tom woke up. Next, he brushed his teeth. Last, he ate breakfast.",1,2026-03-06 00:06:27.267
+1527,403,Who are the characters?,multiple_choice,"[""Liza and her brother"",""Beach"",""Sandcastle""]",Liza and her brother,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1528,403,Where did the story happen?,multiple_choice,"[""Park"",""Beach"",""School""]",Beach,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1529,403,What did they build?,multiple_choice,"[""House"",""Sandcastle"",""Boat""]",Sandcastle,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1530,403,The beach is the:,multiple_choice,"[""Character"",""Setting"",""Problem""]",Setting,0.3,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1531,403,Liza is a:,multiple_choice,"[""Place"",""Person"",""Animal""]",Person,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1532,403,The story happens at the:,multiple_choice,"[""Beach"",""Mall"",""Church""]",Beach,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1533,403,Who went with Liza?,multiple_choice,"[""Friend"",""Brother"",""Teacher""]",Brother,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1534,403,The sandcastle is a:,multiple_choice,"[""Thing"",""Place"",""Person""]",Thing,0.3,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1535,403,Characters are:,multiple_choice,"[""People in the story"",""Places"",""Problems""]",People in the story,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1536,403,Setting tells us:,multiple_choice,"[""Who"",""Where"",""Why""]",Where,0.2,comprehension,NULL,Liza and her brother went to the beach. They built a sandcastle.,1,2026-03-06 00:06:27.273
+1537,404,What is the text mostly about?,multiple_choice,"[""Cats"",""Dogs"",""Birds""]",Dogs,0.2,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1538,404,Dogs can:,multiple_choice,"[""Guard houses"",""Fly"",""Swim only""]",Guard houses,0.2,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1539,404,The main idea is:,multiple_choice,"[""Dogs are helpful"",""Cats are cute"",""Birds sing""]",Dogs are helpful,0.3,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1540,404,"""Helpful"" means:",multiple_choice,"[""Kind"",""Angry"",""Loud""]",Kind,0.3,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1541,404,The best title for this passage is:,multiple_choice,"[""Helpful Dogs"",""Blue Sky"",""Fast Cars""]",Helpful Dogs,0.3,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1542,404,Dogs help:,multiple_choice,"[""People"",""Cars"",""Chairs""]",People,0.2,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1543,404,The passage is about one main:,multiple_choice,"[""Idea"",""Color"",""Number""]",Idea,0.2,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1544,404,"""Guard"" means:",multiple_choice,"[""Protect"",""Run"",""Sleep""]",Protect,0.3,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1545,404,Supporting details give more information about the:,multiple_choice,"[""Title"",""Main idea"",""Pictures""]",Main idea,0.3,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1546,404,Main idea means:,multiple_choice,"[""Small detail"",""Big idea"",""Question""]",Big idea,0.2,comprehension,NULL,Dogs are helpful animals. They guard houses and help people.,1,2026-03-06 00:06:27.280
+1547,405,Why did the streets get wet?,multiple_choice,"[""It rained"",""It was sunny"",""It snowed""]",It rained,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1548,405,What happened because it rained?,multiple_choice,"[""Wet streets"",""Dry ground"",""Hot weather""]",Wet streets,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1549,405,Rain is the:,multiple_choice,"[""Effect"",""Cause"",""Detail""]",Cause,0.3,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1550,405,Wet streets are the:,multiple_choice,"[""Cause"",""Effect"",""Title""]",Effect,0.3,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1551,405,Cause means:,multiple_choice,"[""Why"",""Where"",""Who""]",Why,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1552,405,Effect means:,multiple_choice,"[""Result"",""Question"",""Person""]",Result,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1553,405,"If it rains, we use:",multiple_choice,"[""Umbrella"",""Fan"",""Heater""]",Umbrella,0.3,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1554,405,Wet streets happen after:,multiple_choice,"[""Rain"",""Sun"",""Wind""]",Rain,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1555,405,Hard rain causes:,multiple_choice,"[""Wet streets"",""Fire"",""Snow""]",Wet streets,0.2,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1556,405,The passage shows:,multiple_choice,"[""Problem"",""Cause and effect"",""Setting""]",Cause and effect,0.3,comprehension,NULL,It rained hard. The streets became wet.,1,2026-03-06 00:06:27.287
+1557,407,Where did Ben bring his kite?,multiple_choice,"[""School"",""Park"",""Beach""]",Park,0.2,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1558,407,The wind was:,multiple_choice,"[""Calm"",""Strong"",""Warm""]",Strong,0.2,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1559,407,Why did Ben feel sad?,multiple_choice,"[""He lost his toy"",""The kite got stuck"",""He went home""]",The kite got stuck,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1560,407,Who helped Ben?,multiple_choice,"[""His friend"",""His father"",""His teacher""]",His father,0.2,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1561,407,How did they solve the problem?,multiple_choice,"[""Climbed the tree"",""Used a long stick"",""Bought a new kite""]",Used a long stick,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1562,407,What happened after the kite was removed?,multiple_choice,"[""Ben cried"",""Ben smiled"",""Ben ran away""]",Ben smiled,0.2,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1563,407,The strong wind caused the kite to:,multiple_choice,"[""Fly low"",""Tear"",""Get stuck""]",Get stuck,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1564,407,The solution in the story is:,multiple_choice,"[""Going home"",""Using a stick to get the kite"",""Buying food""]",Using a stick to get the kite,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1565,407,What is the main problem?,multiple_choice,"[""Ben forgot the kite"",""The kite got stuck"",""The park was closed""]",The kite got stuck,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1566,407,The story teaches that problems can be:,multiple_choice,"[""Ignored"",""Solved with help"",""Forgotten""]",Solved with help,0.3,comprehension,NULL,Ben brought his kite to the park. The wind was very strong. The kite got stuck in a tree. Ben felt sad. His father used a long stick to get the kite down. Ben smiled again.,1,2026-03-06 00:06:27.293
+1567,408,Who likes reading books?,multiple_choice,"[""Ana"",""Mia"",""Both""]",Ana,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1568,408,Who likes playing outside?,multiple_choice,"[""Ana"",""Mia"",""Both""]",Mia,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1569,408,Where does Ana read?,multiple_choice,"[""Park"",""Room"",""Library""]",Room,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1570,408,What do both girls enjoy?,multiple_choice,"[""Sleeping"",""Learning new things"",""Cooking""]",Learning new things,0.3,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1571,408,Ana is quiet while:,multiple_choice,"[""Playing"",""Reading"",""Running""]",Reading,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1572,408,Mia prefers to:,multiple_choice,"[""Stay inside"",""Read quietly"",""Play outside""]",Play outside,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1573,408,One similarity between Ana and Mia:,multiple_choice,"[""Both read books"",""Both enjoy learning"",""Both play outside""]",Both enjoy learning,0.3,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1574,408,One difference between Ana and Mia:,multiple_choice,"[""Both are girls"",""One reads, one plays"",""Both are friends""]","One reads, one plays",0.3,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1575,408,"The word ""both"" means:",multiple_choice,"[""Only one"",""The two"",""None""]",The two,0.2,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1576,408,Ana and Mia are alike because they:,multiple_choice,"[""Like noise"",""Enjoy learning"",""Stay home""]",Enjoy learning,0.3,comprehension,NULL,Ana likes to read books quietly in her room. Mia likes to play outside with her friends. Both girls enjoy learning new things.,1,2026-03-06 00:06:27.300
+1577,409,The rabbit is:,multiple_choice,"[""Slow"",""Quick"",""Heavy""]",Quick,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1578,409,"""Quick"" means:",multiple_choice,"[""Fast"",""Small"",""Loud""]",Fast,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1579,409,The turtle is:,multiple_choice,"[""Fast"",""Slow"",""Tall""]",Slow,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1580,409,"""Slow"" means:",multiple_choice,"[""Fast"",""Not fast"",""Big""]",Not fast,0.3,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1581,409,Quick and fast are:,multiple_choice,"[""Antonyms"",""Synonyms"",""Opposites""]",Synonyms,0.3,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1582,409,Slow and fast are:,multiple_choice,"[""Synonyms"",""Antonyms"",""Same""]",Antonyms,0.3,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1583,409,The rabbit runs:,multiple_choice,"[""Slowly"",""Quickly"",""Sadly""]",Quickly,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1584,409,The turtle moves:,multiple_choice,"[""Fast"",""Quickly"",""Slowly""]",Slowly,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1585,409,The opposite of quick is:,multiple_choice,"[""Fast"",""Slow"",""Big""]",Slow,0.2,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1586,409,Context clues help us:,multiple_choice,"[""Guess meaning"",""Skip reading"",""Draw pictures""]",Guess meaning,0.3,comprehension,NULL,The rabbit is quick. It runs very fast. The turtle is slow. It moves very slowly.,1,2026-03-06 00:06:27.307
+1587,410,What filled the sky?,multiple_choice,"[""Stars"",""Clouds"",""Birds""]",Clouds,0.2,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1588,410,The wind was:,multiple_choice,"[""Calm"",""Hard"",""Warm""]",Hard,0.2,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1589,410,Why did Carlo grab an umbrella?,multiple_choice,"[""It might rain"",""It is sunny"",""It is cold""]",It might rain,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1590,410,Dark clouds tell us it may:,multiple_choice,"[""Snow"",""Rain"",""Shine""]",Rain,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1591,410,The clue that shows rain is coming:,multiple_choice,"[""Stars"",""Strong wind"",""Dark clouds""]",Dark clouds,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1592,410,Carlo felt:,multiple_choice,"[""Prepared"",""Sleepy"",""Angry""]",Prepared,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1593,410,The weather is likely:,multiple_choice,"[""Rainy"",""Sunny"",""Dry""]",Rainy,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1594,410,An inference is:,multiple_choice,"[""A guess using clues"",""A fact only"",""A drawing""]",A guess using clues,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1595,410,The best conclusion is:,multiple_choice,"[""It will be hot"",""It may rain"",""It is night""]",It may rain,0.3,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1596,410,What helped Carlo make a good decision?,multiple_choice,"[""The story"",""The clues in the sky"",""His teacher""]",The clues in the sky,0.4,comprehension,NULL,Dark clouds filled the sky. The wind blew hard. Carlo grabbed his umbrella before leaving the house.,1,2026-03-06 00:06:27.313
+1597,412,What is the text mostly about?,multiple_choice,"[""Animals"",""Plants"",""Cars""]",Plants,0.2,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1598,412,Plants need sunlight to:,multiple_choice,"[""Sleep"",""Make food"",""Jump""]",Make food,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1599,412,"Without water, plants:",multiple_choice,"[""Grow taller"",""Cannot live"",""Become blue""]",Cannot live,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1600,412,Healthy soil helps plants:,multiple_choice,"[""Grow strong"",""Fly"",""Swim""]",Grow strong,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1601,412,Which is an important detail?,multiple_choice,"[""Plants are green"",""Plants need water"",""Plants are pretty""]",Plants need water,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1602,412,A summary should include:,multiple_choice,"[""Every small detail"",""Main idea and key details"",""Only pictures""]",Main idea and key details,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1603,412,Which is NOT needed by plants?,multiple_choice,"[""Soil"",""Water"",""Candy""]",Candy,0.2,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1604,412,The main idea of the passage is:,multiple_choice,"[""Plants need sunlight, water, and soil to grow"",""Plants are colorful"",""Soil is brown""]","Plants need sunlight, water, and soil to grow",0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1605,412,Which is the best summary?,multiple_choice,"[""Plants need sunlight, water, and soil to grow and stay healthy."",""Plants are green and small."",""Water is wet.""]","Plants need sunlight, water, and soil to grow and stay healthy.",0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1606,412,A good summary is:,multiple_choice,"[""Long and detailed"",""Short and clear"",""Confusing""]",Short and clear,0.3,comprehension,NULL,"Plants need sunlight, water, and soil to grow and stay healthy.",1,2026-03-06 00:06:27.320
+1607,201,I ___ happy.,multiple_choice,"[""am"",""an"",""in""]",am,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1608,201,She ___ my friend.,multiple_choice,"[""is"",""are"",""am""]",is,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1609,201,We ___ going to school.,multiple_choice,"[""are"",""is"",""am""]",are,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1610,201,I have ___ apple.,multiple_choice,"[""a"",""an"",""the""]",an,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1611,201,___ is my bag.,multiple_choice,"[""This"",""These"",""Those""]",This,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1612,201,Choose the correct spelling:,multiple_choice,"[""because"",""becos"",""becuse""]",because,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1613,201,The cat is ___ the table.,multiple_choice,"[""on"",""in"",""at""]",on,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1614,201,Choose the correct word:,multiple_choice,"[""their"",""thier"",""ther""]",their,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1615,201,I ___ a pencil.,multiple_choice,"[""have"",""has"",""had""]",have,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1616,201,She ___ running fast.,multiple_choice,"[""is"",""are"",""am""]",is,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.373
+1617,202,A barangay is a:,multiple_choice,"[""small community"",""big country"",""animal""]",small community,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1618,202,A fiesta is a:,multiple_choice,"[""celebration"",""homework"",""storm""]",celebration,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1619,202,The palengke is a:,multiple_choice,"[""market"",""classroom"",""playground""]",market,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1620,202,A jeepney is used for:,multiple_choice,"[""transportation"",""cooking"",""planting""]",transportation,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1621,202,A farmer works in the:,multiple_choice,"[""rice field"",""hospital"",""mall""]",rice field,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1622,202,"In Math, to add means:",multiple_choice,"[""put together"",""take away"",""cut""]",put together,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1623,202,"In Math, the sum is the:",multiple_choice,"[""answer to addition"",""answer to subtraction"",""shape""]",answer to addition,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1624,202,Plants need water to:,multiple_choice,"[""grow"",""jump"",""sing""]",grow,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1625,202,The sun gives us:,multiple_choice,"[""light"",""shoes"",""books""]",light,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1626,202,An animal is a:,multiple_choice,"[""living thing"",""number"",""building""]",living thing,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1627,204,Which is a proper noun?,multiple_choice,"[""school"",""Manila"",""cat"",""boy""]",Manila,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1628,204,Which is a common noun?,multiple_choice,"[""Juan"",""Christmas"",""dog"",""May""]",dog,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1629,204,Choose the proper noun:,multiple_choice,"[""park"",""Rizal Park"",""tree"",""river""]",Rizal Park,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1630,204,Which is a common noun?,multiple_choice,"[""Maria"",""teacher"",""Monday"",""Ateneo""]",teacher,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1631,204,Choose the proper noun:,multiple_choice,"[""town"",""Cebu City"",""street"",""market""]",Cebu City,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1632,204,Which is a masculine noun?,multiple_choice,"[""mother"",""uncle"",""aunt"",""sister""]",uncle,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1633,204,Which is a feminine noun?,multiple_choice,"[""father"",""brother"",""grandmother"",""boy""]",grandmother,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1634,204,Choose the masculine noun:,multiple_choice,"[""king"",""queen"",""princess"",""mother""]",king,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1635,204,Which is a feminine noun?,multiple_choice,"[""hero"",""mother"",""man"",""boy""]",mother,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1636,204,Choose the neutral noun (used for any gender):,multiple_choice,"[""student"",""uncle"",""grandmother"",""father""]",student,0.4,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
+1637,205,The boy ___ fast.,multiple_choice,"[""run"",""runs"",""ran"",""running""]",runs,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1638,205,Maria ___ a book.,multiple_choice,"[""read"",""reads"",""reading"",""reader""]",reads,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1639,205,The dog ___ in the yard.,multiple_choice,"[""play"",""plays"",""played"",""playing""]",plays,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1640,205,We ___ our hands before eating.,multiple_choice,"[""wash"",""washes"",""washing"",""washed""]",wash,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1641,205,The teacher ___ the lesson clearly.,multiple_choice,"[""explain"",""explains"",""explained"",""explaining""]",explains,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1642,205,The cat ___ on the roof.,multiple_choice,"[""jump"",""jumps"",""jumped"",""jumping""]",jumps,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1643,205,I ___ my homework every day.,multiple_choice,"[""do"",""does"",""did"",""doing""]",do,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1644,205,They ___ football in the park.,multiple_choice,"[""play"",""plays"",""played"",""playing""]",play,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1645,205,She ___ water from the bottle.,multiple_choice,"[""drink"",""drinks"",""drank"",""drinking""]",drinks,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1646,205,The baby ___ loudly when hungry.,multiple_choice,"[""cry"",""cries"",""cried"",""crying""]",cries,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.393
+1647,206,The kitten is very ___ and soft.,multiple_choice,"[""small"",""run"",""eat"",""jump""]",small,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1648,206,Maria wore a ___ dress to the party.,multiple_choice,"[""red"",""run"",""dog"",""play""]",red,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1649,206,The boy felt ___ after winning the game.,multiple_choice,"[""happy"",""cry"",""eat"",""tall""]",happy,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1650,206,This bag is ___ than mine.,multiple_choice,"[""big"",""dog"",""run"",""play""]",big,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1651,206,The sky is ___ today with no clouds.,multiple_choice,"[""blue"",""sing"",""tall"",""fast""]",blue,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1652,206,The storybook is very ___.,multiple_choice,"[""exciting"",""dog"",""eat"",""run""]",exciting,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1653,206,The flowers in the garden are ___ and colorful.,multiple_choice,"[""beautiful"",""cat"",""jump"",""small""]",beautiful,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1654,206,He is ___ because he lost his toy.,multiple_choice,"[""sad"",""happy"",""run"",""tall""]",sad,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1655,206,There are ___ apples on the table.,multiple_choice,"[""many"",""red"",""big"",""sad""]",many,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1656,206,The cube is ___ in shape.,multiple_choice,"[""square"",""tall"",""dog"",""jump""]",square,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.400
+1657,207,Which word is a verb?,multiple_choice,"[""jump"",""blue"",""chair""]",jump,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1658,207,Which word is an adjective?,multiple_choice,"[""run"",""tall"",""swim""]",tall,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1659,207,Which is a demonstrative pronoun?,multiple_choice,"[""this"",""happy"",""walk""]",this,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1660,207,Which word is a synonym of big?,multiple_choice,"[""large"",""tiny"",""short""]",large,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1661,207,Which word is an antonym of hot?,multiple_choice,"[""warm"",""cold"",""sunny""]",cold,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1662,207,Choose the verb:,multiple_choice,"[""dance"",""pretty"",""long""]",dance,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1663,207,Choose the adjective:,multiple_choice,"[""jump"",""sing"",""beautiful""]",beautiful,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1664,207,"""___ are my shoes."" (far away, more than one)",multiple_choice,"[""Those"",""Jump"",""Happy""]",Those,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1665,207,Which word means the same as fast?,multiple_choice,"[""quick"",""slow"",""weak""]",quick,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1666,207,Which word means the opposite of tall?,multiple_choice,"[""big"",""high"",""short""]",short,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.407
+1667,210,Which word belongs to the -at family?,multiple_choice,"[""cat"",""cut"",""cot""]",cat,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1668,210,Which word rhymes with cake?,multiple_choice,"[""bike"",""bake"",""book""]",bake,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1669,210,Which word has the same pattern as light?,multiple_choice,"[""night"",""late"",""let""]",night,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1670,210,Which word belongs to the -an family?,multiple_choice,"[""man"",""men"",""moon""]",man,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1671,210,Which word rhymes with ball?,multiple_choice,"[""tall"",""tell"",""tool""]",tall,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1672,210,Which word has the -ake pattern?,multiple_choice,"[""lake"",""look"",""lock""]",lake,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1673,210,Which word rhymes with sun?,multiple_choice,"[""run"",""ran"",""sin""]",run,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1674,210,Which word belongs to the -ig family?,multiple_choice,"[""pig"",""peg"",""pug""]",pig,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1675,210,Which word has the same ending sound as book?,multiple_choice,"[""cook"",""cake"",""coat""]",cook,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1676,210,Which word belongs to the -ap family?,multiple_choice,"[""map"",""mop"",""mob""]",map,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.417
+1677,211,Choose the correctly spelled word:,multiple_choice,"[""becaus"",""because"",""becose""]",because,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1678,211,Choose the correctly spelled word:,multiple_choice,"[""nite"",""night"",""nyght""]",night,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1679,211,Choose the correctly spelled word:,multiple_choice,"[""lites"",""lights"",""lightes""]",lights,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1680,211,Choose the correctly spelled word:,multiple_choice,"[""playd"",""plaed"",""played""]",played,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1681,211,Choose the correctly spelled word:,multiple_choice,"[""helpfull"",""helpful"",""helpfol""]",helpful,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1682,211,Choose the correctly spelled word:,multiple_choice,"[""happi"",""happy"",""hapy""]",happy,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1683,211,Choose the correctly spelled word:,multiple_choice,"[""jumpd"",""jumped"",""jumpt""]",jumped,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1684,211,Choose the correctly spelled word:,multiple_choice,"[""littel"",""little"",""litle""]",little,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1685,211,Choose the correctly spelled word:,multiple_choice,"[""runing"",""running"",""runnung""]",running,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1686,211,Choose the correctly spelled word:,multiple_choice,"[""studdy"",""study"",""stody""]",study,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.420
+1687,212,"What is the root word of ""playing""?",multiple_choice,"[""play"",""playing"",""played""]",play,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1688,212,"What is the root word of ""teacher""?",multiple_choice,"[""teach"",""teacher"",""teaches""]",teach,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1689,212,"What is the root word of ""helpful""?",multiple_choice,"[""helping"",""help"",""helpful""]",help,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1690,212,"What is the root word of ""jumped""?",multiple_choice,"[""jumping"",""jump"",""jumps""]",jump,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1691,212,"What is the root word of ""reader""?",multiple_choice,"[""read"",""reader"",""reading""]",read,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1692,212,"What is the root word of ""happily""?",multiple_choice,"[""happy"",""happily"",""happiness""]",happy,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1693,212,"What is the root word of ""fastest""?",multiple_choice,"[""fast"",""faster"",""fastest""]",fast,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1694,212,"What is the root word of ""painted""?",multiple_choice,"[""painting"",""paint"",""painter""]",paint,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1695,212,"What is the root word of ""singer""?",multiple_choice,"[""sing"",""singing"",""singer""]",sing,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1696,212,"What is the root word of ""kindness""?",multiple_choice,"[""kind"",""kindly"",""kindness""]",kind,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.427
+1697,501,Which sentence starts correctly?,multiple_choice,"[""the dog barks."",""The dog barks."",""THE dog barks.""]",The dog barks.,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1698,501,Which sentence has the correct end punctuation?,multiple_choice,"[""I love to read"",""I love to read."",""i love to read""]",I love to read.,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1699,501,Which of the following is a complete sentence?,multiple_choice,"[""Running fast."",""The boy runs fast."",""The fast boy.""]",The boy runs fast.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1700,501,Which sentence expresses a complete thought?,multiple_choice,"[""My dog."",""The big tree."",""My dog is brown.""]",My dog is brown.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1701,501,What punctuation mark ends a telling sentence?,multiple_choice,"[""?"",""!"","".""]",.,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1702,501,What does every sentence begin with?,multiple_choice,"[""A small letter"",""A capital letter"",""A number""]",A capital letter,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1703,501,Which sentence is written correctly?,multiple_choice,"[""she has a book"",""She has a book."",""she has a book.""]",She has a book.,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1704,501,Which sentence is NOT complete?,multiple_choice,"[""The flowers bloom."",""Birds sing."",""Under the tree.""]",Under the tree.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.483
+1705,502,"Which word is an adjective in: ""The tall tree swayed.""?",multiple_choice,"[""tree"",""tall"",""swayed""]",tall,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1706,502,Which sentence uses an adjective to describe?,multiple_choice,"[""The dog barked."",""The loud dog barked."",""The dog ran away.""]",The loud dog barked.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1707,502,Which word best describes the taste of a mango?,multiple_choice,"[""runs"",""sweet"",""quickly""]",sweet,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1708,502,Which sentence uses a SENSORY adjective?,multiple_choice,"[""The cat sat."",""The soft, fluffy cat sat."",""The cat ran.""]","The soft, fluffy cat sat.",0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1709,502,What do adjectives describe?,multiple_choice,"[""Verbs"",""Nouns or pronouns"",""Other adjectives only""]",Nouns or pronouns,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1710,502,Which word is an adjective?,multiple_choice,"[""jump"",""slowly"",""beautiful""]",beautiful,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1711,502,Which sentence has TWO adjectives?,multiple_choice,"[""The cat is small."",""The small, white cat sat."",""The cat sat quietly.""]","The small, white cat sat.",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1712,502,Which adjective describes how something FEELS?,multiple_choice,"[""bright"",""rough"",""loud""]",rough,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.490
+1713,503,What is the FIRST sentence of a paragraph usually called?,multiple_choice,"[""Supporting sentence"",""Topic sentence"",""Concluding sentence""]",Topic sentence,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1714,503,What is the main job of a topic sentence?,multiple_choice,"[""To give details"",""To state the main idea"",""To end the paragraph""]",To state the main idea,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1715,503,What are supporting sentences used for?,multiple_choice,"[""To start the paragraph"",""To give details about the main idea"",""To change the topic""]",To give details about the main idea,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1716,503,Where should all sentences in a paragraph focus?,multiple_choice,"[""On different topics"",""On one main idea"",""On the weather""]",On one main idea,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1717,503,Which is a good topic sentence about dogs?,multiple_choice,"[""My bag is big."",""Dogs are wonderful pets."",""I like to swim.""]",Dogs are wonderful pets.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1718,503,What should you do to the first line of a paragraph?,multiple_choice,"[""Capitalize it only"",""Indent and capitalize it"",""Underline it""]",Indent and capitalize it,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1719,503,"Which sentence is a SUPPORTING sentence for ""I love mangoes.""?",multiple_choice,"[""I like reading."",""Mangoes are sweet and juicy."",""The sky is blue.""]",Mangoes are sweet and juicy.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1720,503,How many main ideas should ONE paragraph have?,multiple_choice,"[""As many as possible"",""Only one"",""At least three""]",Only one,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.493
+1721,504,Which sentence is a QUESTION?,multiple_choice,"[""Close the door."",""Where is my bag?"",""I like to read.""]",Where is my bag?,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1722,504,Which sentence is a COMMAND?,multiple_choice,"[""Who is there?"",""Please sit down."",""I am happy.""]",Please sit down.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1723,504,What punctuation ends a question?,multiple_choice,"[""."","";"",""?""]",?,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1724,504,Which word BEGINS a question?,multiple_choice,"[""Run"",""Please"",""When""]",When,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1725,504,Which is a COMMAND sentence?,multiple_choice,"[""The dog is hungry."",""Are you ready?"",""Feed the dog now.""]",Feed the dog now.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1726,504,What does an imperative sentence do?,multiple_choice,"[""Asks a question"",""Gives a command or request"",""States a fact""]",Gives a command or request,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1727,504,Which word is a question word?,multiple_choice,"[""Jump"",""Why"",""The""]",Why,0.1,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1728,504,Which sentence is a CORRECT question?,multiple_choice,"[""where is my pencil"",""Where is my pencil?"",""Where is my pencil.""]",Where is my pencil?,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.500
+1729,505,Which word joins two ideas that are DIFFERENT?,multiple_choice,"[""and"",""but"",""or""]",but,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1730,505,Which word shows a CHOICE between two ideas?,multiple_choice,"[""and"",""but"",""or""]",or,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1731,505,Which word ADDS two ideas together?,multiple_choice,"[""and"",""but"",""or""]",and,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1732,505,"Choose the correct joining word: ""I am tired ___ I will study.""",multiple_choice,"[""and"",""but"",""because""]",but,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1733,505,"Choose the correct joining word: ""We can go swimming ___ we can stay home.""",multiple_choice,"[""and"",""but"",""or""]",or,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1734,505,"Which sentence correctly uses ""and""?",multiple_choice,"[""I like rice and I like bread."",""I like rice and but I like bread."",""And I like rice.""]",I like rice and I like bread.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1735,505,"What are ""and"", ""but"", and ""or"" called?",multiple_choice,"[""Adjectives"",""Conjunctions"",""Nouns""]",Conjunctions,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1736,505,Which sentence uses a COMMA correctly before a conjunction?,multiple_choice,"[""I am happy, but she is sad."",""I am happy but, she is sad."",""I am happy but she, is sad.""]","I am happy, but she is sad.",0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.507
+1737,506,What are the THREE parts of a story?,multiple_choice,"[""Title, body, ending"",""Beginning, middle, end"",""Introduction, paragraphs, conclusion""]","Beginning, middle, end",0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1738,506,Where in a story do you introduce the characters and setting?,multiple_choice,"[""Middle"",""End"",""Beginning""]",Beginning,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1739,506,Where in a story is the main problem usually found?,multiple_choice,"[""Beginning"",""Middle"",""End""]",Middle,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1740,506,Where in a story is the problem SOLVED?,multiple_choice,"[""Beginning"",""Middle"",""End""]",End,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1741,506,Which time word is BEST for starting a story?,multiple_choice,"[""Finally"",""One day"",""In conclusion""]",One day,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1742,506,What does a story usually need?,multiple_choice,"[""A title and list"",""Characters, setting, and problem"",""Only a beginning""]","Characters, setting, and problem",0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1743,506,Which sentence is a good BEGINNING for a story?,multiple_choice,"[""And she was happy."",""One sunny day, Mia found a lost puppy."",""The end.""]","One sunny day, Mia found a lost puppy.",0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1744,506,Which time word signals the END of a story?,multiple_choice,"[""First"",""Finally"",""Next""]",Finally,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.510
+1745,507,Which time-order word comes FIRST in a sequence?,multiple_choice,"[""Then"",""Next"",""First""]",First,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1746,507,Which time-order word signals the LAST step?,multiple_choice,"[""First"",""Then"",""Finally""]",Finally,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1747,507,Which word connects steps in the MIDDLE of a sequence?,multiple_choice,"[""First"",""Finally"",""Next""]",Next,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1748,507,Time-order words help us understand the ___ of events.,multiple_choice,"[""size"",""sequence"",""topic""]",sequence,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1749,507,Which sentence uses a time-order word correctly?,multiple_choice,"[""First I woke up then I ate."",""First, I woke up. Then, I ate breakfast."",""I woke up first, then, ate.""]","First, I woke up. Then, I ate breakfast.",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1750,507,What type of writing often uses time-order words?,multiple_choice,"[""Only stories"",""Procedures and narratives"",""Only descriptions""]",Procedures and narratives,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1751,507,Which of these is a time-order word?,multiple_choice,"[""big"",""After that"",""because""]",After that,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1752,507,"Arrange the steps: ""___, peel the banana. ___, eat it. ___, wash your hands.""",multiple_choice,"[""Finally, Then, First"",""First, Then, Finally"",""Then, First, Finally""]","First, Then, Finally",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.517
+1753,508,"What does ""because"" show in a sentence?",multiple_choice,"[""A question"",""A reason or cause"",""A comparison""]",A reason or cause,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1754,508,"Complete: ""I wear a jacket ___ it is cold.""",multiple_choice,"[""and"",""because"",""but""]",because,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1755,508,"Which part is the CAUSE? ""The plants grow tall because they get sunlight.""",multiple_choice,"[""The plants grow tall"",""they get sunlight"",""tall""]",they get sunlight,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1756,508,"Which sentence correctly uses ""because""?",multiple_choice,"[""I study hard, I pass."",""I study hard because I want to pass."",""Because I study hard.""]",I study hard because I want to pass.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1757,508,"Complete: ""She smiled ___ she received a gift.""",multiple_choice,"[""and"",""because"",""but""]",because,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1758,508,"What is the EFFECT in: ""I drink water because it is hot.""?",multiple_choice,"[""it is hot"",""I drink water"",""because""]",I drink water,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1759,508,Which sentence gives an EXPLANATION?,multiple_choice,"[""I am tired."",""I am tired because I ran a lot."",""I ran a lot.""]",I am tired because I ran a lot.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1760,508,What word signals a reason or explanation?,multiple_choice,"[""but"",""because"",""and""]",because,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.523
+1761,509,Which form compares TWO things?,multiple_choice,"[""big"",""bigger"",""biggest""]",bigger,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1762,509,Which form compares THREE or more things?,multiple_choice,"[""fast"",""faster"",""fastest""]",fastest,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1763,509,Which sentence correctly compares two things?,multiple_choice,"[""The cat is big."",""The cat is bigger than the dog."",""The cat is biggest.""]",The cat is bigger than the dog.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1764,509,"Complete: ""Maria is ___ than Ben."" (smart)",multiple_choice,"[""smart"",""smarter"",""smartest""]",smarter,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1765,509,"Complete: ""This is the ___ mango I have ever tasted."" (sweet)",multiple_choice,"[""sweet"",""sweeter"",""sweetest""]",sweetest,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1766,509,"For long adjectives, we use ___ before the adjective to compare two things.",multiple_choice,"[""most"",""more"",""less""]",more,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1767,509,Which sentence uses a comparative adjective correctly?,multiple_choice,"[""She is more taller."",""She is taller than him."",""She is tallest of them.""]",She is taller than him.,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1768,509,Which word shows two things are EQUAL?,multiple_choice,"[""bigger"",""fastest"",""both""]",both,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.530
+1769,510,What does BAYANIHAN mean?,multiple_choice,"[""Being selfish"",""Community spirit and helping each other"",""Celebrating alone""]",Community spirit and helping each other,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1770,510,Which of these is a symbol of the Philippines?,multiple_choice,"[""Maple leaf"",""Philippine flag"",""Big Ben""]",Philippine flag,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1771,510,What are the THREE colors of the Philippine flag?,multiple_choice,"[""Red, white, green"",""Blue, red, white"",""Yellow, blue, red""]","Blue, red, white",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1772,510,"Which word means ""compatriots"" or ""fellow Filipinos""?",multiple_choice,"[""pamana"",""kababayan"",""bayanihan""]",kababayan,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1773,510,"Which word means ""heritage"" or ""inheritance""?",multiple_choice,"[""pamana"",""mabuhay"",""bayanihan""]",pamana,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1774,510,What does MABUHAY mean?,multiple_choice,"[""Goodbye"",""Long live! / Welcome!"",""Thank you""]",Long live! / Welcome!,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1775,510,Which sentence shows national pride?,multiple_choice,"[""I like pizza."",""I am proud to be Filipino."",""The sky is blue.""]",I am proud to be Filipino.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1776,510,Which theme shows COMMUNITY VALUES?,multiple_choice,"[""Shopping alone"",""Helping your neighbors"",""Ignoring others""]",Helping your neighbors,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.533
+1777,511,What is the main purpose of a descriptive paragraph?,multiple_choice,"[""To tell a story"",""To paint a picture with words"",""To give instructions""]",To paint a picture with words,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1778,511,Which sentence uses the SENSE of SIGHT?,multiple_choice,"[""The music was loud."",""The roses smelled sweet."",""The sky was bright blue.""]",The sky was bright blue.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1779,511,Which sentence uses the SENSE of TOUCH?,multiple_choice,"[""The food tasted salty."",""The pillow felt soft and warm."",""The bird sang beautifully.""]",The pillow felt soft and warm.,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1780,511,Which word is a SENSORY adjective for smell?,multiple_choice,"[""loud"",""fragrant"",""smooth""]",fragrant,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1781,511,What should a descriptive paragraph ALWAYS begin with?,multiple_choice,"[""A concluding thought"",""A topic sentence stating what is being described"",""A supporting detail""]",A topic sentence stating what is being described,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1782,511,Which sentence adds the MOST description?,multiple_choice,"[""The flower is nice."",""The flower is beautiful."",""The bright, fragrant yellow flower bloomed in the garden.""]","The bright, fragrant yellow flower bloomed in the garden.",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1783,511,What are the FIVE senses used in descriptive writing?,multiple_choice,"[""Sight, smell, taste, touch, hearing"",""Sight, thought, speech, action, taste"",""Color, size, shape, weight, texture""]","Sight, smell, taste, touch, hearing",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1784,511,Which word describes SOUND?,multiple_choice,"[""colorful"",""humming"",""rough""]",humming,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.540
+1785,512,What does a SUMMARY include?,multiple_choice,"[""Your opinion only"",""The main idea and key details"",""Your favorite character only""]",The main idea and key details,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1786,512,What is a TEXT-TO-SELF connection?,multiple_choice,"[""Connecting the text to another book"",""Relating the text to your own life"",""Connecting the text to world events""]",Relating the text to your own life,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1787,512,Which sentence starter is best for sharing an OPINION about a book?,multiple_choice,"[""The story is about..."",""I think this story is... because..."",""This reminds me of...""]",I think this story is... because...,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1788,512,Which sentence starter is best for SUMMARIZING a text?,multiple_choice,"[""I think..."",""This story is about..."",""This reminds me of...""]",This story is about...,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1789,512,What are the THREE parts of a book response?,multiple_choice,"[""Title, author, illustrator"",""Summary, connection, opinion"",""Beginning, middle, end""]","Summary, connection, opinion",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1790,512,Which sentence shows a TEXT-TO-SELF connection?,multiple_choice,"[""The book has 10 chapters."",""This reminds me of when I helped my brother."",""The author wrote other books too.""]",This reminds me of when I helped my brother.,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1791,512,"What does ""I think this story is heartwarming because..."" express?",multiple_choice,"[""A summary"",""An opinion with a reason"",""A connection""]",An opinion with a reason,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1792,512,Why do we include a PERSONAL CONNECTION in a book response?,multiple_choice,"[""To copy the author"",""To show how the text relates to your life"",""To rewrite the story""]",To show how the text relates to your life,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.547
+1793,513,Which sentence is written CORRECTLY?,multiple_choice,"[""the sky is blue"",""The sky is blue."",""The sky is blue""]",The sky is blue.,0.2,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1794,513,"Which word in ""The big, red apple is sweet."" is an adjective?",multiple_choice,"[""apple"",""is"",""big""]",big,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1795,513,What is the first sentence of a paragraph called?,multiple_choice,"[""Supporting sentence"",""Topic sentence"",""Ending sentence""]",Topic sentence,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1796,513,Which sentence is a QUESTION?,multiple_choice,"[""Open the window."",""Can you help me?"",""I am reading.""]",Can you help me?,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1797,513,Which joining word shows CONTRAST?,multiple_choice,"[""and"",""but"",""or""]",but,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1798,513,What are the THREE parts of a story in order?,multiple_choice,"[""End, beginning, middle"",""Beginning, middle, end"",""Middle, end, beginning""]","Beginning, middle, end",0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1799,513,"Complete: ""First, I woke up. ___, I brushed my teeth.""",multiple_choice,"[""Finally"",""Then"",""Because""]",Then,0.3,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1800,513,"Which sentence uses ""because"" CORRECTLY?",multiple_choice,"[""Because I am happy."",""I am happy because it is my birthday."",""I am happy, and because I smile.""]",I am happy because it is my birthday.,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1801,513,"Complete: ""This mango is ___ than that one."" (sweet)",multiple_choice,"[""sweet"",""sweetest"",""sweeter""]",sweeter,0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.550
+1802,513,What does a book response include?,multiple_choice,"[""Only a list of characters"",""Summary, personal connection, and opinion"",""Only the plot""]","Summary, personal connection, and opinion",0.4,creating,NULL,NULL,1,2026-03-06 00:06:27.550
