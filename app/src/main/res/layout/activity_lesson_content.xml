@@ -4,13 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- Fun Background with Module Image -->
-    <ImageView
+    <!-- Soft page background -->
+    <View
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/bg_module"
-        android:scaleType="centerCrop"
-        android:alpha="0.15" />
+        android:background="#F0F4FF" />
 
     <!-- Main Content -->
     <RelativeLayout
@@ -68,39 +66,42 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <!-- Fun Scaffolding Level Card -->
+                <!-- Pacing badge -->
                 <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="8dp"
-                    app:cardBackgroundColor="@color/accent_yellow">
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="20dp"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="4dp">
 
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:gravity="center_vertical"
-                        android:padding="16dp">
+                        android:background="@drawable/bg_gradient_purple_blue"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
 
                         <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:text="⭐"
-                            android:textSize="32sp"
-                            android:gravity="center" />
+                            android:textSize="16sp" />
 
                         <TextView
                             android:id="@+id/tvScaffolding"
-                            android:layout_width="0dp"
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="📖 BEGINNER MODE"
-                            android:textColor="@color/color_charcoal"
-                            android:textSize="16sp"
-                            android:fontFamily="@font/visby_bold" />
+                            android:layout_marginStart="8dp"
+                            android:text="BEGINNER MODE"
+                            android:textColor="@color/white"
+                            android:textSize="13sp"
+                            android:fontFamily="@font/visby_bold"
+                            android:letterSpacing="0.08" />
 
                     </LinearLayout>
 

@@ -55,17 +55,15 @@ public class LessonContentActivity extends AppCompatActivity {
     private int placementLevel;
     private SessionManager sessionManager;
 
-    // Chip colors cycling through a fun kid-friendly palette
+    // Rotating palette for word chips
     private static final int[] CHIP_COLORS = {
-            0xFFE91E63, // pink
-            0xFF9C27B0, // purple
-            0xFF3F51B5, // indigo
-            0xFF2196F3, // blue
-            0xFF009688, // teal
-            0xFF4CAF50, // green
-            0xFFFF9800, // orange
-            0xFFF44336, // red
+            0xFFE91E63, 0xFF9C27B0, 0xFF3F51B5, 0xFF2196F3,
+            0xFF009688, 0xFF4CAF50, 0xFFFF9800, 0xFFF44336,
     };
+
+    // Phonics tile colors (Orton-Gillingham convention)
+    private static final int TILE_VOWEL     = 0xFFD32F2F; // red  – vowels
+    private static final int TILE_CONSONANT = 0xFF1565C0; // blue – consonants
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,22 +82,19 @@ public class LessonContentActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
-        btnBack = findViewById(R.id.btnBack);
-        tvLessonTitle = findViewById(R.id.tvLessonTitle);
-        tvLessonNumber = findViewById(R.id.tvLessonNumber);
-        tvScaffolding = findViewById(R.id.tvScaffolding);
+        btnBack           = findViewById(R.id.btnBack);
+        tvLessonTitle     = findViewById(R.id.tvLessonTitle);
+        tvLessonNumber    = findViewById(R.id.tvLessonNumber);
+        tvScaffolding     = findViewById(R.id.tvScaffolding);
         llContentSections = findViewById(R.id.llContentSections);
-        progressBar = findViewById(R.id.progressBar);
-        btnComplete = findViewById(R.id.btnComplete);
+        progressBar       = findViewById(R.id.progressBar);
+        btnComplete       = findViewById(R.id.btnComplete);
 
         tvLessonNumber.setText("📖 Lesson " + lessonNumber);
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> {
-            setResult(RESULT_CANCELED);
-            finish();
-        });
+        btnBack.setOnClickListener(v -> { setResult(RESULT_CANCELED); finish(); });
         btnComplete.setOnClickListener(v -> markLessonCompleted());
     }
 
@@ -112,21 +107,20 @@ public class LessonContentActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
                 progressBar.setVisibility(View.GONE);
-
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
                     displayLessonContent(response.body());
                     btnComplete.setEnabled(true);
                 } else {
-                    Toast.makeText(LessonContentActivity.this, "Failed to load lesson. Please try again.", Toast.LENGTH_LONG).show();
-                    btnComplete.setEnabled(false);
+                    Toast.makeText(LessonContentActivity.this,
+                            "Failed to load lesson. Please try again.", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<LessonContentResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(LessonContentActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                btnComplete.setEnabled(false);
+                Toast.makeText(LessonContentActivity.this,
+                        "Network error: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -134,19 +128,23 @@ public class LessonContentActivity extends AppCompatActivity {
     private void displayLessonContent(LessonContentResponse data) {
         tvLessonTitle.setText(data.getLesson().getTitle());
         tvScaffolding.setText(data.getPacing().getDescription());
-        buildKidFriendlyContent(data.getLesson().getObjective(), data.getLesson().getContent());
+        buildContent(data.getLesson().getObjective(), data.getLesson().getContent());
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Kid-friendly content builder
+    // Content builder
     // ─────────────────────────────────────────────────────────────────────────
 
-    private void buildKidFriendlyContent(String objective, String rawJson) {
+    private void buildContent(String objective, String rawJson) {
         llContentSections.removeAllViews();
 
-        // Learning objective
+        // "Read with a grown-up" hint banner
+        addHintBanner("👨‍👩‍👧  Ask a grown-up to read this with you!");
+
+        // Objective
         if (objective != null && !objective.trim().isEmpty()) {
-            addTextCard("🎯", "TODAY'S GOAL", objective.trim(), 0xFFE3F2FD, 0xFF1565C0);
+            LinearLayout c = makeModernCard("🎯", "WHAT YOU WILL LEARN", 0xFF1565C0);
+            addBodyText(c, objective.trim(), 17);
         }
 
         if (rawJson == null || rawJson.trim().isEmpty()) return;
@@ -154,14 +152,14 @@ public class LessonContentActivity extends AppCompatActivity {
         try {
             JSONObject json = new JSONObject(rawJson);
 
-            // Rule / instruction
+            // Rule
             String rule = json.optString("rule", null);
             if (rule == null) rule = json.optString("instruction", null);
             if (rule != null && !rule.isEmpty()) {
-                addTextCard("📏", "THE RULE", rule, 0xFFFFF3E0, 0xFFBF360C);
+                addRuleCard(rule);
             }
 
-            // Key words as colorful chips
+            // Key words
             String[] wordFields = {"keyWords", "words", "themeWords", "sightWords",
                     "practiceWords", "verbList", "adjectives", "mathWords", "scienceWords"};
             for (String field : wordFields) {
@@ -170,7 +168,7 @@ public class LessonContentActivity extends AppCompatActivity {
                     if (val instanceof JSONArray) {
                         JSONArray arr = (JSONArray) val;
                         if (arr.length() > 0 && arr.get(0) instanceof JSONArray) {
-                            addPairsChipsCard("📖", "TODAY'S WORDS", arr);
+                            addPairsCard("📖", "TODAY'S WORDS", arr);
                         } else {
                             addWordChipsCard("📖", "TODAY'S WORDS", arr);
                         }
@@ -179,7 +177,7 @@ public class LessonContentActivity extends AppCompatActivity {
                 }
             }
 
-            // Patterns as chips
+            // Patterns
             if (json.has("patterns")) {
                 addWordChipsCard("🔤", "PATTERNS", json.getJSONArray("patterns"));
             }
@@ -189,16 +187,16 @@ public class LessonContentActivity extends AppCompatActivity {
                 addClustersCard(json.getJSONObject("clusters"));
             }
 
-            // Examples
+            // Examples with phonics tiles
             if (json.has("examples")) {
                 addExamplesCard(json.get("examples"));
             }
 
-            // Context sentences / practice
+            // Sentences
             String[] sentenceFields = {"contextSentences", "sentencePractice", "sentenceFrames"};
             for (String field : sentenceFields) {
                 if (json.has(field)) {
-                    addSentencesCard("📝", "PRACTICE SENTENCES", json.getJSONArray(field));
+                    addSentencesCard(json.getJSONArray(field));
                     break;
                 }
             }
@@ -209,120 +207,172 @@ public class LessonContentActivity extends AppCompatActivity {
             if (tip == null) tip = json.optString("selfCheck", null);
             if (tip == null) tip = json.optString("trick", null);
             if (tip != null && !tip.isEmpty()) {
-                addTextCard("⭐", "REMEMBER THIS!", tip, 0xFFFFFDE7, 0xFFF57F17);
+                addTipCard(tip);
             }
 
         } catch (Exception e) {
-            // Not valid JSON — plain text fallback
-            addTextCard("📖", "LESSON", rawJson, 0xFFFFFFFF, 0xFF333333);
+            LinearLayout c = makeModernCard("📖", "LESSON", 0xFF555555);
+            addBodyText(c, rawJson, 17);
         }
     }
 
-    // ── Plain text section card ──────────────────────────────────────────────
+    // ─────────────────────────────────────────────────────────────────────────
+    // Section card builders
+    // ─────────────────────────────────────────────────────────────────────────
 
-    private void addTextCard(String emoji, String label, String body, int bgColor, int labelColor) {
-        CardView card = makeCard(bgColor);
-        LinearLayout inner = makeCardInner(card);
-
-        inner.addView(makeSectionHeader(emoji + "  " + label, labelColor));
+    /** Thin hint banner at the very top (not a full card). */
+    private void addHintBanner(String text) {
+        LinearLayout banner = new LinearLayout(this);
+        banner.setOrientation(LinearLayout.HORIZONTAL);
+        banner.setGravity(Gravity.CENTER);
+        GradientDrawable bg = roundRect(0xFFEDE7F6, dp(12));
+        banner.setBackground(bg);
+        banner.setPadding(dp(16), dp(10), dp(16), dp(10));
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, dp(18));
+        banner.setLayoutParams(lp);
 
         TextView tv = new TextView(this);
-        tv.setText(body);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        tv.setTextColor(0xFF333333);
-        tv.setLineSpacing(0f, 1.45f);
-        inner.addView(tv);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        tv.setTextColor(0xFF4A148C);
+        tv.setTypeface(null, Typeface.ITALIC);
+        tv.setGravity(Gravity.CENTER);
+        banner.addView(tv);
+        llContentSections.addView(banner);
     }
 
-    // ── Word chips card ──────────────────────────────────────────────────────
+    /** Rule card: extra-large text so the rule stands out clearly. */
+    private void addRuleCard(String rule) {
+        LinearLayout c = makeModernCard("📏", "THE RULE", 0xFFBF360C);
+        addBodyText(c, rule, 19);
+    }
 
+    /** Tip / memory trick card with star accent. */
+    private void addTipCard(String tip) {
+        LinearLayout c = makeModernCard("⭐", "REMEMBER THIS!", 0xFFE65100);
+
+        // Yellow highlight box for the tip text
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setBackground(roundRect(0xFFFFF9C4, dp(12)));
+        box.setPadding(dp(14), dp(12), dp(14), dp(12));
+        addBodyText(box, tip, 17);
+        c.addView(box);
+    }
+
+    /** Word chips — 2 per row so each word is large and readable. */
     private void addWordChipsCard(String emoji, String label, JSONArray words) throws Exception {
-        CardView card = makeCard(0xFFF3E5F5);
-        LinearLayout inner = makeCardInner(card);
+        LinearLayout c = makeModernCard(emoji, label, 0xFF6A1B9A);
 
-        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF6A1B9A));
-
-        // Chips in rows of 3
-        final int PER_ROW = 3;
+        final int PER_ROW = 2;
         LinearLayout row = null;
         for (int i = 0; i < words.length(); i++) {
             if (i % PER_ROW == 0) {
-                row = new LinearLayout(this);
-                row.setOrientation(LinearLayout.HORIZONTAL);
-                LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
-                        LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                rp.setMargins(0, 0, 0, dp(10));
-                row.setLayoutParams(rp);
-                inner.addView(row);
+                row = makeHRow(dp(10));
+                c.addView(row);
             }
             row.addView(makeWordChip(words.getString(i), CHIP_COLORS[i % CHIP_COLORS.length]));
         }
-
-        // Pad remaining cells so chips align left
-        if (words.length() % PER_ROW != 0 && row != null) {
-            int spare = PER_ROW - (words.length() % PER_ROW);
-            for (int i = 0; i < spare; i++) {
-                View spacer = new View(this);
-                spacer.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-                row.addView(spacer);
-            }
+        // Pad last row
+        if (row != null && words.length() % PER_ROW != 0) {
+            View spacer = new View(this);
+            spacer.setLayoutParams(new LinearLayout.LayoutParams(0,
+                    LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(spacer);
         }
     }
 
-    // ── Synonym / antonym pairs card ─────────────────────────────────────────
-
-    private void addPairsChipsCard(String emoji, String label, JSONArray pairs) throws Exception {
-        CardView card = makeCard(0xFFF3E5F5);
-        LinearLayout inner = makeCardInner(card);
-        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF6A1B9A));
-
+    /** Synonym/antonym pair chips. */
+    private void addPairsCard(String emoji, String label, JSONArray pairs) throws Exception {
+        LinearLayout c = makeModernCard(emoji, label, 0xFF6A1B9A);
         for (int i = 0; i < pairs.length(); i++) {
             JSONArray pair = pairs.getJSONArray(i);
-            LinearLayout row = new LinearLayout(this);
-            row.setOrientation(LinearLayout.HORIZONTAL);
+            LinearLayout row = makeHRow(dp(10));
             row.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            rp.setMargins(0, 0, 0, dp(10));
-            row.setLayoutParams(rp);
-
             row.addView(makeWordChip(pair.getString(0), CHIP_COLORS[i * 2 % CHIP_COLORS.length]));
             TextView arrow = new TextView(this);
             arrow.setText("  ↔  ");
             arrow.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            arrow.setTextColor(0xFF555555);
+            arrow.setTextColor(0xFF777777);
             row.addView(arrow);
             row.addView(makeWordChip(pair.getString(1), CHIP_COLORS[(i * 2 + 1) % CHIP_COLORS.length]));
-            inner.addView(row);
+            c.addView(row);
         }
     }
 
-    // ── Examples card ────────────────────────────────────────────────────────
+    /** Clusters (e.g. bl/cl → "black, clap"). */
+    private void addClustersCard(JSONObject clusters) throws Exception {
+        LinearLayout c = makeModernCard("🔤", "CLUSTERS", 0xFF00695C);
+        java.util.Iterator<String> keys = clusters.keys();
+        int ci = 0;
+        while (keys.hasNext()) {
+            String k = keys.next();
+            JSONArray arr = clusters.getJSONArray(k);
+            LinearLayout row = makeHRow(dp(10));
+            row.setGravity(Gravity.CENTER_VERTICAL);
+            TextView keyTv = new TextView(this);
+            keyTv.setText(k.toUpperCase() + ":");
+            keyTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
+            keyTv.setTypeface(null, Typeface.BOLD);
+            keyTv.setTextColor(0xFF555555);
+            keyTv.setMinWidth(dp(52));
+            row.addView(keyTv);
+            for (int j = 0; j < arr.length(); j++) {
+                row.addView(makeWordChip(arr.getString(j), CHIP_COLORS[ci++ % CHIP_COLORS.length]));
+            }
+            c.addView(row);
+        }
+    }
 
+    /**
+     * Examples card — the key learning section.
+     *
+     * For each example we show:
+     *  1. The full word in a large colored bubble
+     *  2. If a phonics breakdown is available (e.g. "H+a+n+d"), individual
+     *     letter tiles with consonants = blue, vowels = red.
+     *  3. A "Say it!" prompt so kids know to speak each tile aloud.
+     */
     private void addExamplesCard(Object examples) throws Exception {
-        CardView card = makeCard(0xFFE8F5E9);
-        LinearLayout inner = makeCardInner(card);
-        inner.addView(makeSectionHeader("💡  LOOK AT THESE", 0xFF2E7D32));
+        LinearLayout c = makeModernCard("💡", "SOUND IT OUT", 0xFF2E7D32);
+
+        // Instruction hint
+        TextView hint = new TextView(this);
+        hint.setText("👉  Point to each tile and say its sound!");
+        hint.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        hint.setTextColor(0xFF555555);
+        hint.setTypeface(null, Typeface.ITALIC);
+        LinearLayout.LayoutParams hp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        hp.setMargins(0, 0, 0, dp(16));
+        hint.setLayoutParams(hp);
+        c.addView(hint);
+
+        // Legend: blue = consonant, red = vowel
+        c.addView(makeTileLegend());
 
         if (examples instanceof JSONArray) {
             JSONArray arr = (JSONArray) examples;
             for (int i = 0; i < arr.length(); i++) {
+                String word = "", breakdown = null;
                 if (arr.get(i) instanceof JSONObject) {
-                    // Object shape: {word, division, vowelSound}
-                    JSONObject item = arr.getJSONObject(i);
-                    String word  = item.optString("word", "");
-                    String div   = item.optString("division", "");
-                    String sound = item.optString("vowelSound", "");
-                    StringBuilder line = new StringBuilder(word);
-                    if (!div.isEmpty())   line.append("  →  ").append(div);
-                    if (!sound.isEmpty()) line.append("  (").append(sound).append(")");
-                    inner.addView(makeExampleRow(line.toString(), i));
+                    JSONObject obj = arr.getJSONObject(i);
+                    word      = obj.optString("word", "");
+                    breakdown = obj.optString("division", null);
+                    if (breakdown == null) breakdown = obj.optString("vowelSound", null);
                 } else {
-                    inner.addView(makeExampleRow(arr.getString(i), i));
+                    String raw = arr.getString(i);
+                    if (raw.contains(" - ")) {
+                        String[] parts = raw.split(" - ", 2);
+                        word      = parts[0].trim();
+                        breakdown = parts[1].trim();
+                    } else {
+                        word = raw;
+                    }
                 }
+                c.addView(makeExampleBlock(word, breakdown, i));
             }
         } else if (examples instanceof JSONObject) {
             JSONObject exObj = (JSONObject) examples;
@@ -331,129 +381,272 @@ public class LessonContentActivity extends AppCompatActivity {
             while (keys.hasNext()) {
                 String k = keys.next();
                 JSONArray sub = exObj.getJSONArray(k);
-                TextView subHeader = new TextView(this);
-                subHeader.setText(capitalize(k));
-                subHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-                subHeader.setTypeface(null, Typeface.BOLD);
-                subHeader.setTextColor(0xFF555555);
-                subHeader.setPadding(0, dp(4), 0, dp(4));
-                inner.addView(subHeader);
+                TextView subLabel = new TextView(this);
+                subLabel.setText(capitalize(k));
+                subLabel.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                subLabel.setTypeface(null, Typeface.BOLD);
+                subLabel.setTextColor(0xFF777777);
+                subLabel.setPadding(0, dp(4), 0, dp(6));
+                c.addView(subLabel);
                 for (int j = 0; j < sub.length(); j++) {
-                    inner.addView(makeExampleRow(sub.getString(j), i++));
+                    String raw = sub.getString(j);
+                    String w = raw, bd = null;
+                    if (raw.contains(" - ")) {
+                        String[] p = raw.split(" - ", 2);
+                        w = p[0].trim(); bd = p[1].trim();
+                    }
+                    c.addView(makeExampleBlock(w, bd, i++));
                 }
             }
         }
     }
 
-    // ── Sentences card ───────────────────────────────────────────────────────
-
-    private void addSentencesCard(String emoji, String label, JSONArray sentences) throws Exception {
-        CardView card = makeCard(0xFFE8EAF6);
-        LinearLayout inner = makeCardInner(card);
-        inner.addView(makeSectionHeader(emoji + "  " + label, 0xFF283593));
-
+    /** Practice sentences — numbered list. */
+    private void addSentencesCard(JSONArray sentences) throws Exception {
+        LinearLayout c = makeModernCard("📝", "PRACTICE SENTENCES", 0xFF283593);
         for (int i = 0; i < sentences.length(); i++) {
+            LinearLayout row = makeHRow(dp(12));
+            row.setGravity(Gravity.TOP);
+
+            // Number bubble
+            TextView num = makeCircleBadge(String.valueOf(i + 1),
+                    CHIP_COLORS[i % CHIP_COLORS.length], dp(30), 13);
+            LinearLayout.LayoutParams np = new LinearLayout.LayoutParams(dp(30), dp(30));
+            np.setMargins(0, dp(2), dp(12), 0);
+            num.setLayoutParams(np);
+            row.addView(num);
+
             TextView tv = new TextView(this);
-            tv.setText((i + 1) + ".  " + sentences.getString(i));
+            tv.setText(sentences.getString(i));
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
             tv.setTextColor(0xFF333333);
-            tv.setLineSpacing(0f, 1.4f);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            lp.setMargins(0, 0, 0, dp(10));
-            tv.setLayoutParams(lp);
-            inner.addView(tv);
-        }
-    }
-
-    // ── Clusters card ────────────────────────────────────────────────────────
-
-    private void addClustersCard(JSONObject clusters) throws Exception {
-        CardView card = makeCard(0xFFF3E5F5);
-        LinearLayout inner = makeCardInner(card);
-        inner.addView(makeSectionHeader("🔤  CLUSTERS", 0xFF6A1B9A));
-
-        java.util.Iterator<String> keys = clusters.keys();
-        int colorIdx = 0;
-        while (keys.hasNext()) {
-            String k = keys.next();
-            JSONArray arr = clusters.getJSONArray(k);
-
-            LinearLayout row = new LinearLayout(this);
-            row.setOrientation(LinearLayout.HORIZONTAL);
-            row.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            rp.setMargins(0, 0, 0, dp(10));
-            row.setLayoutParams(rp);
-
-            TextView keyTv = new TextView(this);
-            keyTv.setText(k.toUpperCase() + ":");
-            keyTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-            keyTv.setTypeface(null, Typeface.BOLD);
-            keyTv.setTextColor(0xFF555555);
-            keyTv.setMinWidth(dp(56));
-            row.addView(keyTv);
-
-            for (int j = 0; j < arr.length(); j++) {
-                row.addView(makeWordChip(arr.getString(j), CHIP_COLORS[colorIdx++ % CHIP_COLORS.length]));
-            }
-            inner.addView(row);
+            tv.setLineSpacing(0f, 1.45f);
+            tv.setLayoutParams(new LinearLayout.LayoutParams(
+                    0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
+            row.addView(tv);
+            c.addView(row);
         }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // View factory helpers
+    // Phonics example block
     // ─────────────────────────────────────────────────────────────────────────
 
-    private CardView makeCard(int bgColor) {
-        CardView card = new CardView(this);
-        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        cp.setMargins(0, 0, 0, dp(16));
-        card.setLayoutParams(cp);
-        card.setRadius(dp(18));
-        card.setCardElevation(dp(4));
-        card.setCardBackgroundColor(bgColor);
-        return card;
+    /**
+     * Creates a self-contained card for one example word:
+     *   - Large word bubble
+     *   - Phonics letter tiles (consonant=blue, vowel=red) if breakdown present
+     */
+    private View makeExampleBlock(String word, String breakdown, int index) {
+        LinearLayout box = new LinearLayout(this);
+        box.setOrientation(LinearLayout.VERTICAL);
+        box.setGravity(Gravity.CENTER);
+        box.setBackground(roundRect(0xFFF1F8E9, dp(14)));
+        box.setPadding(dp(12), dp(16), dp(12), dp(16));
+        LinearLayout.LayoutParams bp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        bp.setMargins(0, 0, 0, dp(14));
+        box.setLayoutParams(bp);
+
+        // Large word
+        TextView wordTv = new TextView(this);
+        wordTv.setText(word);
+        wordTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+        wordTv.setTypeface(null, Typeface.BOLD);
+        wordTv.setTextColor(CHIP_COLORS[index % CHIP_COLORS.length]);
+        wordTv.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams wp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        wp.setMargins(0, 0, 0, dp(12));
+        wordTv.setLayoutParams(wp);
+        box.addView(wordTv);
+
+        // Phonics tiles if breakdown available
+        if (breakdown != null && (breakdown.contains("+") || hasSingleCharSplit(breakdown))) {
+            box.addView(makeLetterTiles(breakdown));
+
+            // "Say it!" label
+            TextView sayIt = new TextView(this);
+            sayIt.setText("Say it out loud! 🔊");
+            sayIt.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            sayIt.setTextColor(0xFF888888);
+            sayIt.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams sp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            sp.setMargins(0, dp(8), 0, 0);
+            sayIt.setLayoutParams(sp);
+            box.addView(sayIt);
+        }
+
+        return box;
     }
 
-    /** Creates the inner LinearLayout, adds it to the card, and returns it. */
-    private LinearLayout makeCardInner(CardView card) {
-        LinearLayout inner = new LinearLayout(this);
-        inner.setOrientation(LinearLayout.VERTICAL);
-        inner.setPadding(dp(20), dp(16), dp(20), dp(18));
-        card.addView(inner);
-        llContentSections.addView(card);
-        return inner;
+    /**
+     * Renders a row of letter tiles from a phonics breakdown string.
+     * e.g. "H+a+n+d" → [H blue][a red][n blue][d blue]
+     *      "Ti-ger"  → [Ti blue][ger blue]   (syllable split)
+     */
+    private LinearLayout makeLetterTiles(String breakdown) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER);
+
+        // Split on '+' (letter-level) or '-' (syllable-level)
+        String[] segments = breakdown.split("[+\\-]");
+        for (String seg : segments) {
+            seg = seg.trim();
+            if (seg.isEmpty()) continue;
+
+            boolean isVowel = isVowelSegment(seg);
+            int tileColor   = isVowel ? TILE_VOWEL : TILE_CONSONANT;
+
+            TextView tile = new TextView(this);
+            tile.setText(seg.toUpperCase());
+            tile.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
+            tile.setTypeface(null, Typeface.BOLD);
+            tile.setTextColor(Color.WHITE);
+            tile.setGravity(Gravity.CENTER);
+
+            GradientDrawable bg = new GradientDrawable();
+            bg.setColor(tileColor);
+            bg.setCornerRadius(dp(8));
+            tile.setBackground(bg);
+
+            int w = dp(44 + Math.max(0, (seg.length() - 1) * 10));
+            LinearLayout.LayoutParams tp = new LinearLayout.LayoutParams(w, dp(50));
+            tp.setMargins(dp(3), 0, dp(3), 0);
+            tile.setLayoutParams(tp);
+            row.addView(tile);
+        }
+        return row;
     }
 
-    private TextView makeSectionHeader(String text, int color) {
+    /** Vowel if the segment's first character is a, e, i, o, or u (any case). */
+    private boolean isVowelSegment(String seg) {
+        if (seg.isEmpty()) return false;
+        return "aeiouAEIOU".indexOf(seg.charAt(0)) >= 0;
+    }
+
+    /** True if the string contains '-' (syllable split) with single-char segments. */
+    private boolean hasSingleCharSplit(String s) {
+        if (!s.contains("-")) return false;
+        for (String part : s.split("-")) {
+            if (!part.trim().isEmpty()) return true;
+        }
+        return false;
+    }
+
+    /** Small legend row: 🟦 = consonant   🟥 = vowel */
+    private View makeTileLegend() {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, dp(14));
+        row.setLayoutParams(lp);
+
+        row.addView(makeTileSwatch(TILE_CONSONANT));
+        row.addView(makeLegendLabel("= consonant    "));
+        row.addView(makeTileSwatch(TILE_VOWEL));
+        row.addView(makeLegendLabel("= vowel"));
+        return row;
+    }
+
+    private View makeTileSwatch(int color) {
+        View v = new View(this);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(color);
+        bg.setCornerRadius(dp(4));
+        v.setBackground(bg);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(dp(18), dp(18));
+        lp.setMargins(0, 0, dp(5), 0);
+        v.setLayoutParams(lp);
+        return v;
+    }
+
+    private TextView makeLegendLabel(String text) {
         TextView tv = new TextView(this);
         tv.setText(text);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15);
-        tv.setTypeface(null, Typeface.BOLD);
-        tv.setTextColor(color);
-        tv.setAllCaps(true);
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 0, 0, dp(12));
-        tv.setLayoutParams(lp);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        tv.setTextColor(0xFF777777);
         return tv;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Modern card factory (colored header band + white body)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /**
+     * Creates a modern card with a colored header band.
+     * Returns the white content LinearLayout for adding children.
+     */
+    private LinearLayout makeModernCard(String emoji, String label, int headerColor) {
+        CardView card = new CardView(this);
+        LinearLayout.LayoutParams cp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        cp.setMargins(0, 0, 0, dp(18));
+        card.setLayoutParams(cp);
+        card.setRadius(dp(20));
+        card.setCardElevation(dp(6));
+        card.setCardBackgroundColor(Color.WHITE);
+
+        LinearLayout wrapper = new LinearLayout(this);
+        wrapper.setOrientation(LinearLayout.VERTICAL);
+
+        // ── Colored header band ──────────────────────────────────────────
+        LinearLayout header = new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setBackgroundColor(headerColor);
+        header.setPadding(dp(18), dp(14), dp(18), dp(14));
+
+        TextView emojiTv = new TextView(this);
+        emojiTv.setText(emoji);
+        emojiTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+        header.addView(emojiTv);
+
+        TextView labelTv = new TextView(this);
+        labelTv.setText("  " + label);
+        labelTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+        labelTv.setTypeface(null, Typeface.BOLD);
+        labelTv.setTextColor(Color.WHITE);
+        labelTv.setLetterSpacing(0.08f);
+        header.addView(labelTv);
+
+        // ── White content area ───────────────────────────────────────────
+        LinearLayout content = new LinearLayout(this);
+        content.setOrientation(LinearLayout.VERTICAL);
+        content.setPadding(dp(18), dp(18), dp(18), dp(20));
+
+        wrapper.addView(header);
+        wrapper.addView(content);
+        card.addView(wrapper);
+        llContentSections.addView(card);
+        return content;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // View helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    private void addBodyText(LinearLayout parent, String text, int spSize) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, spSize);
+        tv.setTextColor(0xFF333333);
+        tv.setLineSpacing(0f, 1.5f);
+        parent.addView(tv);
     }
 
     private TextView makeWordChip(String word, int color) {
         TextView chip = new TextView(this);
         chip.setText(word);
-        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        chip.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19);
         chip.setTypeface(null, Typeface.BOLD);
         chip.setTextColor(Color.WHITE);
         chip.setGravity(Gravity.CENTER);
-        chip.setPadding(dp(10), dp(12), dp(10), dp(12));
+        chip.setPadding(dp(8), dp(14), dp(8), dp(14));
 
         GradientDrawable bg = new GradientDrawable();
         bg.setColor(color);
@@ -462,49 +655,42 @@ public class LessonContentActivity extends AppCompatActivity {
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        lp.setMargins(dp(4), 0, dp(4), 0);
+        lp.setMargins(dp(5), 0, dp(5), 0);
         chip.setLayoutParams(lp);
         return chip;
     }
 
-    private View makeExampleRow(String text, int index) {
-        LinearLayout row = new LinearLayout(this);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-        row.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams rp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT);
-        rp.setMargins(0, 0, 0, dp(10));
-        row.setLayoutParams(rp);
-
-        // Colored left dot / number bubble
-        TextView num = new TextView(this);
-        num.setText(String.valueOf(index + 1));
-        num.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
-        num.setTypeface(null, Typeface.BOLD);
-        num.setTextColor(Color.WHITE);
-        num.setGravity(Gravity.CENTER);
-        num.setPadding(dp(6), dp(6), dp(6), dp(6));
-        int bubbleColor = CHIP_COLORS[index % CHIP_COLORS.length];
-        GradientDrawable bubble = new GradientDrawable();
-        bubble.setColor(bubbleColor);
-        bubble.setShape(GradientDrawable.OVAL);
-        num.setBackground(bubble);
-        LinearLayout.LayoutParams np = new LinearLayout.LayoutParams(dp(32), dp(32));
-        np.setMargins(0, 0, dp(12), 0);
-        np.gravity = Gravity.TOP;
-        num.setLayoutParams(np);
-        row.addView(num);
-
+    private TextView makeCircleBadge(String text, int color, int sizePx, int spSize) {
         TextView tv = new TextView(this);
         tv.setText(text);
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
-        tv.setTextColor(0xFF333333);
-        tv.setLineSpacing(0f, 1.35f);
-        tv.setLayoutParams(new LinearLayout.LayoutParams(
-                0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f));
-        row.addView(tv);
+        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, spSize);
+        tv.setTypeface(null, Typeface.BOLD);
+        tv.setTextColor(Color.WHITE);
+        tv.setGravity(Gravity.CENTER);
+        GradientDrawable bg = new GradientDrawable();
+        bg.setColor(color);
+        bg.setShape(GradientDrawable.OVAL);
+        tv.setBackground(bg);
+        tv.setLayoutParams(new LinearLayout.LayoutParams(sizePx, sizePx));
+        return tv;
+    }
+
+    /** Horizontal LinearLayout with a bottom margin. */
+    private LinearLayout makeHRow(int bottomMarginPx) {
+        LinearLayout row = new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(0, 0, 0, bottomMarginPx);
+        row.setLayoutParams(lp);
         return row;
+    }
+
+    private GradientDrawable roundRect(int color, int radiusPx) {
+        GradientDrawable d = new GradientDrawable();
+        d.setColor(color);
+        d.setCornerRadius(radiusPx);
+        return d;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -535,13 +721,14 @@ public class LessonContentActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<UpdateProgressResponse> call, Response<UpdateProgressResponse> response) {
                 progressBar.setVisibility(View.GONE);
-
                 if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                    Toast.makeText(LessonContentActivity.this, "✅ Lesson Complete! Moving to Game...", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LessonContentActivity.this,
+                            "✅ Lesson Complete! Moving to Game...", Toast.LENGTH_SHORT).show();
                     setResult(RESULT_OK);
                     finish();
                 } else {
-                    Toast.makeText(LessonContentActivity.this, "Failed to save progress", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LessonContentActivity.this,
+                            "Failed to save progress", Toast.LENGTH_SHORT).show();
                     btnComplete.setEnabled(true);
                 }
             }
@@ -549,24 +736,17 @@ public class LessonContentActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<UpdateProgressResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(LessonContentActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(LessonContentActivity.this,
+                        "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 btnComplete.setEnabled(true);
             }
         });
     }
 
-    /**
-     * Convert placement level string to integer for API calls
-     */
     private int convertPlacementLevelToInt(String levelString) {
-        if (levelString == null) return 2; // Default to intermediate
-
-        if (levelString.contains("2") || levelString.toLowerCase().contains("beginner")) {
-            return 1;
-        } else if (levelString.contains("4") || levelString.toLowerCase().contains("advanced")) {
-            return 3;
-        } else {
-            return 2; // Grade 3 or intermediate
-        }
+        if (levelString == null) return 2;
+        if (levelString.contains("2") || levelString.toLowerCase().contains("beginner")) return 1;
+        if (levelString.contains("4") || levelString.toLowerCase().contains("advanced")) return 3;
+        return 2;
     }
 }
