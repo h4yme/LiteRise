@@ -11,6 +11,7 @@
  * {
  *   "node_id":       101,
  *   "game_type":     "minimal_pairs",   // minimal_pairs | timed_trail | picture_match | story_sequencing | synonym_sprint
+ *                                      // dialogue_reading | fill_in_blanks | sentence_scramble | word_explosion | word_hunt
  *   "lesson_content": "{...}"           // ContentJSON string from the lesson
  * }
  *
@@ -46,7 +47,10 @@ $nodeId       = isset($body['node_id'])       ? intval($body['node_id'])        
 $gameType     = isset($body['game_type'])     ? trim($body['game_type'])            : '';
 $lessonContent = isset($body['lesson_content']) ? trim($body['lesson_content'])     : '';
 
-$allowedTypes = ['minimal_pairs', 'timed_trail', 'picture_match', 'story_sequencing', 'synonym_sprint'];
+$allowedTypes = [
+    'minimal_pairs', 'timed_trail', 'picture_match', 'story_sequencing', 'synonym_sprint',
+    'dialogue_reading', 'fill_in_blanks', 'sentence_scramble', 'word_explosion', 'word_hunt'
+];
 
 if ($nodeId === 0 || !in_array($gameType, $allowedTypes)) {
     http_response_code(400);
@@ -144,6 +148,67 @@ Keep vocabulary at Grade 3 level.
 
 Return ONLY valid JSON, no explanation:
 {"groups":[{"targetWord":"bright","synonyms":["shiny","glowing","light"],"antonyms":["dark","dull","dim"]},{"targetWord":"clean","synonyms":["tidy","neat","fresh"],"antonyms":["dirty","messy","filthy"]},{"targetWord":"small","synonyms":["tiny","little","mini"],"antonyms":["big","large","huge"]},{"targetWord":"full","synonyms":["filled","packed","loaded"],"antonyms":["empty","hollow","bare"]},{"targetWord":"fast","synonyms":["quick","speedy","swift"],"antonyms":["slow","lazy","sluggish"]},{"targetWord":"bright","synonyms":["smart","clever","sharp"],"antonyms":["dull","slow","dim"]}]}
+PROMPT,
+
+    'dialogue_reading' => <<<PROMPT
+You are a Grade 3 English teacher in the Philippines.
+Given this lesson content JSON: {LESSON}
+
+Create a short 6-line dialogue between two Filipino children (e.g. Maria and Juan) that naturally uses key words or the phonics pattern from the lesson.
+Use simple, conversational sentences appropriate for 8-year-olds.
+Each line has a speaker name, an emoji avatar, and the spoken text.
+
+Return ONLY valid JSON, no explanation:
+{"lines":[{"speaker":"Maria","avatar":"👧","text":"Hello Juan! Did you finish your homework?"},{"speaker":"Juan","avatar":"👦","text":"Yes! I read about frogs and their long legs."},{"speaker":"Maria","avatar":"👧","text":"I like frogs. They jump so high!"},{"speaker":"Juan","avatar":"👦","text":"The frog in my book could jump over a log."},{"speaker":"Maria","avatar":"👧","text":"That is a big jump for a small frog."},{"speaker":"Juan","avatar":"👦","text":"Let us read about it together after class."}]}
+PROMPT,
+
+    'fill_in_blanks' => <<<PROMPT
+You are a Grade 3 English teacher in the Philippines.
+Given this lesson content JSON: {LESSON}
+
+Generate 8 fill-in-the-blank questions using key words or the phonics pattern from the lesson.
+Each question splits a sentence into text before the blank and text after the blank, with one correct answer and 3 wrong options.
+Keep sentences simple and grade-appropriate.
+
+Return ONLY valid JSON, no explanation:
+{"questions":[{"beforeBlank":"The frog sat on the ","afterBlank":" by the pond.","correctAnswer":"log","options":["log","dog","fog","hog"]},{"beforeBlank":"She could ","afterBlank":" very fast in the race.","correctAnswer":"run","options":["run","bun","sun","fun"]},...]}
+PROMPT,
+
+    'sentence_scramble' => <<<PROMPT
+You are a Grade 3 English teacher in the Philippines.
+Given this lesson content JSON: {LESSON}
+
+Generate 8 sentences that use key words or the phonics pattern from the lesson.
+Each sentence should be suitable for scrambling into a drag-and-drop word-ordering game.
+Use 4–8 words per sentence. Set sentences in a Filipino school or home context.
+
+Return ONLY valid JSON, no explanation:
+{"sentences":[{"sentence":"The frog jumped over the log."},{"sentence":"Maria ran fast to the store."},{"sentence":"He kept the lamp on the desk."},{"sentence":"She drank cold milk at breakfast."},{"sentence":"The drum made a very loud sound."},{"sentence":"Ben and Ana sang a happy song."},{"sentence":"My dog can jump over the bench."},{"sentence":"She found a stamp in her bag."}]}
+PROMPT,
+
+    'word_explosion' => <<<PROMPT
+You are a Grade 3 English teacher in the Philippines.
+Given this lesson content JSON: {LESSON}
+
+Generate 3 word categories for a bubble-popping vocabulary game.
+The first category must use key words directly from the lesson.
+The other two can be contrasting or related categories.
+Each category has a name, a hex color, and 8 words appropriate for Grade 3.
+
+Return ONLY valid JSON, no explanation:
+{"categories":[{"name":"LESSON WORDS","color":"#7C3AED","words":["frog","log","stop","lamp","milk","drum","fast","jump"]},{"name":"ANIMALS","color":"#FF6B6B","words":["cat","dog","bird","fish","lion","snake","deer","bear"]},{"name":"ACTIONS","color":"#4ECDC4","words":["run","sing","read","swim","draw","kick","clap","spin"]}]}
+PROMPT,
+
+    'word_hunt' => <<<PROMPT
+You are a Grade 3 English teacher in the Philippines.
+Given this lesson content JSON: {LESSON}
+
+Generate 8 words from the lesson for a word-search (word hunt) game.
+Choose words that are 3–7 letters long so they fit well in a grid.
+For each word provide a short kid-friendly hint (one sentence, max 10 words) and a simple definition.
+
+Return ONLY valid JSON, no explanation:
+{"words":[{"word":"frog","hint":"It jumps and lives near water.","definition":"A small green animal that hops."},{"word":"lamp","hint":"It gives light in a dark room.","definition":"A device that produces light."},{"word":"stop","hint":"It means do not go any further.","definition":"To come to an end or halt."},{"word":"drum","hint":"You hit it to make music.","definition":"A musical instrument you beat with sticks."},{"word":"milk","hint":"A white drink from a cow.","definition":"A white liquid that is good for your bones."},{"word":"fast","hint":"The opposite of slow.","definition":"Moving quickly."},{"word":"jump","hint":"You lift both feet off the ground.","definition":"To push yourself up into the air."},{"word":"log","hint":"A thick piece of wood from a tree.","definition":"A heavy section cut from a tree trunk."}]}
 PROMPT
 ];
 
