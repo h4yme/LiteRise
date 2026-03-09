@@ -52,6 +52,7 @@ public class LessonContentActivity extends AppCompatActivity {
     private MaterialButton btnComplete;
 
     private int nodeId, lessonNumber, placementLevel;
+    private boolean isSupplemental;
     private SessionManager sessionManager;
     private String cachedLessonContent; // forwarded to games so they use lesson words/sentences
 
@@ -99,6 +100,7 @@ public class LessonContentActivity extends AppCompatActivity {
         sessionManager   = new SessionManager(this);
         nodeId           = getIntent().getIntExtra("node_id", 1);
         lessonNumber     = getIntent().getIntExtra("lesson_number", 1);
+        isSupplemental   = getIntent().getBooleanExtra("is_supplemental", false);
         placementLevel   = convertPlacementLevelToInt(sessionManager.getPlacementLevel());
 
         fVisbyBold      = ResourcesCompat.getFont(this, R.font.visby_bold);
@@ -731,7 +733,8 @@ public class LessonContentActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null
                         && response.body().isSuccess()) {
                     Toast.makeText(LessonContentActivity.this,
-                            "Lesson complete! Moving to game...", Toast.LENGTH_SHORT).show();
+                            isSupplemental ? "Intervention complete! Returning to map..." : "Lesson complete! Moving to game...",
+                            Toast.LENGTH_SHORT).show();
                     android.content.Intent resultData = new android.content.Intent();
                     if (cachedLessonContent != null) {
                         resultData.putExtra("lesson_content", cachedLessonContent);
