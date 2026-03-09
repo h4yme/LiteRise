@@ -56,10 +56,19 @@ try {
         exit;
     }
     
-    // Check if this is a supplemental node (exists in SupplementalNodes, not Nodes)
-    $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM SupplementalNodes WHERE SupplementalNodeID = ?");
-    $stmtCheck->execute([$nodeId]);
-    $isSupplemental = (int)$stmtCheck->fetchColumn() > 0;
+    // Determine node type: core nodes live in Nodes (IDs 101-513); supplemental nodes
+    // live in SupplementalNodes with auto-incremented IDs that overlap the core range.
+    // Always check Nodes first — if found there it is a core node, never supplemental.
+    $stmtCore = $conn->prepare("SELECT COUNT(*) FROM Nodes WHERE NodeID = ?");
+    $stmtCore->execute([$nodeId]);
+    $isCoreNode = (int)$stmtCore->fetchColumn() > 0;
+
+    $isSupplemental = false;
+    if (!$isCoreNode) {
+        $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM SupplementalNodes WHERE SupplementalNodeID = ?");
+        $stmtCheck->execute([$nodeId]);
+        $isSupplemental = (int)$stmtCheck->fetchColumn() > 0;
+    }
 
     if ($isSupplemental) {
         // For supplemental nodes, update StudentSupplementalProgress.IsCompleted when lesson phase completes
