@@ -56,14 +56,39 @@ try {
         exit;
     }
     
-    // Check if progress exists
+    // Check if this is a supplemental node (exists in SupplementalNodes, not Nodes)
+    $stmtCheck = $conn->prepare("SELECT COUNT(*) FROM SupplementalNodes WHERE SupplementalNodeID = ?");
+    $stmtCheck->execute([$nodeId]);
+    $isSupplemental = (int)$stmtCheck->fetchColumn() > 0;
+
+    if ($isSupplemental) {
+        // For supplemental nodes, update StudentSupplementalProgress.IsCompleted when lesson phase completes
+        // (supplemental nodes don't have game/quiz phases — lesson completion = done)
+        if ($phase === 'lesson') {
+            $stmt = $conn->prepare("
+                UPDATE StudentSupplementalProgress
+                SET IsCompleted = 1, CompletedDate = GETDATE()
+                WHERE StudentID = ? AND SupplementalNodeID = ?
+            ");
+            $stmt->execute([$studentId, $nodeId]);
+        }
+        // game/quiz phases on supplemental nodes are no-ops
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => ucfirst($phase) . ' completed successfully'
+        ]);
+        exit;
+    }
+
+    // Core node — check if progress row exists
     $stmt = $conn->prepare("
         SELECT COUNT(*) FROM StudentNodeProgress
         WHERE StudentID = ? AND NodeID = ?
     ");
     $stmt->execute([$studentId, $nodeId]);
     $exists = $stmt->fetchColumn();
-    
+
     if (!$exists) {
         $stmt = $conn->prepare("
             INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted)
@@ -71,7 +96,7 @@ try {
         ");
         $stmt->execute([$studentId, $nodeId]);
     }
-    
+
     // Update phase
     $field = '';
     switch ($phase) {
@@ -85,14 +110,14 @@ try {
             $field = 'QuizCompleted';
             break;
     }
-    
+
     $stmt = $conn->prepare("
         UPDATE StudentNodeProgress
         SET $field = 1
         WHERE StudentID = ? AND NodeID = ?
     ");
     $stmt->execute([$studentId, $nodeId]);
-    
+
     http_response_code(200);
     echo json_encode([
         'success' => true,
