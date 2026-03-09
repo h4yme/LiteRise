@@ -155,7 +155,7 @@ public class PictureMatchActivity extends BaseGameActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "picture_match", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
             @Override
@@ -182,7 +182,12 @@ public class PictureMatchActivity extends BaseGameActivity {
                             startTimer();
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("PictureMatch", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("PictureMatch", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 setupMatchData();
                 setupRecyclerViews();
@@ -191,6 +196,7 @@ public class PictureMatchActivity extends BaseGameActivity {
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("PictureMatch", "AI generate network error: " + t.getMessage());
                 setupMatchData();
                 setupRecyclerViews();
                 startTimer();

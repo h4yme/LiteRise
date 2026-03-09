@@ -569,8 +569,8 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
+        ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
+        aiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
                 .enqueue(new Callback<GameContentResponse>() {
             @Override
             public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
@@ -589,7 +589,12 @@ public class SentenceScrambleActivity extends BaseGameActivity {
                             startGame();
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("SentenceScramble", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("SentenceScramble", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 loadFallbackSentences();
                 startGame();
@@ -597,6 +602,7 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("SentenceScramble", "AI generate network error: " + t.getMessage());
                 loadFallbackSentences();
                 startGame();
             }

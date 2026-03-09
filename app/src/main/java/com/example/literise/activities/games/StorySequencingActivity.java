@@ -139,7 +139,7 @@ public class StorySequencingActivity extends BaseGameActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "story_sequencing", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
             @Override
@@ -170,7 +170,12 @@ public class StorySequencingActivity extends BaseGameActivity {
                             startTimer();
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("StorySequencing", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("StorySequencing", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 setupStoryData();
                 setupRecyclerView();
@@ -179,6 +184,7 @@ public class StorySequencingActivity extends BaseGameActivity {
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("StorySequencing", "AI generate network error: " + t.getMessage());
                 setupStoryData();
                 setupRecyclerView();
                 startTimer();

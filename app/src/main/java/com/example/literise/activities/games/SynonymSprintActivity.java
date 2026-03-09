@@ -142,7 +142,7 @@ public class SynonymSprintActivity extends AppCompatActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "synonym_sprint", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
             @Override
@@ -174,7 +174,12 @@ public class SynonymSprintActivity extends AppCompatActivity {
                             targetWord = firstWord;
                             tvTargetWord.setText(targetWord.toUpperCase());
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("SynonymSprint", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("SynonymSprint", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 gameContainer.post(() -> {
                     calculateLanePositions();
@@ -185,6 +190,7 @@ public class SynonymSprintActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("SynonymSprint", "AI generate network error: " + t.getMessage());
                 gameContainer.post(() -> {
                     calculateLanePositions();
                     positionCharacterInLane(currentLane, false);

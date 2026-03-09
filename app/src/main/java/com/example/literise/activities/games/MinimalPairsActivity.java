@@ -126,7 +126,7 @@ public class MinimalPairsActivity extends BaseGameActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "minimal_pairs", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
             @Override
@@ -150,13 +150,19 @@ public class MinimalPairsActivity extends BaseGameActivity {
                             loadCurrentPair();
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("MinimalPairs", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("MinimalPairs", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 setupMinimalPairs();
             }
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("MinimalPairs", "AI generate network error: " + t.getMessage());
                 setupMinimalPairs();
             }
         });

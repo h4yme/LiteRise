@@ -201,7 +201,8 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        apiService.generateGameContent(new GameContentRequest(nodeId, "fill_in_blanks", lessonContent))
+        ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
+        aiService.generateGameContent(new GameContentRequest(nodeId, "fill_in_blanks", lessonContent))
                 .enqueue(new Callback<GameContentResponse>() {
             @Override
             public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
@@ -230,13 +231,19 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
                             loadQuestion(0);
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("FillInBlanks", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("FillInBlanks", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 loadFallbackQuestions();
             }
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("FillInBlanks", "AI generate network error: " + t.getMessage());
                 loadFallbackQuestions();
             }
         });

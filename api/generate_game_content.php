@@ -234,7 +234,7 @@ curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $requestPayload,
-    CURLOPT_TIMEOUT        => 30,
+    CURLOPT_TIMEOUT        => 25,
     CURLOPT_HTTPHEADER     => [
         'Content-Type: application/json',
         'x-api-key: ' . $anthropicApiKey,

@@ -114,8 +114,8 @@ public class WordExplosionActivity extends AppCompatActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.generateGameContent(new GameContentRequest(nodeId, "word_explosion", lessonContent))
+        ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
+        aiService.generateGameContent(new GameContentRequest(nodeId, "word_explosion", lessonContent))
                 .enqueue(new Callback<GameContentResponse>() {
             @Override
             public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
@@ -144,13 +144,19 @@ public class WordExplosionActivity extends AppCompatActivity {
                             String firstName = cats.get(0).getAsJsonObject().get("name").getAsString().toUpperCase();
                             targetCategory = firstName;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("WordExplosion", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("WordExplosion", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 startGame();
             }
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("WordExplosion", "AI generate network error: " + t.getMessage());
                 startGame();
             }
         });

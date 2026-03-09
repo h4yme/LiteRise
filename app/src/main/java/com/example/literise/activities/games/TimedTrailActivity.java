@@ -124,7 +124,7 @@ public class TimedTrailActivity extends BaseGameActivity {
     }
 
     private void generateWithAI(int nodeId, String lessonContent) {
-        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "timed_trail", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
             @Override
@@ -162,7 +162,12 @@ public class TimedTrailActivity extends BaseGameActivity {
                             startGame();
                             return;
                         }
-                    } catch (Exception ignored) {}
+                    } catch (Exception e) {
+                        android.util.Log.w("TimedTrail", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("TimedTrail", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
                 }
                 setupQuestions();
                 startGame();
@@ -170,6 +175,7 @@ public class TimedTrailActivity extends BaseGameActivity {
 
             @Override
             public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("TimedTrail", "AI generate network error: " + t.getMessage());
                 setupQuestions();
                 startGame();
             }
