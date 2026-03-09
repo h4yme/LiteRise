@@ -130,7 +130,7 @@ try {
     echo json_encode([
         'success' => true,
         'result' => [
-            'score_percent'    => round($scorePercent, 2),
+            'score_percent'    => (int) round($scorePercent),
             'correct_count'    => $correctCount,
             'total_questions'  => $totalQuestions,
             'adaptive_decision'=> $adaptiveDecision,

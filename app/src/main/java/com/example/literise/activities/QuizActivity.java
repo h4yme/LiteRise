@@ -293,7 +293,7 @@ public class QuizActivity extends AppCompatActivity {
         intent.putExtra("node_id", nodeId);
         intent.putExtra("module_id", moduleId);
         intent.putExtra("lesson_number", lessonNumber);
-        intent.putExtra("score_percent", (int) result.getResult().getScorePercent());
+        intent.putExtra("score_percent", result.getResult().getScorePercent());
         intent.putExtra("correct_count", result.getResult().getCorrectCount());
         intent.putExtra("total_questions", result.getResult().getTotalQuestions());
         intent.putExtra("adaptive_decision", result.getResult().getAdaptiveDecision());

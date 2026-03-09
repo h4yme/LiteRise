@@ -19,7 +19,7 @@ public class QuizSubmitResponse {
 
     public static class Result {
         @SerializedName("score_percent")
-        private double scorePercent;
+        private int scorePercent;
 
         @SerializedName("correct_count")
         private int correctCount;
@@ -36,7 +36,7 @@ public class QuizSubmitResponse {
         @SerializedName("unlocked_nodes")
         private List<UnlockedNode> unlockedNodes;
 
-        public double getScorePercent() { return scorePercent; }
+        public int getScorePercent() { return scorePercent; }
         public int getCorrectCount() { return correctCount; }
         public int getTotalQuestions() { return totalQuestions; }
         public String getAdaptiveDecision() { return adaptiveDecision; }
