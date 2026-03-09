@@ -162,6 +162,7 @@ try {
  * so that "8" and "eight" (and similar pairs) are treated as the same token.
  */
 function normalizeNumbers($text) {
+    // Always normalize to word form so "8" and "eight" both become "eight".
     static $digitToWord = [
         '0' => 'zero',  '1' => 'one',   '2' => 'two',   '3' => 'three',
         '4' => 'four',  '5' => 'five',  '6' => 'six',   '7' => 'seven',
@@ -170,19 +171,11 @@ function normalizeNumbers($text) {
         '15' => 'fifteen', '16' => 'sixteen', '17' => 'seventeen',
         '18' => 'eighteen', '19' => 'nineteen', '20' => 'twenty',
     ];
-    static $wordToDigit = null;
-    if ($wordToDigit === null) {
-        $wordToDigit = array_flip($digitToWord);
-    }
 
-    // Replace each whitespace-separated token if it matches a known mapping.
     $tokens = preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
     foreach ($tokens as &$tok) {
-        $lower = strtolower($tok);
-        if (isset($digitToWord[$lower])) {
-            $tok = $digitToWord[$lower];
-        } elseif (isset($wordToDigit[$lower])) {
-            $tok = $wordToDigit[$lower];
+        if (isset($digitToWord[$tok])) {
+            $tok = $digitToWord[$tok];
         }
     }
     return implode('', $tokens);
