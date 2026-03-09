@@ -496,7 +496,7 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         }
 
         // Auto-advance
-        tvBlank.postDelayed(() -> {
+        tvSentence.postDelayed(() -> {
             int next = currentIndex + 1;
             if (next < questions.size()) loadQuestion(next);
             else endGame();
