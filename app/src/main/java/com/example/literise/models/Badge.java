@@ -4,16 +4,16 @@ package com.example.literise.models;
  * Represents a badge/achievement that can be earned
  */
 public class Badge {
-    public static final String BADGE_FIRST_STEPS = "first_steps";
-    public static final String BADGE_MODULE_MASTER = "module_master";
-    public static final String BADGE_SPEED_READER = "speed_reader";
-    public static final String BADGE_WORD_WIZARD = "word_wizard";
-    public static final String BADGE_GRAMMAR_GURU = "grammar_guru";
-    public static final String BADGE_STORY_STAR = "story_star";
-    public static final String BADGE_PERFECT_SCORE = "perfect_score";
-    public static final String BADGE_DEDICATED_LEARNER = "dedicated_learner";
-    public static final String BADGE_CHAMPION = "champion";
-    public static final String BADGE_GROWTH_MINDSET = "growth_mindset";
+    public static final String BADGE_FIRST_STEPS        = "first_steps";
+    public static final String BADGE_PHONICS_PIONEER    = "badge_module1";  // Module 1: Phonics and Word Study
+    public static final String BADGE_WORD_SCHOLAR       = "badge_module2";  // Module 2: Vocabulary and Word Knowledge
+    public static final String BADGE_GRAMMAR_GUARDIAN   = "badge_module3";  // Module 3: Grammar Awareness and Grammatical Structures
+    public static final String BADGE_TEXT_EXPLORER      = "badge_module4";  // Module 4: Comprehending and Analyzing Texts
+    public static final String BADGE_CREATIVE_COMPOSER  = "badge_module5";  // Module 5: Creating and Composing Text
+    public static final String BADGE_PERFECT_SCORE      = "perfect_score";
+    public static final String BADGE_DEDICATED_LEARNER  = "dedicated_learner";
+    public static final String BADGE_CHAMPION           = "champion";
+    public static final String BADGE_GROWTH_MINDSET     = "growth_mindset";
 
     private String badgeId;
     private String title;
@@ -67,25 +67,32 @@ public class Badge {
      */
     public static Badge[] getAllBadges() {
         return new Badge[] {
-                new Badge(BADGE_FIRST_STEPS, "First Steps",
+                // Module completion badges — match badge_seed.sql UnlockCondition values
+                new Badge(BADGE_PHONICS_PIONEER,   "Phonics Pioneer",
+                        "Completed Module 1: Phonics and Word Study",
+                        "badge_module1", "Complete all lessons in Module 1"),
+                new Badge(BADGE_WORD_SCHOLAR,      "Word Scholar",
+                        "Completed Module 2: Vocabulary and Word Knowledge",
+                        "badge_module2", "Complete all lessons in Module 2"),
+                new Badge(BADGE_GRAMMAR_GUARDIAN,  "Grammar Guardian",
+                        "Completed Module 3: Grammar Awareness and Grammatical Structures",
+                        "badge_module3", "Complete all lessons in Module 3"),
+                new Badge(BADGE_TEXT_EXPLORER,     "Text Explorer",
+                        "Completed Module 4: Comprehending and Analyzing Texts",
+                        "badge_module4", "Complete all lessons in Module 4"),
+                new Badge(BADGE_CREATIVE_COMPOSER, "Creative Composer",
+                        "Completed Module 5: Creating and Composing Text",
+                        "badge_module5", "Complete all lessons in Module 5"),
+                // Achievement badges
+                new Badge(BADGE_FIRST_STEPS,       "First Steps",
                         "Complete your first lesson", "ic_first_steps", "Complete 1 lesson"),
-                new Badge(BADGE_MODULE_MASTER, "Module Master",
-                        "Complete an entire module", "ic_module_master", "Complete any module"),
-                new Badge(BADGE_SPEED_READER, "Speed Reader",
-                        "Read at 100 words per minute", "ic_speed_reader", "Achieve 100 WPM"),
-                new Badge(BADGE_WORD_WIZARD, "Word Wizard",
-                        "Master 500 vocabulary words", "ic_word_wizard", "Learn 500 words"),
-                new Badge(BADGE_GRAMMAR_GURU, "Grammar Guru",
-                        "Perfect score on grammar assessment", "ic_grammar_guru", "100% on Grammar test"),
-                new Badge(BADGE_STORY_STAR, "Story Star",
-                        "Write 10 complete stories", "ic_story_star", "Write 10 stories"),
-                new Badge(BADGE_PERFECT_SCORE, "Perfect Score",
+                new Badge(BADGE_PERFECT_SCORE,     "Perfect Score",
                         "Get 100% on any assessment", "ic_perfect_score", "Score 100% on test"),
                 new Badge(BADGE_DEDICATED_LEARNER, "Dedicated Learner",
                         "Maintain a 7-day streak", "ic_streak", "7-day streak"),
-                new Badge(BADGE_CHAMPION, "Champion",
+                new Badge(BADGE_CHAMPION,          "Champion",
                         "Complete all 5 modules", "ic_champion", "Complete all modules"),
-                new Badge(BADGE_GROWTH_MINDSET, "Growth Mindset",
+                new Badge(BADGE_GROWTH_MINDSET,    "Growth Mindset",
                         "Improve 50% from pre-test", "ic_growth", "50% improvement")
         };
     }

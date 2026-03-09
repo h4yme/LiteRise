@@ -1039,11 +1039,7 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
         String userAnswer = String.join(" ", currentAnswer);
 
-        String correctAnswer = sentence.getCorrectSentence();
-
-
-
-        boolean isCorrect = userAnswer.equalsIgnoreCase(correctAnswer);
+        boolean isCorrect = sentence.checkAnswer(userAnswer);
 
 
 

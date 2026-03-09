@@ -201,7 +201,7 @@ public interface ApiService {
     @POST("submit_answer.php")
     Call<SubmitAnswerResponse> submitAnswer(@Body SubmitAnswerRequest request);
 
-    // 🎤 Evaluate Pronunciation (Audio-based assessment)
+    // 🎤 Evaluate Pronunciation (Audio-based assessment — placement test)
     @Multipart
     @POST("evaluate_pronunciation.php")
     Call<okhttp3.ResponseBody> evaluatePronunciation(
@@ -209,6 +209,15 @@ public interface ApiService {
             @Part("item_id") okhttp3.RequestBody itemId,
             @Part("response_id") okhttp3.RequestBody responseId,
             @Part("session_id") okhttp3.RequestBody sessionId,
+            @Part("target_word") okhttp3.RequestBody targetWord,
+            @Part okhttp3.MultipartBody.Part audioFile
+    );
+
+    // 🎤 Evaluate Game Pronunciation (lightweight — in-game use, no DB recording)
+    @Multipart
+    @POST("evaluate_game_pronunciation.php")
+    Call<okhttp3.ResponseBody> evaluateGamePronunciation(
+            @Part("student_id") okhttp3.RequestBody studentId,
             @Part("target_word") okhttp3.RequestBody targetWord,
             @Part okhttp3.MultipartBody.Part audioFile
     );

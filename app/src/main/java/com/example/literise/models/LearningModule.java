@@ -17,6 +17,8 @@ public class LearningModule {
     private String gradientStart; // Gradient color start
     private String gradientEnd; // Gradient color end
     private String iconResName; // Icon resource name
+    private int totalLessons; // Total lessons in this module
+    private int completedLessons; // Lessons completed by the student
 
     public LearningModule(int moduleId, String title, String subtitle, String domain,
                           double performanceScore, String gradientStart, String gradientEnd) {
@@ -30,6 +32,8 @@ public class LearningModule {
         this.performanceScore = performanceScore;
         this.gradientStart = gradientStart;
         this.gradientEnd = gradientEnd;
+        this.completedLessons = 0;
+        this.totalLessons = 10; // default, overridden per module
     }
 
     // Getters
@@ -46,17 +50,24 @@ public class LearningModule {
     public String getGradientEnd() { return gradientEnd; }
     public String getIconResName() { return iconResName; }
 
+    // Getters (continued)
+    public int getTotalLessons() { return totalLessons; }
+    public int getCompletedLessons() { return completedLessons; }
+
     // Setters
     public void setLevel(int level) { this.level = level; }
     public void setLocked(boolean locked) { isLocked = locked; }
     public void setPriorityOrder(int order) { this.priorityOrder = order; }
     public void setIconResName(String iconResName) { this.iconResName = iconResName; }
+    public void setTotalLessons(int totalLessons) { this.totalLessons = totalLessons; }
+    public void setCompletedLessons(int completedLessons) { this.completedLessons = completedLessons; }
 
     /**
-     * Get progress percentage for this module
+     * Get lesson progress percentage for this module (0–100)
      */
     public int getProgressPercentage() {
-        return (int) ((level / (double) totalLevels) * 100);
+        if (totalLessons <= 0) return 0;
+        return (int) ((completedLessons / (double) totalLessons) * 100);
     }
 
     /**

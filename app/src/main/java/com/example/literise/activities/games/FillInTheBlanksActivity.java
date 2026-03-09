@@ -2,7 +2,13 @@ package com.example.literise.activities.games;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.BackgroundColorSpan;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
@@ -53,9 +59,13 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     private ProgressBar timerProgress;
 
     // UI – Question
-    private TextView tvQuestionBefore;
-    private TextView tvBlank;
-    private TextView tvQuestionAfter;
+    private TextView tvSentence;
+
+    // Blank display states
+    private static final int BLANK_EMPTY   = 0;
+    private static final int BLANK_FILLED  = 1;
+    private static final int BLANK_CORRECT = 2;
+    private static final int BLANK_WRONG   = 3;
 
     // UI – Word Options
     private RecyclerView recyclerWordOptions;
@@ -120,9 +130,7 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         progressBar = findViewById(R.id.progressBar);
         tvTimer = findViewById(R.id.tvTimer);
         timerProgress = findViewById(R.id.timerProgress);
-        tvQuestionBefore = findViewById(R.id.tvQuestionBefore);
-        tvBlank = findViewById(R.id.tvBlank);
-        tvQuestionAfter = findViewById(R.id.tvQuestionAfter);
+        tvSentence = findViewById(R.id.tvSentence);
         recyclerWordOptions = findViewById(R.id.recyclerWordOptions);
         btnCheckAnswer = findViewById(R.id.btnCheckAnswer);
         lottieCorrect = findViewById(R.id.lottieCorrect);
@@ -431,11 +439,8 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
         progressBar.setMax(questions.size());
         progressBar.setProgress(index + 1);
 
-        // Sentence parts
-        tvQuestionBefore.setText(q.beforeBlank);
-        tvBlank.setText("______");
-        try { tvBlank.setBackgroundResource(R.drawable.bg_blank_space); } catch (Exception ignored) {}
-        tvQuestionAfter.setText(q.afterBlank);
+        // Sentence with inline blank
+        updateSentenceDisplay(q.beforeBlank, "", q.afterBlank, BLANK_EMPTY);
 
         // Shuffled word options
         currentOptions = new ArrayList<>(Arrays.asList(q.options));
@@ -461,10 +466,10 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     private void onWordSelected(String word) {
         if (isAnswerLocked) return;
         selectedWord = word;
-        tvBlank.setText(word);
-        try { tvBlank.setBackgroundResource(R.drawable.bg_blank_filled); } catch (Exception ignored) {}
-        tvBlank.animate().scaleX(1.15f).scaleY(1.15f).setDuration(120)
-                .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(120).start()).start();
+        DemoDataProvider.FillQuestion q = questions.get(currentIndex);
+        updateSentenceDisplay(q.beforeBlank, word, q.afterBlank, BLANK_FILLED);
+        tvSentence.animate().scaleX(1.05f).scaleY(1.05f).setDuration(120)
+                .withEndAction(() -> tvSentence.animate().scaleX(1f).scaleY(1f).setDuration(120).start()).start();
         btnCheckAnswer.setEnabled(true);
         adapter.setSelected(word);
     }
@@ -481,22 +486,41 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
             correctAnswers++;
             score += 10;
             tvScore.setText(String.valueOf(score));
-            try { tvBlank.setBackgroundResource(R.drawable.bg_blank_correct); } catch (Exception ignored) {}
-            tvBlank.animate().scaleX(1.2f).scaleY(1.2f).setDuration(200)
-                    .withEndAction(() -> tvBlank.animate().scaleX(1f).scaleY(1f).setDuration(200).start()).start();
+            updateSentenceDisplay(q.beforeBlank, selectedWord, q.afterBlank, BLANK_CORRECT);
+            tvSentence.animate().scaleX(1.1f).scaleY(1.1f).setDuration(200)
+                    .withEndAction(() -> tvSentence.animate().scaleX(1f).scaleY(1f).setDuration(200).start()).start();
             playLottieOnce(lottieCorrect);
         } else {
-            try { tvBlank.setBackgroundResource(R.drawable.bg_blank_wrong); } catch (Exception ignored) {}
-            tvBlank.setText(q.correctAnswer);
-            shakeView(tvBlank);
+            updateSentenceDisplay(q.beforeBlank, q.correctAnswer, q.afterBlank, BLANK_WRONG);
+            shakeView(tvSentence);
         }
 
         // Auto-advance
-        tvBlank.postDelayed(() -> {
+        tvSentence.postDelayed(() -> {
             int next = currentIndex + 1;
             if (next < questions.size()) loadQuestion(next);
             else endGame();
         }, 1200);
+    }
+
+    /** Renders the sentence with a styled inline blank that wraps naturally. */
+    private void updateSentenceDisplay(String before, String blankText, String after, int state) {
+        String displayBlank = (blankText == null || blankText.isEmpty()) ? " ______ " : " " + blankText + " ";
+        String full = before + displayBlank + after;
+        SpannableStringBuilder sb = new SpannableStringBuilder(full);
+        int start = before.length();
+        int end   = start + displayBlank.length();
+        int bgColor, fgColor;
+        switch (state) {
+            case BLANK_CORRECT: bgColor = 0xFFE8F5E9; fgColor = 0xFF4CAF50; break;
+            case BLANK_WRONG:   bgColor = 0xFFFFEBEE; fgColor = 0xFFF44336; break;
+            case BLANK_FILLED:  bgColor = 0xFFEDE9FE; fgColor = 0xFF7C3AED; break;
+            default:            bgColor = 0xFFF5F3FF; fgColor = 0xFF7C3AED; break;
+        }
+        sb.setSpan(new BackgroundColorSpan(bgColor), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new ForegroundColorSpan(fgColor), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new StyleSpan(Typeface.BOLD),     start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        tvSentence.setText(sb);
     }
 
     private void startTimer() {
