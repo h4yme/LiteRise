@@ -41,6 +41,7 @@ import com.example.literise.database.SessionManager;
 import com.example.literise.models.GameContentRequest;
 
 import com.example.literise.models.GameContentResponse;
+import com.example.literise.models.LessonContentResponse;
 
 import com.google.android.material.button.MaterialButton;
 
@@ -104,7 +105,31 @@ public class StorySequencingActivity extends BaseGameActivity {
         int nodeId = getIntent().getIntExtra("node_id", -1);
 
         if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
-            loadAiContent(nodeId, lessonContent);
+            generateWithAI(nodeId, lessonContent);
+        } else if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                setupStoryData();
+                                setupRecyclerView();
+                                startTimer();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            setupStoryData();
+                            setupRecyclerView();
+                            startTimer();
+                        }
+                    });
         } else {
             setupStoryData();
             setupRecyclerView();
@@ -113,7 +138,7 @@ public class StorySequencingActivity extends BaseGameActivity {
 
     }
 
-    private void loadAiContent(int nodeId, String lessonContent) {
+    private void generateWithAI(int nodeId, String lessonContent) {
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
         GameContentRequest request = new GameContentRequest(nodeId, "story_sequencing", lessonContent);
         apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {

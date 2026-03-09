@@ -76,6 +76,7 @@ import com.example.literise.models.SaveGameResultResponse;
 
 import com.example.literise.models.ScrambleSentence;
 
+import com.example.literise.models.LessonContentResponse;
 import com.example.literise.models.ScrambleSentenceResponse;
 
 import com.example.literise.utils.AppConfig;
@@ -430,38 +431,32 @@ public class SentenceScrambleActivity extends BaseGameActivity {
         String lessonContent = getIntent().getStringExtra("lesson_content");
         int nodeId = getIntent().getIntExtra("node_id", -1);
         if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
-            ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-            apiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
-                    .enqueue(new Callback<GameContentResponse>() {
-                @Override
-                public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
-                    if (response.isSuccessful() && response.body() != null && response.body().success
-                            && response.body().content != null) {
-                        try {
-                            JsonArray arr = response.body().content.getAsJsonArray("sentences");
-                            List<ScrambleSentence> aiSentences = new ArrayList<>();
-                            for (int i = 0; i < arr.size(); i++) {
-                                JsonObject obj = arr.get(i).getAsJsonObject();
-                                String sentence = obj.get("sentence").getAsString();
-                                aiSentences.add(new ScrambleSentence(i + 1, sentence, 1.0f));
-                            }
-                            if (!aiSentences.isEmpty()) {
-                                sentences = aiSentences;
-                                startGame();
-                                return;
-                            }
-                        } catch (Exception ignored) {}
-                    }
-                    loadFallbackSentences();
-                    startGame();
-                }
+            generateWithAI(nodeId, lessonContent);
+            return;
+        }
 
-                @Override
-                public void onFailure(Call<GameContentResponse> call, Throwable t) {
-                    loadFallbackSentences();
-                    startGame();
-                }
-            });
+        if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                loadFallbackSentences();
+                                startGame();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            loadFallbackSentences();
+                            startGame();
+                        }
+                    });
             return;
         }
 
@@ -572,6 +567,41 @@ public class SentenceScrambleActivity extends BaseGameActivity {
     }
 
 
+
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
+        apiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
+                .enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray arr = response.body().content.getAsJsonArray("sentences");
+                        List<ScrambleSentence> aiSentences = new ArrayList<>();
+                        for (int i = 0; i < arr.size(); i++) {
+                            JsonObject obj = arr.get(i).getAsJsonObject();
+                            String sentence = obj.get("sentence").getAsString();
+                            aiSentences.add(new ScrambleSentence(i + 1, sentence, 1.0f));
+                        }
+                        if (!aiSentences.isEmpty()) {
+                            sentences = aiSentences;
+                            startGame();
+                            return;
+                        }
+                    } catch (Exception ignored) {}
+                }
+                loadFallbackSentences();
+                startGame();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                loadFallbackSentences();
+                startGame();
+            }
+        });
+    }
 
     private void loadFallbackSentences() {
 
