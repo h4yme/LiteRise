@@ -43,6 +43,8 @@ try {
     $numQuestions = 5;
     
     // Get quiz questions (OptionsJSON holds options as {"A":"...","B":"...","C":"...","D":"..."})
+    // Note: SQL Server requires TOP parameter to be bound as integer (PDO::PARAM_INT),
+    // otherwise PDO's default string binding causes a runtime error.
     $stmt = $conn->prepare("
         SELECT TOP (?)
             QuestionID,
@@ -54,7 +56,9 @@ try {
         ORDER BY NEWID()
     ");
 
-    $stmt->execute([$numQuestions, $nodeId]);
+    $stmt->bindValue(1, $numQuestions, PDO::PARAM_INT);
+    $stmt->bindValue(2, $nodeId, PDO::PARAM_INT);
+    $stmt->execute();
     $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     if (empty($questions)) {
