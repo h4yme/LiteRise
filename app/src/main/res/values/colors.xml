@@ -3,6 +3,7 @@
     <!-- 🌿 Brand Colors (from Figma) -->
     <color name="color_pistachio">#84C788</color>
     <color name="color_jade1">#11B067</color>
+    <color name="jade1">#11B067</color>
     <color name="color_jade2">#11A968</color>
     <color name="color_sunglow">#FDC94A</color>
     <color name="color_xanthous">#F8B929</color>
