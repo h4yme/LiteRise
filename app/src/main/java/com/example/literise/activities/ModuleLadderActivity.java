@@ -70,6 +70,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
     // Track current node for auto-progression
     private NodeView currentNode;
     private boolean isAutoProceedMode = true; // Auto-proceed through phases
+    private boolean isSupplementalLaunch = false; // True when launching a supplemental/intervention lesson
     private String lastLessonContent; // lesson JSON forwarded to the following game
 
     // Path coordinates
@@ -155,7 +156,13 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 result -> {
                     Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
-                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isSupplementalLaunch) {
+                        // Supplemental/intervention lesson finished — no game/quiz, just reload ladder
+                        isSupplementalLaunch = false;
+                        Log.d(TAG, "Intervention lesson completed — refreshing ladder");
+                        Toast.makeText(this, "✅ Intervention Complete! Keep going! 🌟", Toast.LENGTH_SHORT).show();
+                        loadModuleLadder();
+                    } else if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
                         // Capture lesson content so the game can use lesson words/sentences
                         android.content.Intent data = result.getData();
                         lastLessonContent = (data != null) ? data.getStringExtra("lesson_content") : null;
@@ -168,6 +175,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                             startGamePhase(currentNode);
                         }, 800);
                     } else {
+                        isSupplementalLaunch = false;
                         // User backed out or lesson failed to load — refresh ladder, do NOT proceed
                         Log.d(TAG, "Lesson not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
@@ -390,6 +398,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     intent.putExtra("lesson_number", 0);
                     intent.putExtra("placement_level", placementLevel);
                     intent.putExtra("is_supplemental", true);
+                    isSupplementalLaunch = true;
                     lessonLauncher.launch(intent);
                 })
                 .setNegativeButton("Later", null)
