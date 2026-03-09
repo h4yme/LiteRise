@@ -457,16 +457,17 @@ public class DashboardActivity extends BaseActivity {
             double performanceScore = score / 100.0; // Convert 0-100 to 0-1
 
             LearningModule module = new LearningModule(
-                    i + 1,                        // moduleId
-                    moduleName,                   // title
-                    getModuleSubtitle(i),         // subtitle
-                    getModuleDomain(i),           // domain
-                    performanceScore,             // performanceScore (0-1)
-                    gradients[i * 2],             // gradientStart
-                    gradients[i * 2 + 1]          // gradientEnd
+                    i + 1,                              // moduleId
+                    moduleName,                         // title
+                    getModuleSubtitleByName(moduleName),// subtitle
+                    getModuleDomainByName(moduleName),  // domain
+                    performanceScore,                   // performanceScore (0-1)
+                    gradients[i * 2],                   // gradientStart
+                    gradients[i * 2 + 1]                // gradientEnd
             );
             module.setPriorityOrder(i + 1);
             module.setLocked(i != 0); // Only first module unlocked
+            module.setTotalLessons(getLessonCountByName(moduleName));
             modules.add(module);
         }
 
@@ -506,20 +507,34 @@ public class DashboardActivity extends BaseActivity {
         }
     }
 
-    private String getModuleDomain(int index) {
-        String[] domains = {"Phonics", "Vocabulary", "Grammar", "Comprehension", "Writing"};
-        return index < domains.length ? domains[index] : "General";
+    private String getModuleDomainByName(String moduleName) {
+        if (moduleName == null) return "General";
+        if (moduleName.contains("Phonics"))       return "Phonics";
+        if (moduleName.contains("Vocabulary"))    return "Vocabulary";
+        if (moduleName.contains("Grammar"))       return "Grammar";
+        if (moduleName.contains("Comprehend"))    return "Comprehension";
+        if (moduleName.contains("Creating") || moduleName.contains("Composing")) return "Writing";
+        return "General";
     }
 
-    private String getModuleSubtitle(int index) {
-        String[] subtitles = {
-                "Letter sounds and word patterns",
-                "Building your word bank",
-                "Sentence structure and rules",
-                "Understanding what you read",
-                "Express your ideas in writing"
-        };
-        return index < subtitles.length ? subtitles[index] : "English Module";
+    private String getModuleSubtitleByName(String moduleName) {
+        if (moduleName == null) return "English Module";
+        if (moduleName.contains("Phonics"))       return "Letter sounds and word patterns";
+        if (moduleName.contains("Vocabulary"))    return "Building your word bank";
+        if (moduleName.contains("Grammar"))       return "Sentence structure and rules";
+        if (moduleName.contains("Comprehend"))    return "Understanding what you read";
+        if (moduleName.contains("Creating") || moduleName.contains("Composing")) return "Express your ideas in writing";
+        return "English Module";
+    }
+
+    private int getLessonCountByName(String moduleName) {
+        if (moduleName == null) return 10;
+        if (moduleName.contains("Phonics"))       return 12;
+        if (moduleName.contains("Vocabulary"))    return 10;
+        if (moduleName.contains("Grammar"))       return 8;
+        if (moduleName.contains("Comprehend"))    return 10;
+        if (moduleName.contains("Creating") || moduleName.contains("Composing")) return 8;
+        return 10;
     }
 
     private String[] getModuleGradients() {
@@ -846,8 +861,13 @@ public class DashboardActivity extends BaseActivity {
                             int nodesPerModule = body.getTotalCount() / modules.size();
                             if (nodesPerModule > 0) {
                                 int completedModules = body.getCompletedCount() / nodesPerModule;
+                                int remainingCompleted = body.getCompletedCount();
                                 for (int i = 0; i < modules.size(); i++) {
                                     modules.get(i).setLocked(i > completedModules);
+                                    int moduleCompleted = Math.min(remainingCompleted, nodesPerModule);
+                                    modules.get(i).setCompletedLessons(Math.max(0, moduleCompleted));
+                                    modules.get(i).setTotalLessons(nodesPerModule);
+                                    remainingCompleted -= moduleCompleted;
                                 }
                                 moduleAdapter.notifyDataSetChanged();
                             }

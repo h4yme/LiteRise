@@ -67,12 +67,12 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
                 ? R.drawable.ic_lock : R.drawable.ic_play);
 
         // ── Progress bar & percentage ──────────────────────────────────────
-        int scorePct = (int) (module.getPerformanceScore() * 100);
-        holder.progressBar.setProgress(scorePct);
-        holder.tvProgress.setText(scorePct + "%");
+        int progressPct = module.getProgressPercentage();
+        holder.progressBar.setProgress(progressPct);
+        holder.tvProgress.setText(progressPct + "%");
 
         // ── Lesson count ───────────────────────────────────────────────────
-        holder.tvLessonCount.setText(getLessonCount(module.getDomain()) + " Lessons");
+        holder.tvLessonCount.setText(module.getTotalLessons() + " Lessons");
 
         // ── Locked overlay ─────────────────────────────────────────────────
         holder.lockOverlay.setVisibility(module.isLocked() ? View.VISIBLE : View.GONE);
@@ -114,18 +114,6 @@ public class ModuleAdapter extends RecyclerView.Adapter<ModuleAdapter.ModuleView
             case "Comprehension": return R.drawable.ic_lightbulb;
             case "Writing":       return R.drawable.ic_edit;
             default:              return R.drawable.ic_book;
-        }
-    }
-
-    private int getLessonCount(String domain) {
-        if (domain == null) return 10;
-        switch (domain) {
-            case "Phonics":       return 12;
-            case "Vocabulary":    return 10;
-            case "Grammar":       return 8;
-            case "Comprehension": return 10;
-            case "Writing":       return 8;
-            default:              return 10;
         }
     }
 
