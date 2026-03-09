@@ -703,7 +703,8 @@ public class PictureMatchActivity extends BaseGameActivity {
 
         session.saveXP(currentXP + xpEarned);
 
-
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
 
         showResultDialog(allMatched, correctCount, total, xpEarned, stars);
 
@@ -839,6 +840,10 @@ public class PictureMatchActivity extends BaseGameActivity {
 
             if (isCorrect) {
 
+                android.content.Intent result = new android.content.Intent();
+                result.putExtra("xp_earned", xpEarned);
+                result.putExtra("accuracy", accuracy);
+                setResult(RESULT_OK, result);
                 finish();
 
             } else {

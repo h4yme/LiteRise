@@ -444,6 +444,9 @@ public class WordExplosionActivity extends AppCompatActivity {
         }
         activeBubbles.clear();
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Lottie celebration then finish
         if (lottieComplete != null) {
             lottieComplete.setVisibility(View.VISIBLE);
@@ -452,12 +455,18 @@ public class WordExplosionActivity extends AppCompatActivity {
                 @Override public void onAnimationEnd(android.animation.Animator animation) {
                     String message = String.format("Great job!\nScore: %d\nBest Combo: %dx", score, maxCombo);
                     Toast.makeText(WordExplosionActivity.this, message, Toast.LENGTH_LONG).show();
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", score);
+                    setResult(RESULT_OK, result);
                     finish();
                 }
             });
         } else {
             String message = String.format("Great job!\nScore: %d\nBest Combo: %dx", score, maxCombo);
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", score);
+            setResult(RESULT_OK, result);
             finish();
         }
     }

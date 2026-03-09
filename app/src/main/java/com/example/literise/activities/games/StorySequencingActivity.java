@@ -771,6 +771,11 @@ public class StorySequencingActivity extends BaseGameActivity {
         btnFinish.setOnClickListener(v -> {
             dialog.dismiss();
             if (isCorrect) {
+                markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+                android.content.Intent result = new android.content.Intent();
+                result.putExtra("xp_earned", xpEarned);
+                result.putExtra("accuracy", accuracy);
+                setResult(RESULT_OK, result);
                 finish(); // Go back to module ladder if perfect
             } else {
                 // Reset game for retry

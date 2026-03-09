@@ -501,6 +501,9 @@ public class MinimalPairsActivity extends BaseGameActivity {
         int accuracy = (totalPairs > 0) ? (correctCount * 100 / totalPairs) : 0;
         int xpEarned = correctCount * 10;
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         new AlertDialog.Builder(this)
                 .setTitle("Pronunciation Practice Complete!")
                 .setMessage(
@@ -508,7 +511,13 @@ public class MinimalPairsActivity extends BaseGameActivity {
                                 "Accuracy: " + accuracy + "%\n\n" +
                                 "XP Earned: +" + xpEarned
                 )
-                .setPositiveButton("Finish", (d, w) -> finish())
+                .setPositiveButton("Finish", (d, w) -> {
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", xpEarned);
+                    result.putExtra("accuracy", accuracy);
+                    setResult(RESULT_OK, result);
+                    finish();
+                })
                 .setNegativeButton("Practice Again", (d, w) -> restartGame())
                 .setCancelable(false)
                 .show();

@@ -766,6 +766,10 @@ public class DialogueReadingActivity extends BaseGameActivity {
 
             dialog.dismiss();
 
+            markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", xpEarned);
+            setResult(RESULT_OK, result);
             finish();
 
         });

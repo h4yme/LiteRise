@@ -1562,6 +1562,10 @@ public class SentenceScrambleActivity extends BaseGameActivity {
 
 
 
+        // Mark game phase complete in StudentNodeProgress
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+        markGamePhaseComplete(nodeId);
+
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
 
         apiService.saveGameResult(request).enqueue(new Callback<SaveGameResultResponse>() {

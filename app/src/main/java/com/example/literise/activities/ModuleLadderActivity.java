@@ -206,11 +206,11 @@ public class ModuleLadderActivity extends AppCompatActivity {
         gameLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Log.d(TAG, "Returned from Game Activity");
+                    Log.d(TAG, "Returned from Game Activity, resultCode=" + result.getResultCode());
 
-                    if (isAutoProceedMode && currentNode != null) {
-                        // Automatically proceed to quiz phase
-                        Log.d(TAG, "Auto-proceeding to Quiz phase");
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                        // Game was genuinely completed — automatically proceed to quiz phase
+                        Log.d(TAG, "Game completed (RESULT_OK) — Auto-proceeding to Quiz phase");
                         Toast.makeText(this, "🎉 Great job! Time for the quiz! ✅", Toast.LENGTH_SHORT).show();
 
                         // Small delay for toast to show
@@ -218,7 +218,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
                             startQuizPhase(currentNode);
                         }, 800);
                     } else {
-                        // User backed out or reviewing - refresh ladder
+                        // User backed out or game not completed — refresh ladder, do NOT proceed
+                        Log.d(TAG, "Game not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
                     }
                 }

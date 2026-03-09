@@ -532,6 +532,9 @@ public class TimedTrailActivity extends BaseGameActivity {
         int accuracy = (totalQuestions > 0) ? (correctAnswers * 100 / totalQuestions) : 0;
         int xpEarned = distanceTraveled + (accuracy / 2);
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Play celebration then show dialog
         if (lottieComplete != null) {
             lottieComplete.setVisibility(android.view.View.VISIBLE);
@@ -557,7 +560,13 @@ public class TimedTrailActivity extends BaseGameActivity {
                                 "Best Streak: " + maxStreak + "\n\n" +
                                 "XP Earned: +" + xpEarned
                 )
-                .setPositiveButton("Finish", (d, w) -> finish())
+                .setPositiveButton("Finish", (d, w) -> {
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", xpEarned);
+                    result.putExtra("accuracy", accuracy);
+                    setResult(RESULT_OK, result);
+                    finish();
+                })
                 .setNegativeButton("Play Again", (d, w) -> restartGame())
                 .setCancelable(false)
                 .show();

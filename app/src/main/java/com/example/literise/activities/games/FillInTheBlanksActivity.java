@@ -551,6 +551,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void saveGameResult(int xpEarned, int accuracy, int timeSeconds) {
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(nodeId);
+
         int studentId = session.getStudentId();
         SaveGameResultRequest request = new SaveGameResultRequest.Builder(
                 studentId, "FillInTheBlanks", xpEarned)

@@ -582,6 +582,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
         }
         activeWords.clear();
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Lottie celebration then finish
         if (lottieComplete != null) {
             lottieComplete.setVisibility(View.VISIBLE);
@@ -591,6 +594,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
                     String message = String.format("Great job!\nScore: %d\nDistance: %dm\nBest Streak: %dx",
                             score, distance, maxCombo);
                     Toast.makeText(SynonymSprintActivity.this, message, Toast.LENGTH_LONG).show();
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", score);
+                    setResult(RESULT_OK, result);
                     finish();
                 }
             });
@@ -598,6 +604,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
             String message = String.format("Great job!\nScore: %d\nDistance: %dm",
                     score, distance);
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", score);
+            setResult(RESULT_OK, result);
             finish();
         }
     }
