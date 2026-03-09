@@ -273,7 +273,7 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
 
     // Intervention means the student must redo before the node is truly complete
     $quizCompleted = ($decision === 'ADD_INTERVENTION') ? 0 : 1;
-    $nodeState     = ($decision === 'ADD_INTERVENTION') ? 'NEEDS_INTERVENTION' : 'COMPLETED';
+    $nodeState     = ($decision === 'ADD_INTERVENTION') ? 'ADD_INTERVENTION' : 'COMPLETED';
 
     if ($exists) {
         $stmt = $conn->prepare("
