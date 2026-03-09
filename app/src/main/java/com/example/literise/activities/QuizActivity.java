@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -55,7 +54,6 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvQuizTitle;
     private TextView tvQuestionNumber;
     private TextView tvQuestionText;
-    private RadioGroup radioGroupOptions;
     private RadioButton rbOption1, rbOption2, rbOption3, rbOption4;
     private CardView cardOption1, cardOption2, cardOption3, cardOption4;
     private Button btnNext;
@@ -74,7 +72,10 @@ public class QuizActivity extends AppCompatActivity {
     private List<QuizQuestionsResponse.Question> questions = new ArrayList<>();
     private Map<Integer, String> selectedAnswers = new HashMap<>(); // questionId → answer text
     private int currentQuestionIndex = 0;
-    private int totalQuestions = 5;
+    private int totalQuestions = 10;
+
+    // Currently selected option index: 0=A, 1=B, 2=C, 3=D, -1=none
+    private int selectedOptionIndex = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +101,6 @@ public class QuizActivity extends AppCompatActivity {
         tvQuizTitle = findViewById(R.id.tvQuizTitle);
         tvQuestionNumber = findViewById(R.id.tvQuestionNumber);
         tvQuestionText = findViewById(R.id.tvQuestionText);
-        radioGroupOptions = findViewById(R.id.radioGroupOptions);
         rbOption1 = findViewById(R.id.rbOption1);
         rbOption2 = findViewById(R.id.rbOption2);
         rbOption3 = findViewById(R.id.rbOption3);
@@ -113,31 +113,40 @@ public class QuizActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
 
-        // Set quiz title
         tvQuizTitle.setText("Quiz " + lessonNumber);
     }
 
     private void setupListeners() {
         btnBack.setOnClickListener(v -> {
-            // Warn user about losing progress
             Toast.makeText(this, "Quiz progress will be lost", Toast.LENGTH_SHORT).show();
             finish();
         });
 
-        // CardView click listeners: RadioButtons are nested (not direct children of RadioGroup),
-        // so RadioGroup cannot auto-enforce single-selection. We check the button manually
-        // via radioGroupOptions.check() which triggers OnCheckedChangeListener correctly.
-        cardOption1.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption1));
-        cardOption2.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption2));
-        cardOption3.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption3));
-        cardOption4.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption4));
-
-        // Enable next button when an option is selected
-        radioGroupOptions.setOnCheckedChangeListener((group, checkedId) -> {
-            btnNext.setEnabled(checkedId != -1);
-        });
+        // Card click listeners manage selection manually.
+        // RadioButtons are NOT direct children of a RadioGroup, so we cannot use
+        // RadioGroup to enforce single-selection. Instead, each card click explicitly
+        // unchecks all buttons then checks only the selected one.
+        cardOption1.setOnClickListener(v -> selectOption(0));
+        cardOption2.setOnClickListener(v -> selectOption(1));
+        cardOption3.setOnClickListener(v -> selectOption(2));
+        cardOption4.setOnClickListener(v -> selectOption(3));
 
         btnNext.setOnClickListener(v -> handleNextButton());
+    }
+
+    /**
+     * Select a single option by index (0=A, 1=B, 2=C, 3=D).
+     * Unchecks all RadioButtons first, then checks only the selected one.
+     */
+    private void selectOption(int index) {
+        selectedOptionIndex = index;
+
+        rbOption1.setChecked(index == 0);
+        rbOption2.setChecked(index == 1);
+        rbOption3.setChecked(index == 2);
+        rbOption4.setChecked(index == 3);
+
+        btnNext.setEnabled(true);
     }
 
     /**
@@ -194,11 +203,14 @@ public class QuizActivity extends AppCompatActivity {
         setOption(cardOption3, rbOption3, question.getOptionC(), "C");
         setOption(cardOption4, rbOption4, question.getOptionD(), "D");
 
-        // Clear previous selection
-        radioGroupOptions.clearCheck();
+        // Reset selection for this question
+        selectedOptionIndex = -1;
+        rbOption1.setChecked(false);
+        rbOption2.setChecked(false);
+        rbOption3.setChecked(false);
+        rbOption4.setChecked(false);
         btnNext.setEnabled(false);
 
-        // Update button text
         if (currentQuestionIndex == totalQuestions - 1) {
             btnNext.setText("✅ Submit Quiz");
         } else {
@@ -210,15 +222,17 @@ public class QuizActivity extends AppCompatActivity {
      * Handle next button click
      */
     private void handleNextButton() {
-        int selectedId = radioGroupOptions.getCheckedRadioButtonId();
+        if (selectedOptionIndex == -1) return;
+
         QuizQuestionsResponse.Question currentQuestion = questions.get(currentQuestionIndex);
 
-        // Store answer text (matches CorrectAnswer in DB)
         String answerText = "";
-        if (selectedId == R.id.rbOption1) answerText = currentQuestion.getOptionA();
-        else if (selectedId == R.id.rbOption2) answerText = currentQuestion.getOptionB();
-        else if (selectedId == R.id.rbOption3) answerText = currentQuestion.getOptionC();
-        else if (selectedId == R.id.rbOption4) answerText = currentQuestion.getOptionD();
+        switch (selectedOptionIndex) {
+            case 0: answerText = currentQuestion.getOptionA(); break;
+            case 1: answerText = currentQuestion.getOptionB(); break;
+            case 2: answerText = currentQuestion.getOptionC(); break;
+            case 3: answerText = currentQuestion.getOptionD(); break;
+        }
 
         selectedAnswers.put(currentQuestion.getQuestionId(), answerText);
 
@@ -244,7 +258,6 @@ public class QuizActivity extends AppCompatActivity {
 
         int studentId = sessionManager.getStudentId();
 
-        // Create submit request with student answers
         QuizSubmitRequest request = new QuizSubmitRequest(studentId, nodeId, placementLevel, selectedAnswers);
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);

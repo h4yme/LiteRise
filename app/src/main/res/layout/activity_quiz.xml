@@ -150,8 +150,8 @@
                 </androidx.cardview.widget.CardView>
 
                 <!-- Answer Options with Fun Colors -->
-                <RadioGroup
-                    android:id="@+id/radioGroupOptions"
+                <LinearLayout
+                    android:id="@+id/llOptionsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -195,6 +195,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -240,6 +242,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -285,6 +289,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -330,13 +336,15 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
 
                     </androidx.cardview.widget.CardView>
 
-                </RadioGroup>
+                </LinearLayout>
 
                 <!-- Loading Indicator -->
                 <ProgressBar
