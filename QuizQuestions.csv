@@ -64,7 +64,7 @@
 1290,107,"Be careful, or you might _______ on the wet floor.",multiple_choice,"[""fall"",""full""]",fall,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
 1291,107,Did you _______ enough water after the race?,multiple_choice,"[""draw"",""drink""]",drink,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
 1292,107,Which word is spelled correctly?,multiple_choice,"[""carry"",""karey""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
-1293,107,"""I will _______ my lunch to school.""",multiple_choice,"[""bring"",""bring""]",bring,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
+1293,107,"""I will _______ my lunch to school.""",multiple_choice,"[""bring"",""take""]",bring,0.2,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
 1294,107,"Choose the correct word: ""The leaves _______ in Autumn.""",multiple_choice,"[""fall"",""feel""]",fall,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
 1295,107,"""Can you _______ a straight line?""",multiple_choice,"[""draw"",""drow""]",draw,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
 1296,107,"""Help me _______ these groceries.""",multiple_choice,"[""carry"",""curry""]",carry,0.3,phonics,NULL,NULL,1,2026-03-06 00:06:27.030
@@ -148,16 +148,16 @@
 1374,301,Does a sentence make sense?,multiple_choice,"[""Yes"",""No""]",Yes,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
 1375,301,"""Under the table"" is a:",multiple_choice,"[""Sentence"",""Non-sentence""]",Non-sentence,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
 1376,301,"""She is happy."" is a:",multiple_choice,"[""Sentence"",""Non-sentence""]",Sentence,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.130
-1377,302,Arrange these words into a sentence: is / Manila / big,sentence_arrange,"[""is"",""Manila"",""big""]",Manila is big.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1378,302,Arrange these words: mango / The / sweet / is,sentence_arrange,"[""mango"",""The"",""sweet"",""is""]",The mango is sweet.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1377,302,Choose the correct word order: is / Manila / big,multiple_choice,"[""Manila is big."",""Big Manila is.""]",Manila is big.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1378,302,Choose the correct word order: mango / The / sweet / is,multiple_choice,"[""The mango is sweet."",""Sweet the mango is.""]",The mango is sweet.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
 1379,302,Choose the correct order:,multiple_choice,"[""I my town love."",""I love my town.""]",I love my town.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1380,302,"Fix this sentence: ""plants / The / rice / farmer""",sentence_arrange,"[""plants"",""The"",""rice"",""farmer""]",The farmer plants rice.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1380,302,Choose the correct word order: plants / The / rice / farmer,multiple_choice,"[""The farmer plants rice."",""Rice the farmer plants.""]",The farmer plants rice.,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
 1381,302,Which makes sense?,multiple_choice,"[""We see Mayon."",""Mayon we see.""]",We see Mayon.,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1382,302,Arrange: colorful / festival / The / is,sentence_arrange,"[""colorful"",""festival"",""The"",""is""]",The festival is colorful.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1382,302,Choose the correct word order: colorful / festival / The / is,multiple_choice,"[""The festival is colorful."",""Colorful the festival is.""]",The festival is colorful.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
 1383,302,"Is ""Red the apple is"" correct word order?",multiple_choice,"[""Yes"",""No""]",No,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1384,302,Arrange: teacher / My / kind / is,sentence_arrange,"[""teacher"",""My"",""kind"",""is""]",My teacher is kind.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1385,302,Arrange: swim / Fish / water / in,sentence_arrange,"[""swim"",""Fish"",""water"",""in""]",Fish swim in water.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
-1386,302,Fix: play / We / the / park / in,sentence_arrange,"[""play"",""We"",""the"",""park"",""in""]",We play in the park.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1384,302,Choose the correct word order: teacher / My / kind / is,multiple_choice,"[""My teacher is kind."",""Is my teacher kind.""]",My teacher is kind.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1385,302,Choose the correct word order: swim / Fish / water / in,multiple_choice,"[""Fish swim in water."",""Water swim Fish in.""]",Fish swim in water.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
+1386,302,Choose the correct word order: play / We / the / park / in,multiple_choice,"[""We play in the park."",""In the park we play.""]",We play in the park.,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.137
 1387,303,"In ""The bird flies,"" who is the doer?",multiple_choice,"[""bird"",""flies""]",bird,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
 1388,303,"What is the action in ""Maria dances""?",multiple_choice,"[""Maria"",""dances""]",dances,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
 1389,303,"In ""The car stopped,"" what is the subject?",multiple_choice,"[""car"",""stopped""]",car,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.143
@@ -212,7 +212,7 @@
 1438,308,The last step word is:,multiple_choice,"[""Next"",""Finally""]",Finally,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
 1439,308,"""___, wash your hands. Next, use soap.""",multiple_choice,"[""First"",""Then""]",First,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
 1440,308,Which is a time order word?,multiple_choice,"[""Small"",""Then""]",Then,0.2,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
-1441,308,"Put these in order: Finally, First, Next",sequence,"[""First"",""Next"",""Finally""]","First, Next, Finally",0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
+1441,308,What is the correct order of these time-order words?,multiple_choice,"[""First, Next, Finally"",""Next, First, Finally"",""Finally, Next, First""]","First, Next, Finally",0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
 1442,308,"""Next"" shows:",multiple_choice,"[""First step"",""Following step""]",Following step,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
 1443,308,Which shows sequence?,multiple_choice,"[""And"",""Second""]",Second,0.4,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
 1444,308,"""I ate, ___ I slept.""",multiple_choice,"[""Then"",""Before""]",Then,0.3,grammar,NULL,NULL,1,2026-03-06 00:06:27.170
@@ -393,11 +393,11 @@
 1619,202,The palengke is a:,multiple_choice,"[""market"",""classroom"",""playground""]",market,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
 1620,202,A jeepney is used for:,multiple_choice,"[""transportation"",""cooking"",""planting""]",transportation,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
 1621,202,A farmer works in the:,multiple_choice,"[""rice field"",""hospital"",""mall""]",rice field,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
-1622,202,"In Math, to add means:",multiple_choice,"[""put together"",""take away"",""cut""]",put together,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
-1623,202,"In Math, the sum is the:",multiple_choice,"[""answer to addition"",""answer to subtraction"",""shape""]",answer to addition,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
-1624,202,Plants need water to:,multiple_choice,"[""grow"",""jump"",""sing""]",grow,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
-1625,202,The sun gives us:,multiple_choice,"[""light"",""shoes"",""books""]",light,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
-1626,202,An animal is a:,multiple_choice,"[""living thing"",""number"",""building""]",living thing,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1622,203,"In Math, to add means:",multiple_choice,"[""put together"",""take away"",""cut""]",put together,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1623,203,"In Math, the sum is the:",multiple_choice,"[""answer to addition"",""answer to subtraction"",""shape""]",answer to addition,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1624,203,Plants need water to:,multiple_choice,"[""grow"",""jump"",""sing""]",grow,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1625,203,The sun gives us:,multiple_choice,"[""light"",""shoes"",""books""]",light,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
+1626,203,An animal is a:,multiple_choice,"[""living thing"",""number"",""building""]",living thing,0.2,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.380
 1627,204,Which is a proper noun?,multiple_choice,"[""school"",""Manila"",""cat"",""boy""]",Manila,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
 1628,204,Which is a common noun?,multiple_choice,"[""Juan"",""Christmas"",""dog"",""May""]",dog,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
 1629,204,Choose the proper noun:,multiple_choice,"[""park"",""Rizal Park"",""tree"",""river""]",Rizal Park,0.3,vocabulary,NULL,NULL,1,2026-03-06 00:06:27.387
