@@ -835,14 +835,26 @@ public class DashboardActivity extends BaseActivity {
                     @Override
                     public void onResponse(Call<CheckModulesCompleteResponse> call,
                                            Response<CheckModulesCompleteResponse> response) {
-                        if (response.isSuccessful()
-                                && response.body() != null
-                                && response.body().isSuccess()
-                                && response.body().isShouldTriggerPostAssessment()) {
-                            showPostAssessmentDialog(
-                                    response.body().getCompletedCount(),
-                                    response.body().getTotalCount()
-                            );
+                        if (!response.isSuccessful() || response.body() == null || !response.body().isSuccess()) return;
+
+                        CheckModulesCompleteResponse body = response.body();
+
+                        // Unlock modules sequentially based on how many nodes are completed.
+                        // There are 5 modules with equal node counts (total_count / 5 nodes each).
+                        // A module is fully complete when all its nodes are done, which unlocks the next module.
+                        if (modules != null && moduleAdapter != null && body.getTotalCount() > 0) {
+                            int nodesPerModule = body.getTotalCount() / modules.size();
+                            if (nodesPerModule > 0) {
+                                int completedModules = body.getCompletedCount() / nodesPerModule;
+                                for (int i = 0; i < modules.size(); i++) {
+                                    modules.get(i).setLocked(i > completedModules);
+                                }
+                                moduleAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        if (body.isShouldTriggerPostAssessment()) {
+                            showPostAssessmentDialog(body.getCompletedCount(), body.getTotalCount());
                         }
                     }
 
