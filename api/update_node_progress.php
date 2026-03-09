@@ -72,21 +72,9 @@ try {
             ");
             $stmt->execute([$studentId, $nodeId]);
 
-            // Unlock the parent core node by marking its quiz as completed
-            $stmtAfter = $conn->prepare("
-                SELECT AfterNodeID FROM SupplementalNodes WHERE SupplementalNodeID = ?
-            ");
-            $stmtAfter->execute([$nodeId]);
-            $afterNodeId = $stmtAfter->fetchColumn();
-
-            if ($afterNodeId) {
-                $stmt = $conn->prepare("
-                    UPDATE StudentNodeProgress
-                    SET QuizCompleted = 1
-                    WHERE StudentID = ? AND NodeID = ?
-                ");
-                $stmt->execute([$studentId, $afterNodeId]);
-            }
+            // Note: QuizCompleted for the parent core node is intentionally NOT set here.
+            // The Android client will auto-launch the quiz retake after intervention;
+            // submit_quiz.php will set QuizCompleted=1 when the student passes (score >= 70).
         }
         // game/quiz phases on supplemental nodes are no-ops
         http_response_code(200);

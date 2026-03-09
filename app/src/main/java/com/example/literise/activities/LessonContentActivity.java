@@ -125,8 +125,18 @@ public class LessonContentActivity extends AppCompatActivity {
     }
 
     private void setupListeners() {
-        btnBack.setOnClickListener(v -> { setResult(RESULT_CANCELED); finish(); });
+        btnBack.setOnClickListener(v -> cancelLesson());
         btnComplete.setOnClickListener(v -> markLessonCompleted());
+    }
+
+    @Override
+    public void onBackPressed() {
+        cancelLesson();
+    }
+
+    private void cancelLesson() {
+        setResult(RESULT_CANCELED);
+        finish();
     }
 
     // ── API ───────────────────────────────────────────────────────────────────

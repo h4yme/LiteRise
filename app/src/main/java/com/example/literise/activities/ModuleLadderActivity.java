@@ -71,6 +71,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
     private NodeView currentNode;
     private boolean isAutoProceedMode = true; // Auto-proceed through phases
     private boolean isSupplementalLaunch = false; // True when launching a supplemental/intervention lesson
+    private int pendingQuizNodeId = 0; // Core node to re-quiz after intervention completes
+    private List<NodeView> allNodeViews = new ArrayList<>();
     private String lastLessonContent; // lesson JSON forwarded to the following game
 
     // Path coordinates
@@ -157,11 +159,28 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
                     if (result.getResultCode() == android.app.Activity.RESULT_OK && isSupplementalLaunch) {
-                        // Supplemental/intervention lesson finished — no game/quiz, just reload ladder
                         isSupplementalLaunch = false;
-                        Log.d(TAG, "Intervention lesson completed — refreshing ladder");
-                        Toast.makeText(this, "✅ Intervention Complete! Keep going! 🌟", Toast.LENGTH_SHORT).show();
-                        loadModuleLadder();
+                        Log.d(TAG, "Intervention lesson completed — launching quiz retake");
+                        Toast.makeText(this, "✅ Intervention Complete! Now retake the quiz! 📝", Toast.LENGTH_SHORT).show();
+                        // Find the core node and launch its quiz directly
+                        NodeView targetNode = null;
+                        for (NodeView nv : allNodeViews) {
+                            if (nv.getNodeId() == pendingQuizNodeId) {
+                                targetNode = nv;
+                                break;
+                            }
+                        }
+                        pendingQuizNodeId = 0;
+                        if (targetNode != null) {
+                            final NodeView quizNode = targetNode;
+                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                isAutoProceedMode = true;
+                                currentNode = quizNode;
+                                startQuizPhase(quizNode);
+                            }, 1000);
+                        } else {
+                            loadModuleLadder();
+                        }
                     } else if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
                         // Capture lesson content so the game can use lesson words/sentences
                         android.content.Intent data = result.getData();
@@ -361,6 +380,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
             return;
         }
 
+        allNodeViews = nodeViews; // keep reference for post-intervention quiz lookup
         pathView.setNodes(nodeViews);
 
         // Update progress
@@ -399,6 +419,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     intent.putExtra("placement_level", placementLevel);
                     intent.putExtra("is_supplemental", true);
                     isSupplementalLaunch = true;
+                    pendingQuizNodeId = intervention.getAfterNodeId();
                     lessonLauncher.launch(intent);
                 })
                 .setNegativeButton("Later", null)
