@@ -10,7 +10,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
 import com.airbnb.lottie.LottieAnimationView;
@@ -38,7 +37,7 @@ import java.util.Random;
  * Word Explosion - Bubble Popping Vocabulary Game
  * Pop bubbles by word categories to score points
  */
-public class WordExplosionActivity extends AppCompatActivity {
+public class WordExplosionActivity extends BaseGameActivity {
 
     // UI Elements
     private FrameLayout gameContainer;

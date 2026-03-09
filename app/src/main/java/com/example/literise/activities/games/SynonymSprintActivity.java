@@ -12,7 +12,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GestureDetectorCompat;
 
@@ -42,7 +41,7 @@ import java.util.Random;
  * Synonym Sprint - Subway Surfers Style Runner
  * Swipe left/right to collect synonyms and avoid antonyms
  */
-public class SynonymSprintActivity extends AppCompatActivity {
+public class SynonymSprintActivity extends BaseGameActivity {
 
     // UI Elements
     private FrameLayout gameContainer;
