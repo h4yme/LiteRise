@@ -12,6 +12,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
@@ -56,6 +57,7 @@ public class QuizActivity extends AppCompatActivity {
     private TextView tvQuestionText;
     private RadioGroup radioGroupOptions;
     private RadioButton rbOption1, rbOption2, rbOption3, rbOption4;
+    private CardView cardOption1, cardOption2, cardOption3, cardOption4;
     private Button btnNext;
     private ProgressBar progressBar;
     private TextView tvProgress;
@@ -103,6 +105,10 @@ public class QuizActivity extends AppCompatActivity {
         rbOption2 = findViewById(R.id.rbOption2);
         rbOption3 = findViewById(R.id.rbOption3);
         rbOption4 = findViewById(R.id.rbOption4);
+        cardOption1 = findViewById(R.id.cardOption1);
+        cardOption2 = findViewById(R.id.cardOption2);
+        cardOption3 = findViewById(R.id.cardOption3);
+        cardOption4 = findViewById(R.id.cardOption4);
         btnNext = findViewById(R.id.btnNext);
         progressBar = findViewById(R.id.progressBar);
         tvProgress = findViewById(R.id.tvProgress);
@@ -118,14 +124,20 @@ public class QuizActivity extends AppCompatActivity {
             finish();
         });
 
-        // Enable next button when option is selected
+        // CardView click listeners: RadioButtons are nested (not direct children of RadioGroup),
+        // so RadioGroup cannot auto-enforce single-selection. We check the button manually
+        // via radioGroupOptions.check() which triggers OnCheckedChangeListener correctly.
+        cardOption1.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption1));
+        cardOption2.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption2));
+        cardOption3.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption3));
+        cardOption4.setOnClickListener(v -> radioGroupOptions.check(R.id.rbOption4));
+
+        // Enable next button when an option is selected
         radioGroupOptions.setOnCheckedChangeListener((group, checkedId) -> {
-            btnNext.setEnabled(true);
+            btnNext.setEnabled(checkedId != -1);
         });
 
-        btnNext.setOnClickListener(v -> {
-            handleNextButton();
-        });
+        btnNext.setOnClickListener(v -> handleNextButton());
     }
 
     /**
@@ -177,10 +189,10 @@ public class QuizActivity extends AppCompatActivity {
         tvQuestionText.setText(question.getQuestionText());
 
         // Show only options that have content
-        setOption(rbOption1, question.getOptionA(), "A");
-        setOption(rbOption2, question.getOptionB(), "B");
-        setOption(rbOption3, question.getOptionC(), "C");
-        setOption(rbOption4, question.getOptionD(), "D");
+        setOption(cardOption1, rbOption1, question.getOptionA(), "A");
+        setOption(cardOption2, rbOption2, question.getOptionB(), "B");
+        setOption(cardOption3, rbOption3, question.getOptionC(), "C");
+        setOption(cardOption4, rbOption4, question.getOptionD(), "D");
 
         // Clear previous selection
         radioGroupOptions.clearCheck();
@@ -214,12 +226,12 @@ public class QuizActivity extends AppCompatActivity {
         displayCurrentQuestion();
     }
 
-    private void setOption(RadioButton rb, String text, String label) {
+    private void setOption(CardView card, RadioButton rb, String text, String label) {
         if (text != null && !text.isEmpty()) {
             rb.setText(label + ") " + text);
-            rb.setVisibility(View.VISIBLE);
+            card.setVisibility(View.VISIBLE);
         } else {
-            rb.setVisibility(View.GONE);
+            card.setVisibility(View.GONE);
         }
     }
 

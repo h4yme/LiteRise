@@ -158,6 +158,7 @@
 
                     <!-- Option 1 - Blue -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -202,6 +203,7 @@
 
                     <!-- Option 2 - Green -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -246,6 +248,7 @@
 
                     <!-- Option 3 - Purple -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -290,6 +293,7 @@
 
                     <!-- Option 4 - Orange -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"

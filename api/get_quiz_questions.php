@@ -40,7 +40,7 @@ try {
     }
     
     // Determine number of questions
-    $numQuestions = 5;
+    $numQuestions = 10;
     
     // Get quiz questions (OptionsJSON holds options as {"A":"...","B":"...","C":"...","D":"..."})
     // Note: SQL Server requires TOP parameter to be bound as integer (PDO::PARAM_INT),
