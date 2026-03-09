@@ -32,7 +32,7 @@
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:src="@drawable/ic_arrow_back"
-                android:tint="@color/white"
+                app:tint="@color/white"
                 android:padding="8dp"
                 android:background="@drawable/bg_circle_white_ripple" />
 
@@ -150,14 +150,15 @@
                 </androidx.cardview.widget.CardView>
 
                 <!-- Answer Options with Fun Colors -->
-                <RadioGroup
-                    android:id="@+id/radioGroupOptions"
+                <LinearLayout
+                    android:id="@+id/llOptionsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
                     <!-- Option 1 - Blue -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -194,6 +195,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -202,6 +205,7 @@
 
                     <!-- Option 2 - Green -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -238,6 +242,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -246,6 +252,7 @@
 
                     <!-- Option 3 - Purple -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -282,6 +289,8 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
@@ -290,6 +299,7 @@
 
                     <!-- Option 4 - Orange -->
                     <androidx.cardview.widget.CardView
+                        android:id="@+id/cardOption4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
@@ -326,13 +336,15 @@
                                 android:textColor="@color/color_charcoal"
                                 android:paddingEnd="16dp"
                                 android:button="@null"
+                                android:clickable="false"
+                                android:focusable="false"
                                 android:drawableEnd="@drawable/ic_radio_button" />
 
                         </LinearLayout>
 
                     </androidx.cardview.widget.CardView>
 
-                </RadioGroup>
+                </LinearLayout>
 
                 <!-- Loading Indicator -->
                 <ProgressBar

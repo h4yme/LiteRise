@@ -12,13 +12,23 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GestureDetectorCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.example.literise.models.LessonContentResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,7 +41,7 @@ import java.util.Random;
  * Synonym Sprint - Subway Surfers Style Runner
  * Swipe left/right to collect synonyms and avoid antonyms
  */
-public class SynonymSprintActivity extends AppCompatActivity {
+public class SynonymSprintActivity extends BaseGameActivity {
 
     // UI Elements
     private FrameLayout gameContainer;
@@ -87,11 +97,105 @@ public class SynonymSprintActivity extends AppCompatActivity {
         applyModuleTheme();
         setupListeners();
 
-        // Wait for layout to calculate lane positions
-        gameContainer.post(() -> {
-            calculateLanePositions();
-            positionCharacterInLane(currentLane, false);
-            startGame();
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            generateWithAI(nodeId, lessonContent);
+        } else if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                gameContainer.post(() -> {
+                                    calculateLanePositions();
+                                    positionCharacterInLane(currentLane, false);
+                                    startGame();
+                                });
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            gameContainer.post(() -> {
+                                calculateLanePositions();
+                                positionCharacterInLane(currentLane, false);
+                                startGame();
+                            });
+                        }
+                    });
+        } else {
+            // Wait for layout to calculate lane positions
+            gameContainer.post(() -> {
+                calculateLanePositions();
+                positionCharacterInLane(currentLane, false);
+                startGame();
+            });
+        }
+    }
+
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "synonym_sprint", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray groupsArray = response.body().content.getAsJsonArray("groups");
+                        Map<String, WordData> aiDatabase = new HashMap<>();
+                        String firstWord = null;
+                        for (int i = 0; i < groupsArray.size(); i++) {
+                            JsonObject obj = groupsArray.get(i).getAsJsonObject();
+                            String word = obj.get("targetWord").getAsString();
+                            JsonArray synonymsArr = obj.getAsJsonArray("synonyms");
+                            JsonArray antonymsArr = obj.getAsJsonArray("antonyms");
+                            List<String> synonyms = new ArrayList<>();
+                            List<String> antonyms = new ArrayList<>();
+                            for (int j = 0; j < synonymsArr.size(); j++) {
+                                synonyms.add(synonymsArr.get(j).getAsString());
+                            }
+                            for (int j = 0; j < antonymsArr.size(); j++) {
+                                antonyms.add(antonymsArr.get(j).getAsString());
+                            }
+                            aiDatabase.put(word, new WordData(synonyms, antonyms));
+                            if (firstWord == null) firstWord = word;
+                        }
+                        if (!aiDatabase.isEmpty() && firstWord != null) {
+                            wordDatabase = aiDatabase;
+                            targetWord = firstWord;
+                            tvTargetWord.setText(targetWord.toUpperCase());
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.w("SynonymSprint", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("SynonymSprint", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
+                }
+                gameContainer.post(() -> {
+                    calculateLanePositions();
+                    positionCharacterInLane(currentLane, false);
+                    startGame();
+                });
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("SynonymSprint", "AI generate network error: " + t.getMessage());
+                gameContainer.post(() -> {
+                    calculateLanePositions();
+                    positionCharacterInLane(currentLane, false);
+                    startGame();
+                });
+            }
         });
     }
 
@@ -477,6 +581,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
         }
         activeWords.clear();
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Lottie celebration then finish
         if (lottieComplete != null) {
             lottieComplete.setVisibility(View.VISIBLE);
@@ -486,6 +593,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
                     String message = String.format("Great job!\nScore: %d\nDistance: %dm\nBest Streak: %dx",
                             score, distance, maxCombo);
                     Toast.makeText(SynonymSprintActivity.this, message, Toast.LENGTH_LONG).show();
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", score);
+                    setResult(RESULT_OK, result);
                     finish();
                 }
             });
@@ -493,6 +603,9 @@ public class SynonymSprintActivity extends AppCompatActivity {
             String message = String.format("Great job!\nScore: %d\nDistance: %dm",
                     score, distance);
             Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", score);
+            setResult(RESULT_OK, result);
             finish();
         }
     }

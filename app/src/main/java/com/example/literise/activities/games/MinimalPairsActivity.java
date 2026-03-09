@@ -21,13 +21,24 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.example.literise.models.LessonContentResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Minimal Pairs - Pronunciation Challenge Game
@@ -79,11 +90,82 @@ public class MinimalPairsActivity extends BaseGameActivity {
 
         initializeViews();
         applyModuleTheme();
-        setupMinimalPairs();
         setupTextToSpeech();
         setupSpeechRecognition();
         setupListeners();
         checkMicrophonePermission();
+
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            generateWithAI(nodeId, lessonContent);
+        } else if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                setupMinimalPairs();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            setupMinimalPairs();
+                        }
+                    });
+        } else {
+            setupMinimalPairs();
+        }
+    }
+
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "minimal_pairs", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray pairsArray = response.body().content.getAsJsonArray("pairs");
+                        List<MinimalPair> aiPairs = new ArrayList<>();
+                        for (int i = 0; i < pairsArray.size(); i++) {
+                            JsonObject obj = pairsArray.get(i).getAsJsonObject();
+                            String targetWord = obj.get("targetWord").getAsString();
+                            String contrastWord = obj.get("contrastWord").getAsString();
+                            String hint = obj.has("hint") ? obj.get("hint").getAsString() : "";
+                            aiPairs.add(new MinimalPair(targetWord, contrastWord, hint, R.drawable.ic_mouth_i));
+                        }
+                        if (!aiPairs.isEmpty()) {
+                            minimalPairs = aiPairs;
+                            Collections.shuffle(minimalPairs);
+                            totalPairs = minimalPairs.size();
+                            loadCurrentPair();
+                            return;
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.w("MinimalPairs", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("MinimalPairs", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
+                }
+                setupMinimalPairs();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("MinimalPairs", "AI generate network error: " + t.getMessage());
+                setupMinimalPairs();
+            }
+        });
     }
 
     private void initializeViews() {
@@ -419,6 +501,9 @@ public class MinimalPairsActivity extends BaseGameActivity {
         int accuracy = (totalPairs > 0) ? (correctCount * 100 / totalPairs) : 0;
         int xpEarned = correctCount * 10;
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         new AlertDialog.Builder(this)
                 .setTitle("Pronunciation Practice Complete!")
                 .setMessage(
@@ -426,7 +511,13 @@ public class MinimalPairsActivity extends BaseGameActivity {
                                 "Accuracy: " + accuracy + "%\n\n" +
                                 "XP Earned: +" + xpEarned
                 )
-                .setPositiveButton("Finish", (d, w) -> finish())
+                .setPositiveButton("Finish", (d, w) -> {
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", xpEarned);
+                    result.putExtra("accuracy", accuracy);
+                    setResult(RESULT_OK, result);
+                    finish();
+                })
                 .setNegativeButton("Practice Again", (d, w) -> restartGame())
                 .setCancelable(false)
                 .show();

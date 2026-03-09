@@ -15,13 +15,24 @@ import androidx.cardview.widget.CardView;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
+import com.example.literise.models.LessonContentResponse;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Timed Trail - Race track comprehension game
@@ -77,9 +88,98 @@ public class TimedTrailActivity extends BaseGameActivity {
 
         initializeViews();
         applyModuleTheme();
-        setupQuestions();
         setupListeners();
-        startGame();
+
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        int nodeId = getIntent().getIntExtra("node_id", -1);
+
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            generateWithAI(nodeId, lessonContent);
+        } else if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                setupQuestions();
+                                startGame();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            setupQuestions();
+                            startGame();
+                        }
+                    });
+        } else {
+            setupQuestions();
+            startGame();
+        }
+    }
+
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService apiService = ApiClient.getAiClient(this).create(ApiService.class);
+        GameContentRequest request = new GameContentRequest(nodeId, "timed_trail", lessonContent);
+        apiService.generateGameContent(request).enqueue(new Callback<GameContentResponse>() {
+            @Override
+            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                if (response.isSuccessful() && response.body() != null && response.body().success
+                        && response.body().content != null) {
+                    try {
+                        JsonArray questionsArray = response.body().content.getAsJsonArray("questions");
+                        List<TrailQuestion> aiQuestions = new ArrayList<>();
+                        for (int i = 0; i < questionsArray.size(); i++) {
+                            JsonObject obj = questionsArray.get(i).getAsJsonObject();
+                            String questionText = obj.get("question").getAsString();
+                            String optA = obj.get("optionA").getAsString();
+                            String optB = obj.get("optionB").getAsString();
+                            String optC = obj.get("optionC").getAsString();
+                            String optD = obj.get("optionD").getAsString();
+                            String correctLetter = obj.get("correct").getAsString().trim().toUpperCase();
+                            int correctIndex;
+                            switch (correctLetter) {
+                                case "B": correctIndex = 1; break;
+                                case "C": correctIndex = 2; break;
+                                case "D": correctIndex = 3; break;
+                                default:  correctIndex = 0; break;
+                            }
+                            aiQuestions.add(new TrailQuestion(
+                                    questionText,
+                                    new String[]{optA, optB, optC, optD},
+                                    correctIndex
+                            ));
+                        }
+                        if (!aiQuestions.isEmpty()) {
+                            questions = aiQuestions;
+                            Collections.shuffle(questions);
+                            totalQuestions = questions.size();
+                            startGame();
+                            return;
+                        }
+                    } catch (Exception e) {
+                        android.util.Log.w("TimedTrail", "AI parse error: " + e.getMessage());
+                    }
+                } else {
+                    android.util.Log.w("TimedTrail", "AI generate failed: code=" + response.code()
+                            + " msg=" + (response.body() != null ? response.body().message : "null"));
+                }
+                setupQuestions();
+                startGame();
+            }
+
+            @Override
+            public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                android.util.Log.w("TimedTrail", "AI generate network error: " + t.getMessage());
+                setupQuestions();
+                startGame();
+            }
+        });
     }
 
     private void initializeViews() {
@@ -432,6 +532,9 @@ public class TimedTrailActivity extends BaseGameActivity {
         int accuracy = (totalQuestions > 0) ? (correctAnswers * 100 / totalQuestions) : 0;
         int xpEarned = distanceTraveled + (accuracy / 2);
 
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+
         // Play celebration then show dialog
         if (lottieComplete != null) {
             lottieComplete.setVisibility(android.view.View.VISIBLE);
@@ -457,7 +560,13 @@ public class TimedTrailActivity extends BaseGameActivity {
                                 "Best Streak: " + maxStreak + "\n\n" +
                                 "XP Earned: +" + xpEarned
                 )
-                .setPositiveButton("Finish", (d, w) -> finish())
+                .setPositiveButton("Finish", (d, w) -> {
+                    android.content.Intent result = new android.content.Intent();
+                    result.putExtra("xp_earned", xpEarned);
+                    result.putExtra("accuracy", accuracy);
+                    setResult(RESULT_OK, result);
+                    finish();
+                })
                 .setNegativeButton("Play Again", (d, w) -> restartGame())
                 .setCancelable(false)
                 .show();

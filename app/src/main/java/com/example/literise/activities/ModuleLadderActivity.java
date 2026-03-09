@@ -33,6 +33,7 @@ import com.example.literise.models.ModuleLadderResponse;
 import com.example.literise.models.NodeData;
 import com.example.literise.models.NodeProgressResponse;
 import com.example.literise.models.NodeView;
+import com.example.literise.models.SupplementalNodeData;
 import com.example.literise.views.ModulePathView;
 
 import java.util.ArrayList;
@@ -70,6 +71,9 @@ public class ModuleLadderActivity extends AppCompatActivity {
     // Track current node for auto-progression
     private NodeView currentNode;
     private boolean isAutoProceedMode = true; // Auto-proceed through phases
+    private boolean isSupplementalLaunch = false; // True when launching a supplemental/intervention lesson
+    private int pendingQuizNodeId = 0; // Core node to re-quiz after intervention completes
+    private List<NodeView> allNodeViews = new ArrayList<>();
     private String lastLessonContent; // lesson JSON forwarded to the following game
 
     // Path coordinates
@@ -155,7 +159,30 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 result -> {
                     Log.d(TAG, "Returned from LessonContentActivity, resultCode=" + result.getResultCode());
 
-                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isSupplementalLaunch) {
+                        isSupplementalLaunch = false;
+                        Log.d(TAG, "Intervention lesson completed — launching quiz retake");
+                        Toast.makeText(this, "✅ Intervention Complete! Now retake the quiz! 📝", Toast.LENGTH_SHORT).show();
+                        // Find the core node and launch its quiz directly
+                        NodeView targetNode = null;
+                        for (NodeView nv : allNodeViews) {
+                            if (nv.getNodeId() == pendingQuizNodeId) {
+                                targetNode = nv;
+                                break;
+                            }
+                        }
+                        pendingQuizNodeId = 0;
+                        if (targetNode != null) {
+                            final NodeView quizNode = targetNode;
+                            new android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
+                                isAutoProceedMode = true;
+                                currentNode = quizNode;
+                                startQuizPhase(quizNode);
+                            }, 1000);
+                        } else {
+                            loadModuleLadder();
+                        }
+                    } else if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
                         // Capture lesson content so the game can use lesson words/sentences
                         android.content.Intent data = result.getData();
                         lastLessonContent = (data != null) ? data.getStringExtra("lesson_content") : null;
@@ -168,6 +195,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
                             startGamePhase(currentNode);
                         }, 800);
                     } else {
+                        isSupplementalLaunch = false;
                         // User backed out or lesson failed to load — refresh ladder, do NOT proceed
                         Log.d(TAG, "Lesson not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
@@ -179,11 +207,11 @@ public class ModuleLadderActivity extends AppCompatActivity {
         gameLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    Log.d(TAG, "Returned from Game Activity");
+                    Log.d(TAG, "Returned from Game Activity, resultCode=" + result.getResultCode());
 
-                    if (isAutoProceedMode && currentNode != null) {
-                        // Automatically proceed to quiz phase
-                        Log.d(TAG, "Auto-proceeding to Quiz phase");
+                    if (result.getResultCode() == android.app.Activity.RESULT_OK && isAutoProceedMode && currentNode != null) {
+                        // Game was genuinely completed — automatically proceed to quiz phase
+                        Log.d(TAG, "Game completed (RESULT_OK) — Auto-proceeding to Quiz phase");
                         Toast.makeText(this, "🎉 Great job! Time for the quiz! ✅", Toast.LENGTH_SHORT).show();
 
                         // Small delay for toast to show
@@ -191,7 +219,8 @@ public class ModuleLadderActivity extends AppCompatActivity {
                             startQuizPhase(currentNode);
                         }, 800);
                     } else {
-                        // User backed out or reviewing - refresh ladder
+                        // User backed out or game not completed — refresh ladder, do NOT proceed
+                        Log.d(TAG, "Game not completed (back/error) — refreshing ladder");
                         loadModuleLadder();
                     }
                 }
@@ -280,12 +309,23 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         int currentNodeId = data.getCurrentNodeId();
 
+        // If currentNodeId points to an already-completed node, advance it
+        if (currentNodeId != 0) {
+            for (NodeData nd : nodesData) {
+                if (nd.getNodeId() == currentNodeId &&
+                        nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted()) {
+                    currentNodeId = 0; // reset so fallback below picks next incomplete
+                    Log.d(TAG, "currentNodeId pointed to a completed node — advancing to next incomplete");
+                    break;
+                }
+            }
+        }
         // API may return null (parsed as 0) — fall back to first incomplete node
         if (currentNodeId == 0) {
             for (NodeData nd : nodesData) {
                 if (!(nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted())) {
                     currentNodeId = nd.getNodeId();
-                    Log.d(TAG, "currentNodeId was null, resolved to first incomplete node: " + currentNodeId);
+                    Log.d(TAG, "currentNodeId resolved to first incomplete node: " + currentNodeId);
                     break;
                 }
             }
@@ -309,15 +349,17 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 continue;
             }
 
-            // Determine node state
+            // Determine node state — COMPLETED must be checked before CURRENT
+            // so a finished node whose CurrentNodeID hasn't been updated yet
+            // doesn't block the unlock chain for the next node.
             NodeView.NodeState state;
-            if (nodeData.getNodeId() == currentNodeId) {
-                state = NodeView.NodeState.CURRENT;
-            } else if (nodeData.isLessonCompleted() &&
+            if (nodeData.isLessonCompleted() &&
                     nodeData.isGameCompleted() &&
                     nodeData.isQuizCompleted()) {
                 state = NodeView.NodeState.COMPLETED;
-            } else if (nodeNumber == 1 || (i > 0 && nodeViews.get(i - 1).getState() == NodeView.NodeState.COMPLETED)) {
+            } else if (nodeData.getNodeId() == currentNodeId) {
+                state = NodeView.NodeState.CURRENT;
+            } else if (nodeNumber == 1 || (!nodeViews.isEmpty() && nodeViews.get(nodeViews.size() - 1).getState() == NodeView.NodeState.COMPLETED)) {
                 state = NodeView.NodeState.UNLOCKED;
             } else {
                 state = NodeView.NodeState.LOCKED;
@@ -353,6 +395,7 @@ public class ModuleLadderActivity extends AppCompatActivity {
             return;
         }
 
+        allNodeViews = nodeViews; // keep reference for post-intervention quiz lookup
         pathView.setNodes(nodeViews);
 
         // Update progress
@@ -365,6 +408,38 @@ public class ModuleLadderActivity extends AppCompatActivity {
         int progress = (completedNodes * 100) / nodeViews.size();
         moduleProgress.setProgress(progress);
         progressText.setText(progress + "%");
+
+        // Show prompt for any pending INTERVENTION nodes
+        List<SupplementalNodeData> supplementalNodes = data.getSupplementalNodes();
+        if (supplementalNodes != null) {
+            for (SupplementalNodeData sn : supplementalNodes) {
+                if ("INTERVENTION".equals(sn.getNodeType()) && !sn.isCompleted()) {
+                    showInterventionPrompt(sn);
+                    break; // show one at a time
+                }
+            }
+        }
+    }
+
+    private void showInterventionPrompt(SupplementalNodeData intervention) {
+        new AlertDialog.Builder(this)
+                .setTitle("📚 Intervention Required")
+                .setMessage("Complete the remedial lesson before continuing:\n\n\"" + intervention.getTitle() + "\"")
+                .setPositiveButton("Start Intervention", (dialog, which) -> {
+                    Intent intent = new Intent(this, LessonContentActivity.class);
+                    intent.putExtra("node_id", intervention.getId());
+                    intent.putExtra("lesson_title", intervention.getTitle());
+                    intent.putExtra("module_id", moduleId);
+                    intent.putExtra("lesson_number", 0);
+                    intent.putExtra("placement_level", placementLevel);
+                    intent.putExtra("is_supplemental", true);
+                    isSupplementalLaunch = true;
+                    pendingQuizNodeId = intervention.getAfterNodeId();
+                    lessonLauncher.launch(intent);
+                })
+                .setNegativeButton("Later", null)
+                .setCancelable(true)
+                .show();
     }
 
     private void handleNodeClick(NodeView node) {
@@ -520,8 +595,27 @@ public class ModuleLadderActivity extends AppCompatActivity {
         if (moduleDomain != null) {
             switch (moduleDomain.toLowerCase()) {
                 case "phonics":
-                    // Phonics: sound recognition, word patterns, letter games
-                    String[] phonicsGames = {"minimal_pairs", "word_hunt", "word_explosion", "picture_match", "fill_in_blanks"};
+                    // Phonics: content-appropriate rotation based on LessonsUpdated.csv
+                    // 1→word_hunt(CVCC sight words), 2→minimal_pairs(CCVC sounds),
+                    // 3→fill_in_blanks(VCV+VCCV syllable), 4→sentence_scramble(sight words in sentences),
+                    // 5→fill_in_blanks(VCV open syllable), 6→fill_in_blanks(VCCV closed),
+                    // 7→sentence_scramble(action stories), 8→minimal_pairs(antonyms),
+                    // 9→timed_trail(MCQ comparison), 10→sentence_scramble(abstract),
+                    // 11→timed_trail(definitions), 12→sentence_scramble(spatial)
+                    String[] phonicsGames = {
+                            "word_hunt",         // 1: CVCC sight words (find them in a grid)
+                            "minimal_pairs",     // 2: CCVC clusters (sound discrimination)
+                            "fill_in_blanks",    // 3: VCV+VCCV syllable division
+                            "sentence_scramble", // 4: Q2 sight words in sentences
+                            "fill_in_blanks",    // 5: VCV open syllable (Pi-lot, Si-lent)
+                            "fill_in_blanks",    // 6: VCCV closed syllable (Bas-ket)
+                            "sentence_scramble", // 7: Action sight words in stories
+                            "minimal_pairs",     // 8: Antonym pairs (near-far, cold-hot)
+                            "timed_trail",       // 9: Comparison MCQ (better/best)
+                            "sentence_scramble", // 10: Abstract words in sentences
+                            "timed_trail",       // 11: Definitions MCQ
+                            "sentence_scramble"  // 12: Spatial direction sentences
+                    };
                     return phonicsGames[(nodeNum - 1) % phonicsGames.length];
 
                 case "vocabulary":

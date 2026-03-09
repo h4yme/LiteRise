@@ -20,9 +20,14 @@ import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.GameContentRequest;
+import com.example.literise.models.GameContentResponse;
 import com.example.literise.models.SaveGameResultRequest;
+import com.example.literise.models.LessonContentResponse;
 import com.example.literise.models.SaveGameResultResponse;
 import com.example.literise.utils.DemoDataProvider;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import java.util.ArrayList;
@@ -167,7 +172,85 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void loadQuestions() {
-        // Try to generate questions from the lesson the student just completed
+        String lessonContent = getIntent().getStringExtra("lesson_content");
+        if (lessonContent != null && !lessonContent.isEmpty() && nodeId > 0) {
+            generateWithAI(nodeId, lessonContent);
+        } else if (nodeId > 0) {
+            int placementLevel = getIntent().getIntExtra("placement_level", 2);
+            ApiService fetchService = ApiClient.getClient(this).create(ApiService.class);
+            fetchService.getLessonContent(nodeId, placementLevel)
+                    .enqueue(new Callback<LessonContentResponse>() {
+                        @Override
+                        public void onResponse(Call<LessonContentResponse> call, Response<LessonContentResponse> response) {
+                            if (response.isSuccessful() && response.body() != null
+                                    && response.body().getLesson() != null
+                                    && response.body().getLesson().getContent() != null) {
+                                generateWithAI(nodeId, response.body().getLesson().getContent());
+                            } else {
+                                loadFallbackQuestions();
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<LessonContentResponse> call, Throwable t) {
+                            loadFallbackQuestions();
+                        }
+                    });
+        } else {
+            loadFallbackQuestions();
+        }
+    }
+
+    private void generateWithAI(int nodeId, String lessonContent) {
+        ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
+        aiService.generateGameContent(new GameContentRequest(nodeId, "fill_in_blanks", lessonContent))
+                .enqueue(new Callback<GameContentResponse>() {
+                    @Override
+                    public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success
+                                && response.body().content != null) {
+                            try {
+                                JsonArray arr = response.body().content.getAsJsonArray("questions");
+                                List<DemoDataProvider.FillQuestion> aiQs = new ArrayList<>();
+                                for (int i = 0; i < arr.size(); i++) {
+                                    JsonObject obj = arr.get(i).getAsJsonObject();
+                                    String before  = obj.get("beforeBlank").getAsString();
+                                    String after   = obj.has("afterBlank") ? obj.get("afterBlank").getAsString() : "";
+                                    String correct = obj.get("correctAnswer").getAsString();
+                                    JsonArray opts = obj.getAsJsonArray("options");
+                                    List<String> wrongList = new ArrayList<>();
+                                    for (int j = 0; j < opts.size(); j++) {
+                                        String opt = opts.get(j).getAsString();
+                                        if (!opt.equalsIgnoreCase(correct)) wrongList.add(opt);
+                                    }
+                                    aiQs.add(new DemoDataProvider.FillQuestion(
+                                            before, after, correct,
+                                            wrongList.toArray(new String[0]), moduleDomain));
+                                }
+                                if (!aiQs.isEmpty()) {
+                                    questions = aiQs;
+                                    loadQuestion(0);
+                                    return;
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.w("FillInBlanks", "AI parse error: " + e.getMessage());
+                            }
+                        } else {
+                            android.util.Log.w("FillInBlanks", "AI generate failed: code=" + response.code()
+                                    + " msg=" + (response.body() != null ? response.body().message : "null"));
+                        }
+                        loadFallbackQuestions();
+                    }
+
+                    @Override
+                    public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                        android.util.Log.w("FillInBlanks", "AI generate network error: " + t.getMessage());
+                        loadFallbackQuestions();
+                    }
+                });
+    }
+
+    private void loadFallbackQuestions() {
+        // Try to generate questions from the lesson JSON if available
         try {
             String lessonContent = getIntent().getStringExtra("lesson_content");
             if (lessonContent != null) {
@@ -468,6 +551,9 @@ public class FillInTheBlanksActivity extends BaseGameActivity {
     }
 
     private void saveGameResult(int xpEarned, int accuracy, int timeSeconds) {
+        // Mark game phase complete in StudentNodeProgress
+        markGamePhaseComplete(nodeId);
+
         int studentId = session.getStudentId();
         SaveGameResultRequest request = new SaveGameResultRequest.Builder(
                 studentId, "FillInTheBlanks", xpEarned)
