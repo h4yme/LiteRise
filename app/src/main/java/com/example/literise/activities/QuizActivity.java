@@ -223,6 +223,7 @@ public class QuizActivity extends AppCompatActivity {
      */
     private void handleNextButton() {
         if (selectedOptionIndex == -1) return;
+        if (currentQuestionIndex >= questions.size()) return;
 
         QuizQuestionsResponse.Question currentQuestion = questions.get(currentQuestionIndex);
 
