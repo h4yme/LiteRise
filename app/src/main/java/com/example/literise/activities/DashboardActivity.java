@@ -512,7 +512,7 @@ public class DashboardActivity extends BaseActivity {
         if (moduleName.contains("Phonics"))       return "Phonics";
         if (moduleName.contains("Vocabulary"))    return "Vocabulary";
         if (moduleName.contains("Grammar"))       return "Grammar";
-        if (moduleName.contains("Comprehend"))    return "Comprehension";
+        if (moduleName.contains("Comprehend"))    return "Comprehending";
         if (moduleName.contains("Creating") || moduleName.contains("Composing")) return "Writing";
         return "General";
     }
