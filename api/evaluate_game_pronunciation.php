@@ -157,9 +157,44 @@ try {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/**
+ * Map digit characters/strings to their English word equivalents and vice-versa
+ * so that "8" and "eight" (and similar pairs) are treated as the same token.
+ */
+function normalizeNumbers($text) {
+    static $digitToWord = [
+        '0' => 'zero',  '1' => 'one',   '2' => 'two',   '3' => 'three',
+        '4' => 'four',  '5' => 'five',  '6' => 'six',   '7' => 'seven',
+        '8' => 'eight', '9' => 'nine',  '10' => 'ten',  '11' => 'eleven',
+        '12' => 'twelve', '13' => 'thirteen', '14' => 'fourteen',
+        '15' => 'fifteen', '16' => 'sixteen', '17' => 'seventeen',
+        '18' => 'eighteen', '19' => 'nineteen', '20' => 'twenty',
+    ];
+    static $wordToDigit = null;
+    if ($wordToDigit === null) {
+        $wordToDigit = array_flip($digitToWord);
+    }
+
+    // Replace each whitespace-separated token if it matches a known mapping.
+    $tokens = preg_split('/(\s+)/', $text, -1, PREG_SPLIT_DELIM_CAPTURE);
+    foreach ($tokens as &$tok) {
+        $lower = strtolower($tok);
+        if (isset($digitToWord[$lower])) {
+            $tok = $digitToWord[$lower];
+        } elseif (isset($wordToDigit[$lower])) {
+            $tok = $wordToDigit[$lower];
+        }
+    }
+    return implode('', $tokens);
+}
+
 function gamePronScore($recognized, $target, $confidence, $isPassage) {
     $recognized = strtolower(trim($recognized));
     $target     = strtolower(trim($target));
+
+    // Normalize numeric tokens so "8" == "eight", "2" == "two", etc.
+    $recognized = normalizeNumbers($recognized);
+    $target     = normalizeNumbers($target);
     if (empty($recognized)) return 0.0;
 
     if ($isPassage) {
