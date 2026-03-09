@@ -92,19 +92,39 @@
                 android:drawablePadding="8dp" />
         </LinearLayout>
 
-        <!-- Avatar -->
+        <!-- Avatar track row -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="56dp"
+            android:layout_marginBottom="4dp">
 
-            <ImageView
-                android:id="@+id/iv_avatar"
+            <!-- Finish flag marker -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end|center_vertical"
+                android:text="🏁"
+                android:textSize="22sp"/>
+
+            <!-- Running avatar container -->
+            <FrameLayout
+                android:id="@+id/avatarContainer"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:src="@drawable/ic_avatar_running"
                 android:layout_gravity="start|center_vertical"
-                android:contentDescription="Running Avatar" />
+                android:background="@drawable/bg_circle_purple">
+
+                <ImageView
+                    android:id="@+id/iv_avatar"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_avatar_running"
+                    app:tint="@color/white"
+                    android:contentDescription="Running Avatar"/>
+
+            </FrameLayout>
+
         </FrameLayout>
 
         <!-- Progress Track -->

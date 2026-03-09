@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.tts.TextToSpeech;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ProgressBar;
@@ -236,8 +237,7 @@ public class MinimalPairsActivity extends BaseGameActivity {
         super.onRequestPermissionsResult(code, p, r);
         if (code == REQUEST_RECORD_AUDIO
                 && (r.length == 0 || r[0] != PackageManager.PERMISSION_GRANTED)) {
-            android.widget.Toast.makeText(this, "Microphone permission required",
-                    android.widget.Toast.LENGTH_LONG).show();
+            com.example.literise.utils.CustomToast.showError(this, "Microphone permission required");
             finish();
         }
     }
@@ -480,24 +480,74 @@ public class MinimalPairsActivity extends BaseGameActivity {
         int xpEarned = correctCount * 10 + (avgAcc / 10);
 
         markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
+        showResultDialog(accuracy, avgAcc, xpEarned);
+    }
 
-        new AlertDialog.Builder(this)
-                .setTitle("Pronunciation Practice Complete! 🎤")
-                .setMessage(
-                        "Correct: " + correctCount + " / " + totalPairs
-                        + "\nAccuracy: " + accuracy + "%"
-                        + "\nAvg pronunciation: " + avgAcc + "%"
-                        + "\n\nXP Earned: +" + xpEarned)
-                .setPositiveButton("Finish", (d, w) -> {
-                    android.content.Intent result = new android.content.Intent();
-                    result.putExtra("xp_earned", xpEarned);
-                    result.putExtra("accuracy", accuracy);
-                    setResult(RESULT_OK, result);
-                    finish();
-                })
-                .setNegativeButton("Practice Again", (d, w) -> restartGame())
-                .setCancelable(false)
-                .show();
+    private void showResultDialog(int accuracy, int avgAccuracy, int xpEarned) {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_game_result, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView tvResultTitle    = dialogView.findViewById(R.id.tvResultTitle);
+        TextView tvResultSubtitle = dialogView.findViewById(R.id.tvResultSubtitle);
+        TextView tvResultScore    = dialogView.findViewById(R.id.tvResultScore);
+        TextView tvResultAccuracy = dialogView.findViewById(R.id.tvResultAccuracy);
+        TextView tvResultStreak   = dialogView.findViewById(R.id.tvResultStreak);
+        TextView tvResultTime     = dialogView.findViewById(R.id.tvResultTime);
+        TextView tvResultXP       = dialogView.findViewById(R.id.tvResultXP);
+        TextView tvLabelScore     = dialogView.findViewById(R.id.tvLabelScore);
+        TextView tvLabelAccuracy  = dialogView.findViewById(R.id.tvLabelAccuracy);
+        TextView tvLabelStreak    = dialogView.findViewById(R.id.tvLabelStreak);
+        TextView tvLabelTime      = dialogView.findViewById(R.id.tvLabelTime);
+        com.google.android.material.button.MaterialButton btnFinish    = dialogView.findViewById(R.id.btnFinish);
+        com.google.android.material.button.MaterialButton btnPlayAgain = dialogView.findViewById(R.id.btnPlayAgain);
+
+        if (accuracy >= 80) {
+            tvResultTitle.setText("Pronunciation Pro! 🎤");
+            tvResultSubtitle.setText("Excellent speaking skills!");
+        } else if (accuracy >= 60) {
+            tvResultTitle.setText("Great Effort! 🎤");
+            tvResultSubtitle.setText("Keep practicing your sounds!");
+        } else {
+            tvResultTitle.setText("Keep Practicing! 🎤");
+            tvResultSubtitle.setText("Every word makes you better!");
+        }
+
+        tvLabelScore.setText("Correct");
+        tvLabelAccuracy.setText("Accuracy");
+        tvLabelStreak.setText("Avg Pronun.");
+        tvLabelTime.setText("Total Words");
+
+        tvResultScore.setText(correctCount + "/" + totalPairs);
+        tvResultAccuracy.setText(accuracy + "%");
+        tvResultStreak.setText(avgAccuracy + "%");
+        tvResultTime.setText(String.valueOf(totalPairs));
+        tvResultXP.setText("+" + xpEarned + " XP");
+
+        btnPlayAgain.setVisibility(View.VISIBLE);
+
+        btnFinish.setOnClickListener(v -> {
+            dialog.dismiss();
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", xpEarned);
+            result.putExtra("accuracy", accuracy);
+            setResult(RESULT_OK, result);
+            finish();
+        });
+
+        btnPlayAgain.setOnClickListener(v -> {
+            dialog.dismiss();
+            restartGame();
+        });
+
+        dialog.show();
     }
 
     private void restartGame() {

@@ -3,15 +3,17 @@ package com.example.literise.activities.games;
 import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.LayoutInflater;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
+
+import com.example.literise.utils.CustomToast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
@@ -53,7 +55,7 @@ public class TimedTrailActivity extends BaseGameActivity {
     private ImageView btnBack;
     private TextView tvTimer, tvScore, tvStreak, tvQuestion, tvProgress;
     private ProgressBar progressTrack;
-    private ImageView ivAvatar;
+    private android.view.View ivAvatar; // avatarContainer for movement
     private LinearLayout optionsContainer;
     private MaterialButton btnOption1, btnOption2, btnOption3, btnOption4;
     private CardView cardQuestion;
@@ -190,7 +192,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         tvQuestion = findViewById(R.id.tv_question);
         tvProgress = findViewById(R.id.tv_progress);
         progressTrack = findViewById(R.id.progress_track);
-        ivAvatar = findViewById(R.id.iv_avatar);
+        ivAvatar = findViewById(R.id.avatarContainer);
         optionsContainer = findViewById(R.id.options_container);
         btnOption1 = findViewById(R.id.btn_option_1);
         btnOption2 = findViewById(R.id.btn_option_2);
@@ -367,7 +369,7 @@ public class TimedTrailActivity extends BaseGameActivity {
             @Override
             public void onFinish() {
                 // Time's up - no distance gained, streak broken
-                Toast.makeText(TimedTrailActivity.this, "Time's up! Keep going!", Toast.LENGTH_SHORT).show();
+                CustomToast.showWarning(TimedTrailActivity.this, "Time's up! Keep going!");
                 currentStreak = 0;
                 updateStreakDisplay();
                 currentQuestionIndex++;
@@ -418,7 +420,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         String message = currentStreak >= 3
                 ? String.format("Correct! +%dm (Streak Bonus!)", distanceGained)
                 : String.format("Correct! +%dm", distanceGained);
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        CustomToast.showSuccess(this, message);
 
         // Next question after delay
         cardQuestion.postDelayed(() -> {
@@ -436,7 +438,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         highlightCorrectButton(correctIndex);
         updateStreakDisplay();
 
-        Toast.makeText(this, "Wrong! Streak broken!", Toast.LENGTH_SHORT).show();
+        CustomToast.showError(this, "Wrong! Streak broken!");
 
         // Next question after delay
         cardQuestion.postDelayed(() -> {
@@ -450,17 +452,23 @@ public class TimedTrailActivity extends BaseGameActivity {
         // Update progress bar
         int newProgress = Math.min(distanceTraveled, 100);
         ObjectAnimator progressAnimator = ObjectAnimator.ofInt(progressTrack, "progress", newProgress);
-        progressAnimator.setDuration(1000);
+        progressAnimator.setDuration(800);
         progressAnimator.setInterpolator(new DecelerateInterpolator());
         progressAnimator.start();
 
-        // Animate avatar jumping forward
-        ivAvatar.animate()
-                .translationYBy(-50f)
-                .setDuration(250)
-                .withEndAction(() ->
-                        ivAvatar.animate().translationYBy(50f).setDuration(250).start()
-                ).start();
+        // Move avatar horizontally along the track to match progress
+        progressTrack.post(() -> {
+            int trackWidth = progressTrack.getWidth();
+            int avatarWidth = ivAvatar.getWidth();
+            float targetX = (newProgress / 100f) * (trackWidth - avatarWidth);
+            ivAvatar.animate()
+                    .x(targetX)
+                    .translationYBy(-30f)
+                    .setDuration(400)
+                    .withEndAction(() ->
+                            ivAvatar.animate().translationYBy(30f).setDuration(300).start()
+                    ).start();
+        });
     }
 
     private void updateScoreDisplay() {
@@ -551,25 +559,72 @@ public class TimedTrailActivity extends BaseGameActivity {
     }
 
     private void showEndDialog(int accuracy, int xpEarned) {
-        new AlertDialog.Builder(this)
-                .setTitle("Race Complete! 🏁")
-                .setMessage(
-                        "Distance: " + distanceTraveled + "m\n" +
-                                "Correct: " + correctAnswers + " / " + totalQuestions + "\n" +
-                                "Accuracy: " + accuracy + "%\n" +
-                                "Best Streak: " + maxStreak + "\n\n" +
-                                "XP Earned: +" + xpEarned
-                )
-                .setPositiveButton("Finish", (d, w) -> {
-                    android.content.Intent result = new android.content.Intent();
-                    result.putExtra("xp_earned", xpEarned);
-                    result.putExtra("accuracy", accuracy);
-                    setResult(RESULT_OK, result);
-                    finish();
-                })
-                .setNegativeButton("Play Again", (d, w) -> restartGame())
-                .setCancelable(false)
-                .show();
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_game_result, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView tvResultTitle    = dialogView.findViewById(R.id.tvResultTitle);
+        TextView tvResultSubtitle = dialogView.findViewById(R.id.tvResultSubtitle);
+        TextView tvResultScore    = dialogView.findViewById(R.id.tvResultScore);
+        TextView tvResultAccuracy = dialogView.findViewById(R.id.tvResultAccuracy);
+        TextView tvResultStreak   = dialogView.findViewById(R.id.tvResultStreak);
+        TextView tvResultTime     = dialogView.findViewById(R.id.tvResultTime);
+        TextView tvResultXP       = dialogView.findViewById(R.id.tvResultXP);
+        TextView tvLabelScore     = dialogView.findViewById(R.id.tvLabelScore);
+        TextView tvLabelAccuracy  = dialogView.findViewById(R.id.tvLabelAccuracy);
+        TextView tvLabelStreak    = dialogView.findViewById(R.id.tvLabelStreak);
+        TextView tvLabelTime      = dialogView.findViewById(R.id.tvLabelTime);
+        com.google.android.material.button.MaterialButton btnFinish    = dialogView.findViewById(R.id.btnFinish);
+        com.google.android.material.button.MaterialButton btnPlayAgain = dialogView.findViewById(R.id.btnPlayAgain);
+
+        long timeTaken = (System.currentTimeMillis() - startTime) / 1000;
+
+        if (distanceTraveled >= 100) {
+            tvResultTitle.setText("Race Complete! 🏁");
+            tvResultSubtitle.setText("You crossed the finish line!");
+        } else if (accuracy >= 70) {
+            tvResultTitle.setText("Great Race! 🏃");
+            tvResultSubtitle.setText("Solid performance on the track!");
+        } else {
+            tvResultTitle.setText("Race Finished! 🏁");
+            tvResultSubtitle.setText("Keep practicing to go further!");
+        }
+
+        tvLabelScore.setText("Distance");
+        tvLabelAccuracy.setText("Accuracy");
+        tvLabelStreak.setText("Best Streak");
+        tvLabelTime.setText("Time");
+
+        tvResultScore.setText(distanceTraveled + "m");
+        tvResultAccuracy.setText(accuracy + "%");
+        tvResultStreak.setText(String.valueOf(maxStreak));
+        tvResultTime.setText(String.format(Locale.getDefault(), "%d:%02d", timeTaken / 60, timeTaken % 60));
+        tvResultXP.setText("+" + xpEarned + " XP");
+
+        btnPlayAgain.setVisibility(android.view.View.VISIBLE);
+
+        btnFinish.setOnClickListener(v -> {
+            dialog.dismiss();
+            android.content.Intent result = new android.content.Intent();
+            result.putExtra("xp_earned", xpEarned);
+            result.putExtra("accuracy", accuracy);
+            setResult(RESULT_OK, result);
+            finish();
+        });
+
+        btnPlayAgain.setOnClickListener(v -> {
+            dialog.dismiss();
+            restartGame();
+        });
+
+        dialog.show();
     }
 
     /** Plays a Lottie animation once, hiding it when done. */
@@ -595,6 +650,7 @@ public class TimedTrailActivity extends BaseGameActivity {
         distanceTraveled = 0;
 
         progressTrack.setProgress(0);
+        ivAvatar.setX(0f);
         tvScore.setText("0m");
         tvStreak.setText("Streak: 0");
         tvProgress.setText("0 / 100m");

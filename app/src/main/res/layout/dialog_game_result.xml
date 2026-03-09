@@ -1,440 +1,292 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
-
     android:layout_height="wrap_content"
-
     android:layout_margin="24dp"
-
-    app:cardCornerRadius="24dp"
-
-    app:cardElevation="8dp"
-
+    app:cardCornerRadius="28dp"
+    app:cardElevation="24dp"
     app:cardBackgroundColor="@color/white">
 
-
-
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        android:orientation="vertical"
-
-        android:padding="24dp"
-
-        android:gravity="center_horizontal">
-
-
-
-        <!-- Trophy Icon -->
-
-        <ImageView
-
-            android:id="@+id/ivTrophy"
-
-            android:layout_width="80dp"
-
-            android:layout_height="80dp"
-
-            android:src="@drawable/ic_trophy"
-
-            app:tint="@color/color_sunglow"
-
-            android:layout_marginBottom="16dp" />
-
-
-
-        <!-- Title -->
-
-        <TextView
-
-            android:id="@+id/tvResultTitle"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:text="Great Job!"
-
-            android:textSize="28sp"
-
-            android:textStyle="bold"
-
-            android:textColor="@color/text_primary"
-
-            android:fontFamily="sans-serif-medium"
-
-            android:layout_marginBottom="24dp" />
-
-
-
-        <!-- Stats Grid -->
-
+        <!-- Gradient Header -->
         <LinearLayout
-
             android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:background="@drawable/bg_result_header">
 
-            android:layout_height="wrap_content"
-
-            android:orientation="horizontal"
-
-            android:layout_marginBottom="16dp">
-
-
-
-            <!-- Score -->
-
-            <LinearLayout
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:orientation="vertical"
-
-                android:gravity="center"
-
-                android:padding="12dp">
-
-
+            <!-- Trophy circle -->
+            <FrameLayout
+                android:layout_width="72dp"
+                android:layout_height="72dp"
+                android:background="@drawable/bg_circle_white_alpha">
 
                 <ImageView
+                    android:id="@+id/ivTrophy"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_trophy"
+                    app:tint="@color/color_sunglow"/>
 
-                    android:layout_width="24dp"
-
-                    android:layout_height="24dp"
-
-                    android:src="@drawable/ic_star"
-
-                    app:tint="@color/color_sunglow"
-
-                    android:layout_marginBottom="4dp" />
-
-
-
-                <TextView
-
-                    android:id="@+id/tvResultScore"
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="0"
-
-                    android:textSize="24sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="@color/text_primary" />
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Score"
-
-                    android:textSize="12sp"
-
-                    android:textColor="@color/gray_dark" />
-
-            </LinearLayout>
-
-
-
-            <!-- Accuracy -->
-
-            <LinearLayout
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:orientation="vertical"
-
-                android:gravity="center"
-
-                android:padding="12dp">
-
-
-
-                <ImageView
-
-                    android:layout_width="24dp"
-
-                    android:layout_height="24dp"
-
-                    android:src="@drawable/ic_success"
-
-                    app:tint="@color/color_jade1"
-
-                    android:layout_marginBottom="4dp" />
-
-
-
-                <TextView
-
-                    android:id="@+id/tvResultAccuracy"
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="0%"
-
-                    android:textSize="24sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="@color/text_primary" />
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Accuracy"
-
-                    android:textSize="12sp"
-
-                    android:textColor="@color/gray_dark" />
-
-            </LinearLayout>
+            </FrameLayout>
 
         </LinearLayout>
 
-
-
-        <!-- Second Row Stats -->
-
+        <!-- Body content -->
         <LinearLayout
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:gravity="center_horizontal">
 
-            android:orientation="horizontal"
-
-            android:layout_marginBottom="24dp">
-
-
-
-            <!-- Streak -->
-
-            <LinearLayout
-
-                android:layout_width="0dp"
-
+            <!-- Title -->
+            <TextView
+                android:id="@+id/tvResultTitle"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:orientation="vertical"
-
-                android:gravity="center"
-
-                android:padding="12dp">
-
-
-
-                <ImageView
-
-                    android:layout_width="24dp"
-
-                    android:layout_height="24dp"
-
-                    android:src="@drawable/ic_badge"
-
-                    app:tint="@color/color_warning"
-
-                    android:layout_marginBottom="4dp" />
-
-
-
-                <TextView
-
-                    android:id="@+id/tvResultStreak"
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="0"
-
-                    android:textSize="24sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="@color/text_primary" />
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Max Streak"
-
-                    android:textSize="12sp"
-
-                    android:textColor="@color/gray_dark" />
-
-            </LinearLayout>
-
-
-
-            <!-- Time -->
-
-            <LinearLayout
-
-                android:layout_width="0dp"
-
-                android:layout_height="wrap_content"
-
-                android:layout_weight="1"
-
-                android:orientation="vertical"
-
-                android:gravity="center"
-
-                android:padding="12dp">
-
-
-
-                <ImageView
-
-                    android:layout_width="24dp"
-
-                    android:layout_height="24dp"
-
-                    android:src="@drawable/ic_timer"
-
-                    app:tint="@color/color_info_bg"
-
-                    android:layout_marginBottom="4dp" />
-
-
-
-                <TextView
-
-                    android:id="@+id/tvResultTime"
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="0:00"
-
-                    android:textSize="24sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="@color/text_primary" />
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Time"
-
-                    android:textSize="12sp"
-
-                    android:textColor="@color/gray_dark" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-
-        <!-- XP Earned Badge -->
-
-        <androidx.cardview.widget.CardView
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:layout_marginBottom="24dp"
-
-            app:cardCornerRadius="20dp"
-
-            app:cardElevation="0dp"
-
-            app:cardBackgroundColor="@color/color_sunglow">
-
-
+                android:text="Great Job!"
+                android:textSize="26sp"
+                android:fontFamily="@font/poppins_bold"
+                android:textColor="@color/text_primary"
+                android:layout_marginBottom="6dp"/>
 
             <TextView
-
-                android:id="@+id/tvResultXP"
-
+                android:id="@+id/tvResultSubtitle"
                 android:layout_width="wrap_content"
-
                 android:layout_height="wrap_content"
+                android:text="You did awesome!"
+                android:textSize="13sp"
+                android:fontFamily="@font/poppins"
+                android:textColor="@color/gray_dark"
+                android:layout_marginBottom="20dp"/>
 
-                android:paddingHorizontal="24dp"
+            <!-- Stats Row 1: Score + Accuracy -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
 
-                android:paddingVertical="12dp"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="14dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_stat_card">
 
-                android:text="+500 XP"
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_star"
+                        app:tint="@color/color_sunglow"
+                        android:layout_marginBottom="4dp"/>
 
-                android:textSize="18sp"
+                    <TextView
+                        android:id="@+id/tvResultScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textColor="@color/text_primary"/>
 
-                android:textStyle="bold"
+                    <TextView
+                        android:id="@+id/tvLabelScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Score"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/gray_dark"/>
 
-                android:textColor="@color/white" />
+                </LinearLayout>
 
-        </androidx.cardview.widget.CardView>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="14dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_stat_card">
 
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_success"
+                        app:tint="@color/color_jade1"
+                        android:layout_marginBottom="4dp"/>
 
+                    <TextView
+                        android:id="@+id/tvResultAccuracy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0%"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textColor="@color/text_primary"/>
 
-        <!-- Finish Button -->
+                    <TextView
+                        android:id="@+id/tvLabelAccuracy"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Accuracy"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/gray_dark"/>
 
-        <com.google.android.material.button.MaterialButton
+                </LinearLayout>
 
-            android:id="@+id/btnFinish"
+            </LinearLayout>
 
-            android:layout_width="match_parent"
+            <!-- Stats Row 2: Streak + Time/Extra -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="20dp">
 
-            android:layout_height="56dp"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="14dp"
+                    android:layout_marginEnd="6dp"
+                    android:background="@drawable/bg_stat_card">
 
-            android:text="Continue"
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_fire"
+                        app:tint="@color/combo_orange"
+                        android:layout_marginBottom="4dp"/>
 
-            android:textSize="16sp"
+                    <TextView
+                        android:id="@+id/tvResultStreak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textColor="@color/text_primary"/>
 
-            android:textStyle="bold"
+                    <TextView
+                        android:id="@+id/tvLabelStreak"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Best Streak"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/gray_dark"/>
 
-            android:textColor="@color/white"
+                </LinearLayout>
 
-            app:backgroundTint="@color/color_jade1"
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="14dp"
+                    android:layout_marginStart="6dp"
+                    android:background="@drawable/bg_stat_card">
 
-            app:cornerRadius="16dp" />
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_timer"
+                        app:tint="@color/color_info_bg"
+                        android:layout_marginBottom="4dp"/>
 
+                    <TextView
+                        android:id="@+id/tvResultTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0:00"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/poppins_bold"
+                        android:textColor="@color/text_primary"/>
 
+                    <TextView
+                        android:id="@+id/tvLabelTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Time"
+                        android:textSize="11sp"
+                        android:fontFamily="@font/poppins"
+                        android:textColor="@color/gray_dark"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- XP Badge -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="4dp"
+                app:cardBackgroundColor="@color/color_sunglow">
+
+                <TextView
+                    android:id="@+id/tvResultXP"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingHorizontal="28dp"
+                    android:paddingVertical="10dp"
+                    android:text="+500 XP"
+                    android:textSize="17sp"
+                    android:fontFamily="@font/poppins_bold"
+                    android:textColor="@color/white"/>
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Continue Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnFinish"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Continue"
+                android:textSize="16sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/color_jade1"
+                app:cornerRadius="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"/>
+
+            <!-- Play Again Button (hidden by default) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnPlayAgain"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="Play Again"
+                android:textSize="15sp"
+                android:fontFamily="@font/poppins_semibold"
+                android:textColor="@color/purple_600"
+                app:backgroundTint="@color/gray_light"
+                app:cornerRadius="16dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 
