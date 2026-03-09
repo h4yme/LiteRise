@@ -71,6 +71,22 @@ try {
                 WHERE StudentID = ? AND SupplementalNodeID = ?
             ");
             $stmt->execute([$studentId, $nodeId]);
+
+            // Unlock the parent core node by marking its quiz as completed
+            $stmtAfter = $conn->prepare("
+                SELECT AfterNodeID FROM SupplementalNodes WHERE SupplementalNodeID = ?
+            ");
+            $stmtAfter->execute([$nodeId]);
+            $afterNodeId = $stmtAfter->fetchColumn();
+
+            if ($afterNodeId) {
+                $stmt = $conn->prepare("
+                    UPDATE StudentNodeProgress
+                    SET QuizCompleted = 1
+                    WHERE StudentID = ? AND NodeID = ?
+                ");
+                $stmt->execute([$studentId, $afterNodeId]);
+            }
         }
         // game/quiz phases on supplemental nodes are no-ops
         http_response_code(200);
