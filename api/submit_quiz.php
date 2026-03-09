@@ -301,7 +301,9 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
         } else {
             $stmt = $conn->prepare("
                 UPDATE StudentNodeProgress
-                SET QuizCompleted = 1,
+                SET LessonCompleted = 1,
+                    GameCompleted = 1,
+                    QuizCompleted = 1,
                     LatestQuizScore = ?,
                     BestQuizScore = CASE WHEN ISNULL(BestQuizScore, 0) < ? THEN ? ELSE BestQuizScore END,
                     NodeState = 'COMPLETED',
