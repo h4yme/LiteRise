@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
-import com.example.literise.activities.games.SynonymSprintActivity;
-import com.example.literise.activities.games.WordExplosionActivity;
 import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -54,10 +52,6 @@ public class DashboardActivity extends BaseActivity {
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
     private List<LearningModule> modules;
-
-    // Game testing buttons
-    private MaterialButton btnTestPhonicsNinja, btnTestSynonymSprint, btnTestWordExplosion;
-    private MaterialButton btnTestSentenceChef, btnTestWordHunt, btnTestSentenceScramble;
 
     // Custom Bottom Navigation Views
     private LinearLayout navHome, navModules, navProgress, navProfile;
@@ -191,14 +185,6 @@ public class DashboardActivity extends BaseActivity {
 
         stepIndicatorContainer = findViewById(R.id.stepIndicatorContainer);
 
-        // Game testing buttons
-        btnTestPhonicsNinja = findViewById(R.id.btnTestPhonicsNinja);
-        btnTestSynonymSprint = findViewById(R.id.btnTestSynonymSprint);
-        btnTestWordExplosion = findViewById(R.id.btnTestWordExplosion);
-        btnTestSentenceChef = findViewById(R.id.btnTestSentenceChef);
-        btnTestWordHunt = findViewById(R.id.btnTestWordHunt);
-        btnTestSentenceScramble = findViewById(R.id.btnTestSentenceScramble);
-
     }
 
 
@@ -226,71 +212,6 @@ public class DashboardActivity extends BaseActivity {
         // Show tutorial on first visit
 
         showTutorialIfFirstTime();
-
-        // Game testing button listeners
-        setupGameTestListeners();
-
-    }
-
-    /**
-     * Setup game testing button listeners
-     */
-    private void setupGameTestListeners() {
-        // Phonics Ninja - ACTIVE
-       /* btnTestPhonicsNinja.setOnClickListener(v -> {
-            Intent intent = new Intent(this, PhonicsNinjaActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            intent.putExtra("target_pattern", "CVCC");
-            startActivity(intent);
-        });*/
-
-        btnTestSynonymSprint.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SynonymSprintActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            intent.putExtra("target_word", "happy");
-            startActivity(intent);
-        });
-
-        // Word Explosion - Coming soon
-        // Word Explosion - ACTIVE
-        btnTestWordExplosion.setOnClickListener(v -> {
-            Intent intent = new Intent(this, WordExplosionActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            startActivity(intent);
-        });
-
-
-        // Sentence Chef - Coming soon
-        btnTestSentenceChef.setOnClickListener(v -> {
-            Toast.makeText(this, "👨‍🍳 Sentence Chef - Coming Soon!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Word Hunt - If exists
-        btnTestWordHunt.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.WordHuntActivity"));
-                intent.putExtra("node_id", 1);
-                intent.putExtra("student_id", session.getStudentId());
-                startActivity(intent);
-            } catch (ClassNotFoundException e) {
-                Toast.makeText(this, "🔍 Word Hunt - Activity not found", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Sentence Scramble - If exists
-        btnTestSentenceScramble.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.SentenceScrambleActivity"));
-                intent.putExtra("node_id", 1);
-                intent.putExtra("student_id", session.getStudentId());
-                startActivity(intent);
-            } catch (ClassNotFoundException e) {
-                Toast.makeText(this, "🔀 Sentence Scramble - Activity not found", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
 
