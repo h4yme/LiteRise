@@ -32,6 +32,7 @@ import com.example.literise.models.ModuleLadderResponse;
 import com.example.literise.models.NodeData;
 import com.example.literise.models.NodeProgressResponse;
 import com.example.literise.models.NodeView;
+import com.example.literise.models.SupplementalNodeData;
 import com.example.literise.views.ModulePathView;
 
 import java.util.ArrayList;
@@ -364,6 +365,36 @@ public class ModuleLadderActivity extends AppCompatActivity {
         int progress = (completedNodes * 100) / nodeViews.size();
         moduleProgress.setProgress(progress);
         progressText.setText(progress + "%");
+
+        // Show prompt for any pending INTERVENTION nodes
+        List<SupplementalNodeData> supplementalNodes = data.getSupplementalNodes();
+        if (supplementalNodes != null) {
+            for (SupplementalNodeData sn : supplementalNodes) {
+                if ("INTERVENTION".equals(sn.getNodeType()) && !sn.isCompleted()) {
+                    showInterventionPrompt(sn);
+                    break; // show one at a time
+                }
+            }
+        }
+    }
+
+    private void showInterventionPrompt(SupplementalNodeData intervention) {
+        new AlertDialog.Builder(this)
+                .setTitle("📚 Intervention Required")
+                .setMessage("Complete the remedial lesson before continuing:\n\n\"" + intervention.getTitle() + "\"")
+                .setPositiveButton("Start Intervention", (dialog, which) -> {
+                    Intent intent = new Intent(this, LessonContentActivity.class);
+                    intent.putExtra("node_id", intervention.getId());
+                    intent.putExtra("lesson_title", intervention.getTitle());
+                    intent.putExtra("module_id", moduleId);
+                    intent.putExtra("lesson_number", 0);
+                    intent.putExtra("placement_level", placementLevel);
+                    intent.putExtra("is_supplemental", true);
+                    lessonLauncher.launch(intent);
+                })
+                .setNegativeButton("Later", null)
+                .setCancelable(true)
+                .show();
     }
 
     private void handleNodeClick(NodeView node) {

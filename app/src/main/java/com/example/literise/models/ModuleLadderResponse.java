@@ -11,6 +11,9 @@ public class ModuleLadderResponse {
     @SerializedName("nodes")
     private List<NodeData> nodes;
 
+    @SerializedName("supplementalNodes")
+    private List<SupplementalNodeData> supplementalNodes;
+
     @SerializedName("currentNodeId")
     private Integer currentNodeId;  // Changed to Integer to handle null
 
@@ -27,6 +30,10 @@ public class ModuleLadderResponse {
 
     public List<NodeData> getNodes() {
         return nodes;
+    }
+
+    public List<SupplementalNodeData> getSupplementalNodes() {
+        return supplementalNodes;
     }
 
     public int getCurrentNodeId() {
