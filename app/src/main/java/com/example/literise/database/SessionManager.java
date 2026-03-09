@@ -29,6 +29,8 @@ public class SessionManager {
 
     private static final String KEY_XP = "total_xp";
 
+    private static final String KEY_STREAK = "current_streak";
+
     private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
 
     private static final String KEY_NICKNAME = "nickname";
@@ -188,6 +190,20 @@ public class SessionManager {
     public void updateTotalXP(int totalXP) {
 
         saveXP(totalXP);
+
+    }
+
+    public void saveStreak(int streak) {
+
+        editor.putInt(KEY_STREAK, streak);
+
+        editor.apply();
+
+    }
+
+    public int getStreak() {
+
+        return prefs.getInt(KEY_STREAK, 0);
 
     }
 

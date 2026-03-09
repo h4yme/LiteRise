@@ -80,8 +80,6 @@ public class DashboardActivity extends BaseActivity {
 
     private ModulePriorityManager priorityManager;
 
-    private int currentStreak = 10;
-
     private int totalBadges = 7;
 
     private int currentTutorialStep = 0;
@@ -345,7 +343,8 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d Day", currentStreak));
+        int streak = session.getStreak();
+        tvStreak.setText(String.format("%d Day", streak));
 
         tvBadges.setText(String.format("%d Badges Earned", totalBadges));
 

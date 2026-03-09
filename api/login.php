@@ -193,6 +193,8 @@ try {
 
         'LastName' => $student['LastName'],
 
+        'Nickname' => $student['Nickname'] ?? '',
+
         'email' => $student['Email'],
 
         'GradeLevel' => (int)$student['GradeLevel'],

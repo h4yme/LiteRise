@@ -31,6 +31,9 @@ public class Students {
     @SerializedName("Nickname")
     private String nickname;
 
+    @SerializedName("CurrentStreak")
+    private int currentStreak;
+
     @SerializedName("PreAssessmentCompleted")
     private boolean preAssessmentCompleted;
 
@@ -80,6 +83,9 @@ public class Students {
 
     public String getNickname() { return nickname; }
     public void setNickname(String nickname) { this.nickname = nickname; }
+
+    public int getCurrentStreak() { return currentStreak; }
+    public void setCurrentStreak(int currentStreak) { this.currentStreak = currentStreak; }
 
     public boolean isPreAssessmentCompleted() { return preAssessmentCompleted; }
     public void setPreAssessmentCompleted(boolean preAssessmentCompleted) { this.preAssessmentCompleted = preAssessmentCompleted; }
