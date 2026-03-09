@@ -277,18 +277,18 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
             SET QuizCompleted = 1,
                 LatestQuizScore = ?,
                 BestQuizScore = CASE WHEN ISNULL(BestQuizScore, 0) < ? THEN ? ELSE BestQuizScore END,
-                NodeState = ?,
+                NodeState = 'COMPLETED',
                 CompletedDate = GETDATE(),
                 AttemptCount = ISNULL(AttemptCount, 0) + 1
             WHERE StudentID = ? AND NodeID = ?
         ");
-        $stmt->execute([$scoreInt, $scoreInt, $scoreInt, $decision, $studentId, $nodeId]);
+        $stmt->execute([$scoreInt, $scoreInt, $scoreInt, $studentId, $nodeId]);
     } else {
         $stmt = $conn->prepare("
             INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted, LatestQuizScore, BestQuizScore, NodeState, CompletedDate, AttemptCount)
-            VALUES (?, ?, 1, 1, 1, ?, ?, ?, GETDATE(), 1)
+            VALUES (?, ?, 1, 1, 1, ?, ?, 'COMPLETED', GETDATE(), 1)
         ");
-        $stmt->execute([$studentId, $nodeId, $scoreInt, $scoreInt, $decision]);
+        $stmt->execute([$studentId, $nodeId, $scoreInt, $scoreInt]);
     }
 }
 
