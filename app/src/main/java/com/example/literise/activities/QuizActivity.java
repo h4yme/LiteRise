@@ -229,10 +229,10 @@ public class QuizActivity extends AppCompatActivity {
 
         String answerText = "";
         switch (selectedOptionIndex) {
-            case 0: answerText = "A"; break;
-            case 1: answerText = "B"; break;
-            case 2: answerText = "C"; break;
-            case 3: answerText = "D"; break;
+            case 0: answerText = currentQuestion.getOptionA(); break;
+            case 1: answerText = currentQuestion.getOptionB(); break;
+            case 2: answerText = currentQuestion.getOptionC(); break;
+            case 3: answerText = currentQuestion.getOptionD(); break;
         }
 
         selectedAnswers.put(currentQuestion.getQuestionId(), answerText);

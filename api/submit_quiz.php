@@ -66,24 +66,34 @@ try {
     }
     
     // Get correct answers
-    $questionIds = array_keys($answers);
+    // Use int-cast IDs to avoid PDO ODBC type-mismatch with INT column
+    $questionIds = array_map('intval', array_keys($answers));
     $placeholders = implode(',', array_fill(0, count($questionIds), '?'));
-    
+
     $stmt = $conn->prepare("
         SELECT QuestionID, CorrectAnswer
         FROM QuizQuestions
         WHERE QuestionID IN ($placeholders)
     ");
-    $stmt->execute($questionIds);
-    $correctAnswers = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
-    
+    foreach ($questionIds as $i => $qid) {
+        $stmt->bindValue($i + 1, $qid, PDO::PARAM_INT);
+    }
+    $stmt->execute();
+
+    // Build map manually — PDO::FETCH_KEY_PAIR is unreliable with MSSQL ODBC
+    $correctAnswers = [];
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+        $correctAnswers[(int)$row['QuestionID']] = trim((string)$row['CorrectAnswer']);
+    }
+
     // Calculate score
     $correctCount = 0;
     $totalQuestions = count($answers);
-    
+
     foreach ($answers as $questionId => $studentAnswer) {
-        if (isset($correctAnswers[$questionId]) && 
-            $correctAnswers[$questionId] == $studentAnswer) {
+        $id = (int)$questionId;
+        if (isset($correctAnswers[$id]) &&
+            strcasecmp($correctAnswers[$id], trim((string)$studentAnswer)) === 0) {
             $correctCount++;
         }
     }
