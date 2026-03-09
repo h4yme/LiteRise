@@ -307,12 +307,23 @@ public class ModuleLadderActivity extends AppCompatActivity {
 
         int currentNodeId = data.getCurrentNodeId();
 
+        // If currentNodeId points to an already-completed node, advance it
+        if (currentNodeId != 0) {
+            for (NodeData nd : nodesData) {
+                if (nd.getNodeId() == currentNodeId &&
+                        nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted()) {
+                    currentNodeId = 0; // reset so fallback below picks next incomplete
+                    Log.d(TAG, "currentNodeId pointed to a completed node — advancing to next incomplete");
+                    break;
+                }
+            }
+        }
         // API may return null (parsed as 0) — fall back to first incomplete node
         if (currentNodeId == 0) {
             for (NodeData nd : nodesData) {
                 if (!(nd.isLessonCompleted() && nd.isGameCompleted() && nd.isQuizCompleted())) {
                     currentNodeId = nd.getNodeId();
-                    Log.d(TAG, "currentNodeId was null, resolved to first incomplete node: " + currentNodeId);
+                    Log.d(TAG, "currentNodeId resolved to first incomplete node: " + currentNodeId);
                     break;
                 }
             }
@@ -336,15 +347,17 @@ public class ModuleLadderActivity extends AppCompatActivity {
                 continue;
             }
 
-            // Determine node state
+            // Determine node state — COMPLETED must be checked before CURRENT
+            // so a finished node whose CurrentNodeID hasn't been updated yet
+            // doesn't block the unlock chain for the next node.
             NodeView.NodeState state;
-            if (nodeData.getNodeId() == currentNodeId) {
-                state = NodeView.NodeState.CURRENT;
-            } else if (nodeData.isLessonCompleted() &&
+            if (nodeData.isLessonCompleted() &&
                     nodeData.isGameCompleted() &&
                     nodeData.isQuizCompleted()) {
                 state = NodeView.NodeState.COMPLETED;
-            } else if (nodeNumber == 1 || (i > 0 && nodeViews.get(i - 1).getState() == NodeView.NodeState.COMPLETED)) {
+            } else if (nodeData.getNodeId() == currentNodeId) {
+                state = NodeView.NodeState.CURRENT;
+            } else if (nodeNumber == 1 || (!nodeViews.isEmpty() && nodeViews.get(nodeViews.size() - 1).getState() == NodeView.NodeState.COMPLETED)) {
                 state = NodeView.NodeState.UNLOCKED;
             } else {
                 state = NodeView.NodeState.LOCKED;

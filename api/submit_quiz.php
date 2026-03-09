@@ -286,6 +286,7 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
 
     if ($exists) {
         if ($isIntervention) {
+
             // Record attempt/score only — leave NodeState and QuizCompleted as-is
             // so the next core lesson stays locked on the client
             $stmt = $conn->prepare("
@@ -323,6 +324,24 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
                 VALUES (?, ?, 1, 1, 1, ?, ?, 'COMPLETED', GETDATE(), 1)
             ");
             $stmt->execute([$studentId, $nodeId, $scoreInt, $scoreInt]);
+        }
+    }
+
+    // On pass, advance Students.CurrentNodeID to the next node in sequence
+    if (!$isIntervention) {
+        $stmt = $conn->prepare("
+            SELECT n2.NodeID
+            FROM Nodes n1
+            JOIN Nodes n2 ON n2.ModuleID = n1.ModuleID
+                          AND n2.NodeNumber = n1.NodeNumber + 1
+                          AND n2.IsActive = 1
+            WHERE n1.NodeID = ?
+        ");
+        $stmt->execute([$nodeId]);
+        $nextNodeId = $stmt->fetchColumn();
+        if ($nextNodeId) {
+            $stmt = $conn->prepare("UPDATE Students SET CurrentNodeID = ? WHERE StudentID = ?");
+            $stmt->execute([$nextNodeId, $studentId]);
         }
     }
 }
