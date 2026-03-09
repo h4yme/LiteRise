@@ -1,377 +1,232 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
-
     android:layout_height="match_parent">
 
-
-
     <!-- Gradient Background -->
-
     <View
-
         android:layout_width="match_parent"
-
         android:layout_height="match_parent"
-
-        android:background="@drawable/bg_game"/>
-
-
+        android:background="@drawable/bg_game" />
 
     <!-- Main Content -->
-
     <LinearLayout
-
         android:layout_width="match_parent"
-
         android:layout_height="match_parent"
-
         android:orientation="vertical"
-
         android:padding="16dp">
 
-
-
-        <!-- Modern Header with Score -->
-
+        <!-- Header Card -->
         <com.google.android.material.card.MaterialCardView
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
             app:cardCornerRadius="16dp"
-
             app:cardElevation="4dp"
-
-            android:layout_marginBottom="16dp"
-
-            app:cardBackgroundColor="#FFFFFF">
-
-
+            app:cardBackgroundColor="#FFFFFF"
+            android:layout_marginBottom="12dp">
 
             <LinearLayout
-
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal"
-
                 android:gravity="center_vertical"
+                android:padding="14dp">
 
-                android:padding="16dp">
-
-
-
+                <!-- Back Button -->
                 <ImageView
-
                     android:id="@+id/btnBack"
-
-                    android:layout_width="32dp"
-
-                    android:layout_height="32dp"
-
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:src="@drawable/ic_arrow_back"
-
                     app:tint="#333333"
-
                     android:clickable="true"
-
                     android:focusable="true"
-
                     android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="Back" />
 
-                    android:contentDescription="Back"/>
-
-
-
+                <!-- Title + Progress -->
                 <LinearLayout
-
                     android:layout_width="0dp"
-
                     android:layout_height="wrap_content"
-
                     android:layout_weight="1"
-
                     android:orientation="vertical"
-
                     android:layout_marginStart="12dp">
 
-
-
                     <TextView
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
                         android:text="🎤 Dialogue Reading"
-
-                        android:textSize="18sp"
-
+                        android:textSize="17sp"
                         android:textStyle="bold"
-
                         android:textColor="#333333"
-
-                        android:fontFamily="@font/poppins_bold"/>
-
-
+                        android:fontFamily="@font/poppins_bold" />
 
                     <TextView
-
                         android:id="@+id/tvProgress"
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
-                        android:text="Read: 0/6"
-
+                        android:text="0 / 0 lines read"
                         android:textSize="12sp"
-
-                        android:fontFamily="@font/poppins"
-
-                        android:textColor="#7C3AED"/>
-
+                        android:textColor="#7C3AED"
+                        android:fontFamily="@font/poppins" />
                 </LinearLayout>
 
-
-
-                <!-- Score Display -->
-
+                <!-- Score Badge -->
                 <LinearLayout
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
                     android:orientation="horizontal"
-
                     android:gravity="center"
-
                     android:background="@drawable/rounded_bg_accent"
-
                     android:padding="8dp">
 
-
-
                     <ImageView
-
                         android:layout_width="16dp"
-
                         android:layout_height="16dp"
-
                         android:src="@drawable/ic_star"
-
-                        app:tint="#FFD700"/>
-
-
+                        app:tint="#FFD700" />
 
                     <TextView
-
                         android:id="@+id/tvScore"
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
                         android:text="0"
-
                         android:textSize="14sp"
-
                         android:textStyle="bold"
-
                         android:textColor="#FFD700"
-
                         android:fontFamily="@font/poppins_bold"
-
-                        android:layout_marginStart="4dp"/>
-
+                        android:layout_marginStart="4dp" />
                 </LinearLayout>
-
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Overall Accuracy Card (hidden until first line is evaluated) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#E8F5E9"
+            android:layout_marginBottom="12dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:id="@+id/tvOverallAccuracy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Avg accuracy: 0%"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#2E7D32"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginBottom="6dp"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/pbOverallAccuracy"
+                    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="10dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#11B067"
+                    android:progressBackgroundTint="#C8E6C9"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Instructions Card -->
-
         <com.google.android.material.card.MaterialCardView
-
             android:layout_width="match_parent"
-
             android:layout_height="wrap_content"
-
-            app:cardCornerRadius="20dp"
-
-            app:cardElevation="6dp"
-
-            android:layout_marginBottom="16dp"
-
-            app:cardBackgroundColor="#E8F5E9">
-
-
+            app:cardCornerRadius="16dp"
+            app:cardElevation="3dp"
+            app:cardBackgroundColor="#EDE7F6"
+            android:layout_marginBottom="12dp">
 
             <LinearLayout
-
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
                 android:orientation="vertical"
-
-                android:padding="16dp">
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="💡 How to Play"
-
-                    android:textSize="14sp"
-
-                    android:textStyle="bold"
-
-                    android:textColor="#2E7D32"
-
-                    android:fontFamily="@font/poppins_semibold"
-
-                    android:layout_marginBottom="4dp"/>
-
-
-
-                <TextView
-
-                    android:layout_width="wrap_content"
-
-                    android:layout_height="wrap_content"
-
-                    android:text="Record yourself reading each dialogue line aloud! Tap Record, speak clearly, then tap Stop."
-
-                    android:textSize="12sp"
-
-                    android:textColor="#4CAF50"
-
-                    android:fontFamily="@font/poppins"/>
-
-            </LinearLayout>
-
-        </com.google.android.material.card.MaterialCardView>
-
-
-
-        <!-- Dialogue List Card -->
-
-        <com.google.android.material.card.MaterialCardView
-
-            android:layout_width="match_parent"
-
-            android:layout_height="0dp"
-
-            android:layout_weight="1"
-
-            app:cardCornerRadius="20dp"
-
-            app:cardElevation="6dp"
-
-            android:layout_marginBottom="16dp"
-
-            app:cardBackgroundColor="#7C3AED">
-
-
-
-            <LinearLayout
-
-                android:layout_width="match_parent"
-
-                android:layout_height="match_parent"
-
-                android:orientation="vertical"
-
                 android:padding="12dp">
 
-
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💡 How to Play"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="#5E35B1"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginBottom="4dp" />
 
                 <TextView
-
                     android:layout_width="wrap_content"
-
                     android:layout_height="wrap_content"
-
-                    android:text="💬 Dialogue Lines"
-
-                    android:textSize="14sp"
-
-                    android:textColor="@color/white"
-
-                    android:textStyle="bold"
-
-                    android:fontFamily="@font/poppins_semibold"
-
-                    android:layout_marginBottom="8dp"/>
-
-
-
-                <androidx.recyclerview.widget.RecyclerView
-
-                    android:id="@+id/recyclerDialogue"
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="0dp"
-
-                    android:layout_weight="1"
-
-                    android:clipToPadding="false"
-
-                    android:scrollbars="vertical"/>
-
+                    android:text="Tap Record on each line, read it aloud, then tap Stop. Record all lines to complete!"
+                    android:textSize="12sp"
+                    android:textColor="#7E57C2"
+                    android:fontFamily="@font/poppins" />
             </LinearLayout>
-
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Dialogue List -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="#7C3AED"
+            android:layout_marginBottom="12dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:padding="12dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="💬 Dialogue Lines"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/poppins_semibold"
+                    android:layout_marginBottom="8dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerDialogue"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:clipToPadding="false"
+                    android:scrollbars="vertical" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Complete Button -->
-
         <com.google.android.material.button.MaterialButton
-
             android:id="@+id/btnComplete"
-
             android:layout_width="match_parent"
-
             android:layout_height="60dp"
-
             android:text="Complete Reading"
-
-            android:textSize="18sp"
-
+            android:textSize="17sp"
             android:textStyle="bold"
-
             android:fontFamily="@font/poppins_bold"
-
-            app:cornerRadius="20dp"
-
-            app:backgroundTint="#10B981"
-
             android:textColor="#FFFFFF"
-
+            app:cornerRadius="20dp"
+            app:backgroundTint="#11B067"
             app:icon="@drawable/ic_check"
-
             app:iconGravity="textStart"
-
-            app:iconTint="#FFFFFF"/>
+            app:iconTint="#FFFFFF" />
 
     </LinearLayout>
-
 </FrameLayout>
