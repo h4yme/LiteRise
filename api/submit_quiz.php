@@ -271,24 +271,28 @@ function updateNodeProgress($conn, $studentId, $nodeId, $score, $decision) {
 
     $scoreInt = (int)round($score);
 
+    // Intervention means the student must redo before the node is truly complete
+    $quizCompleted = ($decision === 'ADD_INTERVENTION') ? 0 : 1;
+    $nodeState     = ($decision === 'ADD_INTERVENTION') ? 'NEEDS_INTERVENTION' : 'COMPLETED';
+
     if ($exists) {
         $stmt = $conn->prepare("
             UPDATE StudentNodeProgress
-            SET QuizCompleted = 1,
+            SET QuizCompleted = ?,
                 LatestQuizScore = ?,
                 BestQuizScore = CASE WHEN ISNULL(BestQuizScore, 0) < ? THEN ? ELSE BestQuizScore END,
-                NodeState = 'COMPLETED',
-                CompletedDate = GETDATE(),
+                NodeState = ?,
+                CompletedDate = CASE WHEN ? = 1 THEN GETDATE() ELSE CompletedDate END,
                 AttemptCount = ISNULL(AttemptCount, 0) + 1
             WHERE StudentID = ? AND NodeID = ?
         ");
-        $stmt->execute([$scoreInt, $scoreInt, $scoreInt, $studentId, $nodeId]);
+        $stmt->execute([$quizCompleted, $scoreInt, $scoreInt, $scoreInt, $nodeState, $quizCompleted, $studentId, $nodeId]);
     } else {
         $stmt = $conn->prepare("
             INSERT INTO StudentNodeProgress (StudentID, NodeID, LessonCompleted, GameCompleted, QuizCompleted, LatestQuizScore, BestQuizScore, NodeState, CompletedDate, AttemptCount)
-            VALUES (?, ?, 1, 1, 1, ?, ?, 'COMPLETED', GETDATE(), 1)
+            VALUES (?, ?, 1, 1, ?, ?, ?, ?, CASE WHEN ? = 1 THEN GETDATE() ELSE NULL END, 1)
         ");
-        $stmt->execute([$studentId, $nodeId, $scoreInt, $scoreInt]);
+        $stmt->execute([$studentId, $nodeId, $quizCompleted, $scoreInt, $scoreInt, $nodeState, $quizCompleted]);
     }
 }
 
