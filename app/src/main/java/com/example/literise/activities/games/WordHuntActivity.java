@@ -270,17 +270,17 @@ public class WordHuntActivity extends BaseGameActivity {
             // Tint timer progress bar
             if (timerProgress != null) {
                 timerProgress.setProgressTintList(
-                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
             }
 
             // Apply module color to word list card
             androidx.cardview.widget.CardView cardWordList = findViewById(R.id.cardWordList);
             if (cardWordList != null) {
                 android.graphics.drawable.GradientDrawable grad =
-                    new android.graphics.drawable.GradientDrawable(
-                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
-                        new int[]{android.graphics.Color.parseColor(colorStart),
-                                  android.graphics.Color.parseColor(colorEnd)});
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
                 float r = 16 * getResources().getDisplayMetrics().density;
                 grad.setCornerRadius(r);
                 cardWordList.setBackground(grad);
@@ -406,47 +406,47 @@ public class WordHuntActivity extends BaseGameActivity {
         ApiService svc = ApiClient.getClient(this).create(ApiService.class);
         svc.generateGameContent(new GameContentRequest(nodeId, "word_hunt", lessonContent))
                 .enqueue(new retrofit2.Callback<GameContentResponse>() {
-            @Override
-            public void onResponse(retrofit2.Call<GameContentResponse> call,
-                                   retrofit2.Response<GameContentResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().success
-                        && response.body().content != null) {
-                    try {
-                        JsonArray arr = response.body().content.getAsJsonArray("words");
-                        List<WordHuntWord> aiWords = new ArrayList<>();
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            String word       = obj.get("word").getAsString().toLowerCase();
-                            String hint       = obj.has("hint") ? obj.get("hint").getAsString() : "";
-                            String definition = obj.has("definition") ? obj.get("definition").getAsString() : "";
-                            WordHuntWord w = new WordHuntWord(i + 1, word, definition, 1.0f);
-                            w.setHint(hint);
-                            aiWords.add(w);
+                    @Override
+                    public void onResponse(retrofit2.Call<GameContentResponse> call,
+                                           retrofit2.Response<GameContentResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success
+                                && response.body().content != null) {
+                            try {
+                                JsonArray arr = response.body().content.getAsJsonArray("words");
+                                List<WordHuntWord> aiWords = new ArrayList<>();
+                                for (int i = 0; i < arr.size(); i++) {
+                                    JsonObject obj = arr.get(i).getAsJsonObject();
+                                    String word       = obj.get("word").getAsString().toLowerCase();
+                                    String hint       = obj.has("hint") ? obj.get("hint").getAsString() : "";
+                                    String definition = obj.has("definition") ? obj.get("definition").getAsString() : "";
+                                    WordHuntWord w = new WordHuntWord(i + 1, word, definition, 1.0f);
+                                    w.setHint(hint);
+                                    aiWords.add(w);
+                                }
+                                if (!aiWords.isEmpty()) {
+                                    words = aiWords;
+                                    startGame();
+                                    return;
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.w("WordHunt", "AI response parse error: " + e.getMessage());
+                            }
+                        } else {
+                            android.util.Log.w("WordHunt", "AI generate failed: success="
+                                    + (response.body() != null ? response.body().success : "null")
+                                    + " code=" + response.code()
+                                    + (response.body() != null ? " msg=" + response.body().message : ""));
                         }
-                        if (!aiWords.isEmpty()) {
-                            words = aiWords;
-                            startGame();
-                            return;
-                        }
-                    } catch (Exception e) {
-                        android.util.Log.w("WordHunt", "AI response parse error: " + e.getMessage());
+                        // AI failed — fall back to lesson JSON extraction
+                        loadLocalOrDemoWords(lessonContent);
                     }
-                } else {
-                    android.util.Log.w("WordHunt", "AI generate failed: success="
-                            + (response.body() != null ? response.body().success : "null")
-                            + " code=" + response.code()
-                            + (response.body() != null ? " msg=" + response.body().message : ""));
-                }
-                // AI failed — fall back to lesson JSON extraction
-                loadLocalOrDemoWords(lessonContent);
-            }
 
-            @Override
-            public void onFailure(retrofit2.Call<GameContentResponse> call, Throwable t) {
-                android.util.Log.w("WordHunt", "AI generate network error: " + t.getMessage());
-                loadLocalOrDemoWords(lessonContent);
-            }
-        });
+                    @Override
+                    public void onFailure(retrofit2.Call<GameContentResponse> call, Throwable t) {
+                        android.util.Log.w("WordHunt", "AI generate network error: " + t.getMessage());
+                        loadLocalOrDemoWords(lessonContent);
+                    }
+                });
     }
 
     private void loadLocalOrDemoWords(String lessonContent) {

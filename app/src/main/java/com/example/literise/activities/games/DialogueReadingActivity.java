@@ -534,14 +534,14 @@ public class DialogueReadingActivity extends BaseGameActivity {
                 h.tvAccuracy.setVisibility(View.VISIBLE);
                 h.tvAccuracy.setText(line.accuracy + "%");
                 int color = line.accuracy >= 75 ? 0xFF11B067
-                          : line.accuracy >= 50 ? 0xFFF59E0B
-                          : 0xFFEF4444;
+                        : line.accuracy >= 50 ? 0xFFF59E0B
+                        : 0xFFEF4444;
                 h.tvAccuracy.setTextColor(color);
                 h.tvAccuracy.setBackgroundTintList(
                         android.content.res.ColorStateList.valueOf(
                                 line.accuracy >= 75 ? 0xFFE8FFF3
-                              : line.accuracy >= 50 ? 0xFFFFFBEB
-                              : 0xFFFFEBEB));
+                                        : line.accuracy >= 50 ? 0xFFFFFBEB
+                                        : 0xFFFFEBEB));
             } else {
                 h.tvAccuracy.setVisibility(View.GONE);
             }

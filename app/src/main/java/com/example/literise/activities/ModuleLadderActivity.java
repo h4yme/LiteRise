@@ -3,6 +3,7 @@ package com.example.literise.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -602,18 +603,18 @@ public class ModuleLadderActivity extends AppCompatActivity {
                     // 9→timed_trail(MCQ comparison), 10→sentence_scramble(abstract),
                     // 11→timed_trail(definitions), 12→sentence_scramble(spatial)
                     String[] phonicsGames = {
-                        "word_hunt",         // 1: CVCC sight words (find them in a grid)
-                        "minimal_pairs",     // 2: CCVC clusters (sound discrimination)
-                        "fill_in_blanks",    // 3: VCV+VCCV syllable division
-                        "sentence_scramble", // 4: Q2 sight words in sentences
-                        "fill_in_blanks",    // 5: VCV open syllable (Pi-lot, Si-lent)
-                        "fill_in_blanks",    // 6: VCCV closed syllable (Bas-ket)
-                        "sentence_scramble", // 7: Action sight words in stories
-                        "minimal_pairs",     // 8: Antonym pairs (near-far, cold-hot)
-                        "timed_trail",       // 9: Comparison MCQ (better/best)
-                        "sentence_scramble", // 10: Abstract words in sentences
-                        "timed_trail",       // 11: Definitions MCQ
-                        "sentence_scramble"  // 12: Spatial direction sentences
+                            "word_hunt",         // 1: CVCC sight words (find them in a grid)
+                            "minimal_pairs",     // 2: CCVC clusters (sound discrimination)
+                            "fill_in_blanks",    // 3: VCV+VCCV syllable division
+                            "sentence_scramble", // 4: Q2 sight words in sentences
+                            "fill_in_blanks",    // 5: VCV open syllable (Pi-lot, Si-lent)
+                            "fill_in_blanks",    // 6: VCCV closed syllable (Bas-ket)
+                            "sentence_scramble", // 7: Action sight words in stories
+                            "minimal_pairs",     // 8: Antonym pairs (near-far, cold-hot)
+                            "timed_trail",       // 9: Comparison MCQ (better/best)
+                            "sentence_scramble", // 10: Abstract words in sentences
+                            "timed_trail",       // 11: Definitions MCQ
+                            "sentence_scramble"  // 12: Spatial direction sentences
                     };
                     return phonicsGames[(nodeNum - 1) % phonicsGames.length];
 

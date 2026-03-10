@@ -320,6 +320,7 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+
         <!-- FileProvider for sharing certificate images -->
         <provider
             android:name="androidx.core.content.FileProvider"

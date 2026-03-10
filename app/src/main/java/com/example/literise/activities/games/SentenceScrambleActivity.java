@@ -263,17 +263,17 @@ public class SentenceScrambleActivity extends BaseGameActivity {
             // Tint timer progress bar
             if (timerProgress != null) {
                 timerProgress.setProgressTintList(
-                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
             }
 
             // Apply module color to word bank card
             androidx.cardview.widget.CardView cardWordBank = findViewById(R.id.cardWordBank);
             if (cardWordBank != null) {
                 android.graphics.drawable.GradientDrawable grad =
-                    new android.graphics.drawable.GradientDrawable(
-                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
-                        new int[]{android.graphics.Color.parseColor(colorStart),
-                                  android.graphics.Color.parseColor(colorEnd)});
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
                 float r = 20 * getResources().getDisplayMetrics().density;
                 grad.setCornerRadius(r);
                 cardWordBank.setBackground(grad);
@@ -572,41 +572,41 @@ public class SentenceScrambleActivity extends BaseGameActivity {
         ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
         aiService.generateGameContent(new GameContentRequest(nodeId, "sentence_scramble", lessonContent))
                 .enqueue(new Callback<GameContentResponse>() {
-            @Override
-            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().success
-                        && response.body().content != null) {
-                    try {
-                        JsonArray arr = response.body().content.getAsJsonArray("sentences");
-                        List<ScrambleSentence> aiSentences = new ArrayList<>();
-                        for (int i = 0; i < arr.size(); i++) {
-                            JsonObject obj = arr.get(i).getAsJsonObject();
-                            String sentence = obj.get("sentence").getAsString();
-                            aiSentences.add(new ScrambleSentence(i + 1, sentence, 1.0f));
+                    @Override
+                    public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success
+                                && response.body().content != null) {
+                            try {
+                                JsonArray arr = response.body().content.getAsJsonArray("sentences");
+                                List<ScrambleSentence> aiSentences = new ArrayList<>();
+                                for (int i = 0; i < arr.size(); i++) {
+                                    JsonObject obj = arr.get(i).getAsJsonObject();
+                                    String sentence = obj.get("sentence").getAsString();
+                                    aiSentences.add(new ScrambleSentence(i + 1, sentence, 1.0f));
+                                }
+                                if (!aiSentences.isEmpty()) {
+                                    sentences = aiSentences;
+                                    startGame();
+                                    return;
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.w("SentenceScramble", "AI parse error: " + e.getMessage());
+                            }
+                        } else {
+                            android.util.Log.w("SentenceScramble", "AI generate failed: code=" + response.code()
+                                    + " msg=" + (response.body() != null ? response.body().message : "null"));
                         }
-                        if (!aiSentences.isEmpty()) {
-                            sentences = aiSentences;
-                            startGame();
-                            return;
-                        }
-                    } catch (Exception e) {
-                        android.util.Log.w("SentenceScramble", "AI parse error: " + e.getMessage());
+                        loadFallbackSentences();
+                        startGame();
                     }
-                } else {
-                    android.util.Log.w("SentenceScramble", "AI generate failed: code=" + response.code()
-                            + " msg=" + (response.body() != null ? response.body().message : "null"));
-                }
-                loadFallbackSentences();
-                startGame();
-            }
 
-            @Override
-            public void onFailure(Call<GameContentResponse> call, Throwable t) {
-                android.util.Log.w("SentenceScramble", "AI generate network error: " + t.getMessage());
-                loadFallbackSentences();
-                startGame();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                        android.util.Log.w("SentenceScramble", "AI generate network error: " + t.getMessage());
+                        loadFallbackSentences();
+                        startGame();
+                    }
+                });
     }
 
     private void loadFallbackSentences() {

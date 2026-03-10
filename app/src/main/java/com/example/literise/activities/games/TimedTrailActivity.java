@@ -4,13 +4,12 @@ import android.animation.ObjectAnimator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-
+import android.view.View;
 import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 
@@ -221,10 +220,10 @@ public class TimedTrailActivity extends BaseGameActivity {
             android.view.View header = findViewById(R.id.header);
             if (header != null) {
                 android.graphics.drawable.GradientDrawable grad =
-                    new android.graphics.drawable.GradientDrawable(
-                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
-                        new int[]{android.graphics.Color.parseColor(colorStart),
-                                  android.graphics.Color.parseColor(colorEnd)});
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
                 grad.setCornerRadius(0f);
                 header.setBackground(grad);
             }

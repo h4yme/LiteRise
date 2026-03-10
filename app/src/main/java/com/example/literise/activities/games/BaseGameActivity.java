@@ -133,7 +133,7 @@ public abstract class BaseGameActivity extends AppCompatActivity {
                         } else {
                             android.util.Log.w("BaseGameActivity",
                                     "Game phase update returned non-success for node " + nodeId
-                                    + " code=" + response.code());
+                                            + " code=" + response.code());
                         }
                     }
 

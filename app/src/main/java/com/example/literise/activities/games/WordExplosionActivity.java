@@ -118,55 +118,55 @@ public class WordExplosionActivity extends BaseGameActivity {
         ApiService aiService = ApiClient.getAiClient(this).create(ApiService.class);
         aiService.generateGameContent(new GameContentRequest(nodeId, "word_explosion", lessonContent))
                 .enqueue(new Callback<GameContentResponse>() {
-            @Override
-            public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
-                if (response.isSuccessful() && response.body() != null && response.body().success
-                        && response.body().content != null) {
-                    try {
-                        JsonArray cats = response.body().content.getAsJsonArray("categories");
-                        for (int i = 0; i < cats.size(); i++) {
-                            JsonObject obj = cats.get(i).getAsJsonObject();
-                            String name  = obj.get("name").getAsString().toUpperCase();
-                            String color = obj.has("color") ? obj.get("color").getAsString() : "#7C3AED";
-                            JsonArray wordsArr = obj.getAsJsonArray("words");
-                            List<String> wordList = new ArrayList<>();
-                            for (int j = 0; j < wordsArr.size(); j++) {
-                                wordList.add(wordsArr.get(j).getAsString().toLowerCase());
-                            }
-                            if (!wordList.isEmpty()) {
-                                categoryDatabase.put(name, new CategoryData(wordList, color));
-                                if (!availableCategories.contains(name)) {
-                                    availableCategories.add(0, name);
+                    @Override
+                    public void onResponse(Call<GameContentResponse> call, Response<GameContentResponse> response) {
+                        if (response.isSuccessful() && response.body() != null && response.body().success
+                                && response.body().content != null) {
+                            try {
+                                JsonArray cats = response.body().content.getAsJsonArray("categories");
+                                for (int i = 0; i < cats.size(); i++) {
+                                    JsonObject obj = cats.get(i).getAsJsonObject();
+                                    String name  = obj.get("name").getAsString().toUpperCase();
+                                    String color = obj.has("color") ? obj.get("color").getAsString() : "#7C3AED";
+                                    JsonArray wordsArr = obj.getAsJsonArray("words");
+                                    List<String> wordList = new ArrayList<>();
+                                    for (int j = 0; j < wordsArr.size(); j++) {
+                                        wordList.add(wordsArr.get(j).getAsString().toLowerCase());
+                                    }
+                                    if (!wordList.isEmpty()) {
+                                        categoryDatabase.put(name, new CategoryData(wordList, color));
+                                        if (!availableCategories.contains(name)) {
+                                            availableCategories.add(0, name);
+                                        }
+                                    }
                                 }
+                                // Set first AI category as target and update UI immediately
+                                if (cats.size() > 0) {
+                                    String firstName = cats.get(0).getAsJsonObject().get("name").getAsString().toUpperCase();
+                                    targetCategory = firstName;
+                                    tvTargetCategory.setText(targetCategory);
+                                    CategoryData firstData = categoryDatabase.get(targetCategory);
+                                    if (firstData != null) {
+                                        cardTargetCategory.setCardBackgroundColor(
+                                                android.graphics.Color.parseColor(firstData.color));
+                                    }
+                                }
+                            } catch (Exception e) {
+                                android.util.Log.w("WordExplosion", "AI parse error: " + e.getMessage());
                             }
+                        } else {
+                            android.util.Log.w("WordExplosion", "AI generate failed: code=" + response.code()
+                                    + " msg=" + (response.body() != null ? response.body().message : "null"));
                         }
-                        // Set first AI category as target and update UI immediately
-                        if (cats.size() > 0) {
-                            String firstName = cats.get(0).getAsJsonObject().get("name").getAsString().toUpperCase();
-                            targetCategory = firstName;
-                            tvTargetCategory.setText(targetCategory);
-                            CategoryData firstData = categoryDatabase.get(targetCategory);
-                            if (firstData != null) {
-                                cardTargetCategory.setCardBackgroundColor(
-                                        android.graphics.Color.parseColor(firstData.color));
-                            }
-                        }
-                    } catch (Exception e) {
-                        android.util.Log.w("WordExplosion", "AI parse error: " + e.getMessage());
+                        startGame();
                     }
-                } else {
-                    android.util.Log.w("WordExplosion", "AI generate failed: code=" + response.code()
-                            + " msg=" + (response.body() != null ? response.body().message : "null"));
-                }
-                startGame();
-            }
 
-            @Override
-            public void onFailure(Call<GameContentResponse> call, Throwable t) {
-                android.util.Log.w("WordExplosion", "AI generate network error: " + t.getMessage());
-                startGame();
-            }
-        });
+                    @Override
+                    public void onFailure(Call<GameContentResponse> call, Throwable t) {
+                        android.util.Log.w("WordExplosion", "AI generate network error: " + t.getMessage());
+                        startGame();
+                    }
+                });
     }
 
     private void initializeCategoryDatabase() {
@@ -248,17 +248,17 @@ public class WordExplosionActivity extends BaseGameActivity {
             if (colorEnd == null || colorEnd.isEmpty()) colorEnd = "#44A08D";
             if (cardTargetCategory != null) {
                 android.graphics.drawable.GradientDrawable grad =
-                    new android.graphics.drawable.GradientDrawable(
-                        android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
-                        new int[]{android.graphics.Color.parseColor(colorStart),
-                                  android.graphics.Color.parseColor(colorEnd)});
+                        new android.graphics.drawable.GradientDrawable(
+                                android.graphics.drawable.GradientDrawable.Orientation.TL_BR,
+                                new int[]{android.graphics.Color.parseColor(colorStart),
+                                        android.graphics.Color.parseColor(colorEnd)});
                 float r = 20 * getResources().getDisplayMetrics().density;
                 grad.setCornerRadius(r);
                 cardTargetCategory.setBackground(grad);
             }
             if (progressBar != null) {
                 progressBar.setProgressTintList(
-                    android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
+                        android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(colorStart)));
             }
         } catch (Exception ignored) {}
     }
