@@ -7,22 +7,20 @@
 
 
     <!-- ✅ Internet permission required for all API calls -->
-
     <uses-permission android:name="android.permission.INTERNET" />
 
-
-
     <!-- ✅ Audio recording permission for pronunciation assessment -->
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
-
-
     <!-- Optional: if you'll use local storage or cached images -->
-
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <!-- ✅ Notifications & Alarms for daily reminders -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
 
@@ -320,6 +318,11 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+
+        <!-- ✅ Daily Reminder BroadcastReceiver -->
+        <receiver
+            android:name=".receivers.DailyReminderReceiver"
+            android:exported="false" />
 
         <!-- FileProvider for sharing certificate images -->
         <provider

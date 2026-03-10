@@ -10,12 +10,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.literise.R;
 import com.example.literise.adapters.ModuleAdapter;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.CheckModulesCompleteResponse;
 import com.example.literise.models.LearningModule;
 import com.example.literise.utils.ModulePriorityManager;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ModulesViewActivity extends BaseNavActivity {
 
@@ -94,6 +101,59 @@ public class ModulesViewActivity extends BaseNavActivity {
             startActivity(intent);
         });
         rvModulesList.setAdapter(moduleAdapter);
+
+        // Fetch real completion counts from API
+        fetchCompletionData();
+    }
+
+    private void fetchCompletionData() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class)
+                .checkModulesComplete(studentId)
+                .enqueue(new Callback<CheckModulesCompleteResponse>() {
+                    @Override
+                    public void onResponse(Call<CheckModulesCompleteResponse> call,
+                                           Response<CheckModulesCompleteResponse> response) {
+                        if (!response.isSuccessful() || response.body() == null
+                                || !response.body().isSuccess()) return;
+
+                        CheckModulesCompleteResponse body = response.body();
+                        if (body.getTotalCount() <= 0 || modules == null || modules.isEmpty()) return;
+
+                        int nodesPerModule = body.getTotalCount() / modules.size();
+                        if (nodesPerModule <= 0) return;
+
+                        int remaining = body.getCompletedCount();
+                        int completedModules = body.getCompletedCount() / nodesPerModule;
+
+                        for (int i = 0; i < modules.size(); i++) {
+                            modules.get(i).setLocked(i > completedModules);
+                            int modCompleted = Math.min(remaining, nodesPerModule);
+                            modules.get(i).setCompletedLessons(Math.max(0, modCompleted));
+                            modules.get(i).setTotalLessons(nodesPerModule);
+                            remaining -= modCompleted;
+                        }
+                        moduleAdapter.notifyDataSetChanged();
+
+                        // Refresh overall progress bar
+                        int total = 0, completed = 0;
+                        for (LearningModule m : modules) {
+                            total += m.getTotalLessons();
+                            completed += m.getCompletedLessons();
+                        }
+                        int pct = total > 0 ? (completed * 100 / total) : 0;
+                        tvOverallPercent.setText(pct + "%");
+                        tvOverallLessons.setText(completed + " / " + total + " lessons");
+                        progressOverall.setProgress(pct);
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckModulesCompleteResponse> call, Throwable t) {
+                        // Silently fail — static data already shown
+                    }
+                });
     }
 
     private int getScore(String name) {

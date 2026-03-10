@@ -6,8 +6,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.CheckModulesCompleteResponse;
 import com.google.android.material.button.MaterialButton;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProgressViewActivity extends BaseNavActivity {
 
@@ -51,7 +58,8 @@ public class ProgressViewActivity extends BaseNavActivity {
         // Top stats
         tvStatXP.setText(String.valueOf(session.getXP()));
         tvStatStreak.setText(String.valueOf(session.getStreak()));
-        tvStatLessons.setText("0"); // placeholder — extend SessionManager if needed
+        tvStatLessons.setText("0"); // updated from API below
+        fetchLessonsDone();
 
         // Skills from placement test scores
         setSkill(tvScorePhonics, progressPhonics,
@@ -69,6 +77,27 @@ public class ProgressViewActivity extends BaseNavActivity {
     private void setSkill(TextView label, ProgressBar bar, int score) {
         label.setText(score + "%");
         bar.setProgress(score);
+    }
+
+    private void fetchLessonsDone() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class)
+                .checkModulesComplete(studentId)
+                .enqueue(new Callback<CheckModulesCompleteResponse>() {
+                    @Override
+                    public void onResponse(Call<CheckModulesCompleteResponse> call,
+                                           Response<CheckModulesCompleteResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            tvStatLessons.setText(
+                                    String.valueOf(response.body().getCompletedCount()));
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<CheckModulesCompleteResponse> call, Throwable t) { }
+                });
     }
 
     @Override
