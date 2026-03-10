@@ -831,6 +831,13 @@ public class DashboardActivity extends BaseActivity {
 
                         if (body.isShouldTriggerPostAssessment()) {
                             showPostAssessmentDialog(body.getCompletedCount(), body.getTotalCount());
+                        } else if (body.isPostAssessmentDone() && !session.hasCompletedPostAssessment()) {
+                            // Post-assessment was completed (e.g. on another device or after reinstall)
+                            // but the local session flag was never set — sync it and show the banner.
+                            session.markPostAssessmentCompleted();
+                            if (cardCertificateBanner != null) {
+                                cardCertificateBanner.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
 
