@@ -138,10 +138,7 @@ public class GamificationManager {
         // Check all possible badges
         String[] allBadgeIds = {
                 Badge.BADGE_FIRST_STEPS,
-                Badge.BADGE_MODULE_MASTER,
                 Badge.BADGE_PERFECT_SCORE,
-                Badge.BADGE_STORY_STAR,
-                Badge.BADGE_WORD_WIZARD,
                 Badge.BADGE_DEDICATED_LEARNER,
                 Badge.BADGE_CHAMPION
         };
@@ -174,17 +171,8 @@ public class GamificationManager {
             case Badge.BADGE_FIRST_STEPS:
                 shouldAward = getLessonsCompleted() >= 1;
                 break;
-            case Badge.BADGE_MODULE_MASTER:
-                shouldAward = getModulesCompleted() >= 1;
-                break;
             case Badge.BADGE_PERFECT_SCORE:
                 shouldAward = getPerfectScores() >= 1;
-                break;
-            case Badge.BADGE_STORY_STAR:
-                shouldAward = getStoriesWritten() >= 10;
-                break;
-            case Badge.BADGE_WORD_WIZARD:
-                shouldAward = getWordsMastered() >= 500;
                 break;
             case Badge.BADGE_DEDICATED_LEARNER:
                 shouldAward = getCurrentStreak() >= 7;
@@ -272,7 +260,6 @@ public class GamificationManager {
     public void incrementModulesCompleted() {
         int count = getModulesCompleted();
         prefs.edit().putInt(KEY_MODULES_COMPLETED, count + 1).apply();
-        checkAndAwardBadge(Badge.BADGE_MODULE_MASTER);
         checkAndAwardBadge(Badge.BADGE_CHAMPION);
     }
 
@@ -299,7 +286,6 @@ public class GamificationManager {
     public void incrementStoriesWritten() {
         int count = getStoriesWritten();
         prefs.edit().putInt(KEY_STORIES_WRITTEN, count + 1).apply();
-        checkAndAwardBadge(Badge.BADGE_STORY_STAR);
     }
 
     public int getStoriesWritten() {
@@ -311,7 +297,6 @@ public class GamificationManager {
      */
     public void setWordsMastered(int count) {
         prefs.edit().putInt(KEY_WORDS_MASTERED, count).apply();
-        checkAndAwardBadge(Badge.BADGE_WORD_WIZARD);
     }
 
     public int getWordsMastered() {

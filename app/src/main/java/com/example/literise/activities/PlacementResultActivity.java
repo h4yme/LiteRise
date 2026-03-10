@@ -4,18 +4,23 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
@@ -26,6 +31,12 @@ import com.example.literise.models.SavePlacementResultRequest;
 import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.utils.SessionLogger;
 import com.google.android.material.button.MaterialButton;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,6 +64,13 @@ public class PlacementResultActivity extends AppCompatActivity {
     private View rowCategory1, rowCategory2, rowCategory3, rowCategory4, rowCategory5;
     private View contentSection;
     private MaterialButton btnContinueToDashboard;
+    private MaterialButton btnViewCertificate;
+
+    // Post-assessment improvement views
+    private LinearLayout sectionImprovement;
+    private TextView tvPreThetaValue, tvPreLevelLabel;
+    private TextView tvPostThetaValue, tvPostLevelLabel;
+    private TextView tvThetaImprovement, tvImprovementMessage;
 
     // Audio
     private MediaPlayer resultVoicePlayer;
@@ -66,6 +84,7 @@ public class PlacementResultActivity extends AppCompatActivity {
     private int[] categoryScores;
     private double finalTheta;
     private long startTime;
+    private boolean isPostAssessment;
 
     private SessionManager sessionManager;
 
@@ -117,6 +136,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         rowCategory5 = findViewById(R.id.rowCategory5);
 
         btnContinueToDashboard = findViewById(R.id.btnContinueToDashboard);
+        btnViewCertificate     = findViewById(R.id.btnViewCertificate);
+
+        sectionImprovement   = findViewById(R.id.sectionImprovement);
+        tvPreThetaValue      = findViewById(R.id.tvPreThetaValue);
+        tvPreLevelLabel      = findViewById(R.id.tvPreLevelLabel);
+        tvPostThetaValue     = findViewById(R.id.tvPostThetaValue);
+        tvPostLevelLabel     = findViewById(R.id.tvPostLevelLabel);
+        tvThetaImprovement   = findViewById(R.id.tvThetaImprovement);
+        tvImprovementMessage = findViewById(R.id.tvImprovementMessage);
     }
 
     private void getResultsFromIntent() {
@@ -126,8 +154,9 @@ public class PlacementResultActivity extends AppCompatActivity {
         accuracy       = intent.getDoubleExtra("accuracy", 0.0);
         totalAnswered  = intent.getIntExtra("total_answered", 0);
         totalCorrect   = intent.getIntExtra("total_correct", 0);
-        categoryScores = intent.getIntArrayExtra("category_scores");
-        finalTheta     = intent.getDoubleExtra("final_theta", 0.0);
+        categoryScores    = intent.getIntArrayExtra("category_scores");
+        finalTheta        = intent.getDoubleExtra("final_theta", 0.0);
+        isPostAssessment  = intent.getBooleanExtra("is_post_assessment", false);
         long passedStartTime = intent.getLongExtra("start_time", 0);
         if (passedStartTime > 0) startTime = passedStartTime;
 
@@ -148,7 +177,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         tvLevelName.setText(levelName);
         tvLevelNumber.setText("Level " + placementLevel);
         tvAccuracy.setText(String.format("%.0f%%", accuracy));
-        tvQuestionsAnswered.setText(totalAnswered + "/" + 25);
+        tvQuestionsAnswered.setText(Math.min(totalAnswered, 25) + "/25");
+
+        if (isPostAssessment) {
+            tvCongrats.setText("You Did It! \uD83C\uDF93 LiteRise Complete!");
+            btnContinueToDashboard.setText("Back to Dashboard");
+            showImprovementSection();
+            sectionImprovement.setVisibility(View.VISIBLE);
+            btnViewCertificate.setVisibility(View.VISIBLE);
+        }
 
         if (categoryScores.length >= 5) {
             tvCategory1Score.setText(categoryScores[0] + "%");
@@ -164,6 +201,34 @@ public class PlacementResultActivity extends AppCompatActivity {
                 animateProgressBar(pbCategory4, categoryScores[3]);
                 animateProgressBar(pbCategory5, categoryScores[4]);
             }, 900);
+        }
+    }
+
+    private void showImprovementSection() {
+        double preTheta  = sessionManager.getPreTheta();
+        String preLevel  = sessionManager.getPreLevel();
+        double thetaDiff = finalTheta - preTheta;
+
+        tvPreThetaValue.setText(String.format(Locale.US, "%.2f", preTheta));
+        tvPreLevelLabel.setText(preLevel.isEmpty() ? "—" : preLevel);
+        tvPostThetaValue.setText(String.format(Locale.US, "%.2f", finalTheta));
+        tvPostLevelLabel.setText(levelName);
+
+        String sign = thetaDiff >= 0 ? "+" : "";
+        tvThetaImprovement.setText(sign + String.format(Locale.US, "%.2f", thetaDiff));
+
+        if (thetaDiff > 0.1) {
+            tvThetaImprovement.setTextColor(0xFF059669);
+            tvImprovementMessage.setText("\uD83C\uDF1F Amazing growth! You've improved so much since you started LiteRise!");
+            tvImprovementMessage.setTextColor(0xFF059669);
+        } else if (thetaDiff >= -0.1) {
+            tvThetaImprovement.setTextColor(0xFFD97706);
+            tvImprovementMessage.setText("\uD83D\uDCAA You maintained your level! Keep practicing to grow even more!");
+            tvImprovementMessage.setTextColor(0xFFD97706);
+        } else {
+            tvThetaImprovement.setTextColor(0xFFDC2626);
+            tvImprovementMessage.setText("\uD83D\uDCDA Keep going! Every reader grows at their own pace. You've got this!");
+            tvImprovementMessage.setTextColor(0xFFDC2626);
         }
     }
 
@@ -309,6 +374,16 @@ public class PlacementResultActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
+
+        btnViewCertificate.setOnClickListener(v -> shareCertificate());
+    }
+
+    private void shareCertificate() {
+        String name = sessionManager.getFullname();
+        if (name == null || name.isEmpty()) name = sessionManager.getNickname();
+        if (name == null || name.isEmpty()) name = "Student";
+        com.example.literise.utils.CertificateHelper.generateAndShare(
+                this, name, levelName, finalTheta, sessionManager.getPreTheta(), accuracy);
     }
 
     private String getAppVersion() {
@@ -321,17 +396,22 @@ public class PlacementResultActivity extends AppCompatActivity {
     }
 
     private void savePlacementResult() {
+        // Always persist post-assessment cert data so the user can reprint later
+        if (isPostAssessment) {
+            sessionManager.savePostAssessmentResult(finalTheta, levelName, accuracy);
+        }
+
         int studentId = sessionManager.getStudentId();
         if (studentId == 0) {
             Log.w(TAG, "Cannot save placement result: No student ID found");
             return;
         }
 
-        String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+        String assessmentType = isPostAssessment ? "PostAssessment" : "PreAssessment";
 
         if (com.example.literise.utils.AppConfig.DEMO_MODE) {
             Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
-            if ("PreAssessment".equals(assessmentType)) {
+            if (!isPostAssessment) {
                 sessionManager.setAssessmentCompleted(true);
                 sessionManager.setAssessmentStarted(false);
             }
@@ -365,7 +445,7 @@ public class PlacementResultActivity extends AppCompatActivity {
                                    Response<SavePlacementResultResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Placement result saved: " + response.body().getMessage());
-                    if ("PreAssessment".equals(assessmentType)) {
+                    if (!isPostAssessment) {
                         sessionManager.setAssessmentCompleted(true);
                         sessionManager.setAssessmentStarted(false);
                     }

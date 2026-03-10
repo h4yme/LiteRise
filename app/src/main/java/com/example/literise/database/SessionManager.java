@@ -29,6 +29,8 @@ public class SessionManager {
 
     private static final String KEY_XP = "total_xp";
 
+    private static final String KEY_STREAK = "current_streak";
+
     private static final String KEY_HAS_SEEN_WELCOME = "has_seen_welcome";
 
     private static final String KEY_NICKNAME = "nickname";
@@ -42,6 +44,15 @@ public class SessionManager {
     private static final String KEY_CAT3_GRAMMAR_AWARENESS = "cat3_grammar_awareness";
     private static final String KEY_CAT4_COMPREHENDING_TEXT = "cat4_comprehending_text";
     private static final String KEY_CAT5_CREATING_COMPOSING = "cat5_creating_composing";
+    private static final String KEY_PRE_THETA = "pre_assessment_theta";
+    private static final String KEY_PRE_LEVEL = "pre_assessment_level";
+    private static final String KEY_PRE_ACCURACY = "pre_assessment_accuracy";
+
+    // Post-assessment certificate data
+    private static final String KEY_POST_COMPLETED   = "post_assessment_completed";
+    private static final String KEY_POST_THETA       = "post_assessment_theta_value";
+    private static final String KEY_POST_LEVEL_NAME  = "post_assessment_level_name";
+    private static final String KEY_POST_ACCURACY    = "post_assessment_accuracy_value";
 
 
     private SharedPreferences prefs;
@@ -191,6 +202,20 @@ public class SessionManager {
 
     }
 
+    public void saveStreak(int streak) {
+
+        editor.putInt(KEY_STREAK, streak);
+
+        editor.apply();
+
+    }
+
+    public int getStreak() {
+
+        return prefs.getInt(KEY_STREAK, 0);
+
+    }
+
     public String getFullName() {
 
         return prefs.getString(KEY_FULLNAME, null);
@@ -282,6 +307,57 @@ public class SessionManager {
             return prefs.getInt(key, 0);
         }
         return 0;
+    }
+
+    public void savePreTheta(double theta) {
+        editor.putFloat(KEY_PRE_THETA, (float) theta);
+        editor.apply();
+    }
+
+    public double getPreTheta() {
+        return prefs.getFloat(KEY_PRE_THETA, 0.0f);
+    }
+
+    public void savePreLevel(String level) {
+        editor.putString(KEY_PRE_LEVEL, level);
+        editor.apply();
+    }
+
+    public String getPreLevel() {
+        return prefs.getString(KEY_PRE_LEVEL, "");
+    }
+
+    public void savePreAccuracy(double accuracy) {
+        editor.putFloat(KEY_PRE_ACCURACY, (float) accuracy);
+        editor.apply();
+    }
+
+    public double getPreAccuracy() {
+        return prefs.getFloat(KEY_PRE_ACCURACY, 0.0f);
+    }
+
+    public void savePostAssessmentResult(double theta, String levelName, double accuracy) {
+        editor.putBoolean(KEY_POST_COMPLETED, true);
+        editor.putFloat(KEY_POST_THETA, (float) theta);
+        editor.putString(KEY_POST_LEVEL_NAME, levelName);
+        editor.putFloat(KEY_POST_ACCURACY, (float) accuracy);
+        editor.apply();
+    }
+
+    public boolean hasCompletedPostAssessment() {
+        return prefs.getBoolean(KEY_POST_COMPLETED, false);
+    }
+
+    public double getPostTheta() {
+        return prefs.getFloat(KEY_POST_THETA, 0.0f);
+    }
+
+    public String getPostLevelName() {
+        return prefs.getString(KEY_POST_LEVEL_NAME, "");
+    }
+
+    public double getPostAccuracy() {
+        return prefs.getFloat(KEY_POST_ACCURACY, 0.0f);
     }
 
     /**

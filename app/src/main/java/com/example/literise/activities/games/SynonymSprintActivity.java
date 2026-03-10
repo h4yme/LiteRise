@@ -4,16 +4,19 @@ import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.cardview.widget.CardView;
 import androidx.core.view.GestureDetectorCompat;
+
+import com.example.literise.utils.CustomToast;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
@@ -566,7 +569,7 @@ public class SynonymSprintActivity extends BaseGameActivity {
         if (gameTimer != null) gameTimer.cancel();
         if (spawnTimer != null) spawnTimer.cancel();
 
-        Toast.makeText(this, "Game Paused", Toast.LENGTH_SHORT).show();
+        CustomToast.showInfo(this, "Game Paused");
         finish();
     }
 
@@ -581,33 +584,78 @@ public class SynonymSprintActivity extends BaseGameActivity {
         }
         activeWords.clear();
 
-        // Mark game phase complete in StudentNodeProgress
         markGamePhaseComplete(getIntent().getIntExtra("node_id", -1));
 
-        // Lottie celebration then finish
         if (lottieComplete != null) {
             lottieComplete.setVisibility(View.VISIBLE);
             lottieComplete.playAnimation();
             lottieComplete.addAnimatorListener(new android.animation.AnimatorListenerAdapter() {
                 @Override public void onAnimationEnd(android.animation.Animator animation) {
-                    String message = String.format("Great job!\nScore: %d\nDistance: %dm\nBest Streak: %dx",
-                            score, distance, maxCombo);
-                    Toast.makeText(SynonymSprintActivity.this, message, Toast.LENGTH_LONG).show();
-                    android.content.Intent result = new android.content.Intent();
-                    result.putExtra("xp_earned", score);
-                    setResult(RESULT_OK, result);
-                    finish();
+                    lottieComplete.setVisibility(View.GONE);
+                    showResultDialog();
                 }
             });
         } else {
-            String message = String.format("Great job!\nScore: %d\nDistance: %dm",
-                    score, distance);
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            showResultDialog();
+        }
+    }
+
+    private void showResultDialog() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_game_result, null);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setView(dialogView);
+        builder.setCancelable(false);
+
+        AlertDialog dialog = builder.create();
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
+
+        TextView tvResultTitle    = dialogView.findViewById(R.id.tvResultTitle);
+        TextView tvResultSubtitle = dialogView.findViewById(R.id.tvResultSubtitle);
+        TextView tvResultScore    = dialogView.findViewById(R.id.tvResultScore);
+        TextView tvResultAccuracy = dialogView.findViewById(R.id.tvResultAccuracy);
+        TextView tvResultStreak   = dialogView.findViewById(R.id.tvResultStreak);
+        TextView tvResultTime     = dialogView.findViewById(R.id.tvResultTime);
+        TextView tvResultXP       = dialogView.findViewById(R.id.tvResultXP);
+        TextView tvLabelScore     = dialogView.findViewById(R.id.tvLabelScore);
+        TextView tvLabelAccuracy  = dialogView.findViewById(R.id.tvLabelAccuracy);
+        TextView tvLabelStreak    = dialogView.findViewById(R.id.tvLabelStreak);
+        TextView tvLabelTime      = dialogView.findViewById(R.id.tvLabelTime);
+        com.google.android.material.button.MaterialButton btnFinish = dialogView.findViewById(R.id.btnFinish);
+
+        if (score >= 150) {
+            tvResultTitle.setText("Sprint Champion! 🏆");
+            tvResultSubtitle.setText("Amazing word collection!");
+        } else if (score >= 80) {
+            tvResultTitle.setText("Great Sprint! 🏃");
+            tvResultSubtitle.setText("You collected lots of synonyms!");
+        } else {
+            tvResultTitle.setText("Keep Running! 🏃");
+            tvResultSubtitle.setText("Practice makes perfect!");
+        }
+
+        tvLabelScore.setText("Score");
+        tvLabelAccuracy.setText("Distance");
+        tvLabelStreak.setText("Best Combo");
+        tvLabelTime.setText("Words Hit");
+
+        tvResultScore.setText(String.valueOf(score));
+        tvResultAccuracy.setText(distance + "m");
+        tvResultStreak.setText(maxCombo + "x");
+        tvResultTime.setText(String.valueOf(score / Math.max(1, 10)));
+        tvResultXP.setText("+" + score + " XP");
+
+        btnFinish.setOnClickListener(v -> {
+            dialog.dismiss();
             android.content.Intent result = new android.content.Intent();
             result.putExtra("xp_earned", score);
             setResult(RESULT_OK, result);
             finish();
-        }
+        });
+
+        dialog.show();
     }
 
     @Override

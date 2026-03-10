@@ -18,8 +18,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
 
-import com.example.literise.activities.games.SynonymSprintActivity;
-import com.example.literise.activities.games.WordExplosionActivity;
 import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
@@ -50,14 +48,12 @@ public class DashboardActivity extends BaseActivity {
     private ImageView ivLeoMascot, ivSettings;
 
     private MaterialButton btnContinueLesson;
+    private android.widget.LinearLayout cardCertificateBanner;
+    private MaterialButton btnRePrintCertificate;
 
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
     private List<LearningModule> modules;
-
-    // Game testing buttons
-    private MaterialButton btnTestPhonicsNinja, btnTestSynonymSprint, btnTestWordExplosion;
-    private MaterialButton btnTestSentenceChef, btnTestWordHunt, btnTestSentenceScramble;
 
     // Custom Bottom Navigation Views
     private LinearLayout navHome, navModules, navProgress, navProfile;
@@ -85,8 +81,6 @@ public class DashboardActivity extends BaseActivity {
     private SessionManager session;
 
     private ModulePriorityManager priorityManager;
-
-    private int currentStreak = 10;
 
     private int totalBadges = 7;
 
@@ -145,6 +139,8 @@ public class DashboardActivity extends BaseActivity {
         //btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
         rvModules = findViewById(R.id.rvModules);
+        cardCertificateBanner  = findViewById(R.id.cardCertificateBanner);
+        btnRePrintCertificate  = findViewById(R.id.btnRePrintCertificate);
 
         // Setup RecyclerView
         rvModules.setLayoutManager(new LinearLayoutManager(this));
@@ -191,14 +187,6 @@ public class DashboardActivity extends BaseActivity {
 
         stepIndicatorContainer = findViewById(R.id.stepIndicatorContainer);
 
-        // Game testing buttons
-        btnTestPhonicsNinja = findViewById(R.id.btnTestPhonicsNinja);
-        btnTestSynonymSprint = findViewById(R.id.btnTestSynonymSprint);
-        btnTestWordExplosion = findViewById(R.id.btnTestWordExplosion);
-        btnTestSentenceChef = findViewById(R.id.btnTestSentenceChef);
-        btnTestWordHunt = findViewById(R.id.btnTestWordHunt);
-        btnTestSentenceScramble = findViewById(R.id.btnTestSentenceScramble);
-
     }
 
 
@@ -208,6 +196,21 @@ public class DashboardActivity extends BaseActivity {
         // Continue lesson button (optional, may not be in layout)
         if (btnContinueLesson != null) {
             btnContinueLesson.setOnClickListener(v -> continueLesson());
+        }
+
+        // Certificate re-print button
+        if (btnRePrintCertificate != null) {
+            btnRePrintCertificate.setOnClickListener(v -> {
+                String name = session.getFullname();
+                if (name == null || name.isEmpty()) name = session.getNickname();
+                if (name == null || name.isEmpty()) name = "Student";
+                com.example.literise.utils.CertificateHelper.generateAndShare(
+                        this, name,
+                        session.getPostLevelName(),
+                        session.getPostTheta(),
+                        session.getPreTheta(),
+                        session.getPostAccuracy());
+            });
         }
 
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
@@ -226,71 +229,6 @@ public class DashboardActivity extends BaseActivity {
         // Show tutorial on first visit
 
         showTutorialIfFirstTime();
-
-        // Game testing button listeners
-        setupGameTestListeners();
-
-    }
-
-    /**
-     * Setup game testing button listeners
-     */
-    private void setupGameTestListeners() {
-        // Phonics Ninja - ACTIVE
-       /* btnTestPhonicsNinja.setOnClickListener(v -> {
-            Intent intent = new Intent(this, PhonicsNinjaActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            intent.putExtra("target_pattern", "CVCC");
-            startActivity(intent);
-        });*/
-
-        btnTestSynonymSprint.setOnClickListener(v -> {
-            Intent intent = new Intent(this, SynonymSprintActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            intent.putExtra("target_word", "happy");
-            startActivity(intent);
-        });
-
-        // Word Explosion - Coming soon
-        // Word Explosion - ACTIVE
-        btnTestWordExplosion.setOnClickListener(v -> {
-            Intent intent = new Intent(this, WordExplosionActivity.class);
-            intent.putExtra("node_id", 1);
-            intent.putExtra("student_id", session.getStudentId());
-            startActivity(intent);
-        });
-
-
-        // Sentence Chef - Coming soon
-        btnTestSentenceChef.setOnClickListener(v -> {
-            Toast.makeText(this, "👨‍🍳 Sentence Chef - Coming Soon!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Word Hunt - If exists
-        btnTestWordHunt.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.WordHuntActivity"));
-                intent.putExtra("node_id", 1);
-                intent.putExtra("student_id", session.getStudentId());
-                startActivity(intent);
-            } catch (ClassNotFoundException e) {
-                Toast.makeText(this, "🔍 Word Hunt - Activity not found", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        // Sentence Scramble - If exists
-        btnTestSentenceScramble.setOnClickListener(v -> {
-            try {
-                Intent intent = new Intent(this, Class.forName("com.example.literise.activities.SentenceScrambleActivity"));
-                intent.putExtra("node_id", 1);
-                intent.putExtra("student_id", session.getStudentId());
-                startActivity(intent);
-            } catch (ClassNotFoundException e) {
-                Toast.makeText(this, "🔀 Sentence Scramble - Activity not found", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
 
@@ -424,10 +362,16 @@ public class DashboardActivity extends BaseActivity {
 
         tvHeaderXP.setText(String.format("%d XP", xp));
 
-        tvStreak.setText(String.format("%d Day", currentStreak));
+        int streak = session.getStreak();
+        tvStreak.setText(String.format("%d Day", streak));
 
         tvBadges.setText(String.format("%d Badges Earned", totalBadges));
 
+        // Show the certificate banner if the user has completed the post-assessment
+        if (cardCertificateBanner != null) {
+            cardCertificateBanner.setVisibility(
+                    session.hasCompletedPostAssessment() ? View.VISIBLE : View.GONE);
+        }
     }
 
 
@@ -457,7 +401,7 @@ public class DashboardActivity extends BaseActivity {
             double performanceScore = score / 100.0; // Convert 0-100 to 0-1
 
             LearningModule module = new LearningModule(
-                    i + 1,                              // moduleId
+                    getModuleIdByName(moduleName),      // moduleId (actual DB ID, not position)
                     moduleName,                         // title
                     getModuleSubtitleByName(moduleName),// subtitle
                     getModuleDomainByName(moduleName),  // domain
@@ -507,12 +451,24 @@ public class DashboardActivity extends BaseActivity {
         }
     }
 
+    private int getModuleIdByName(String moduleName) {
+        if (moduleName == null) return 1;
+        switch (moduleName) {
+            case "Phonics and Word Study":                          return 1;
+            case "Vocabulary and Word Knowledge":                   return 2;
+            case "Grammar Awareness and Grammatical Structures":    return 3;
+            case "Comprehending and Analyzing Text":                return 4;
+            case "Creating and Composing Text":                     return 5;
+            default:                                                return 1;
+        }
+    }
+
     private String getModuleDomainByName(String moduleName) {
         if (moduleName == null) return "General";
         if (moduleName.contains("Phonics"))       return "Phonics";
         if (moduleName.contains("Vocabulary"))    return "Vocabulary";
         if (moduleName.contains("Grammar"))       return "Grammar";
-        if (moduleName.contains("Comprehend"))    return "Comprehension";
+        if (moduleName.contains("Comprehend"))    return "Comprehending";
         if (moduleName.contains("Creating") || moduleName.contains("Composing")) return "Writing";
         return "General";
     }
@@ -875,12 +831,57 @@ public class DashboardActivity extends BaseActivity {
 
                         if (body.isShouldTriggerPostAssessment()) {
                             showPostAssessmentDialog(body.getCompletedCount(), body.getTotalCount());
+                        } else if (body.isPostAssessmentDone() && !session.hasCompletedPostAssessment()) {
+                            // Post-assessment done on server but local data is missing —
+                            // fetch the full result so the certificate has real values.
+                            fetchAndSavePostAssessmentResult();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<CheckModulesCompleteResponse> call, Throwable t) {
                         // Silently fail — do not interrupt the user
+                    }
+                });
+    }
+
+    private void fetchAndSavePostAssessmentResult() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class).getPlacementProgress(studentId)
+                .enqueue(new Callback<com.example.literise.models.PlacementProgressResponse>() {
+                    @Override
+                    public void onResponse(Call<com.example.literise.models.PlacementProgressResponse> call,
+                                           Response<com.example.literise.models.PlacementProgressResponse> response) {
+                        if (!response.isSuccessful() || response.body() == null || !response.body().isSuccess()) return;
+
+                        com.example.literise.models.PlacementProgressResponse body = response.body();
+                        com.example.literise.models.PlacementProgressResponse.AssessmentResults results = body.getResults();
+                        if (results == null) return;
+
+                        com.example.literise.models.PlacementProgressResponse.AssessmentDetail post = results.getPost();
+                        if (post == null) return;
+
+                        // Persist the post-assessment result so the certificate has real values
+                        session.savePostAssessmentResult(
+                                post.getFinalTheta(),
+                                post.getLevelName(),
+                                post.getAccuracyPercentage());
+
+                        // Also sync pre-theta if not already saved (needed for Ability Growth calc)
+                        if (session.getPreTheta() == 0.0 && results.getPre() != null) {
+                            session.savePreTheta(results.getPre().getFinalTheta());
+                        }
+
+                        if (cardCertificateBanner != null) {
+                            cardCertificateBanner.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<com.example.literise.models.PlacementProgressResponse> call, Throwable t) {
+                        // Silently fail
                     }
                 });
     }

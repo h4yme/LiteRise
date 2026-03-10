@@ -799,27 +799,42 @@ public class LessonContentActivity extends AppCompatActivity {
 
         java.util.Iterator<String> keys = clusters.keys();
         int ci = 0;
+        final int CHIPS_PER_ROW = 4;
         while (keys.hasNext()) {
             String k = keys.next();
             Object val = clusters.opt(k);
             if (!(val instanceof JSONArray)) continue;
             JSONArray arr = (JSONArray) val;
 
-            LinearLayout row = makeHRow(dp(8));
-            row.setGravity(Gravity.CENTER_VERTICAL);
-
             TextView keyTv = new TextView(this);
             keyTv.setText(k.toUpperCase());
             keyTv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
             keyTv.setTypeface(fPoppinsSemi);
             keyTv.setTextColor(pillText);
-            keyTv.setMinWidth(dp(52));
-            row.addView(keyTv);
+            LinearLayout.LayoutParams klp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+            klp.setMargins(0, 0, 0, dp(6));
+            keyTv.setLayoutParams(klp);
+            body.addView(keyTv);
 
+            LinearLayout chipRow = null;
             for (int j = 0; j < arr.length(); j++) {
-                row.addView(makeWordChip(arr.getString(j), CHIP_COLORS[ci++ % CHIP_COLORS.length]));
+                if (j % CHIPS_PER_ROW == 0) {
+                    chipRow = makeHRow(dp(8));
+                    body.addView(chipRow);
+                }
+                chipRow.addView(makeWordChip(arr.getString(j), CHIP_COLORS[ci++ % CHIP_COLORS.length]));
             }
-            body.addView(row);
+            // Pad last row so chips keep consistent sizing
+            int rem = arr.length() % CHIPS_PER_ROW;
+            if (rem != 0 && chipRow != null) {
+                for (int p = 0; p < CHIPS_PER_ROW - rem; p++) {
+                    TextView spacer = new TextView(this);
+                    spacer.setLayoutParams(new LinearLayout.LayoutParams(0, 1, 1f));
+                    chipRow.addView(spacer);
+                }
+            }
+            body.addView(vSpace(4));
         }
     }
 

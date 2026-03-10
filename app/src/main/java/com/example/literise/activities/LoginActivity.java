@@ -223,6 +223,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     sessionManager.saveXP(s.getXp());
 
+                    sessionManager.saveStreak(s.getCurrentStreak());
+
 
 
 

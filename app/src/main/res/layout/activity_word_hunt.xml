@@ -424,15 +424,13 @@
 
         android:visibility="gone"
 
-        app:cardCornerRadius="16dp"
+        app:cardCornerRadius="20dp"
 
-        app:cardElevation="4dp"
+        app:cardElevation="8dp"
 
-        app:cardBackgroundColor="@color/color_success_bg"
+        app:cardBackgroundColor="@color/white"
 
         app:layout_constraintBottom_toTopOf="@id/buttonContainer">
-
-
 
         <LinearLayout
 
@@ -440,79 +438,177 @@
 
             android:layout_height="wrap_content"
 
-            android:orientation="vertical"
+            android:orientation="vertical">
 
-            android:padding="16dp">
+            <!-- Green header band -->
+            <LinearLayout
 
-
-
-            <TextView
-
-                android:id="@+id/tvFoundWord"
-
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
 
                 android:layout_height="wrap_content"
 
-                android:text="WORD"
+                android:orientation="horizontal"
 
-                android:textSize="18sp"
+                android:gravity="center_vertical"
 
-                android:textStyle="bold"
+                android:paddingHorizontal="14dp"
 
-                android:fontFamily="@font/poppins_bold"
+                android:paddingVertical="10dp"
 
-                android:textColor="@color/color_success" />
+                android:background="@drawable/bg_word_found">
 
+                <TextView
 
+                    android:layout_width="0dp"
 
-            <TextView
+                    android:layout_height="wrap_content"
 
-                android:id="@+id/tvDefinition"
+                    android:layout_weight="1"
 
-                android:layout_width="wrap_content"
+                    android:text="✓  Word Found!"
+
+                    android:textSize="12sp"
+
+                    android:fontFamily="@font/poppins_semibold"
+
+                    android:textColor="#0B6E3A"/>
+
+                <TextView
+
+                    android:id="@+id/tvFoundWord"
+
+                    android:layout_width="wrap_content"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="WORD"
+
+                    android:textSize="17sp"
+
+                    android:fontFamily="@font/poppins_bold"
+
+                    android:textColor="@color/color_jade1"/>
+
+            </LinearLayout>
+
+            <!-- Definition + Example body -->
+            <LinearLayout
+
+                android:layout_width="match_parent"
 
                 android:layout_height="wrap_content"
 
-                android:text="Definition goes here"
+                android:orientation="vertical"
 
-                android:textSize="14sp"
+                android:padding="14dp">
 
-                android:fontFamily="@font/poppins"
+                <LinearLayout
 
-                android:textColor="@color/text_primary"
+                    android:layout_width="match_parent"
 
-                android:layout_marginTop="4dp" />
+                    android:layout_height="wrap_content"
 
+                    android:orientation="horizontal"
 
+                    android:gravity="top">
 
-            <TextView
+                    <TextView
 
-                android:id="@+id/tvExample"
+                        android:layout_width="wrap_content"
 
-                android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
 
-                android:layout_height="wrap_content"
+                        android:text="📖 "
 
-                android:text="Example: ..."
+                        android:textSize="14sp"
 
-                android:textSize="12sp"
+                        android:layout_marginTop="1dp"/>
 
-                android:textStyle="italic"
+                    <TextView
 
-                android:fontFamily="@font/poppins"
+                        android:id="@+id/tvDefinition"
 
-                android:textColor="@color/gray_dark"
+                        android:layout_width="0dp"
 
-                android:layout_marginTop="8dp"
+                        android:layout_height="wrap_content"
 
-                android:visibility="gone" />
+                        android:layout_weight="1"
+
+                        android:text="Definition goes here"
+
+                        android:textSize="14sp"
+
+                        android:fontFamily="@font/poppins"
+
+                        android:textColor="@color/text_primary"
+
+                        android:lineSpacingMultiplier="1.3"/>
+
+                </LinearLayout>
+
+                <TextView
+
+                    android:id="@+id/tvExample"
+
+                    android:layout_width="match_parent"
+
+                    android:layout_height="wrap_content"
+
+                    android:text="Example: ..."
+
+                    android:textSize="12sp"
+
+                    android:fontFamily="@font/poppins"
+
+                    android:textColor="@color/gray_dark"
+
+                    android:textStyle="italic"
+
+                    android:paddingHorizontal="10dp"
+
+                    android:paddingVertical="8dp"
+
+                    android:layout_marginTop="8dp"
+
+                    android:background="@drawable/bg_stat_card"
+
+                    android:visibility="gone"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
 
 
+
+    <!-- Lottie: word found sparkle -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieCorrect"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Lottie: all words found celebration -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieComplete"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="gone"
+        app:lottie_rawRes="@raw/lottie_result_celebrate"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="false"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- Bottom Buttons -->
 
