@@ -366,7 +366,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="#FFFFFF"
-                            app:trackTint="@color/purple_500"/>
+                            app:trackTint="@color/switch_track_tint"/>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -443,7 +443,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="#FFFFFF"
-                            app:trackTint="@color/purple_500"/>
+                            app:trackTint="@color/switch_track_tint"/>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
@@ -508,7 +508,7 @@
                             android:layout_height="wrap_content"
                             android:checked="true"
                             app:thumbTint="#FFFFFF"
-                            app:trackTint="@color/purple_500"/>
+                            app:trackTint="@color/switch_track_tint"/>
 
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
