@@ -87,6 +87,21 @@ try {
     $stmt->nextRowset();
     $comparison = $stmt->fetch(PDO::FETCH_ASSOC);
 
+    // Override FinalTheta with the authoritative PreAssessmentTheta from Students table.
+    // PlacementResults.FinalTheta may reflect an intermediate value from a previous
+    // incomplete session; Students.PreAssessmentTheta holds the confirmed final value.
+    if ($preResult) {
+        $stmtTheta = $conn->prepare(
+            "SELECT PreAssessmentTheta FROM dbo.Students WHERE StudentID = :sid"
+        );
+        $stmtTheta->bindValue(':sid', $studentID, PDO::PARAM_INT);
+        $stmtTheta->execute();
+        $thetaRow = $stmtTheta->fetch(PDO::FETCH_ASSOC);
+        if ($thetaRow && $thetaRow['PreAssessmentTheta'] !== null) {
+            $preResult['FinalTheta'] = (float)$thetaRow['PreAssessmentTheta'];
+        }
+    }
+
     // Format response
     $response = [
         'success' => true,

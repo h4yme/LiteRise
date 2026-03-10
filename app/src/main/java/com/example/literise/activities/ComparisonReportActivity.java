@@ -7,6 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+
 import com.example.literise.R;
 import com.example.literise.api.ApiClient;
 import com.example.literise.database.SessionManager;
@@ -25,8 +26,8 @@ public class ComparisonReportActivity extends BaseActivity {
 
     private ProgressBar progressBarLoading;
     private LinearLayout contentLayout;
-    private LinearLayout layoutNoPostAssessment;
-    private LinearLayout cardGrowth;
+    private View layoutNoPostAssessment;
+    private View cardGrowth;
 
     private TextView tvPreTheta, tvPreLevel, tvPreAccuracy, tvPreDate;
     private TextView tvPostTheta, tvPostLevel, tvPostAccuracy, tvPostDate;
