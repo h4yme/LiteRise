@@ -3,8 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="16dp"
-    android:paddingEnd="16dp"
+    android:paddingStart="12dp"
+    android:paddingEnd="12dp"
     android:paddingBottom="12dp">
 
     <com.google.android.material.card.MaterialCardView
@@ -21,10 +21,10 @@
             android:orientation="horizontal"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
             android:gravity="center"
-            android:weightSum="4">
+            android:weightSum="5">
 
             <!-- Home -->
             <LinearLayout
@@ -38,8 +38,8 @@
                 android:paddingBottom="6dp">
 
                 <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="32dp">
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
 
                     <View
                         android:id="@+id/indicatorHome"
@@ -50,8 +50,8 @@
 
                     <ImageView
                         android:id="@+id/iconHome"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_home_filled"
                         app:tint="#7C3AED"
@@ -63,10 +63,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Home"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textColor="#7C3AED"
                     android:fontFamily="@font/visby_bold"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="3dp"/>
             </LinearLayout>
 
             <!-- Modules -->
@@ -81,8 +81,8 @@
                 android:paddingBottom="6dp">
 
                 <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="32dp">
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
 
                     <View
                         android:id="@+id/indicatorModules"
@@ -93,8 +93,8 @@
 
                     <ImageView
                         android:id="@+id/iconModules"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_book"
                         app:tint="#9CA3AF"
@@ -106,10 +106,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Modules"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textColor="#9CA3AF"
                     android:fontFamily="@font/visby_regular"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="3dp"/>
             </LinearLayout>
 
             <!-- Progress -->
@@ -124,8 +124,8 @@
                 android:paddingBottom="6dp">
 
                 <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="32dp">
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
 
                     <View
                         android:id="@+id/indicatorProgress"
@@ -136,8 +136,8 @@
 
                     <ImageView
                         android:id="@+id/iconProgress"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_chart"
                         app:tint="#9CA3AF"
@@ -149,10 +149,53 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Progress"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textColor="#9CA3AF"
                     android:fontFamily="@font/visby_regular"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Badges -->
+            <LinearLayout
+                android:id="@+id/navBadges"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
+
+                    <View
+                        android:id="@+id/indicatorBadges"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="invisible"/>
+
+                    <ImageView
+                        android:id="@+id/iconBadges"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_badge"
+                        app:tint="#9CA3AF"
+                        android:contentDescription="Badges"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/labelBadges"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Badges"
+                    android:textSize="10sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginTop="3dp"/>
             </LinearLayout>
 
             <!-- Profile -->
@@ -167,8 +210,8 @@
                 android:paddingBottom="6dp">
 
                 <FrameLayout
-                    android:layout_width="56dp"
-                    android:layout_height="32dp">
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
 
                     <View
                         android:id="@+id/indicatorProfile"
@@ -179,8 +222,8 @@
 
                     <ImageView
                         android:id="@+id/iconProfile"
-                        android:layout_width="22dp"
-                        android:layout_height="22dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
                         android:layout_gravity="center"
                         android:src="@drawable/ic_user"
                         app:tint="#9CA3AF"
@@ -192,10 +235,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Profile"
-                    android:textSize="11sp"
+                    android:textSize="10sp"
                     android:textColor="#9CA3AF"
                     android:fontFamily="@font/visby_regular"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="3dp"/>
             </LinearLayout>
 
         </LinearLayout>
