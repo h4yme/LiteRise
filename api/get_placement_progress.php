@@ -156,13 +156,15 @@ function formatResult($result) {
             'category1' => $result['Category1Score'] ? (float)$result['Category1Score'] : null,
             'category2' => $result['Category2Score'] ? (float)$result['Category2Score'] : null,
             'category3' => $result['Category3Score'] ? (float)$result['Category3Score'] : null,
-            'category4' => $result['Category4Score'] ? (float)$result['Category4Score'] : null
+            'category4' => $result['Category4Score'] ? (float)$result['Category4Score'] : null,
+            'category5' => $result['Category5Score'] ? (float)$result['Category5Score'] : null
         ],
         'CategoryTheta' => [
             'category1' => $result['Category1Theta'] ? (float)$result['Category1Theta'] : null,
             'category2' => $result['Category2Theta'] ? (float)$result['Category2Theta'] : null,
             'category3' => $result['Category3Theta'] ? (float)$result['Category3Theta'] : null,
-            'category4' => $result['Category4Theta'] ? (float)$result['Category4Theta'] : null
+            'category4' => $result['Category4Theta'] ? (float)$result['Category4Theta'] : null,
+            'category5' => $result['Category5Theta'] ? (float)$result['Category5Theta'] : null
         ],
         'TimeSpentSeconds' => $result['TimeSpentSeconds'] ? (int)$result['TimeSpentSeconds'] : null,
         'DeviceInfo' => $result['DeviceInfo'],

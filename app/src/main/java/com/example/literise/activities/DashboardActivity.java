@@ -377,7 +377,7 @@ public class DashboardActivity extends BaseActivity {
             double performanceScore = score / 100.0; // Convert 0-100 to 0-1
 
             LearningModule module = new LearningModule(
-                    i + 1,                              // moduleId
+                    getModuleIdByName(moduleName),      // moduleId (actual DB ID, not position)
                     moduleName,                         // title
                     getModuleSubtitleByName(moduleName),// subtitle
                     getModuleDomainByName(moduleName),  // domain
@@ -424,6 +424,18 @@ public class DashboardActivity extends BaseActivity {
                 return session.getCategoryScore("Cat5_CreatingComposing");
             default:
                 return 50; // default score
+        }
+    }
+
+    private int getModuleIdByName(String moduleName) {
+        if (moduleName == null) return 1;
+        switch (moduleName) {
+            case "Phonics and Word Study":                          return 1;
+            case "Vocabulary and Word Knowledge":                   return 2;
+            case "Grammar Awareness and Grammatical Structures":    return 3;
+            case "Comprehending and Analyzing Text":                return 4;
+            case "Creating and Composing Text":                     return 5;
+            default:                                                return 1;
         }
     }
 
