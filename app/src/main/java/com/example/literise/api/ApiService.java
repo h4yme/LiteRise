@@ -279,4 +279,17 @@ public interface ApiService {
     @Headers("Content-Type: application/json")
     @POST("generate_game_content.php")
     Call<GameContentResponse> generateGameContent(@Body GameContentRequest request);
+
+    // 🏅 Get all badges with earned status for a student
+    @GET("get_badges.php")
+    Call<com.example.literise.models.BadgesResponse> getBadges(
+            @Query("student_id") int studentId
+    );
+
+    // 🏅 Award badge after completing a node
+    @Headers("Content-Type: application/json")
+    @POST("award_badge.php")
+    Call<com.example.literise.models.AwardBadgeResponse> awardBadge(
+            @Body com.example.literise.models.AwardBadgeRequest request
+    );
 }

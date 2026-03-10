@@ -5,9 +5,16 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.BadgesResponse;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class ProfileViewActivity extends BaseNavActivity {
 
@@ -66,7 +73,28 @@ public class ProfileViewActivity extends BaseNavActivity {
         tvProfilePlacementLevel.setText(level != null && !level.isEmpty() ? level : "Not tested yet");
         tvProfileXP.setText(String.valueOf(xp));
         tvProfileStreak.setText(String.valueOf(streak));
-        tvProfileBadges.setText("7"); // placeholder — replace with real badge count
+        tvProfileBadges.setText("—"); // will be updated from API
+        fetchBadgeCount();
+    }
+
+    private void fetchBadgeCount() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+        ApiClient.getClient(this).create(ApiService.class)
+                .getBadges(studentId)
+                .enqueue(new Callback<BadgesResponse>() {
+                    @Override
+                    public void onResponse(Call<BadgesResponse> call,
+                                           Response<BadgesResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            tvProfileBadges.setText(
+                                    String.valueOf(response.body().getEarnedCount()));
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<BadgesResponse> call, Throwable t) { }
+                });
     }
 
     private void openSettings() {

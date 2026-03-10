@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="32dp"
+    android:paddingBottom="24dp">
+
+    <!-- Lottie confetti / sparkle -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieConfetti"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        app:lottie_rawRes="@raw/lottie_sparkle_stars"
+        app:lottie_loop="false"
+        app:lottie_autoPlay="true"
+        android:layout_marginBottom="-24dp"/>
+
+    <!-- Badge image -->
+    <ImageView
+        android:id="@+id/ivDialogBadge"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:scaleType="fitCenter"
+        android:layout_marginBottom="16dp"
+        android:contentDescription="New Badge"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Badge Earned!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:textColor="#7C3AED"
+        android:fontFamily="@font/visby_bold"
+        android:layout_marginBottom="6dp"/>
+
+    <TextView
+        android:id="@+id/tvDialogBadgeName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="17sp"
+        android:textStyle="bold"
+        android:textColor="#1F2937"
+        android:fontFamily="@font/visby_bold"
+        android:gravity="center"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:id="@+id/tvDialogBadgeDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="13sp"
+        android:textColor="#6B7280"
+        android:fontFamily="@font/visby_regular"
+        android:gravity="center"
+        android:layout_marginBottom="6dp"/>
+
+    <!-- XP reward pill -->
+    <LinearLayout
+        android:id="@+id/llXpReward"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/bg_semi_white_pill"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/ic_star"
+            app:tint="#FFD700"
+            android:layout_marginEnd="5dp"
+            android:contentDescription="XP"/>
+
+        <TextView
+            android:id="@+id/tvDialogXP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+100 XP"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:textColor="#7C3AED"
+            android:fontFamily="@font/visby_bold"/>
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnDialogClose"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Awesome!"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/visby_bold"
+        app:backgroundTint="#7C3AED"
+        app:cornerRadius="24dp"/>
+
+</LinearLayout>

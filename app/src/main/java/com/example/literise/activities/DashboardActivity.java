@@ -22,6 +22,7 @@ import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.BadgesResponse;
 import com.example.literise.models.CheckModulesCompleteResponse;
 import com.example.literise.models.CompleteTutorialRequest;
 import com.example.literise.models.LearningModule;
@@ -385,6 +386,7 @@ public class DashboardActivity extends BaseActivity {
         tvStreak.setText(String.format("%d Day", streak));
 
         tvBadges.setText(String.format("%d Badges Earned", totalBadges));
+        fetchRealBadgeCount();
 
         // Show the certificate banner if the user has completed the post-assessment
         if (cardCertificateBanner != null) {
@@ -394,6 +396,25 @@ public class DashboardActivity extends BaseActivity {
     }
 
 
+
+    private void fetchRealBadgeCount() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+        ApiClient.getClient(this).create(ApiService.class)
+                .getBadges(studentId)
+                .enqueue(new Callback<BadgesResponse>() {
+                    @Override
+                    public void onResponse(Call<BadgesResponse> call,
+                                           Response<BadgesResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            tvBadges.setText(response.body().getEarnedCount() + " Badges Earned");
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<BadgesResponse> call, Throwable t) { }
+                });
+    }
 
     /**
      * Load modules based on placement test results
