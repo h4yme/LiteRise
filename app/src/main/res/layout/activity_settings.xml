@@ -405,6 +405,24 @@
 
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Log Out Button -->
+                <TextView
+                    android:id="@+id/btnLogOut"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="32dp"
+                    android:padding="16dp"
+                    android:text="Log Out"
+                    android:textSize="15sp"
+                    android:textColor="#EF4444"
+                    android:textStyle="bold"
+                    android:fontFamily="@font/visby_bold"
+                    android:gravity="center"
+                    android:background="@drawable/bg_logout_btn"
+                    android:clickable="true"
+                    android:focusable="true"/>
+
             </LinearLayout>
 
         </LinearLayout>
