@@ -64,6 +64,14 @@ public class PlacementIntroActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Skip intro for post-assessment — go straight to the test
+        String assessmentType = getIntent().getStringExtra("assessment_type");
+        if ("POST".equals(assessmentType)) {
+            startPlacementTest();
+            return;
+        }
+
         setContentView(R.layout.activity_placement_intro);
 
         ivLeo             = findViewById(R.id.ivLeo);

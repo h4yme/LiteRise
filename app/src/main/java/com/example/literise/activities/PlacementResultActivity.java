@@ -3,19 +3,25 @@ package com.example.literise.activities;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
@@ -26,6 +32,12 @@ import com.example.literise.models.SavePlacementResultRequest;
 import com.example.literise.models.SavePlacementResultResponse;
 import com.example.literise.utils.SessionLogger;
 import com.google.android.material.button.MaterialButton;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -53,6 +65,13 @@ public class PlacementResultActivity extends AppCompatActivity {
     private View rowCategory1, rowCategory2, rowCategory3, rowCategory4, rowCategory5;
     private View contentSection;
     private MaterialButton btnContinueToDashboard;
+    private MaterialButton btnViewCertificate;
+
+    // Post-assessment improvement views
+    private LinearLayout sectionImprovement;
+    private TextView tvPreThetaValue, tvPreLevelLabel;
+    private TextView tvPostThetaValue, tvPostLevelLabel;
+    private TextView tvThetaImprovement, tvImprovementMessage;
 
     // Audio
     private MediaPlayer resultVoicePlayer;
@@ -66,6 +85,7 @@ public class PlacementResultActivity extends AppCompatActivity {
     private int[] categoryScores;
     private double finalTheta;
     private long startTime;
+    private boolean isPostAssessment;
 
     private SessionManager sessionManager;
 
@@ -117,6 +137,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         rowCategory5 = findViewById(R.id.rowCategory5);
 
         btnContinueToDashboard = findViewById(R.id.btnContinueToDashboard);
+        btnViewCertificate     = findViewById(R.id.btnViewCertificate);
+
+        sectionImprovement   = findViewById(R.id.sectionImprovement);
+        tvPreThetaValue      = findViewById(R.id.tvPreThetaValue);
+        tvPreLevelLabel      = findViewById(R.id.tvPreLevelLabel);
+        tvPostThetaValue     = findViewById(R.id.tvPostThetaValue);
+        tvPostLevelLabel     = findViewById(R.id.tvPostLevelLabel);
+        tvThetaImprovement   = findViewById(R.id.tvThetaImprovement);
+        tvImprovementMessage = findViewById(R.id.tvImprovementMessage);
     }
 
     private void getResultsFromIntent() {
@@ -126,8 +155,9 @@ public class PlacementResultActivity extends AppCompatActivity {
         accuracy       = intent.getDoubleExtra("accuracy", 0.0);
         totalAnswered  = intent.getIntExtra("total_answered", 0);
         totalCorrect   = intent.getIntExtra("total_correct", 0);
-        categoryScores = intent.getIntArrayExtra("category_scores");
-        finalTheta     = intent.getDoubleExtra("final_theta", 0.0);
+        categoryScores    = intent.getIntArrayExtra("category_scores");
+        finalTheta        = intent.getDoubleExtra("final_theta", 0.0);
+        isPostAssessment  = intent.getBooleanExtra("is_post_assessment", false);
         long passedStartTime = intent.getLongExtra("start_time", 0);
         if (passedStartTime > 0) startTime = passedStartTime;
 
@@ -148,7 +178,15 @@ public class PlacementResultActivity extends AppCompatActivity {
         tvLevelName.setText(levelName);
         tvLevelNumber.setText("Level " + placementLevel);
         tvAccuracy.setText(String.format("%.0f%%", accuracy));
-        tvQuestionsAnswered.setText(totalAnswered + "/" + 25);
+        tvQuestionsAnswered.setText(Math.min(totalAnswered, 25) + "/25");
+
+        if (isPostAssessment) {
+            tvCongrats.setText("You Did It! \uD83C\uDF93 LiteRise Complete!");
+            btnContinueToDashboard.setText("Back to Dashboard");
+            showImprovementSection();
+            sectionImprovement.setVisibility(View.VISIBLE);
+            btnViewCertificate.setVisibility(View.VISIBLE);
+        }
 
         if (categoryScores.length >= 5) {
             tvCategory1Score.setText(categoryScores[0] + "%");
@@ -164,6 +202,34 @@ public class PlacementResultActivity extends AppCompatActivity {
                 animateProgressBar(pbCategory4, categoryScores[3]);
                 animateProgressBar(pbCategory5, categoryScores[4]);
             }, 900);
+        }
+    }
+
+    private void showImprovementSection() {
+        double preTheta  = sessionManager.getPreTheta();
+        String preLevel  = sessionManager.getPreLevel();
+        double thetaDiff = finalTheta - preTheta;
+
+        tvPreThetaValue.setText(String.format(Locale.US, "%.2f", preTheta));
+        tvPreLevelLabel.setText(preLevel.isEmpty() ? "—" : preLevel);
+        tvPostThetaValue.setText(String.format(Locale.US, "%.2f", finalTheta));
+        tvPostLevelLabel.setText(levelName);
+
+        String sign = thetaDiff >= 0 ? "+" : "";
+        tvThetaImprovement.setText(sign + String.format(Locale.US, "%.2f", thetaDiff));
+
+        if (thetaDiff > 0.1) {
+            tvThetaImprovement.setTextColor(0xFF059669);
+            tvImprovementMessage.setText("\uD83C\uDF1F Amazing growth! You've improved so much since you started LiteRise!");
+            tvImprovementMessage.setTextColor(0xFF059669);
+        } else if (thetaDiff >= -0.1) {
+            tvThetaImprovement.setTextColor(0xFFD97706);
+            tvImprovementMessage.setText("\uD83D\uDCAA You maintained your level! Keep practicing to grow even more!");
+            tvImprovementMessage.setTextColor(0xFFD97706);
+        } else {
+            tvThetaImprovement.setTextColor(0xFFDC2626);
+            tvImprovementMessage.setText("\uD83D\uDCDA Keep going! Every reader grows at their own pace. You've got this!");
+            tvImprovementMessage.setTextColor(0xFFDC2626);
         }
     }
 
@@ -309,6 +375,160 @@ public class PlacementResultActivity extends AppCompatActivity {
             overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
             finish();
         });
+
+        btnViewCertificate.setOnClickListener(v -> shareCertificate());
+    }
+
+    private void shareCertificate() {
+        try {
+            // Build the certificate bitmap from a programmatically drawn layout
+            int width  = 1200;
+            int height = 900;
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+
+            // Background
+            android.graphics.Paint bgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            bgPaint.setColor(0xFFFFFFFF);
+            canvas.drawRect(0, 0, width, height, bgPaint);
+
+            // Purple border
+            android.graphics.Paint borderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            borderPaint.setColor(0xFF7C3AED);
+            borderPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            borderPaint.setStrokeWidth(18f);
+            canvas.drawRoundRect(18, 18, width - 18, height - 18, 32, 32, borderPaint);
+
+            // Inner accent border
+            android.graphics.Paint innerBorder = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            innerBorder.setColor(0xFFDDD6FE);
+            innerBorder.setStyle(android.graphics.Paint.Style.STROKE);
+            innerBorder.setStrokeWidth(4f);
+            canvas.drawRoundRect(30, 30, width - 30, height - 30, 26, 26, innerBorder);
+
+            // Header background strip
+            android.graphics.Paint headerBg = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            headerBg.setColor(0xFF7C3AED);
+            canvas.drawRect(0, 0, width, 150, headerBg);
+
+            // App name
+            android.graphics.Paint appNamePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            appNamePaint.setColor(0xFFFFFFFF);
+            appNamePaint.setTextSize(54f);
+            appNamePaint.setFakeBoldText(true);
+            appNamePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("LiteRise", width / 2f, 90, appNamePaint);
+
+            android.graphics.Paint subAppPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            subAppPaint.setColor(0xFFDDD6FE);
+            subAppPaint.setTextSize(28f);
+            subAppPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("English Reading Program", width / 2f, 132, subAppPaint);
+
+            // Certificate title
+            android.graphics.Paint titlePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            titlePaint.setColor(0xFF1A1A2E);
+            titlePaint.setTextSize(48f);
+            titlePaint.setFakeBoldText(true);
+            titlePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("Certificate of Completion", width / 2f, 230, titlePaint);
+
+            // Divider
+            android.graphics.Paint dividerPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            dividerPaint.setColor(0xFF7C3AED);
+            dividerPaint.setStrokeWidth(3f);
+            canvas.drawLine(100, 250, width - 100, 250, dividerPaint);
+
+            // "This certifies that"
+            android.graphics.Paint certPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            certPaint.setColor(0xFF6B7280);
+            certPaint.setTextSize(30f);
+            certPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("This certifies that", width / 2f, 320, certPaint);
+
+            // Student name
+            String studentName = sessionManager.getFullname();
+            if (studentName == null || studentName.isEmpty()) studentName = sessionManager.getNickname();
+            if (studentName == null || studentName.isEmpty()) studentName = "Student";
+            android.graphics.Paint namePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            namePaint.setColor(0xFF7C3AED);
+            namePaint.setTextSize(56f);
+            namePaint.setFakeBoldText(true);
+            namePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText(studentName, width / 2f, 400, namePaint);
+
+            // Underline name
+            float nameWidth = namePaint.measureText(studentName);
+            canvas.drawLine(width / 2f - nameWidth / 2 - 20, 415,
+                    width / 2f + nameWidth / 2 + 20, 415, dividerPaint);
+
+            // Completion text
+            canvas.drawText("has successfully completed the", width / 2f, 465, certPaint);
+            android.graphics.Paint boldCertPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            boldCertPaint.setColor(0xFF1A1A2E);
+            boldCertPaint.setTextSize(34f);
+            boldCertPaint.setFakeBoldText(true);
+            boldCertPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("LiteRise English Reading Program", width / 2f, 515, boldCertPaint);
+
+            // Level achieved
+            android.graphics.Paint levelBgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            levelBgPaint.setColor(0xFFF3E8FF);
+            canvas.drawRoundRect(width / 2f - 220, 540, width / 2f + 220, 605, 16, 16, levelBgPaint);
+            android.graphics.Paint levelPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            levelPaint.setColor(0xFF7C3AED);
+            levelPaint.setTextSize(32f);
+            levelPaint.setFakeBoldText(true);
+            levelPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("Level Achieved: " + levelName, width / 2f, 582, levelPaint);
+
+            // Theta improvement
+            double preTheta  = sessionManager.getPreTheta();
+            double thetaDiff = finalTheta - preTheta;
+            String sign = thetaDiff >= 0 ? "+" : "";
+            android.graphics.Paint improvePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            improvePaint.setColor(0xFF059669);
+            improvePaint.setTextSize(26f);
+            improvePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("Ability Growth: " + sign + String.format(Locale.US, "%.2f", thetaDiff)
+                    + "  |  Accuracy: " + String.format(Locale.US, "%.0f%%", accuracy), width / 2f, 650, improvePaint);
+
+            // Date
+            String date = new SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(new Date());
+            canvas.drawText("Completed on " + date, width / 2f, 710, certPaint);
+
+            // Footer
+            android.graphics.Paint footerPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            footerPaint.setColor(0xFF7C3AED);
+            footerPaint.setTextSize(22f);
+            footerPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("www.literise.app", width / 2f, 800, footerPaint);
+
+            // Save bitmap to cache
+            File cachesDir = new File(getCacheDir(), "certificates");
+            if (!cachesDir.exists()) cachesDir.mkdirs();
+            File certFile = new File(cachesDir, "LiteRise_Certificate.png");
+            FileOutputStream fos = new FileOutputStream(certFile);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+
+            Uri contentUri = FileProvider.getUriForFile(
+                    this,
+                    getPackageName() + ".fileprovider",
+                    certFile);
+
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("image/png");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "LiteRise Certificate of Completion");
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(shareIntent, "Share Certificate"));
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error generating certificate: " + e.getMessage());
+            android.widget.Toast.makeText(this, "Could not generate certificate", android.widget.Toast.LENGTH_SHORT).show();
+        }
     }
 
     private String getAppVersion() {
@@ -327,11 +547,11 @@ public class PlacementResultActivity extends AppCompatActivity {
             return;
         }
 
-        String assessmentType = sessionManager.hasCompletedAssessment() ? "PostAssessment" : "PreAssessment";
+        String assessmentType = isPostAssessment ? "PostAssessment" : "PreAssessment";
 
         if (com.example.literise.utils.AppConfig.DEMO_MODE) {
             Log.d(TAG, "Demo mode: Skipping API save, updating local session only");
-            if ("PreAssessment".equals(assessmentType)) {
+            if (!isPostAssessment) {
                 sessionManager.setAssessmentCompleted(true);
                 sessionManager.setAssessmentStarted(false);
             }
@@ -365,7 +585,7 @@ public class PlacementResultActivity extends AppCompatActivity {
                                    Response<SavePlacementResultResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d(TAG, "Placement result saved: " + response.body().getMessage());
-                    if ("PreAssessment".equals(assessmentType)) {
+                    if (!isPostAssessment) {
                         sessionManager.setAssessmentCompleted(true);
                         sessionManager.setAssessmentStarted(false);
                     }

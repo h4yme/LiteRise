@@ -44,6 +44,9 @@ public class SessionManager {
     private static final String KEY_CAT3_GRAMMAR_AWARENESS = "cat3_grammar_awareness";
     private static final String KEY_CAT4_COMPREHENDING_TEXT = "cat4_comprehending_text";
     private static final String KEY_CAT5_CREATING_COMPOSING = "cat5_creating_composing";
+    private static final String KEY_PRE_THETA = "pre_assessment_theta";
+    private static final String KEY_PRE_LEVEL = "pre_assessment_level";
+    private static final String KEY_PRE_ACCURACY = "pre_assessment_accuracy";
 
 
     private SharedPreferences prefs;
@@ -298,6 +301,33 @@ public class SessionManager {
             return prefs.getInt(key, 0);
         }
         return 0;
+    }
+
+    public void savePreTheta(double theta) {
+        editor.putFloat(KEY_PRE_THETA, (float) theta);
+        editor.apply();
+    }
+
+    public double getPreTheta() {
+        return prefs.getFloat(KEY_PRE_THETA, 0.0f);
+    }
+
+    public void savePreLevel(String level) {
+        editor.putString(KEY_PRE_LEVEL, level);
+        editor.apply();
+    }
+
+    public String getPreLevel() {
+        return prefs.getString(KEY_PRE_LEVEL, "");
+    }
+
+    public void savePreAccuracy(double accuracy) {
+        editor.putFloat(KEY_PRE_ACCURACY, (float) accuracy);
+        editor.apply();
+    }
+
+    public double getPreAccuracy() {
+        return prefs.getFloat(KEY_PRE_ACCURACY, 0.0f);
     }
 
     /**

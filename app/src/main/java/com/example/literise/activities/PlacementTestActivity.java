@@ -1363,12 +1363,23 @@ public class PlacementTestActivity extends AppCompatActivity {
         int placementLevel = irtEngine.calculatePlacementLevel();
         String levelName = irtEngine.getPlacementLevelName();
         double accuracy = irtEngine.getAccuracyPercentage();
-        int totalAnswered = irtEngine.getTotalAnswered();
+        // Cap at totalQuestions to prevent display overflow (e.g., 31/25)
+        int totalAnswered = Math.min(irtEngine.getTotalAnswered(), totalQuestions);
         int totalCorrect = irtEngine.getTotalCorrect();
         int[] categoryScores = irtEngine.getCategoryScores();
 
         // Get final theta from API (adaptiveHelper has the accurate theta from server)
         double finalTheta = adaptiveHelper.getCurrentTheta();
+
+        // Determine if this is a post-assessment (pre was already completed)
+        boolean isPostAssessment = sessionManager.hasCompletedAssessment();
+
+        // For pre-assessment: save theta/level/accuracy so post-assessment can show improvement
+        if (!isPostAssessment) {
+            sessionManager.savePreTheta(finalTheta);
+            sessionManager.savePreLevel(levelName);
+            sessionManager.savePreAccuracy(accuracy);
+        }
 
         // Save placement results to SessionManager for dashboard
         sessionManager.savePlacementLevel(levelName);
@@ -1392,6 +1403,7 @@ public class PlacementTestActivity extends AppCompatActivity {
         intent.putExtra("category_scores", categoryScores);
         intent.putExtra("final_theta", finalTheta);
         intent.putExtra("start_time", startTime);
+        intent.putExtra("is_post_assessment", isPostAssessment);
 
         startActivity(intent);
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
