@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.airbnb.lottie.LottieAnimationView;
 import com.example.literise.R;
@@ -381,130 +382,312 @@ public class PlacementResultActivity extends AppCompatActivity {
 
     private void shareCertificate() {
         try {
-            // Build the certificate bitmap from a programmatically drawn layout
-            int width  = 1200;
-            int height = 900;
+            // ── Canvas setup ────────────────────────────────────────────
+            int width  = 1600;
+            int height = 1130;
             Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
             Canvas canvas = new Canvas(bitmap);
 
-            // Background
+            // ── Load fonts ──────────────────────────────────────────────
+            android.graphics.Typeface poppinsBold     = ResourcesCompat.getFont(this, R.font.poppins_bold);
+            android.graphics.Typeface poppinsSemiBold = ResourcesCompat.getFont(this, R.font.poppins_semibold);
+            android.graphics.Typeface poppinsRegular  = ResourcesCompat.getFont(this, R.font.poppins_regular);
+            android.graphics.Typeface serifBold       = android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.BOLD);
+            android.graphics.Typeface serifItalic     = android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.ITALIC);
+            android.graphics.Typeface serifBoldItalic = android.graphics.Typeface.create(android.graphics.Typeface.SERIF, android.graphics.Typeface.BOLD_ITALIC);
+
+            // ── Color palette ───────────────────────────────────────────
+            int cBackground  = 0xFFFDF8F0; // warm parchment
+            int cPurpleDark  = 0xFF3B0764; // deep purple
+            int cPurple      = 0xFF7C3AED; // brand purple
+            int cPurpleLight = 0xFFDDD6FE; // lavender
+            int cPurpleMid   = 0xFFEDE9FE; // very light purple
+            int cGold        = 0xFFAD8A20; // gold accent
+            int cDarkText    = 0xFF1E1B2E; // near-black
+            int cGrayText    = 0xFF6B7280; // muted gray
+            int cGreen       = 0xFF047857; // deep green
+
+            // ── Background (parchment) ──────────────────────────────────
             android.graphics.Paint bgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            bgPaint.setColor(0xFFFFFFFF);
+            bgPaint.setColor(cBackground);
             canvas.drawRect(0, 0, width, height, bgPaint);
 
-            // Purple border
-            android.graphics.Paint borderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            borderPaint.setColor(0xFF7C3AED);
-            borderPaint.setStyle(android.graphics.Paint.Style.STROKE);
-            borderPaint.setStrokeWidth(18f);
-            canvas.drawRoundRect(18, 18, width - 18, height - 18, 32, 32, borderPaint);
+            // Subtle inner glow — very light purple tint in center
+            android.graphics.Paint glowPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            glowPaint.setShader(new android.graphics.RadialGradient(
+                    width / 2f, height / 2f, width * 0.65f,
+                    0x08C4B5FD, 0x00C4B5FD,
+                    android.graphics.Shader.TileMode.CLAMP));
+            canvas.drawRect(0, 0, width, height, glowPaint);
 
-            // Inner accent border
-            android.graphics.Paint innerBorder = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            innerBorder.setColor(0xFFDDD6FE);
-            innerBorder.setStyle(android.graphics.Paint.Style.STROKE);
-            innerBorder.setStrokeWidth(4f);
-            canvas.drawRoundRect(30, 30, width - 30, height - 30, 26, 26, innerBorder);
+            // ── Faint watermark ──────────────────────────────────────────
+            android.graphics.Paint wmPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            wmPaint.setColor(0x087C3AED);
+            wmPaint.setTextSize(220f);
+            if (poppinsBold != null) wmPaint.setTypeface(poppinsBold);
+            wmPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.save();
+            canvas.rotate(-28f, width / 2f, height / 2f);
+            canvas.drawText("LiteRise", width / 2f, height / 2f + 70, wmPaint);
+            canvas.restore();
 
-            // Header background strip
-            android.graphics.Paint headerBg = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            headerBg.setColor(0xFF7C3AED);
-            canvas.drawRect(0, 0, width, 150, headerBg);
+            // ── Outer border (deep purple) ──────────────────────────────
+            android.graphics.Paint outerBorderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            outerBorderPaint.setColor(cPurpleDark);
+            outerBorderPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            outerBorderPaint.setStrokeWidth(22f);
+            canvas.drawRoundRect(14, 14, width - 14, height - 14, 14, 14, outerBorderPaint);
 
-            // App name
-            android.graphics.Paint appNamePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            appNamePaint.setColor(0xFFFFFFFF);
-            appNamePaint.setTextSize(54f);
-            appNamePaint.setFakeBoldText(true);
-            appNamePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("LiteRise", width / 2f, 90, appNamePaint);
+            // ── Gold mid-border ─────────────────────────────────────────
+            android.graphics.Paint goldBorderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            goldBorderPaint.setColor(cGold);
+            goldBorderPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            goldBorderPaint.setStrokeWidth(5f);
+            canvas.drawRoundRect(30, 30, width - 30, height - 30, 8, 8, goldBorderPaint);
 
-            android.graphics.Paint subAppPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            subAppPaint.setColor(0xFFDDD6FE);
-            subAppPaint.setTextSize(28f);
-            subAppPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("English Reading Program", width / 2f, 132, subAppPaint);
+            // ── Inner hairline border ───────────────────────────────────
+            android.graphics.Paint innerBorderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            innerBorderPaint.setColor(cPurpleLight);
+            innerBorderPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            innerBorderPaint.setStrokeWidth(2f);
+            canvas.drawRoundRect(44, 44, width - 44, height - 44, 4, 4, innerBorderPaint);
 
-            // Certificate title
-            android.graphics.Paint titlePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            titlePaint.setColor(0xFF1A1A2E);
-            titlePaint.setTextSize(48f);
-            titlePaint.setFakeBoldText(true);
-            titlePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("Certificate of Completion", width / 2f, 230, titlePaint);
+            // ── Corner ornaments ─────────────────────────────────────────
+            android.graphics.Paint cornerLinePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            cornerLinePaint.setColor(cGold);
+            cornerLinePaint.setStyle(android.graphics.Paint.Style.STROKE);
+            cornerLinePaint.setStrokeWidth(3.5f);
+            android.graphics.Paint cornerDotPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            cornerDotPaint.setColor(cGold);
+            cornerDotPaint.setStyle(android.graphics.Paint.Style.FILL);
+            float cs = 60f, cp = 60f;
+            // Top-left
+            canvas.drawLine(cp, cp + cs, cp, cp, cornerLinePaint);
+            canvas.drawLine(cp, cp, cp + cs, cp, cornerLinePaint);
+            // Top-right
+            canvas.drawLine(width - cp - cs, cp, width - cp, cp, cornerLinePaint);
+            canvas.drawLine(width - cp, cp, width - cp, cp + cs, cornerLinePaint);
+            // Bottom-left
+            canvas.drawLine(cp, height - cp - cs, cp, height - cp, cornerLinePaint);
+            canvas.drawLine(cp, height - cp, cp + cs, height - cp, cornerLinePaint);
+            // Bottom-right
+            canvas.drawLine(width - cp - cs, height - cp, width - cp, height - cp, cornerLinePaint);
+            canvas.drawLine(width - cp, height - cp, width - cp, height - cp - cs, cornerLinePaint);
+            // Corner dots
+            canvas.drawCircle(cp, cp, 7, cornerDotPaint);
+            canvas.drawCircle(width - cp, cp, 7, cornerDotPaint);
+            canvas.drawCircle(cp, height - cp, 7, cornerDotPaint);
+            canvas.drawCircle(width - cp, height - cp, 7, cornerDotPaint);
 
-            // Divider
-            android.graphics.Paint dividerPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            dividerPaint.setColor(0xFF7C3AED);
-            dividerPaint.setStrokeWidth(3f);
-            canvas.drawLine(100, 250, width - 100, 250, dividerPaint);
+            // ── Gold diamond helper ──────────────────────────────────────
+            android.graphics.Paint diamondFillPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            diamondFillPaint.setColor(cGold);
+            diamondFillPaint.setStyle(android.graphics.Paint.Style.FILL);
 
-            // "This certifies that"
-            android.graphics.Paint certPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            certPaint.setColor(0xFF6B7280);
-            certPaint.setTextSize(30f);
-            certPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("This certifies that", width / 2f, 320, certPaint);
+            // ── Decorative rule helper ───────────────────────────────────
+            android.graphics.Paint rulePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            rulePaint.setColor(cGold);
+            rulePaint.setStrokeWidth(2.5f);
 
-            // Student name
+            // ── Header: brand name ───────────────────────────────────────
+            // Small top diamond ornament
+            android.graphics.Path topDiamond = new android.graphics.Path();
+            topDiamond.moveTo(width / 2f, 82f);
+            topDiamond.lineTo(width / 2f + 14, 96f);
+            topDiamond.lineTo(width / 2f, 110f);
+            topDiamond.lineTo(width / 2f - 14, 96f);
+            topDiamond.close();
+            canvas.drawPath(topDiamond, diamondFillPaint);
+
+            android.graphics.Paint brandPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            brandPaint.setColor(cPurpleDark);
+            brandPaint.setTextSize(86f);
+            if (poppinsBold != null) brandPaint.setTypeface(poppinsBold);
+            brandPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("LiteRise", width / 2f, 185f, brandPaint);
+
+            android.graphics.Paint programPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            programPaint.setColor(cGrayText);
+            programPaint.setTextSize(30f);
+            if (poppinsRegular != null) programPaint.setTypeface(poppinsRegular);
+            programPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("E N G L I S H   R E A D I N G   P R O G R A M", width / 2f, 226f, programPaint);
+
+            // ── Ornamental rule below header ─────────────────────────────
+            float ruleY = 258f;
+            canvas.drawLine(90, ruleY, width / 2f - 32, ruleY, rulePaint);
+            canvas.drawLine(width / 2f + 32, ruleY, width - 90, ruleY, rulePaint);
+            android.graphics.Path midDiamond = new android.graphics.Path();
+            midDiamond.moveTo(width / 2f, ruleY - 14);
+            midDiamond.lineTo(width / 2f + 18, ruleY);
+            midDiamond.lineTo(width / 2f, ruleY + 14);
+            midDiamond.lineTo(width / 2f - 18, ruleY);
+            midDiamond.close();
+            canvas.drawPath(midDiamond, diamondFillPaint);
+
+            // ── "Certificate of Completion" ──────────────────────────────
+            android.graphics.Paint certTitlePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            certTitlePaint.setColor(cDarkText);
+            certTitlePaint.setTextSize(74f);
+            certTitlePaint.setTypeface(serifBold);
+            certTitlePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("Certificate of Completion", width / 2f, 348f, certTitlePaint);
+
+            // Thin lavender underline beneath title
+            android.graphics.Paint thinLinePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            thinLinePaint.setColor(cPurpleLight);
+            thinLinePaint.setStrokeWidth(2f);
+            canvas.drawLine(width / 2f - 370, 366f, width / 2f + 370, 366f, thinLinePaint);
+
+            // ── "This certifies that" ────────────────────────────────────
+            android.graphics.Paint certifiesPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            certifiesPaint.setColor(cGrayText);
+            certifiesPaint.setTextSize(34f);
+            certifiesPaint.setTypeface(serifItalic);
+            certifiesPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("This certifies that", width / 2f, 428f, certifiesPaint);
+
+            // ── Student name ─────────────────────────────────────────────
             String studentName = sessionManager.getFullname();
             if (studentName == null || studentName.isEmpty()) studentName = sessionManager.getNickname();
             if (studentName == null || studentName.isEmpty()) studentName = "Student";
             android.graphics.Paint namePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            namePaint.setColor(0xFF7C3AED);
-            namePaint.setTextSize(56f);
-            namePaint.setFakeBoldText(true);
+            namePaint.setColor(cPurple);
+            namePaint.setTextSize(90f);
+            namePaint.setTypeface(serifBoldItalic);
             namePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText(studentName, width / 2f, 400, namePaint);
+            canvas.drawText(studentName, width / 2f, 534f, namePaint);
 
-            // Underline name
-            float nameWidth = namePaint.measureText(studentName);
-            canvas.drawLine(width / 2f - nameWidth / 2 - 20, 415,
-                    width / 2f + nameWidth / 2 + 20, 415, dividerPaint);
+            // Decorative name underline with end-dots
+            float nw = namePaint.measureText(studentName);
+            android.graphics.Paint nameUnderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            nameUnderPaint.setColor(cPurple);
+            nameUnderPaint.setStrokeWidth(3f);
+            canvas.drawLine(width / 2f - nw / 2 - 28, 554f,
+                    width / 2f + nw / 2 + 28, 554f, nameUnderPaint);
+            canvas.drawCircle(width / 2f - nw / 2 - 28, 554f, 6, cornerDotPaint);
+            canvas.drawCircle(width / 2f + nw / 2 + 28, 554f, 6, cornerDotPaint);
 
-            // Completion text
-            canvas.drawText("has successfully completed the", width / 2f, 465, certPaint);
-            android.graphics.Paint boldCertPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            boldCertPaint.setColor(0xFF1A1A2E);
-            boldCertPaint.setTextSize(34f);
-            boldCertPaint.setFakeBoldText(true);
-            boldCertPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("LiteRise English Reading Program", width / 2f, 515, boldCertPaint);
+            // ── Completion description ───────────────────────────────────
+            android.graphics.Paint completedPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            completedPaint.setColor(cGrayText);
+            completedPaint.setTextSize(32f);
+            completedPaint.setTypeface(serifItalic);
+            completedPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("has successfully completed the", width / 2f, 610f, completedPaint);
 
-            // Level achieved
-            android.graphics.Paint levelBgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            levelBgPaint.setColor(0xFFF3E8FF);
-            canvas.drawRoundRect(width / 2f - 220, 540, width / 2f + 220, 605, 16, 16, levelBgPaint);
-            android.graphics.Paint levelPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            levelPaint.setColor(0xFF7C3AED);
-            levelPaint.setTextSize(32f);
-            levelPaint.setFakeBoldText(true);
-            levelPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("Level Achieved: " + levelName, width / 2f, 582, levelPaint);
+            android.graphics.Paint progNamePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            progNamePaint.setColor(cDarkText);
+            progNamePaint.setTextSize(44f);
+            if (poppinsSemiBold != null) progNamePaint.setTypeface(poppinsSemiBold);
+            else progNamePaint.setFakeBoldText(true);
+            progNamePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("LiteRise English Reading Program", width / 2f, 668f, progNamePaint);
 
-            // Theta improvement
+            // ── Level achieved badge ─────────────────────────────────────
+            android.graphics.RectF badgeRect = new android.graphics.RectF(
+                    width / 2f - 270, 694f, width / 2f + 270, 756f);
+            android.graphics.Paint badgeBgPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            badgeBgPaint.setColor(cPurpleMid);
+            canvas.drawRoundRect(badgeRect, 32, 32, badgeBgPaint);
+            android.graphics.Paint badgeBorderPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            badgeBorderPaint.setColor(cPurple);
+            badgeBorderPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            badgeBorderPaint.setStrokeWidth(2.5f);
+            canvas.drawRoundRect(badgeRect, 32, 32, badgeBorderPaint);
+            android.graphics.Paint badgeTextPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            badgeTextPaint.setColor(cPurpleDark);
+            badgeTextPaint.setTextSize(36f);
+            if (poppinsSemiBold != null) badgeTextPaint.setTypeface(poppinsSemiBold);
+            else badgeTextPaint.setFakeBoldText(true);
+            badgeTextPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("\u2605  Level Achieved: " + levelName + "  \u2605", width / 2f, 737f, badgeTextPaint);
+
+            // ── Stats row ────────────────────────────────────────────────
             double preTheta  = sessionManager.getPreTheta();
             double thetaDiff = finalTheta - preTheta;
             String sign = thetaDiff >= 0 ? "+" : "";
-            android.graphics.Paint improvePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            improvePaint.setColor(0xFF059669);
-            improvePaint.setTextSize(26f);
-            improvePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("Ability Growth: " + sign + String.format(Locale.US, "%.2f", thetaDiff)
-                    + "  |  Accuracy: " + String.format(Locale.US, "%.0f%%", accuracy), width / 2f, 650, improvePaint);
+            android.graphics.Paint statsPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            statsPaint.setColor(cGreen);
+            statsPaint.setTextSize(30f);
+            if (poppinsRegular != null) statsPaint.setTypeface(poppinsRegular);
+            statsPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText(
+                    "Ability Growth: " + sign + String.format(Locale.US, "%.2f", thetaDiff)
+                            + "   \u2022   Accuracy: " + String.format(Locale.US, "%.0f%%", accuracy),
+                    width / 2f, 806f, statsPaint);
 
-            // Date
+            // ── Bottom ornamental rule ───────────────────────────────────
+            float bruleY = 836f;
+            canvas.drawLine(90, bruleY, width / 2f - 32, bruleY, rulePaint);
+            canvas.drawLine(width / 2f + 32, bruleY, width - 90, bruleY, rulePaint);
+            android.graphics.Path bDiamond = new android.graphics.Path();
+            bDiamond.moveTo(width / 2f, bruleY - 14);
+            bDiamond.lineTo(width / 2f + 18, bruleY);
+            bDiamond.lineTo(width / 2f, bruleY + 14);
+            bDiamond.lineTo(width / 2f - 18, bruleY);
+            bDiamond.close();
+            canvas.drawPath(bDiamond, diamondFillPaint);
+
+            // ── Bottom section: date | seal | director ───────────────────
             String date = new SimpleDateFormat("MMMM dd, yyyy", Locale.US).format(new Date());
-            canvas.drawText("Completed on " + date, width / 2f, 710, certPaint);
+            float leftX  = width / 4f;
+            float rightX = 3f * width / 4f;
+            float bLineY = 920f;
 
-            // Footer
+            android.graphics.Paint bLabelPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            bLabelPaint.setColor(cGrayText);
+            bLabelPaint.setTextSize(24f);
+            if (poppinsRegular != null) bLabelPaint.setTypeface(poppinsRegular);
+            bLabelPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+
+            android.graphics.Paint bValuePaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            bValuePaint.setColor(cDarkText);
+            bValuePaint.setTextSize(26f);
+            if (poppinsSemiBold != null) bValuePaint.setTypeface(poppinsSemiBold);
+            else bValuePaint.setFakeBoldText(true);
+            bValuePaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+
+            // Left column — date
+            canvas.drawText("Date of Completion", leftX, bLineY - 8, bLabelPaint);
+            canvas.drawLine(leftX - 110, bLineY + 8, leftX + 110, bLineY + 8, rulePaint);
+            canvas.drawText(date, leftX, bLineY + 44, bValuePaint);
+
+            // Right column — director
+            canvas.drawText("Program Director", rightX, bLineY - 8, bLabelPaint);
+            canvas.drawLine(rightX - 110, bLineY + 8, rightX + 110, bLineY + 8, rulePaint);
+            canvas.drawText("LiteRise Academy", rightX, bLineY + 44, bValuePaint);
+
+            // Center seal
+            float sealCX = width / 2f, sealCY = bLineY + 22;
+            float sealR  = 62f;
+            android.graphics.Paint sealOuterPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            sealOuterPaint.setColor(cPurpleDark);
+            sealOuterPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            sealOuterPaint.setStrokeWidth(5f);
+            canvas.drawCircle(sealCX, sealCY, sealR, sealOuterPaint);
+            android.graphics.Paint sealInnerPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            sealInnerPaint.setColor(cGold);
+            sealInnerPaint.setStyle(android.graphics.Paint.Style.STROKE);
+            sealInnerPaint.setStrokeWidth(2.5f);
+            canvas.drawCircle(sealCX, sealCY, sealR - 9, sealInnerPaint);
+            android.graphics.Paint sealTextPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+            sealTextPaint.setColor(cPurpleDark);
+            sealTextPaint.setTextSize(38f);
+            if (poppinsBold != null) sealTextPaint.setTypeface(poppinsBold);
+            else sealTextPaint.setFakeBoldText(true);
+            sealTextPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
+            canvas.drawText("LR", sealCX, sealCY + 14f, sealTextPaint);
+
+            // ── Footer ───────────────────────────────────────────────────
             android.graphics.Paint footerPaint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-            footerPaint.setColor(0xFF7C3AED);
-            footerPaint.setTextSize(22f);
+            footerPaint.setColor(cPurple);
+            footerPaint.setTextSize(24f);
+            if (poppinsRegular != null) footerPaint.setTypeface(poppinsRegular);
             footerPaint.setTextAlign(android.graphics.Paint.Align.CENTER);
-            canvas.drawText("www.literise.app", width / 2f, 800, footerPaint);
+            canvas.drawText("www.literise.app", width / 2f, height - 30f, footerPaint);
 
-            // Save bitmap to cache
+            // ── Save and share ───────────────────────────────────────────
             File cachesDir = new File(getCacheDir(), "certificates");
             if (!cachesDir.exists()) cachesDir.mkdirs();
             File certFile = new File(cachesDir, "LiteRise_Certificate.png");
