@@ -188,6 +188,12 @@ public class MusicManager {
 
         this.context = context.getApplicationContext();
 
+        // Restore persisted music-enabled preference from SettingsActivity
+        android.content.SharedPreferences prefs =
+                this.context.getSharedPreferences("LiteRiseSettings",
+                        android.content.Context.MODE_PRIVATE);
+        isMusicEnabled = prefs.getBoolean("music_enabled", true);
+
     }
 
 
@@ -491,6 +497,11 @@ public class MusicManager {
     public void setMusicEnabled(boolean enabled) {
 
         isMusicEnabled = enabled;
+
+        // Persist to SharedPreferences so it survives app restarts
+        context.getSharedPreferences("LiteRiseSettings",
+                        android.content.Context.MODE_PRIVATE)
+                .edit().putBoolean("music_enabled", enabled).apply();
 
         if (!enabled && mediaPlayer != null && mediaPlayer.isPlaying()) {
 

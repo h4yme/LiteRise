@@ -9,6 +9,16 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.literise.R;
+import com.example.literise.api.ApiClient;
+import com.example.literise.api.ApiService;
+import com.example.literise.database.SessionManager;
+import com.example.literise.models.AwardBadgeRequest;
+import com.example.literise.models.AwardBadgeResponse;
+import com.example.literise.utils.BadgeEarnedDialog;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * Quiz Result Activity - Shows adaptive decision and XP award
@@ -42,6 +52,7 @@ public class QuizResultActivity extends AppCompatActivity {
     private int lessonId;
     private int moduleId;
     private int lessonNumber;
+    private int nodeId;
     private int scorePercent;
     private int correctCount;
     private int totalQuestions;
@@ -54,18 +65,22 @@ public class QuizResultActivity extends AppCompatActivity {
         setContentView(R.layout.activity_quiz_result);
 
         // Get data from intent
-        lessonId = getIntent().getIntExtra("lesson_id", 101);
-        moduleId = getIntent().getIntExtra("module_id", 1);
-        lessonNumber = getIntent().getIntExtra("lesson_number", 1);
-        scorePercent = getIntent().getIntExtra("score_percent", 0);
-        correctCount = getIntent().getIntExtra("correct_count", 0);
-        totalQuestions = getIntent().getIntExtra("total_questions", 5);
+        lessonId         = getIntent().getIntExtra("lesson_id", 101);
+        moduleId         = getIntent().getIntExtra("module_id", 1);
+        lessonNumber     = getIntent().getIntExtra("lesson_number", 1);
+        nodeId           = getIntent().getIntExtra("node_id", 0);
+        scorePercent     = getIntent().getIntExtra("score_percent", 0);
+        correctCount     = getIntent().getIntExtra("correct_count", 0);
+        totalQuestions   = getIntent().getIntExtra("total_questions", 5);
         adaptiveDecision = getIntent().getStringExtra("adaptive_decision");
-        placementLevel = getIntent().getIntExtra("placement_level", 2);
+        placementLevel   = getIntent().getIntExtra("placement_level", 2);
 
         initializeViews();
         setupListeners();
         displayResults();
+
+        // Check badge unlocks after quiz completion
+        if (nodeId > 0) checkBadges(nodeId);
     }
 
     private void initializeViews() {
@@ -122,6 +137,34 @@ public class QuizResultActivity extends AppCompatActivity {
         else if (score >= 70) return 60;
         else if (score >= 60) return 40;
         else return 20;
+    }
+
+    /**
+     * Call award_badge.php to check and award any newly unlocked badges,
+     * then show the earned badge dialog if any new badges were awarded.
+     */
+    private void checkBadges(int nodeId) {
+        SessionManager session = new SessionManager(this);
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class)
+                .awardBadge(new AwardBadgeRequest(studentId, nodeId))
+                .enqueue(new Callback<AwardBadgeResponse>() {
+                    @Override
+                    public void onResponse(Call<AwardBadgeResponse> call,
+                                           Response<AwardBadgeResponse> response) {
+                        if (!response.isSuccessful() || response.body() == null) return;
+                        AwardBadgeResponse body = response.body();
+                        if (body.getNewBadges() != null && !body.getNewBadges().isEmpty()) {
+                            BadgeEarnedDialog.show(QuizResultActivity.this, body.getNewBadges(), null);
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<AwardBadgeResponse> call, Throwable t) {
+                        // Silently fail — badge check is non-critical
+                    }
+                });
     }
 
     /**

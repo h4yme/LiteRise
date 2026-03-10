@@ -22,6 +22,7 @@ import com.example.literise.adapters.ModuleAdapter;
 import com.example.literise.api.ApiClient;
 import com.example.literise.api.ApiService;
 import com.example.literise.database.SessionManager;
+import com.example.literise.models.BadgesResponse;
 import com.example.literise.models.CheckModulesCompleteResponse;
 import com.example.literise.models.CompleteTutorialRequest;
 import com.example.literise.models.LearningModule;
@@ -56,10 +57,10 @@ public class DashboardActivity extends BaseActivity {
     private List<LearningModule> modules;
 
     // Custom Bottom Navigation Views
-    private LinearLayout navHome, navModules, navProgress, navProfile;
-    private ImageView iconHome, iconModules, iconProgress, iconProfile;
-    private TextView labelHome, labelModules, labelProgress, labelProfile;
-    private View indicatorHome, indicatorModules, indicatorProgress, indicatorProfile;
+    private LinearLayout navHome, navModules, navProgress, navBadges, navProfile;
+    private ImageView iconHome, iconModules, iconProgress, iconBadges, iconProfile;
+    private TextView labelHome, labelModules, labelProgress, labelBadges, labelProfile;
+    private View indicatorHome, indicatorModules, indicatorProgress, indicatorBadges, indicatorProfile;
 
     // Lottie Animation Views
     private LottieAnimationView lottieHeaderSparkle, lottieStatsSparkle;
@@ -146,26 +147,30 @@ public class DashboardActivity extends BaseActivity {
         rvModules.setLayoutManager(new LinearLayoutManager(this));
 
         // Custom Bottom Navigation
-        navHome = findViewById(R.id.navHome);
-        navModules = findViewById(R.id.navModules);
+        navHome     = findViewById(R.id.navHome);
+        navModules  = findViewById(R.id.navModules);
         navProgress = findViewById(R.id.navProgress);
-        navProfile = findViewById(R.id.navProfile);
+        navBadges   = findViewById(R.id.navBadges);
+        navProfile  = findViewById(R.id.navProfile);
 
-        iconHome = findViewById(R.id.iconHome);
-        iconModules = findViewById(R.id.iconModules);
+        iconHome     = findViewById(R.id.iconHome);
+        iconModules  = findViewById(R.id.iconModules);
         iconProgress = findViewById(R.id.iconProgress);
-        iconProfile = findViewById(R.id.iconProfile);
+        iconBadges   = findViewById(R.id.iconBadges);
+        iconProfile  = findViewById(R.id.iconProfile);
 
-        labelHome = findViewById(R.id.labelHome);
-        labelModules = findViewById(R.id.labelModules);
+        labelHome     = findViewById(R.id.labelHome);
+        labelModules  = findViewById(R.id.labelModules);
         labelProgress = findViewById(R.id.labelProgress);
-        labelProfile = findViewById(R.id.labelProfile);
+        labelBadges   = findViewById(R.id.labelBadges);
+        labelProfile  = findViewById(R.id.labelProfile);
 
         // Nav pill indicators
-        indicatorHome = findViewById(R.id.indicatorHome);
-        indicatorModules = findViewById(R.id.indicatorModules);
+        indicatorHome     = findViewById(R.id.indicatorHome);
+        indicatorModules  = findViewById(R.id.indicatorModules);
         indicatorProgress = findViewById(R.id.indicatorProgress);
-        indicatorProfile = findViewById(R.id.indicatorProfile);
+        indicatorBadges   = findViewById(R.id.indicatorBadges);
+        indicatorProfile  = findViewById(R.id.indicatorProfile);
 
         // Lottie animations
         lottieHeaderSparkle = findViewById(R.id.lottieHeaderSparkle);
@@ -224,7 +229,8 @@ public class DashboardActivity extends BaseActivity {
         navHome.setOnClickListener(v -> selectNavItem(0));
         navModules.setOnClickListener(v -> selectNavItem(1));
         navProgress.setOnClickListener(v -> selectNavItem(2));
-        navProfile.setOnClickListener(v -> selectNavItem(3));
+        navBadges.setOnClickListener(v -> selectNavItem(3));
+        navProfile.setOnClickListener(v -> selectNavItem(4));
 
         // Show tutorial on first visit
 
@@ -241,24 +247,33 @@ public class DashboardActivity extends BaseActivity {
 
         // Activate selected item
         switch (position) {
-            case 0: // Home
+            case 0: // Home (stay here)
                 activateNavItem(iconHome, labelHome, indicatorHome, R.drawable.ic_home_filled);
                 loadModulesFromPlacementResults();
                 break;
 
             case 1: // Modules
                 activateNavItem(iconModules, labelModules, indicatorModules, R.drawable.ic_book_filled);
-                Toast.makeText(this, "Modules - Coming Soon!", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(this, ModulesViewActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
             case 2: // Progress
                 activateNavItem(iconProgress, labelProgress, indicatorProgress, R.drawable.ic_chart_filled);
-                startActivity(new Intent(this, ComparisonReportActivity.class));
+                startActivity(new Intent(this, ProgressViewActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
-            case 3: // Profile
+            case 3: // Badges
+                activateNavItem(iconBadges, labelBadges, indicatorBadges, R.drawable.ic_badge_filled);
+                startActivity(new Intent(this, BadgesActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                break;
+
+            case 4: // Profile
                 activateNavItem(iconProfile, labelProfile, indicatorProfile, R.drawable.ic_user_filled);
-                openSettings();
+                startActivity(new Intent(this, ProfileViewActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
         }
     }
@@ -315,28 +330,33 @@ public class DashboardActivity extends BaseActivity {
         indicatorHome.setVisibility(View.INVISIBLE);
         indicatorModules.setVisibility(View.INVISIBLE);
         indicatorProgress.setVisibility(View.INVISIBLE);
+        if (indicatorBadges != null) indicatorBadges.setVisibility(View.INVISIBLE);
         indicatorProfile.setVisibility(View.INVISIBLE);
 
         // Set all icons to outline versions
         iconHome.setImageResource(R.drawable.ic_home);
         iconModules.setImageResource(R.drawable.ic_book);
         iconProgress.setImageResource(R.drawable.ic_chart);
+        if (iconBadges != null) iconBadges.setImageResource(R.drawable.ic_badge);
         iconProfile.setImageResource(R.drawable.ic_user);
 
         // Gray all icons
         iconHome.setColorFilter(grayColor);
         iconModules.setColorFilter(grayColor);
         iconProgress.setColorFilter(grayColor);
+        if (iconBadges != null) iconBadges.setColorFilter(grayColor);
         iconProfile.setColorFilter(grayColor);
 
         // Gray all labels
         labelHome.setTextColor(grayColor);
         labelModules.setTextColor(grayColor);
         labelProgress.setTextColor(grayColor);
+        if (labelBadges != null) labelBadges.setTextColor(grayColor);
         labelProfile.setTextColor(grayColor);
         labelHome.setAlpha(1f);
         labelModules.setAlpha(1f);
         labelProgress.setAlpha(1f);
+        if (labelBadges != null) labelBadges.setAlpha(1f);
         labelProfile.setAlpha(1f);
     }
 
@@ -366,6 +386,7 @@ public class DashboardActivity extends BaseActivity {
         tvStreak.setText(String.format("%d Day", streak));
 
         tvBadges.setText(String.format("%d Badges Earned", totalBadges));
+        fetchRealBadgeCount();
 
         // Show the certificate banner if the user has completed the post-assessment
         if (cardCertificateBanner != null) {
@@ -375,6 +396,25 @@ public class DashboardActivity extends BaseActivity {
     }
 
 
+
+    private void fetchRealBadgeCount() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+        ApiClient.getClient(this).create(ApiService.class)
+                .getBadges(studentId)
+                .enqueue(new Callback<BadgesResponse>() {
+                    @Override
+                    public void onResponse(Call<BadgesResponse> call,
+                                           Response<BadgesResponse> response) {
+                        if (response.isSuccessful() && response.body() != null
+                                && response.body().isSuccess()) {
+                            tvBadges.setText(response.body().getEarnedCount() + " Badges Earned");
+                        }
+                    }
+                    @Override
+                    public void onFailure(Call<BadgesResponse> call, Throwable t) { }
+                });
+    }
 
     /**
      * Load modules based on placement test results

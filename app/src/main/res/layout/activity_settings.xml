@@ -1,470 +1,607 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
     android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0EFFE">
 
-    android:layout_height="match_parent">
-
-
-
-
-    <ImageView
-
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-
         android:layout_height="match_parent"
-
-        android:src="@drawable/bg_dashboard"
-
-        android:scaleType="centerCrop"
-
-        android:contentDescription="Dashboard Background"/>
-
-
-
-    <!-- Main Content -->
-
-    <LinearLayout
-
-        android:layout_width="match_parent"
-
-        android:layout_height="match_parent"
-
-        android:orientation="vertical"
-
-        android:padding="20dp">
-
-
-
-        <!-- Header -->
-
-        <RelativeLayout
-
-            android:layout_width="match_parent"
-
-            android:layout_height="wrap_content"
-
-            android:layout_marginBottom="24dp">
-
-
-
-            <!-- Back Button -->
-
-            <ImageView
-
-                android:id="@+id/btnBack"
-
-                android:layout_width="32dp"
-
-                android:layout_height="32dp"
-
-                android:src="@drawable/ic_arrow_back"
-
-                android:layout_alignParentStart="true"
-
-                android:layout_centerVertical="true"
-
-                app:tint="#3B82F6"
-
-                android:clickable="true"
-
-                android:focusable="true"
-
-                android:background="?attr/selectableItemBackgroundBorderless"
-
-                android:contentDescription="Back"/>
-
-
-
-            <!-- Settings Title -->
-
-            <TextView
-
-                android:layout_width="wrap_content"
-
-                android:layout_height="wrap_content"
-
-                android:layout_centerInParent="true"
-
-                android:fontFamily="@font/visby_bold"
-
-                android:text="Settings"
-
-                android:textColor="#2D3436"
-                android:textSize="24sp"
-                android:textStyle="bold" />
-
-        </RelativeLayout>
-
-
-
-        <!-- Settings Cards Container -->
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
-
             android:layout_width="match_parent"
-
-            android:layout_height="0dp"
-
-            android:layout_weight="1"
-
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-
-
-            <!-- Voice Speed Card -->
-
-            <androidx.cardview.widget.CardView
-
+            <!-- Purple Header -->
+            <FrameLayout
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
-                android:layout_marginBottom="16dp"
-
-                app:cardCornerRadius="16dp"
-
-                app:cardElevation="0dp"
-
-                app:cardBackgroundColor="#AAFFF5F0">
-
-
+                android:background="@drawable/bg_header_purple"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="44dp">
 
                 <LinearLayout
-
                     android:layout_width="match_parent"
-
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
 
-                    android:orientation="vertical"
-
-                    android:padding="20dp">
-
-
+                    <ImageView
+                        android:id="@+id/btnBack"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:src="@drawable/ic_arrow_back"
+                        android:background="@drawable/icon_circle_white"
+                        android:padding="9dp"
+                        app:tint="#FFFFFF"
+                        android:layout_marginEnd="14dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:contentDescription="Back"/>
 
                     <TextView
-
                         android:layout_width="wrap_content"
-
                         android:layout_height="wrap_content"
-
-                        android:text="Voice Speed"
-
-                        android:textSize="16sp"
-
+                        android:text="Settings"
+                        android:textSize="22sp"
                         android:textStyle="bold"
-
-                        android:textColor="#2D3436"
-
-                        android:fontFamily="@font/visby_medium"
-
-                        android:layout_marginBottom="12dp"/>
-
-
-
-                    <!-- Voice Speed Selector -->
-
-                    <LinearLayout
-
-                        android:layout_width="match_parent"
-
-                        android:layout_height="40dp"
-
-                        android:orientation="horizontal"
-
-                        android:background="@drawable/bg_rounded_white"
-
-                        android:padding="4dp">
-
-
-
-                        <TextView
-
-                            android:id="@+id/btnVoiceNormal"
-
-                            android:layout_width="0dp"
-
-                            android:layout_height="match_parent"
-
-                            android:layout_weight="1"
-
-                            android:text="Normal"
-
-                            android:textSize="14sp"
-
-                            android:textColor="#FFFFFF"
-
-                            android:fontFamily="@font/poppins_semibold"
-
-                            android:gravity="center"
-
-                            android:background="@drawable/bg_voice_speed_selected"
-
-                            android:clickable="true"
-
-                            android:focusable="true"/>
-
-
-
-                        <TextView
-
-                            android:id="@+id/btnVoiceSlow"
-
-                            android:layout_width="0dp"
-
-                            android:layout_height="match_parent"
-
-                            android:layout_weight="1"
-
-                            android:text="Slow"
-
-                            android:textSize="14sp"
-
-                            android:textColor="#636E72"
-
-                            android:fontFamily="@font/poppins"
-
-                            android:gravity="center"
-
-                            android:clickable="true"
-
-                            android:focusable="true"/>
-
-                    </LinearLayout>
+                        android:textColor="#FFFFFF"
+                        android:fontFamily="@font/visby_bold"/>
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </FrameLayout>
 
-
-
-            <!-- Sounds Card -->
-
-            <androidx.cardview.widget.CardView
-
+            <!-- White Content -->
+            <LinearLayout
                 android:layout_width="match_parent"
-
                 android:layout_height="wrap_content"
-
-                android:layout_marginBottom="16dp"
-
-                app:cardCornerRadius="16dp"
-
-                app:cardElevation="0dp"
-
-                app:cardBackgroundColor="#AAFFF5F0">
-
-
-
-                <RelativeLayout
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    android:padding="20dp">
-
-
-
-                    <TextView
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:text="Sounds"
-
-                        android:textSize="16sp"
-
-                        android:textStyle="bold"
-
-                        android:textColor="#2D3436"
-
-                        android:fontFamily="@font/visby_medium"
-
-                        android:layout_centerVertical="true"/>
-
-
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-
-                        android:id="@+id/switchSounds"
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_alignParentEnd="true"
-
-                        android:layout_centerVertical="true"
-
-                        android:checked="true"
-
-                        app:thumbTint="#FFFFFF"
-
-                        app:trackTint="#00C853"/>
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-
-
-            <!-- Download Lessons Card -->
-
-            <androidx.cardview.widget.CardView
-
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-
-                android:layout_marginBottom="16dp"
-
-                app:cardCornerRadius="16dp"
-
-                app:cardElevation="0dp"
-
-                app:cardBackgroundColor="#AAFFF5F0">
-
-
-
-                <RelativeLayout
-
-                    android:layout_width="match_parent"
-
-                    android:layout_height="wrap_content"
-
-                    android:padding="20dp">
-
-
-
-                    <TextView
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:text="Download Lessons"
-
-                        android:textSize="16sp"
-
-                        android:textStyle="bold"
-
-                        android:textColor="#2D3436"
-
-                        android:fontFamily="@font/visby_medium"
-
-                        android:layout_centerVertical="true"/>
-
-
-
-                    <com.google.android.material.switchmaterial.SwitchMaterial
-
-                        android:id="@+id/switchDownload"
-
-                        android:layout_width="wrap_content"
-
-                        android:layout_height="wrap_content"
-
-                        android:layout_alignParentEnd="true"
-
-                        android:layout_centerVertical="true"
-
-                        android:checked="false"
-
-                        app:thumbTint="#FFFFFF"
-
-                        app:trackTint="#BDBDBD"/>
-
-                </RelativeLayout>
-
-            </androidx.cardview.widget.CardView>
-
-
-
-            <!-- About App Card -->
-
-            <androidx.cardview.widget.CardView
-
-                android:id="@+id/cardAboutApp"
-
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-
-                android:layout_marginBottom="16dp"
-
-                app:cardCornerRadius="16dp"
-
-                app:cardElevation="0dp"
-
-                app:cardBackgroundColor="#AAFFF5F0"
-
-                android:clickable="true"
-
-                android:focusable="true"
-
-                android:foreground="?attr/selectableItemBackground">
-
-
-
+                android:orientation="vertical"
+                android:background="@drawable/bg_white_top_rounded"
+                android:layout_marginTop="-24dp"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="24dp"
+                android:paddingBottom="40dp">
+
+                <!-- ── ACCOUNT Section ── -->
                 <TextView
-
-                    android:layout_width="match_parent"
-
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="ACCOUNT"
+                    android:textSize="12sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="10dp"/>
 
-                    android:text="About App"
+                <!-- Change Display Name Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardChangeName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginBottom="1dp">
 
-                    android:textSize="16sp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
 
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_edit"
+                                app:tint="#7C3AED"
+                                android:contentDescription="Name"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Display Name"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#1F2937"
+                                android:fontFamily="@font/visby_bold"/>
+                            <TextView
+                                android:id="@+id/tvCurrentDisplayName"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Student"
+                                android:textSize="12sp"
+                                android:textColor="#9CA3AF"
+                                android:fontFamily="@font/visby_regular"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#9CA3AF"
+                            android:contentDescription="Edit"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Change Password Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardChangePassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_lock"
+                                app:tint="#7C3AED"
+                                android:contentDescription="Password"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Change Password"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F2937"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#9CA3AF"
+                            android:contentDescription="Go"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── LEARNING Section ── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="LEARNING"
+                    android:textSize="12sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="10dp"/>
+
+                <!-- Voice Speed Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="18dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:layout_marginBottom="14dp">
+
+                            <FrameLayout
+                                android:layout_width="36dp"
+                                android:layout_height="36dp"
+                                android:background="@drawable/bg_icon_chip_purple"
+                                android:layout_marginEnd="12dp">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_volume_up"
+                                    app:tint="#7C3AED"
+                                    android:contentDescription="Voice"/>
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Voice Speed"
+                                android:textSize="15sp"
+                                android:textStyle="bold"
+                                android:textColor="#1F2937"
+                                android:fontFamily="@font/visby_bold"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="44dp"
+                            android:orientation="horizontal"
+                            android:background="@drawable/bg_seg_control_track"
+                            android:padding="4dp">
+
+                            <TextView
+                                android:id="@+id/btnVoiceNormal"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text="Normal"
+                                android:textSize="13sp"
+                                android:textColor="#FFFFFF"
+                                android:fontFamily="@font/visby_bold"
+                                android:gravity="center"
+                                android:background="@drawable/bg_voice_speed_selected"
+                                android:clickable="true"
+                                android:focusable="true"/>
+
+                            <TextView
+                                android:id="@+id/btnVoiceSlow"
+                                android:layout_width="0dp"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text="Slow"
+                                android:textSize="13sp"
+                                android:textColor="#6B7280"
+                                android:fontFamily="@font/visby_medium"
+                                android:gravity="center"
+                                android:clickable="true"
+                                android:focusable="true"/>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Daily Reminders Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_star"
+                                app:tint="#7C3AED"
+                                android:contentDescription="Reminders"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Daily Reminders"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#1F2937"
+                                android:fontFamily="@font/visby_bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Remind me to practice every day"
+                                android:textSize="12sp"
+                                android:textColor="#9CA3AF"
+                                android:fontFamily="@font/visby_regular"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchReminders"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            app:thumbTint="#FFFFFF"
+                            app:trackTint="@color/purple_500"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── AUDIO Section ── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="AUDIO"
+                    android:textSize="12sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- Sound Effects Toggle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_volume_up"
+                                app:tint="#7C3AED"
+                                android:contentDescription="Sounds"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Sound Effects"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#1F2937"
+                                android:fontFamily="@font/visby_bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Play sounds during lessons"
+                                android:textSize="12sp"
+                                android:textColor="#9CA3AF"
+                                android:fontFamily="@font/visby_regular"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchSounds"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            app:thumbTint="#FFFFFF"
+                            app:trackTint="@color/purple_500"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Background Music Toggle -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:layout_marginBottom="12dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_volume_off"
+                                app:tint="#7C3AED"
+                                android:contentDescription="Music"/>
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Background Music"
+                                android:textSize="14sp"
+                                android:textStyle="bold"
+                                android:textColor="#1F2937"
+                                android:fontFamily="@font/visby_bold"/>
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Play music while learning"
+                                android:textSize="12sp"
+                                android:textColor="#9CA3AF"
+                                android:fontFamily="@font/visby_regular"
+                                android:layout_marginTop="2dp"/>
+                        </LinearLayout>
+
+                        <com.google.android.material.switchmaterial.SwitchMaterial
+                            android:id="@+id/switchMusic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            app:thumbTint="#FFFFFF"
+                            app:trackTint="@color/purple_500"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- ── APP Section ── -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="APP"
+                    android:textSize="12sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_bold"
+                    android:letterSpacing="0.12"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="4dp"/>
+
+                <!-- About App Row -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAboutApp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="0dp"
+                    app:cardBackgroundColor="#FFFFFF"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:layout_marginBottom="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="16dp">
+
+                        <FrameLayout
+                            android:layout_width="36dp"
+                            android:layout_height="36dp"
+                            android:background="@drawable/bg_icon_chip_purple"
+                            android:layout_marginEnd="14dp">
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_info"
+                                app:tint="#7C3AED"
+                                android:contentDescription="About"/>
+                        </FrameLayout>
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="About LiteRise"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:textColor="#1F2937"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <ImageView
+                            android:layout_width="16dp"
+                            android:layout_height="16dp"
+                            android:src="@drawable/ic_arrow_forward"
+                            app:tint="#9CA3AF"
+                            android:contentDescription="Go"/>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Log Out Button -->
+                <TextView
+                    android:id="@+id/btnLogOut"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="32dp"
+                    android:padding="16dp"
+                    android:text="Log Out"
+                    android:textSize="15sp"
+                    android:textColor="#EF4444"
                     android:textStyle="bold"
+                    android:fontFamily="@font/visby_bold"
+                    android:gravity="center"
+                    android:background="@drawable/bg_logout_btn"
+                    android:clickable="true"
+                    android:focusable="true"/>
 
-                    android:textColor="#2D3436"
-
-                    android:fontFamily="@font/visby_medium"
-
-                    android:padding="20dp"/>
-
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
         </LinearLayout>
 
+    </androidx.core.widget.NestedScrollView>
 
-
-        <!-- Log Out Button -->
-
-        <TextView
-
-            android:id="@+id/btnLogOut"
-
-            android:layout_width="wrap_content"
-
-            android:layout_height="wrap_content"
-
-            android:text="Log Out"
-
-            android:textSize="16sp"
-
-            android:textColor="#2D3436"
-
-            android:fontFamily="@font/poppins"
-
-            android:layout_gravity="center"
-
-            android:layout_marginBottom="40dp"
-
-            android:clickable="true"
-
-            android:focusable="true"
-
-            android:background="?attr/selectableItemBackground"
-
-            android:padding="12dp"/>
-
-    </LinearLayout>
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
