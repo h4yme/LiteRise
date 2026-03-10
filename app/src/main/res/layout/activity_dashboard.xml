@@ -247,6 +247,72 @@
                 android:paddingTop="28dp"
                 android:paddingBottom="20dp">
 
+                <!-- ═══════════════════════════════════════════════════════════
+                     CERTIFICATE BANNER — shown only after post-assessment
+                     ═══════════════════════════════════════════════════════════ -->
+                <LinearLayout
+                    android:id="@+id/cardCertificateBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:background="@drawable/bg_gradient_purple"
+                    android:padding="16dp"
+                    android:layout_marginBottom="18dp"
+                    android:visibility="gone">
+
+                    <!-- Emoji / icon column -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🎓"
+                        android:textSize="36sp"
+                        android:layout_marginEnd="14dp"/>
+
+                    <!-- Text column -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Certificate Earned!"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:fontFamily="@font/visby_bold"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="You completed the English Reading Program"
+                            android:textColor="#DDDDFF"
+                            android:textSize="12sp"
+                            android:fontFamily="@font/visby_regular"
+                            android:layout_marginTop="2dp"/>
+                    </LinearLayout>
+
+                    <!-- Action button -->
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnRePrintCertificate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="View &amp; Share"
+                        android:textSize="12sp"
+                        android:textColor="@color/purple_700"
+                        app:backgroundTint="#FFFFFF"
+                        app:cornerRadius="20dp"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:layout_marginStart="10dp"/>
+
+                </LinearLayout>
+
                 <!-- SECTION HEADER: "Your Learning Path" + sparkle Lottie -->
                 <LinearLayout
                     android:layout_width="match_parent"

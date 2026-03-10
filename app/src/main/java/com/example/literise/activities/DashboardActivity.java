@@ -48,6 +48,8 @@ public class DashboardActivity extends BaseActivity {
     private ImageView ivLeoMascot, ivSettings;
 
     private MaterialButton btnContinueLesson;
+    private android.widget.LinearLayout cardCertificateBanner;
+    private MaterialButton btnRePrintCertificate;
 
     private RecyclerView rvModules;
     private ModuleAdapter moduleAdapter;
@@ -137,6 +139,8 @@ public class DashboardActivity extends BaseActivity {
         //btnContinueLesson = findViewById(R.id.btnContinueLesson);
 
         rvModules = findViewById(R.id.rvModules);
+        cardCertificateBanner  = findViewById(R.id.cardCertificateBanner);
+        btnRePrintCertificate  = findViewById(R.id.btnRePrintCertificate);
 
         // Setup RecyclerView
         rvModules.setLayoutManager(new LinearLayoutManager(this));
@@ -192,6 +196,21 @@ public class DashboardActivity extends BaseActivity {
         // Continue lesson button (optional, may not be in layout)
         if (btnContinueLesson != null) {
             btnContinueLesson.setOnClickListener(v -> continueLesson());
+        }
+
+        // Certificate re-print button
+        if (btnRePrintCertificate != null) {
+            btnRePrintCertificate.setOnClickListener(v -> {
+                String name = session.getFullname();
+                if (name == null || name.isEmpty()) name = session.getNickname();
+                if (name == null || name.isEmpty()) name = "Student";
+                com.example.literise.utils.CertificateHelper.generateAndShare(
+                        this, name,
+                        session.getPostLevelName(),
+                        session.getPostTheta(),
+                        session.getPreTheta(),
+                        session.getPostAccuracy());
+            });
         }
 
         ivLeoMascot.setOnClickListener(v -> showLeoEncouragement());
@@ -348,6 +367,11 @@ public class DashboardActivity extends BaseActivity {
 
         tvBadges.setText(String.format("%d Badges Earned", totalBadges));
 
+        // Show the certificate banner if the user has completed the post-assessment
+        if (cardCertificateBanner != null) {
+            cardCertificateBanner.setVisibility(
+                    session.hasCompletedPostAssessment() ? View.VISIBLE : View.GONE);
+        }
     }
 
 

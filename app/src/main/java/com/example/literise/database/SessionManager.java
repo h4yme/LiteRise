@@ -48,6 +48,12 @@ public class SessionManager {
     private static final String KEY_PRE_LEVEL = "pre_assessment_level";
     private static final String KEY_PRE_ACCURACY = "pre_assessment_accuracy";
 
+    // Post-assessment certificate data
+    private static final String KEY_POST_COMPLETED   = "post_assessment_completed";
+    private static final String KEY_POST_THETA       = "post_assessment_theta_value";
+    private static final String KEY_POST_LEVEL_NAME  = "post_assessment_level_name";
+    private static final String KEY_POST_ACCURACY    = "post_assessment_accuracy_value";
+
 
     private SharedPreferences prefs;
 
@@ -328,6 +334,30 @@ public class SessionManager {
 
     public double getPreAccuracy() {
         return prefs.getFloat(KEY_PRE_ACCURACY, 0.0f);
+    }
+
+    public void savePostAssessmentResult(double theta, String levelName, double accuracy) {
+        editor.putBoolean(KEY_POST_COMPLETED, true);
+        editor.putFloat(KEY_POST_THETA, (float) theta);
+        editor.putString(KEY_POST_LEVEL_NAME, levelName);
+        editor.putFloat(KEY_POST_ACCURACY, (float) accuracy);
+        editor.apply();
+    }
+
+    public boolean hasCompletedPostAssessment() {
+        return prefs.getBoolean(KEY_POST_COMPLETED, false);
+    }
+
+    public double getPostTheta() {
+        return prefs.getFloat(KEY_POST_THETA, 0.0f);
+    }
+
+    public String getPostLevelName() {
+        return prefs.getString(KEY_POST_LEVEL_NAME, "");
+    }
+
+    public double getPostAccuracy() {
+        return prefs.getFloat(KEY_POST_ACCURACY, 0.0f);
     }
 
     /**
