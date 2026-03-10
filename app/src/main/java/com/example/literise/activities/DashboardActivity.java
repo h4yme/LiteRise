@@ -832,18 +832,56 @@ public class DashboardActivity extends BaseActivity {
                         if (body.isShouldTriggerPostAssessment()) {
                             showPostAssessmentDialog(body.getCompletedCount(), body.getTotalCount());
                         } else if (body.isPostAssessmentDone() && !session.hasCompletedPostAssessment()) {
-                            // Post-assessment was completed (e.g. on another device or after reinstall)
-                            // but the local session flag was never set — sync it and show the banner.
-                            session.markPostAssessmentCompleted();
-                            if (cardCertificateBanner != null) {
-                                cardCertificateBanner.setVisibility(View.VISIBLE);
-                            }
+                            // Post-assessment done on server but local data is missing —
+                            // fetch the full result so the certificate has real values.
+                            fetchAndSavePostAssessmentResult();
                         }
                     }
 
                     @Override
                     public void onFailure(Call<CheckModulesCompleteResponse> call, Throwable t) {
                         // Silently fail — do not interrupt the user
+                    }
+                });
+    }
+
+    private void fetchAndSavePostAssessmentResult() {
+        int studentId = session.getStudentId();
+        if (studentId <= 0) return;
+
+        ApiClient.getClient(this).create(ApiService.class).getPlacementProgress(studentId)
+                .enqueue(new Callback<com.example.literise.models.PlacementProgressResponse>() {
+                    @Override
+                    public void onResponse(Call<com.example.literise.models.PlacementProgressResponse> call,
+                                           Response<com.example.literise.models.PlacementProgressResponse> response) {
+                        if (!response.isSuccessful() || response.body() == null || !response.body().isSuccess()) return;
+
+                        com.example.literise.models.PlacementProgressResponse body = response.body();
+                        com.example.literise.models.PlacementProgressResponse.AssessmentResults results = body.getResults();
+                        if (results == null) return;
+
+                        com.example.literise.models.PlacementProgressResponse.AssessmentDetail post = results.getPost();
+                        if (post == null) return;
+
+                        // Persist the post-assessment result so the certificate has real values
+                        session.savePostAssessmentResult(
+                                post.getFinalTheta(),
+                                post.getLevelName(),
+                                post.getAccuracyPercentage());
+
+                        // Also sync pre-theta if not already saved (needed for Ability Growth calc)
+                        if (session.getPreTheta() == 0.0 && results.getPre() != null) {
+                            session.savePreTheta(results.getPre().getFinalTheta());
+                        }
+
+                        if (cardCertificateBanner != null) {
+                            cardCertificateBanner.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<com.example.literise.models.PlacementProgressResponse> call, Throwable t) {
+                        // Silently fail
                     }
                 });
     }

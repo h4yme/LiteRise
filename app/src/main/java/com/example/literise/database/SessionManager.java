@@ -348,11 +348,6 @@ public class SessionManager {
         return prefs.getBoolean(KEY_POST_COMPLETED, false);
     }
 
-    public void markPostAssessmentCompleted() {
-        editor.putBoolean(KEY_POST_COMPLETED, true);
-        editor.apply();
-    }
-
     public double getPostTheta() {
         return prefs.getFloat(KEY_POST_THETA, 0.0f);
     }
