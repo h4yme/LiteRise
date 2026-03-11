@@ -1,0 +1,271 @@
+@{
+    Layout = null;
+    ViewBag.Title = "Sign In";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LiteRise Portal — Sign In</title>
+    <style>
+        @font-face { font-family:'Visby'; src:url('../fonts/VisbyCF-Regular.otf') format('opentype'); font-weight:400; }
+        @font-face { font-family:'Visby'; src:url('../fonts/VisbyCF-Bold.otf')    format('opentype'); font-weight:700; }
+        @font-face { font-family:'Visby'; src:url('../fonts/VisbyCF-ExtraBold.otf') format('opentype'); font-weight:800; }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Visby', -apple-system, sans-serif;
+            background: #0F172A;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+
+        /* Grid texture */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image:
+                linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none; z-index: 0;
+        }
+
+        /* Glow blobs */
+        .blobs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .blob   { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .55; }
+        .blob-1 { width:420px; height:420px; background: radial-gradient(circle, rgba(17,176,103,.28), transparent 70%); top:-120px; right:-80px; }
+        .blob-2 { width:350px; height:350px; background: radial-gradient(circle, rgba(124,58,237,.2), transparent 70%);  bottom:-90px; left:-60px; }
+        .blob-3 { width:260px; height:260px; background: radial-gradient(circle, rgba(253,201,74,.18), transparent 70%); top:42%; left:8%; }
+
+        /* Branding */
+        .branding {
+            position: fixed; top: 28px; left: 36px; z-index: 10;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .brand-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: linear-gradient(135deg, #0EA05A, #11B067);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; font-weight: 800; font-size: 16px;
+            box-shadow: 0 4px 14px rgba(17,176,103,.4);
+        }
+        .brand-name { font-size: 1.15rem; font-weight: 800; color: #fff; }
+
+        .portal-badge {
+            position: fixed; top: 34px; right: 36px; z-index: 10;
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
+            border-radius: 999px; padding: 4px 14px;
+            font-size: .78rem; font-weight: 600; color: rgba(255,255,255,.6);
+        }
+
+        /* Card */
+        .login-wrap { position: relative; z-index: 1; width: 100%; max-width: 420px; padding: 20px; }
+
+        .card {
+            background: rgba(255,255,255,.97);
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 28px 70px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.08);
+        }
+
+        .card-head { text-align: center; margin-bottom: 28px; }
+        .card-logo {
+            width: 58px; height: 58px; border-radius: 16px;
+            background: linear-gradient(135deg, #0EA05A, #11B067);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(17,176,103,.35);
+        }
+        .card-head h1 { font-size: 1.45rem; font-weight: 800; color: #0F172A; margin-bottom: 6px; }
+        .card-head p  { font-size: .85rem; color: #64748B; }
+
+        /* Role tabs */
+        .role-tabs {
+            display: flex; gap: 6px;
+            background: #F1F5F9; border-radius: 10px;
+            padding: 4px; margin-bottom: 24px;
+        }
+        .role-tab {
+            flex: 1; padding: 8px; border: none; border-radius: 8px;
+            font-size: .84rem; font-weight: 600; cursor: pointer;
+            transition: all .2s; color: #64748B; background: transparent;
+            font-family: inherit;
+        }
+        .role-tab.active { background: #fff; color: #11B067; box-shadow: 0 1px 4px rgba(0,0,0,.1); }
+
+        /* Error */
+        .error-msg {
+            display: flex; align-items: center; gap: 10px;
+            background: #FEE2E2; color: #DC2626;
+            padding: 11px 14px; border-radius: 8px;
+            margin-bottom: 18px; font-size: .84rem; font-weight: 600;
+        }
+
+        /* Form */
+        .form { display: flex; flex-direction: column; gap: 18px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-label { font-size: .83rem; font-weight: 700; color: #0F172A; }
+        .input-wrap { position: relative; }
+        .input-icon {
+            position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+            color: #94A3B8; pointer-events: none; display: flex; align-items: center;
+        }
+        .input-wrap input {
+            width: 100%; padding: 12px 44px 12px 42px;
+            border: 1.5px solid #E2E8F0; border-radius: 10px;
+            font-size: .9rem; background: #F8FAFC; color: #0F172A;
+            transition: all .2s; font-family: inherit;
+        }
+        .input-wrap input:focus {
+            outline: none; border-color: #11B067; background: #fff;
+            box-shadow: 0 0 0 3px rgba(17,176,103,.12);
+        }
+        .pw-toggle {
+            position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+            background: none; border: none; cursor: pointer; color: #94A3B8;
+            display: flex; align-items: center; padding: 4px; transition: color .2s;
+        }
+        .pw-toggle:hover { color: #11B067; }
+
+        .form-options { display: flex; justify-content: space-between; align-items: center; font-size: .84rem; }
+        .remember { display: flex; align-items: center; gap: 7px; cursor: pointer; color: #64748B; }
+        .remember input { accent-color: #11B067; }
+        .forgot { color: #11B067; text-decoration: none; font-weight: 700; }
+        .forgot:hover { color: #0EA05A; }
+
+        .btn-submit {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #0EA05A, #11B067, #22C55E);
+            color: #fff; border: none; border-radius: 10px; padding: 13px;
+            font-size: .97rem; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all .25s;
+            box-shadow: 0 6px 20px rgba(17,176,103,.4); width: 100%;
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(17,176,103,.55); }
+        .btn-submit.loading { opacity: .7; pointer-events: none; }
+
+        .card-foot { text-align: center; margin-top: 18px; font-size: .82rem; color: #94A3B8; }
+        .card-foot a { color: #11B067; text-decoration: none; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="blobs">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+<div class="branding">
+    <div class="brand-icon">L</div>
+    <span class="brand-name">LiteRise</span>
+</div>
+<div class="portal-badge">Teacher &amp; Admin Portal</div>
+
+<div class="login-wrap">
+    <div class="card">
+        <div class="card-head">
+            <div class="card-logo">📚</div>
+            <h1>Portal Sign In</h1>
+            <p>Enter your credentials to continue</p>
+        </div>
+
+        <div class="role-tabs">
+            <button type="button" class="role-tab active">🛡 Admin</button>
+            <button type="button" class="role-tab">📋 Teacher</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage as string)) {
+            <div class="error-msg">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                @ViewBag.ErrorMessage
+            </div>
+        }
+
+        @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { id = "loginForm" })) {
+            @Html.AntiForgeryToken()
+            <div class="form">
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </span>
+                        @Html.TextBox("Email", "", new { type = "email", id = "email", placeholder = "your@email.com", required = "required", autocomplete = "email" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </span>
+                        @Html.Password("Password", "", new { id = "password", placeholder = "••••••••", required = "required", autocomplete = "current-password" })
+                        <button type="button" class="pw-toggle" id="pwToggle">
+                            <svg id="eyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg id="eyeClosed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" name="RememberMe"> Remember me
+                    </label>
+                    <a href="#" class="forgot">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    Sign In
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+                    </svg>
+                </button>
+            </div>
+        }
+
+        <div class="card-foot">
+            Student app? <a href="/">Go to LiteRise home</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Role tabs (cosmetic)
+    document.querySelectorAll('.role-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
+
+    // Password toggle
+    document.getElementById('pwToggle').addEventListener('click', function () {
+        const inp = document.getElementById('password');
+        const show = inp.type === 'password';
+        inp.type = show ? 'text' : 'password';
+        document.getElementById('eyeOpen').style.display  = show ? 'none' : 'block';
+        document.getElementById('eyeClosed').style.display = show ? 'block' : 'none';
+    });
+
+    // Loading state
+    document.getElementById('loginForm').addEventListener('submit', function () {
+        const btn = document.getElementById('submitBtn');
+        btn.classList.add('loading');
+        btn.innerHTML = 'Signing in…';
+    });
+</script>
+</body>
+</html>

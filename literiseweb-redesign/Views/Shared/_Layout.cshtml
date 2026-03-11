@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title — LiteRise Portal</title>
+    @Styles.Render("~/Content/bootstrap.min.css")
+    @Styles.Render("~/Content/Site.css")
+</head>
+<body>
+
+<!-- ── Top bar ──────────────────────────────────────────────────── -->
+<header class="topbar">
+    <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+            </svg>
+        </button>
+        <a href="@Url.Action("Index","Dashboard")" class="topbar-brand">
+            <div class="brand-icon">L</div>
+            LiteRise
+        </a>
+        @{
+            var role = Session["UserRole"] as string ?? "";
+            if (role == "Admin") {
+                <span class="pill pill-purple" style="font-size:.7rem">ADMIN</span>
+            } else if (role == "Teacher") {
+                <span class="pill pill-green" style="font-size:.7rem">TEACHER</span>
+            }
+        }
+    </div>
+
+    <div class="topbar-right">
+        <!-- Notifications -->
+        <button class="topbar-btn" id="notifToggle" aria-label="Notifications">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+            <span class="badge" id="notifBadge" style="display:none">0</span>
+        </button>
+
+        <!-- User menu -->
+        <div class="user-menu" id="userMenu">
+            <div class="user-menu-trigger">
+                @{
+                    var userName     = Session["UserName"]     as string ?? "User";
+                    var userEmail    = Session["UserEmail"]    as string ?? "";
+                    var userInitials = Session["UserInitials"] as string ?? "U";
+                }
+                <div class="user-avatar">@userInitials</div>
+                <div class="user-info">
+                    <span class="user-name">@userName</span>
+                    <span class="user-role">@role</span>
+                </div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--text-muted);margin-left:2px">
+                    <polyline points="6 9 12 15 18 9"/>
+                </svg>
+            </div>
+            <div class="user-dropdown">
+                <a href="@Url.Action("Index","Settings")">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    Settings
+                </a>
+                <div class="dd-divider"></div>
+                <a href="@Url.Action("Logout","Login")" class="dd-logout">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                    Sign Out
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- ── Sidebar ───────────────────────────────────────────────────── -->
+<nav class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+        @{
+            var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+        }
+
+        @if (role == "Admin") {
+            <span class="nav-section-label">Main</span>
+            @NavItem(Url, "Dashboard",       "Dashboard",      "⊞", currentController)
+            @NavItem(Url, "Student",         "Students",       "👥", currentController)
+            @NavItem(Url, "Schools",         "Schools",        "🏫", currentController)
+
+            <span class="nav-section-label" style="margin-top:8px">Content</span>
+            @NavItem(Url, "Analytics",       "Analytics",      "📊", currentController)
+            @NavItem(Url, "Masterfile",      "Masterfile",     "📚", currentController)
+            @NavItem(Url, "Administration",  "Administrators", "🛡", currentController)
+
+            <span class="nav-section-label" style="margin-top:8px">Manage</span>
+            @NavItem(Url, "Notifications",   "Notifications",  "🔔", currentController)
+            @NavItem(Url, "Settings",        "Settings",       "⚙️", currentController)
+        } else {
+            <span class="nav-section-label">Main</span>
+            @NavItem(Url, "Dashboard",       "Dashboard",      "⊞", currentController)
+            @NavItem(Url, "Student",         "My Students",    "👥", currentController)
+            @NavItem(Url, "Analytics",       "Class Analytics","📊", currentController)
+            @NavItem(Url, "Notifications",   "Reports",        "📋", currentController)
+            @NavItem(Url, "Settings",        "Settings",       "⚙️", currentController)
+        }
+    </div>
+
+    <div class="sidebar-foot">
+        <div class="sidebar-foot-inner">
+            <div class="user-avatar" style="width:28px;height:28px;font-size:11px;flex-shrink:0">@userInitials</div>
+            <div class="foot-text">
+                <span class="foot-name">@userName</span>
+                <span class="foot-role">@role Portal</span>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Main content ───────────────────────────────────────────────── -->
+<div class="main-wrap" id="mainWrap">
+    <div class="main-body">
+        @RenderBody()
+    </div>
+</div>
+
+@Scripts.Render("~/Scripts/jquery-3.4.1.min.js")
+@Scripts.Render("~/Scripts/bootstrap.min.js")
+
+<script>
+    // Sidebar toggle
+    const sidebar  = document.getElementById('sidebar');
+    const mainWrap = document.getElementById('mainWrap');
+    document.getElementById('sidebarToggle').addEventListener('click', () => {
+        if (window.innerWidth <= 768) {
+            sidebar.classList.toggle('mobile-open');
+        } else {
+            sidebar.classList.toggle('collapsed');
+        }
+    });
+
+    // User dropdown
+    const userMenu = document.getElementById('userMenu');
+    userMenu.addEventListener('click', () => userMenu.classList.toggle('open'));
+    document.addEventListener('click', e => {
+        if (!userMenu.contains(e.target)) userMenu.classList.remove('open');
+    });
+</script>
+
+@RenderSection("scripts", required: false)
+
+</body>
+</html>
+
+@* Helper function — renders a sidebar nav item *@
+@helper NavItem(UrlHelper url, string controller, string label, string icon, string current) {
+    var isActive = current.Equals(controller, System.StringComparison.OrdinalIgnoreCase) ? " active" : "";
+    <a href="@url.Action("Index", controller)"
+       class="nav-item@isActive"
+       data-label="@label">
+        <span class="nav-icon">@icon</span>
+        <span class="nav-label">@label</span>
+    </a>
+}

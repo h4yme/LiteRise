@@ -1,0 +1,265 @@
+@{
+    ViewBag.Title = "Students";
+    var role = Session["UserRole"] as string ?? "";
+}
+
+<div class="page-header">
+    <ol class="breadcrumb">
+        <li>@(role == "Admin" ? "Admin Portal" : "Teacher Portal")</li>
+        <li class="active">Students</li>
+    </ol>
+    <h1>@(role == "Admin" ? "All Students" : "My Students")</h1>
+    <p>@(role == "Admin" ? "System-wide student roster and progress overview" : "Your assigned students and their progress")</p>
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.ApiError as string)) {
+    <div style="background:#FEE2E2;color:#DC2626;padding:14px 18px;border-radius:10px;margin-bottom:20px;font-weight:600;font-size:.88rem">
+        ⚠️ @ViewBag.ApiError
+    </div>
+}
+
+<!-- KPI row -->
+<div class="kpi-grid" id="kpiGrid">
+    <div class="kpi-card">
+        <div class="kpi-accent" style="background:#7C3AED"></div>
+        <div class="kpi-label">Total Students</div>
+        <div class="kpi-value" id="kpiTotal">—</div>
+        <div class="kpi-sub">Registered learners</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-accent" style="background:#11B067"></div>
+        <div class="kpi-label">Pre-Assessment Done</div>
+        <div class="kpi-value" id="kpiAssessed">—</div>
+        <div class="kpi-sub">Completed placement test</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-accent" style="background:#FDC94A"></div>
+        <div class="kpi-label">Active (7 days)</div>
+        <div class="kpi-value" id="kpiActive">—</div>
+        <div class="kpi-sub">Logged in recently</div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-accent" style="background:#14B8A6"></div>
+        <div class="kpi-label">Avg. Theta (θ)</div>
+        <div class="kpi-value" id="kpiTheta">—</div>
+        <div class="kpi-sub">Average ability score</div>
+    </div>
+</div>
+
+<!-- Filter bar + table -->
+<div class="card">
+    <div class="card-header-bar">
+        <span>Student Roster</span>
+        <div style="display:flex;gap:8px">
+            <button class="btn-lr btn-secondary btn-sm" onclick="exportCSV()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Export CSV
+            </button>
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="filter-bar">
+            <div class="search-wrap">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name, school…" oninput="filterTable()">
+            </div>
+            <select class="filter-select" id="filterLevel" onchange="filterTable()">
+                <option value="">All Levels</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+            <select class="filter-select" id="filterStatus" onchange="filterTable()">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            @if (role == "Admin") {
+            <select class="filter-select" id="filterSchool" onchange="filterTable()">
+                <option value="">All Schools</option>
+                @if (ViewBag.Schools != null) {
+                    foreach (var s in ViewBag.Schools) {
+                        <option value="@s["school_id"]">@s["school_name"]</option>
+                    }
+                }
+            </select>
+            }
+        </div>
+
+        <div class="table-wrap">
+            <table class="lr-table" id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>School</th>
+                        <th>Grade</th>
+                        <th>Level</th>
+                        <th>Pre-θ</th>
+                        <th>Post-θ</th>
+                        <th>XP</th>
+                        <th>Lessons</th>
+                        <th>Last Active</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="11">
+                            <div class="empty-state">
+                                <div class="empty-icon">👥</div>
+                                <p>Loading students…</p>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top:12px;font-size:.8rem;color:var(--text-muted)" id="rowCount"></div>
+    </div>
+</div>
+
+<script>
+const API_BASE = 'http://192.168.1.13/api';
+let allStudents = [];
+
+async function loadStudents() {
+    try {
+        const resp = await fetch(API_BASE + '/get_student_progress.php');
+        const data = await resp.json();
+        allStudents = Array.isArray(data) ? data : (data.students || []);
+        renderKPIs(allStudents);
+        renderTable(allStudents);
+    } catch (e) {
+        document.getElementById('tableBody').innerHTML =
+            '<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not connect to API. Check that 192.168.1.13 is running.</p></div></td></tr>';
+    }
+}
+
+function renderKPIs(students) {
+    document.getElementById('kpiTotal').textContent    = students.length;
+    const assessed = students.filter(s => s.pre_theta != null).length;
+    document.getElementById('kpiAssessed').textContent = assessed;
+    const now     = Date.now();
+    const active  = students.filter(s => {
+        if (!s.last_active) return false;
+        return (now - new Date(s.last_active).getTime()) < 7 * 86400000;
+    }).length;
+    document.getElementById('kpiActive').textContent   = active;
+    const thetas  = students.filter(s => s.pre_theta != null).map(s => parseFloat(s.pre_theta));
+    document.getElementById('kpiTheta').textContent    = thetas.length
+        ? (thetas.reduce((a,b)=>a+b,0)/thetas.length).toFixed(2)
+        : '—';
+}
+
+function levelPill(level) {
+    if (!level) return '<span class="pill pill-gray">—</span>';
+    const map = { Beginner:'pill-purple', Intermediate:'pill-green', Advanced:'pill-yellow' };
+    return `<span class="pill ${map[level]||'pill-gray'}">${level}</span>`;
+}
+
+function statusPill(lastActive) {
+    if (!lastActive) return '<span class="pill pill-gray">No data</span>';
+    const days = (Date.now() - new Date(lastActive).getTime()) / 86400000;
+    return days <= 7
+        ? '<span class="pill pill-green">Active</span>'
+        : '<span class="pill pill-red">Inactive</span>';
+}
+
+function renderTable(students) {
+    const tbody = document.getElementById('tableBody');
+    if (!students.length) {
+        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><div class="empty-icon">🔍</div><p>No students match your filters.</p></div></td></tr>';
+        document.getElementById('rowCount').textContent = '';
+        return;
+    }
+    tbody.innerHTML = students.map(s => `
+        <tr data-level="${s.placement_level||''}" data-school="${s.school_id||''}" data-name="${(s.full_name||'').toLowerCase()}">
+            <td>
+                <div style="display:flex;align-items:center;gap:10px">
+                    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#0EA05A,#11B067);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:700;flex-shrink:0">
+                        ${initials(s.full_name)}
+                    </div>
+                    <div>
+                        <div class="td-name">${s.full_name || '—'}</div>
+                        <div style="font-size:.72rem;color:var(--text-muted)">${s.nickname || ''}</div>
+                    </div>
+                </div>
+            </td>
+            <td>${s.school_name || '—'}</td>
+            <td>${s.grade_level || '—'}</td>
+            <td>${levelPill(s.placement_level)}</td>
+            <td>${s.pre_theta != null ? parseFloat(s.pre_theta).toFixed(2) : '—'}</td>
+            <td>${s.post_theta != null ? parseFloat(s.post_theta).toFixed(2) : '—'}</td>
+            <td>${s.total_xp != null ? Number(s.total_xp).toLocaleString() : '—'}</td>
+            <td>
+                <div style="display:flex;align-items:center;gap:6px">
+                    <span style="font-size:.82rem;font-weight:600">${s.nodes_completed || 0}/65</span>
+                    <div class="progress-bar-wrap" style="width:60px">
+                        <div class="progress-bar-fill" style="width:${Math.round((s.nodes_completed||0)/65*100)}%"></div>
+                    </div>
+                </div>
+            </td>
+            <td style="font-size:.82rem">${formatDate(s.last_active)}</td>
+            <td>${statusPill(s.last_active)}</td>
+            <td>
+                <a href="/Student/Detail/${s.student_id}" class="btn-lr btn-secondary btn-xs">
+                    View →
+                </a>
+            </td>
+        </tr>
+    `).join('');
+    document.getElementById('rowCount').textContent = `Showing ${students.length} student${students.length !== 1 ? 's' : ''}`;
+}
+
+function filterTable() {
+    const q      = document.getElementById('searchInput').value.toLowerCase();
+    const level  = document.getElementById('filterLevel').value;
+    const status = document.getElementById('filterStatus').value;
+    const school = document.getElementById('filterSchool')?.value || '';
+
+    const filtered = allStudents.filter(s => {
+        const name = (s.full_name || '').toLowerCase();
+        const sch  = (s.school_name || '').toLowerCase();
+        if (q && !name.includes(q) && !sch.includes(q)) return false;
+        if (level  && s.placement_level !== level)  return false;
+        if (school && String(s.school_id) !== school) return false;
+        if (status) {
+            const days = s.last_active
+                ? (Date.now() - new Date(s.last_active).getTime()) / 86400000
+                : 999;
+            if (status === 'active'   && days > 7)  return false;
+            if (status === 'inactive' && days <= 7) return false;
+        }
+        return true;
+    });
+    renderTable(filtered);
+}
+
+function exportCSV() {
+    const rows = [['Name','School','Grade','Level','Pre-θ','Post-θ','XP','Lessons Done','Last Active']];
+    allStudents.forEach(s => rows.push([
+        s.full_name, s.school_name, s.grade_level, s.placement_level,
+        s.pre_theta, s.post_theta, s.total_xp, s.nodes_completed, s.last_active
+    ]));
+    const csv  = rows.map(r => r.map(c => `"${c??''}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const a    = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = 'students_' + new Date().toISOString().slice(0,10) + '.csv';
+    a.click();
+}
+
+function initials(name) {
+    if (!name) return '?';
+    return name.trim().split(' ').filter(Boolean).slice(0,2).map(n => n[0].toUpperCase()).join('');
+}
+function formatDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-PH', { month:'short', day:'numeric', year:'numeric' }); }
+    catch { return d; }
+}
+
+loadStudents();
+</script>

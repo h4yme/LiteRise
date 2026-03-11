@@ -1,0 +1,559 @@
+@{
+    ViewBag.Title = "Student Profile";
+    var role      = Session["UserRole"] as string ?? "";
+    var studentId = ViewBag.StudentId ?? 0;
+}
+
+<style>
+    /* ── Profile header ──────────────────────────────────────── */
+    .profile-header {
+        display: flex; align-items: center; gap: 20px;
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 24px;
+        box-shadow: var(--shadow-sm); margin-bottom: 24px;
+    }
+    .profile-avatar {
+        width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+        background: linear-gradient(135deg, #0EA05A, #11B067);
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 26px; font-weight: 800;
+        box-shadow: 0 6px 20px rgba(17,176,103,.3);
+    }
+    .profile-info { flex: 1; min-width: 0; }
+    .profile-name { font-size: 1.4rem; font-weight: 800; color: var(--text); }
+    .profile-meta { font-size: .85rem; color: var(--text-sec); margin-top: 4px; display:flex; gap:14px; flex-wrap:wrap; }
+    .profile-meta span { display:flex; align-items:center; gap:4px; }
+    .profile-stats {
+        display: flex; gap: 24px; flex-shrink: 0;
+    }
+    .pstat { text-align: center; }
+    .pstat-val { font-size: 1.4rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .pstat-lbl { font-size: .72rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+
+    /* ── Assessment cards ────────────────────────────────────── */
+    .assessment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    @media (max-width: 768px) { .assessment-grid { grid-template-columns: 1fr; } }
+
+    .assess-card {
+        background: var(--white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px;
+        box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+    }
+    .assess-card::before {
+        content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    }
+    .assess-pre::before  { background: linear-gradient(90deg,#7C3AED,#A78BFA); }
+    .assess-post::before { background: linear-gradient(90deg,#11B067,#34D399); }
+
+    .assess-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--text-muted); margin-bottom: 12px; }
+    .assess-theta { font-size: 2.4rem; font-weight: 800; color: var(--text); line-height: 1; }
+    .assess-level { margin-top: 8px; }
+    .assess-row   { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: .83rem; }
+    .assess-row-lbl { color: var(--text-sec); }
+    .assess-row-val { font-weight: 700; color: var(--text); }
+    .assess-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; gap: 8px; color: var(--text-muted); text-align: center; }
+    .assess-empty .ei { font-size: 2rem; opacity: .3; }
+
+    .growth-badge {
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 3px 8px; border-radius: 999px; font-size: .75rem; font-weight: 700;
+    }
+    .growth-pos { background: #D1FAE5; color: #065F46; }
+    .growth-neg { background: #FEE2E2; color: #991B1B; }
+    .growth-neu { background: #F1F5F9; color: var(--text-sec); }
+
+    /* ── Category scores ─────────────────────────────────────── */
+    .category-bar { margin-bottom: 12px; }
+    .category-label { display: flex; justify-content: space-between; font-size: .83rem; margin-bottom: 5px; }
+    .category-name  { font-weight: 600; color: var(--text-sec); }
+    .category-score { font-weight: 700; color: var(--text); }
+
+    /* ── Module grid ─────────────────────────────────────────── */
+    .module-section { margin-bottom: 20px; }
+    .module-title   { font-size: .88rem; font-weight: 700; color: var(--text); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .module-num     { background: var(--dark); color: #fff; width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; }
+
+    /* ── Game table ──────────────────────────────────────────── */
+    .game-icon {
+        width: 32px; height: 32px; border-radius: 8px;
+        background: var(--green-pale); display: flex; align-items: center;
+        justify-content: center; font-size: 16px; flex-shrink: 0;
+    }
+    .game-type-map { }
+
+    /* ── Badge grid ──────────────────────────────────────────── */
+    .badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 12px; }
+    .badge-item {
+        display: flex; flex-direction: column; align-items: center; gap: 6px;
+        padding: 14px 8px; background: var(--bg); border: 1px solid var(--border);
+        border-radius: var(--radius); text-align: center; transition: all .2s;
+    }
+    .badge-item:hover { border-color: var(--green); background: var(--green-pale); }
+    .badge-icon { font-size: 2rem; }
+    .badge-name { font-size: .72rem; font-weight: 700; color: var(--text-sec); line-height: 1.3; }
+    .badge-date { font-size: .65rem; color: var(--text-muted); }
+    .badge-locked { opacity: .35; filter: grayscale(1); }
+</style>
+
+<div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+    <div>
+        <ol class="breadcrumb">
+            <li><a href="/Student" style="color:var(--green);text-decoration:none">Students</a></li>
+            <li class="active">Student Profile</li>
+        </ol>
+        <h1>Student Profile</h1>
+    </div>
+    <a href="/Student" class="btn-lr btn-secondary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+        Back to Students
+    </a>
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.ApiError as string)) {
+    <div style="background:#FEE2E2;color:#DC2626;padding:14px 18px;border-radius:10px;margin-bottom:20px;font-weight:600;font-size:.88rem">
+        ⚠️ @ViewBag.ApiError
+    </div>
+}
+
+<!-- Profile header (populated by JS) -->
+<div class="profile-header" id="profileHeader">
+    <div class="profile-avatar" id="profileAvatar">…</div>
+    <div class="profile-info">
+        <div class="profile-name" id="profileName">Loading…</div>
+        <div class="profile-meta" id="profileMeta"></div>
+    </div>
+    <div class="profile-stats" id="profileStats"></div>
+</div>
+
+<!-- Assessment cards -->
+<div class="assessment-grid" id="assessmentGrid">
+    <div class="assess-card assess-pre">
+        <div class="assess-title">📋 Pre-Assessment</div>
+        <div class="assess-empty"><div class="ei">⏳</div><p>Loading…</p></div>
+    </div>
+    <div class="assess-card assess-post">
+        <div class="assess-title">📋 Post-Assessment</div>
+        <div class="assess-empty"><div class="ei">⏳</div><p>Loading…</p></div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('lessons',this)">📚 Lessons</button>
+    <button class="tab-btn"       onclick="switchTab('skills',this)">🎯 Category Skills</button>
+    <button class="tab-btn"       onclick="switchTab('games',this)">🎮 Games</button>
+    <button class="tab-btn"       onclick="switchTab('badges',this)">🏅 Badges</button>
+</div>
+
+<!-- ── Tab: Lessons ── -->
+<div class="tab-panel active" id="tab-lessons">
+    <div class="grid-2" style="margin-bottom:20px">
+        <div class="card">
+            <div class="card-body">
+                <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px">Lesson Progress</div>
+                <div style="font-size:2rem;font-weight:800;color:var(--text)" id="lessonFrac">—</div>
+                <div style="margin-top:10px">
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar-fill" id="lessonBar" style="width:0%"></div>
+                    </div>
+                    <div style="font-size:.75rem;color:var(--text-muted);margin-top:5px" id="lessonPct">0% complete</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:8px">Node Legend</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:.83rem">
+                    <div style="display:flex;align-items:center;gap:8px"><div class="node-cell node-done" style="width:26px;height:26px;font-size:10px">✓</div><span style="color:var(--text-sec)">Completed</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><div class="node-cell node-progress" style="width:26px;height:26px;font-size:10px">→</div><span style="color:var(--text-sec)">In Progress</span></div>
+                    <div style="display:flex;align-items:center;gap:8px"><div class="node-cell node-locked" style="width:26px;height:26px;font-size:10px">🔒</div><span style="color:var(--text-sec)">Locked</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modulesContainer">
+        <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading lesson data…</p></div>
+    </div>
+</div>
+
+<!-- ── Tab: Skills ── -->
+<div class="tab-panel" id="tab-skills">
+    <div class="card">
+        <div class="card-header-bar">Category Scores</div>
+        <div class="card-body" id="skillsBody">
+            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading skills data…</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Tab: Games ── -->
+<div class="tab-panel" id="tab-games">
+    <div class="card">
+        <div class="card-header-bar">Game History</div>
+        <div class="table-wrap" id="gamesTable">
+            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading games…</p></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Tab: Badges ── -->
+<div class="tab-panel" id="tab-badges">
+    <div class="card">
+        <div class="card-header-bar">Badges &amp; Achievements</div>
+        <div class="card-body" id="badgesBody">
+            <div class="empty-state"><div class="empty-icon">⏳</div><p>Loading badges…</p></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_BASE  = 'http://192.168.1.13/api';
+const STUDENT_ID = @studentId;
+
+// ── Helpers ──────────────────────────────────────────────────────
+function initials(name) {
+    if (!name) return '?';
+    return name.trim().split(' ').filter(Boolean).slice(0,2).map(n=>n[0].toUpperCase()).join('');
+}
+function fmt(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-PH',{month:'short',day:'numeric',year:'numeric'}); }
+    catch { return d; }
+}
+function fmtN(n, dec=2) { return n != null ? parseFloat(n).toFixed(dec) : '—'; }
+function levelPill(l) {
+    if (!l) return '<span class="pill pill-gray">—</span>';
+    const m={Beginner:'pill-purple',Intermediate:'pill-green',Advanced:'pill-yellow'};
+    return `<span class="pill ${m[l]||'pill-gray'}">${l}</span>`;
+}
+function growthBadge(pre, post) {
+    if (pre == null || post == null) return '';
+    const d = parseFloat(post) - parseFloat(pre);
+    const cls = d > 0.05 ? 'growth-pos' : d < -0.05 ? 'growth-neg' : 'growth-neu';
+    const icon = d > 0.05 ? '↑' : d < -0.05 ? '↓' : '→';
+    return `<span class="growth-badge ${cls}">${icon} ${Math.abs(d).toFixed(2)}</span>`;
+}
+
+// ── Tab switching ─────────────────────────────────────────────────
+function switchTab(id, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+}
+
+// ── Load student profile ──────────────────────────────────────────
+async function loadProfile() {
+    try {
+        const r    = await fetch(`${API_BASE}/get_student_progress.php?student_id=${STUDENT_ID}`);
+        const data = await r.json();
+        const s    = Array.isArray(data) ? data[0] : (data.student || data);
+        if (!s) return;
+
+        document.getElementById('profileAvatar').textContent = initials(s.full_name || s.name);
+        document.getElementById('profileName').textContent   = s.full_name || s.name || '—';
+
+        document.getElementById('profileMeta').innerHTML = `
+            <span>🏫 ${s.school_name || '—'}</span>
+            <span>📚 Grade ${s.grade_level || '—'}</span>
+            <span>⚧ ${s.gender || '—'}</span>
+            <span>🎂 ${fmt(s.date_of_birth)}</span>
+            <span>🏷 "${s.nickname || '—'}"</span>
+        `;
+
+        document.getElementById('profileStats').innerHTML = `
+            <div class="pstat">
+                <div class="pstat-val">${Number(s.total_xp||0).toLocaleString()}</div>
+                <div class="pstat-lbl">Total XP</div>
+            </div>
+            <div class="pstat">
+                <div class="pstat-val">${s.streak_days || 0}</div>
+                <div class="pstat-lbl">Day Streak</div>
+            </div>
+            <div class="pstat">
+                <div class="pstat-val">${s.nodes_completed || 0}/65</div>
+                <div class="pstat-lbl">Lessons Done</div>
+            </div>
+        `;
+    } catch (e) { console.warn('Profile load failed', e); }
+}
+
+// ── Load assessment ───────────────────────────────────────────────
+async function loadAssessment() {
+    try {
+        const r    = await fetch(`${API_BASE}/get_placement_progress.php?student_id=${STUDENT_ID}`);
+        const data = await r.json();
+        const grid = document.getElementById('assessmentGrid');
+
+        const pre  = data.pre_assessment  || data.pre  || null;
+        const post = data.post_assessment || data.post || null;
+        const cats = [
+            { key:'phonics',        label:'Phonics' },
+            { key:'vocabulary',     label:'Vocabulary' },
+            { key:'grammar',        label:'Grammar' },
+            { key:'comprehension',  label:'Comprehension' },
+            { key:'creating_text',  label:'Creating Text' },
+        ];
+
+        function catBars(assessment) {
+            if (!assessment) return '';
+            return cats.map(c => {
+                const val = parseFloat(assessment[c.key] || 0);
+                const pct = Math.round(val);
+                return `<div class="category-bar">
+                    <div class="category-label">
+                        <span class="category-name">${c.label}</span>
+                        <span class="category-score">${pct}%</span>
+                    </div>
+                    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${pct}%"></div></div>
+                </div>`;
+            }).join('');
+        }
+
+        function assessHtml(a, type) {
+            if (!a) return `<div class="assess-empty"><div class="ei">${type==='pre'?'📋':'🏆'}</div><p>${type==='pre'?'Not yet taken':'Post-assessment locked until lessons complete'}</p></div>`;
+            return `
+                <div style="display:flex;align-items:flex-end;gap:12px;margin-bottom:12px">
+                    <div>
+                        <div style="font-size:.72rem;color:var(--text-muted);font-weight:600">Theta (θ)</div>
+                        <div class="assess-theta">${fmtN(a.theta)}</div>
+                    </div>
+                    ${type==='post' && data.pre_assessment ? growthBadge(data.pre_assessment.theta, a.theta) : ''}
+                </div>
+                <div class="assess-level">${levelPill(a.placement_level || a.level)}</div>
+                <div class="assess-row"><span class="assess-row-lbl">Accuracy</span><span class="assess-row-val">${a.accuracy != null ? parseFloat(a.accuracy).toFixed(1)+'%' : '—'}</span></div>
+                <div class="assess-row"><span class="assess-row-lbl">Items answered</span><span class="assess-row-val">${a.items_answered || '—'}</span></div>
+                <div class="assess-row"><span class="assess-row-lbl">Date taken</span><span class="assess-row-val">${fmt(a.date_taken || a.created_at)}</span></div>
+                <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:12px">
+                    <div style="font-size:.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">Category Scores</div>
+                    ${catBars(a)}
+                </div>
+            `;
+        }
+
+        grid.innerHTML = `
+            <div class="assess-card assess-pre">
+                <div class="assess-title">📋 Pre-Assessment</div>
+                ${assessHtml(pre, 'pre')}
+            </div>
+            <div class="assess-card assess-post">
+                <div class="assess-title" style="display:flex;align-items:center;justify-content:space-between">
+                    <span>🏆 Post-Assessment</span>
+                    ${post && pre ? growthBadge(pre.theta, post.theta) : ''}
+                </div>
+                ${assessHtml(post, 'post')}
+            </div>
+        `;
+
+        // Also populate skills tab
+        loadSkills(pre, post);
+    } catch (e) { console.warn('Assessment load failed', e); }
+}
+
+// ── Skills tab ────────────────────────────────────────────────────
+function loadSkills(pre, post) {
+    const body = document.getElementById('skillsBody');
+    const cats = [
+        { key:'phonics',       label:'Phonics',       icon:'🔤' },
+        { key:'vocabulary',    label:'Vocabulary',    icon:'📖' },
+        { key:'grammar',       label:'Grammar',       icon:'✏️' },
+        { key:'comprehension', label:'Comprehension', icon:'🧠' },
+        { key:'creating_text', label:'Creating Text', icon:'📝' },
+    ];
+
+    if (!pre && !post) {
+        body.innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><p>No assessment data yet.</p></div>';
+        return;
+    }
+
+    body.innerHTML = cats.map(c => {
+        const preVal  = pre  ? parseFloat(pre[c.key]  || 0) : null;
+        const postVal = post ? parseFloat(post[c.key] || 0) : null;
+        const display = postVal ?? preVal ?? 0;
+        const pct     = Math.min(100, Math.round(display));
+        return `
+            <div style="margin-bottom:18px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+                    <span style="font-weight:700;font-size:.88rem;color:var(--text)">${c.icon} ${c.label}</span>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        ${preVal != null  ? `<span style="font-size:.75rem;color:var(--text-muted)">Pre: ${Math.round(preVal)}%</span>` : ''}
+                        ${postVal != null ? `<span style="font-size:.75rem;color:var(--green);font-weight:700">Post: ${Math.round(postVal)}%</span>` : ''}
+                    </div>
+                </div>
+                <div class="progress-bar-wrap" style="height:10px">
+                    <div class="progress-bar-fill" style="width:${pct}%"></div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ── Load lesson/node progress ─────────────────────────────────────
+async function loadLessons() {
+    try {
+        const r    = await fetch(`${API_BASE}/get_node_progress.php?student_id=${STUDENT_ID}`);
+        const nodes = await r.json();
+        const arr   = Array.isArray(nodes) ? nodes : (nodes.nodes || []);
+
+        // Count by status
+        const done  = arr.filter(n => n.status === 'completed' || n.is_completed == 1).length;
+        const inProg = arr.filter(n => n.status === 'in_progress').length;
+        const pct   = Math.round(done / 65 * 100);
+
+        document.getElementById('lessonFrac').textContent = `${done} / 65`;
+        document.getElementById('lessonBar').style.width  = pct + '%';
+        document.getElementById('lessonPct').textContent  = `${pct}% complete · ${inProg} in progress`;
+
+        // Group into 5 modules of 13
+        const container = document.getElementById('modulesContainer');
+        const moduleNames = ['Module 1: Foundations','Module 2: Building Up','Module 3: Expanding','Module 4: Applying','Module 5: Mastery'];
+        let html = '';
+
+        for (let m = 0; m < 5; m++) {
+            const moduleNodes = arr.slice(m * 13, m * 13 + 13);
+            const mDone = moduleNodes.filter(n => n.status === 'completed' || n.is_completed == 1).length;
+            html += `
+                <div class="module-section card" style="margin-bottom:16px">
+                    <div class="card-header-bar">
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <div class="module-num">${m+1}</div>
+                            <span>${moduleNames[m] || 'Module '+(m+1)}</span>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:10px">
+                            <span style="font-size:.82rem;color:var(--text-muted)">${mDone}/13 done</span>
+                            <div class="progress-bar-wrap" style="width:80px"><div class="progress-bar-fill" style="width:${Math.round(mDone/13*100)}%"></div></div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="node-grid">
+                            ${moduleNodes.map((n, i) => {
+                                const nodeNum = m * 13 + i + 1;
+                                const isDone  = n.status === 'completed' || n.is_completed == 1;
+                                const isProg  = n.status === 'in_progress';
+                                const cls     = isDone ? 'node-done' : isProg ? 'node-progress' : 'node-locked';
+                                const icon    = isDone ? '✓' : isProg ? '→' : nodeNum;
+                                const tip     = `Node ${nodeNum}${n.node_title ? ': '+n.node_title : ''}${n.quiz_score != null ? ' | Quiz: '+n.quiz_score+'%' : ''}`;
+                                return `<div class="node-cell ${cls}" title="${tip}">${icon}</div>`;
+                            }).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html || '<div class="empty-state"><div class="empty-icon">📚</div><p>No lesson data yet.</p></div>';
+    } catch (e) {
+        document.getElementById('modulesContainer').innerHTML =
+            '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not load lesson data.</p></div>';
+    }
+}
+
+// ── Load games ────────────────────────────────────────────────────
+async function loadGames() {
+    const wrap = document.getElementById('gamesTable');
+    try {
+        const r     = await fetch(`${API_BASE}/get_game_data.php?student_id=${STUDENT_ID}`);
+        const data  = await r.json();
+        const games = Array.isArray(data) ? data : (data.games || []);
+
+        const gameIcons = {
+            word_hunt:'🔍', scramble:'🔀', fill_blank:'✏️', matching:'🃏',
+            pronunciation:'🎤', listening:'👂', reading:'📖', spelling:'🔡',
+            sentence_build:'🧩', quiz:'📝', flashcard:'⚡'
+        };
+
+        if (!games.length) {
+            wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">🎮</div><p>No games played yet.</p></div>';
+            return;
+        }
+
+        wrap.innerHTML = `
+            <table class="lr-table">
+                <thead>
+                    <tr>
+                        <th>Game</th><th>Score</th><th>Accuracy</th><th>XP Earned</th><th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${games.map(g => {
+                        const icon = gameIcons[g.game_type] || '🎮';
+                        const acc  = g.accuracy != null ? parseFloat(g.accuracy).toFixed(1)+'%' : '—';
+                        return `
+                            <tr>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:10px">
+                                        <div class="game-icon">${icon}</div>
+                                        <div>
+                                            <div style="font-weight:600;font-size:.87rem;color:var(--text)">${g.game_name || g.game_type || '—'}</div>
+                                            <div style="font-size:.72rem;color:var(--text-muted)">${g.game_type || ''}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>${g.score ?? '—'}</strong></td>
+                                <td>
+                                    <div style="display:flex;align-items:center;gap:6px">
+                                        ${acc}
+                                        ${g.accuracy != null ? `<div class="progress-bar-wrap" style="width:50px"><div class="progress-bar-fill" style="width:${parseFloat(g.accuracy)}%"></div></div>` : ''}
+                                    </div>
+                                </td>
+                                <td>${g.xp_earned != null ? '+'+g.xp_earned+' XP' : '—'}</td>
+                                <td style="font-size:.82rem">${fmt(g.played_at || g.created_at)}</td>
+                            </tr>
+                        `;
+                    }).join('')}
+                </tbody>
+            </table>
+        `;
+    } catch (e) {
+        wrap.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not load game data.</p></div>';
+    }
+}
+
+// ── Load badges ───────────────────────────────────────────────────
+async function loadBadges() {
+    const body = document.getElementById('badgesBody');
+    try {
+        const r      = await fetch(`${API_BASE}/get_badges.php?student_id=${STUDENT_ID}`);
+        const data   = await r.json();
+        const badges = Array.isArray(data) ? data : (data.badges || []);
+        const earned = badges.filter(b => b.is_earned == 1 || b.earned_at);
+        const locked = badges.filter(b => !b.is_earned && !b.earned_at);
+
+        if (!badges.length) {
+            body.innerHTML = '<div class="empty-state"><div class="empty-icon">🏅</div><p>No badges data yet.</p></div>';
+            return;
+        }
+
+        body.innerHTML = `
+            ${earned.length ? `
+                <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:12px">Earned (${earned.length})</div>
+                <div class="badge-grid" style="margin-bottom:24px">
+                    ${earned.map(b => `
+                        <div class="badge-item">
+                            <div class="badge-icon">${b.badge_icon || '🏅'}</div>
+                            <div class="badge-name">${b.badge_name || b.name}</div>
+                            <div class="badge-date">${fmt(b.earned_at)}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+            ${locked.length ? `
+                <div style="font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:12px">Locked (${locked.length})</div>
+                <div class="badge-grid">
+                    ${locked.map(b => `
+                        <div class="badge-item badge-locked">
+                            <div class="badge-icon">${b.badge_icon || '🔒'}</div>
+                            <div class="badge-name">${b.badge_name || b.name}</div>
+                            <div class="badge-date">${b.criteria || ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+        `;
+    } catch (e) {
+        body.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Could not load badges.</p></div>';
+    }
+}
+
+// ── Boot ──────────────────────────────────────────────────────────
+Promise.all([loadProfile(), loadAssessment(), loadLessons(), loadGames(), loadBadges()]);
+</script>
