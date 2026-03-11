@@ -1,76 +1,115 @@
 <?php
 /**
- * LiteRise Portal Login API
+ * LiteRise Portal Login
  * POST /api/portal_login.php
- * Body : { "email": "...", "password": "..." }
- * Returns: {
- *   "success": true,
- *   "admin_id": 1,
- *   "name": "System Admin",
- *   "email": "admin@literise.com",
- *   "role": "Admin",          // "Admin" | "Teacher"
- *   "school_id": null,
- *   "token": "<jwt>"
- * }
+ *
+ * Form params (application/x-www-form-urlencoded):
+ *   email    – account email
+ *   password – plain-text password
+ *   role     – "admin" | "teacher"
+ *
+ * Returns: { success, user_id, name, email, role, token, message }
  */
 
-require_once 'src/db.php';
-require_once 'src/auth.php';
+require_once 'src/db.php';   // sets $conn (PDO), sendResponse(), sendError(), headers
+require_once 'src/auth.php'; // provides generateJWT()
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    sendError("Method not allowed", 405);
+    sendError('POST required.', 405);
 }
 
-$input    = getJsonInput();
-$email    = trim($input['email']    ?? '');
-$password = trim($input['password'] ?? '');
+$email    = trim($_POST['email']    ?? '');
+$password = trim($_POST['password'] ?? '');
+$role     = strtolower(trim($_POST['role'] ?? 'admin'));
 
-if (!$email || !$password) {
-    sendError("Email and password are required", 400);
+if ($email === '' || $password === '') {
+    sendError('Email and password are required.', 400);
 }
 
-if (!isValidEmail($email)) {
-    sendError("Invalid email format", 400);
+if (!in_array($role, ['admin', 'teacher'], true)) {
+    sendError('Invalid role. Must be "admin" or "teacher".', 400);
 }
 
-// ── Look up the administrator ─────────────────────────────────
-$stmt = $conn->prepare("EXEC SP_AdminLogin @Email = ?");
-$stmt->execute([$email]);
-$admin = $stmt->fetch(PDO::FETCH_ASSOC);
+// ── Admin login ────────────────────────────────────────────────────────────
+if ($role === 'admin') {
 
-if (!$admin || !password_verify($password, $admin['PasswordHash'])) {
-    sendError("Invalid email or password", 401);
+    $stmt = $conn->prepare(
+        'SELECT AdminID, Username, Email, PasswordHash, Salt,
+                IsActive, FailedLoginAttempts, LockoutEnd
+         FROM   dbo.Admins
+         WHERE  Email = ?'
+    );
+    $stmt->execute([$email]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        sendError('Invalid email or password.', 401);
+    }
+
+    if (!(bool) $row['IsActive']) {
+        sendError('This account has been deactivated.', 403);
+    }
+
+    if ($row['LockoutEnd'] !== null && strtotime($row['LockoutEnd']) > time()) {
+        sendError('Account is temporarily locked. Try again later.', 403);
+    }
+
+    if (!password_verify($password, $row['PasswordHash'])) {
+        $conn->prepare(
+            'UPDATE dbo.Admins SET FailedLoginAttempts = FailedLoginAttempts + 1 WHERE AdminID = ?'
+        )->execute([$row['AdminID']]);
+        sendError('Invalid email or password.', 401);
+    }
+
+    // Success — reset lockout counters, update last login
+    $conn->prepare(
+        'UPDATE dbo.Admins
+         SET FailedLoginAttempts = 0, LockoutEnd = NULL, LastLoginDate = GETDATE()
+         WHERE AdminID = ?'
+    )->execute([$row['AdminID']]);
+
+    $token = generateJWT($row['AdminID'], $row['Email']);
+
+    sendResponse([
+        'user_id' => (int) $row['AdminID'],
+        'name'    => $row['Username'],
+        'email'   => $row['Email'],
+        'role'    => 'admin',
+        'token'   => $token,
+        'message' => 'Login successful.',
+    ]);
+
+// ── Teacher login ──────────────────────────────────────────────────────────
+} else {
+
+    $stmt = $conn->prepare(
+        'SELECT TeacherID, FirstName, LastName, Email, Password, IsActive
+         FROM   dbo.Teachers
+         WHERE  Email = ?'
+    );
+    $stmt->execute([$email]);
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$row) {
+        sendError('Invalid email or password.', 401);
+    }
+
+    if (!(bool) $row['IsActive']) {
+        sendError('This account has been deactivated.', 403);
+    }
+
+    if (!password_verify($password, $row['Password'])) {
+        sendError('Invalid email or password.', 401);
+    }
+
+    $token = generateJWT($row['TeacherID'], $row['Email']);
+
+    sendResponse([
+        'user_id' => (int) $row['TeacherID'],
+        'name'    => $row['FirstName'] . ' ' . $row['LastName'],
+        'email'   => $row['Email'],
+        'role'    => 'teacher',
+        'token'   => $token,
+        'message' => 'Login successful.',
+    ]);
 }
-
-// ── Stamp last login (non-fatal) ─────────────────────────────
-try {
-    $s2 = $conn->prepare("EXEC SP_UpdateAdminLastLogin @AdminID = ?");
-    $s2->execute([$admin['AdminID']]);
-} catch (Exception $e) {
-    error_log("Portal: last-login update failed — " . $e->getMessage());
-}
-
-// ── Build JWT with role claim ─────────────────────────────────
-$secret  = ($_ENV['JWT_SECRET'] ?? getenv('JWT_SECRET')) ?: 'default_secret_change_this';
-$now     = time();
-$expires = $now + (60 * 60 * 24 * 7); // 7 days
-
-$header  = base64UrlEncode(json_encode(['typ' => 'JWT', 'alg' => 'HS256']));
-$payload = base64UrlEncode(json_encode([
-    'iat'     => $now,
-    'exp'     => $expires,
-    'adminID' => $admin['AdminID'],
-    'email'   => $admin['Email'],
-    'role'    => $admin['Role'],
-]));
-$sig   = base64UrlEncode(hash_hmac('sha256', "$header.$payload", $secret, true));
-$token = "$header.$payload.$sig";
-
-sendResponse([
-    'admin_id'  => $admin['AdminID'],
-    'name'      => trim($admin['FirstName'] . ' ' . $admin['LastName']),
-    'email'     => $admin['Email'],
-    'role'      => $admin['Role'],
-    'school_id' => $admin['SchoolID'],
-    'token'     => $token,
-]);
