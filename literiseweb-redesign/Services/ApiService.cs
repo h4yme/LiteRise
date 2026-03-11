@@ -96,19 +96,19 @@ namespace Website.Services
             return token as JArray ?? new JArray();
         }
 
-        /// <summary>Returns detailed progress for a single student.</summary>
+        /// <summary>Returns portal-view detail for a single student (name, XP, placement, etc.).</summary>
         public async Task<JObject> GetStudentProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"get_student_progress.php?student_id={studentId}");
+            var token = await GetJsonAsync($"get_portal_student.php?student_id={studentId}");
             return token as JObject ?? new JObject();
         }
 
         // ── Assessment ────────────────────────────────────────────────
 
-        /// <summary>Returns pre and post assessment results for a student.</summary>
+        /// <summary>Returns pre and post assessment results for a student (portal view).</summary>
         public async Task<JObject> GetPlacementProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"get_placement_progress.php?student_id={studentId}");
+            var token = await GetJsonAsync($"get_portal_placement_progress.php?student_id={studentId}");
             return token as JObject ?? new JObject();
         }
 
