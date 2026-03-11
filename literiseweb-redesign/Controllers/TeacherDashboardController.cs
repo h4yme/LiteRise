@@ -24,15 +24,15 @@ namespace Website.Controllers
                 var students  = await _api.GetStudentsAsync(schoolId);
 
                 int total         = students.Count;
-                int preCompleted  = students.Count(s => s["pre_theta"] != null);
-                int postCompleted = students.Count(s => s["post_theta"] != null);
+                int preCompleted  = students.Count(s => s["pre_theta"]?.ToObject<double?>()  != null);
+                int postCompleted = students.Count(s => s["post_theta"]?.ToObject<double?>() != null);
                 int inactive7Days = students.Count(s => s["status"]?.ToString() == "inactive");
 
-                double avgPreTheta  = preCompleted  > 0 ? Math.Round(students.Where(s => s["pre_theta"]  != null).Average(s => (double)s["pre_theta"]),  3) : 0;
-                double avgPostTheta = postCompleted > 0 ? Math.Round(students.Where(s => s["post_theta"] != null).Average(s => (double)s["post_theta"]), 3) : 0;
+                double avgPreTheta  = preCompleted  > 0 ? Math.Round(students.Where(s => s["pre_theta"]?.ToObject<double?>()  != null).Average(s => s["pre_theta"].ToObject<double>()),  3) : 0;
+                double avgPostTheta = postCompleted > 0 ? Math.Round(students.Where(s => s["post_theta"]?.ToObject<double?>() != null).Average(s => s["post_theta"].ToObject<double>()), 3) : 0;
 
                 var avgLessons = total > 0
-                    ? Math.Round(students.Average(s => (double)(s["lessons_done"] ?? 0)), 1)
+                    ? Math.Round(students.Average(s => s["lessons_done"]?.ToObject<double?>() ?? 0), 1)
                     : 0;
 
                 ViewBag.Students        = students;
