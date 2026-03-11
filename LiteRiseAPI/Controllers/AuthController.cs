@@ -331,7 +331,8 @@ public class AuthController : ControllerBase
         {
             await using var conn = await _db.GetConnectionAsync();
 
-            var spName = req.Role.ToLower() == "admin" ? "SP_AdminLogin" : "SP_TeacherLogin";
+            var role = req.Role.ToLower() == "teacher" ? "teacher" : "admin";
+            var spName = role == "admin" ? "SP_AdminLogin" : "SP_TeacherLogin";
             await using var cmd = new SqlCommand(
                 $"EXEC {spName} @Email = @Email, @Password = @Password", conn);
             cmd.Parameters.AddWithValue("@Email", req.Email.Trim());
@@ -339,18 +340,35 @@ public class AuthController : ControllerBase
 
             await using var reader = await cmd.ExecuteReaderAsync();
             if (!await reader.ReadAsync())
-                return Unauthorized(new ErrorResponse { Error = "Invalid credentials." });
+                return Unauthorized(new ErrorResponse { Error = "Invalid email or password." });
 
-            var userId = Convert.ToInt32(reader["UserID"]);
+            var userId   = Convert.ToInt32(reader["UserID"]);
+            var fullName = reader["FullName"]?.ToString() ?? "";
+            await reader.CloseAsync();
+
             var token = _jwt.GenerateToken(userId, req.Email);
+
+            // Fetch extra fields needed by the portal
+            int? schoolId = null;
+            if (role == "teacher")
+            {
+                await using var extraCmd = new SqlCommand(
+                    "SELECT SchoolID FROM Teachers WHERE TeacherID = @ID", conn);
+                extraCmd.Parameters.AddWithValue("@ID", userId);
+                var sid = await extraCmd.ExecuteScalarAsync();
+                if (sid != null && sid != DBNull.Value) schoolId = Convert.ToInt32(sid);
+            }
 
             return Ok(new
             {
-                success = true,
+                success  = true,
+                user_id  = userId,
+                name     = fullName,
+                email    = req.Email.Trim(),
+                role,
+                school_id = schoolId,
                 token,
-                userId,
-                role = req.Role,
-                fullName = reader["FullName"]?.ToString() ?? ""
+                message  = "Login successful."
             });
         }
         catch (Exception ex)
