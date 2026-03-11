@@ -10,7 +10,7 @@ namespace Website.Controllers
     [AuthFilter]
     public class TeacherDashboardController : Controller
     {
-        private readonly ApiService _api = new ApiService();
+        private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
 
         public async Task<ActionResult> Index()
         {

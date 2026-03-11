@@ -17,6 +17,7 @@ namespace Website.Services
     {
         private static readonly HttpClient _http;
         private static readonly string     _base;
+        private readonly string _authToken;
 
         static ApiService()
         {
@@ -31,11 +32,20 @@ namespace Website.Services
             _http.DefaultRequestHeaders.Add("Accept", "application/json");
         }
 
+        public ApiService(string authToken = null)
+        {
+            _authToken = authToken;
+        }
+
         // ── Generic helpers ───────────────────────────────────────────
 
         private async Task<JToken> GetJsonAsync(string endpoint)
         {
-            var resp = await _http.GetAsync(endpoint);
+            var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
+            if (!string.IsNullOrEmpty(_authToken))
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _authToken);
+            var resp = await _http.SendAsync(request);
             resp.EnsureSuccessStatusCode();
             var json = await resp.Content.ReadAsStringAsync();
             return JToken.Parse(json);
@@ -43,8 +53,14 @@ namespace Website.Services
 
         private async Task<JToken> PostJsonAsync(string endpoint, Dictionary<string, string> data)
         {
-            var content = new FormUrlEncodedContent(data);
-            var resp    = await _http.PostAsync(endpoint, content);
+            var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
+            {
+                Content = new FormUrlEncodedContent(data)
+            };
+            if (!string.IsNullOrEmpty(_authToken))
+                request.Headers.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _authToken);
+            var resp = await _http.SendAsync(request);
             resp.EnsureSuccessStatusCode();
             var json = await resp.Content.ReadAsStringAsync();
             return JToken.Parse(json);

@@ -9,7 +9,7 @@ namespace Website.Controllers
     [AuthFilter]
     public class StudentController : Controller
     {
-        private readonly ApiService _api = new ApiService();
+        private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
 
         // GET /Student
         public async Task<ActionResult> Index()
