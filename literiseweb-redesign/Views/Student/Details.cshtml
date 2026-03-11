@@ -1,0 +1,404 @@
+@{
+    ViewBag.Title = "Student Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var student    = ViewBag.Student    as Newtonsoft.Json.Linq.JObject ?? new Newtonsoft.Json.Linq.JObject();
+    var assessment = ViewBag.Assessment as Newtonsoft.Json.Linq.JObject ?? new Newtonsoft.Json.Linq.JObject();
+    var nodes      = ViewBag.Nodes      as Newtonsoft.Json.Linq.JArray  ?? new Newtonsoft.Json.Linq.JArray();
+    var modules    = ViewBag.Modules    as Newtonsoft.Json.Linq.JArray  ?? new Newtonsoft.Json.Linq.JArray();
+    var games      = ViewBag.Games      as Newtonsoft.Json.Linq.JArray  ?? new Newtonsoft.Json.Linq.JArray();
+    var badges     = ViewBag.Badges     as Newtonsoft.Json.Linq.JArray  ?? new Newtonsoft.Json.Linq.JArray();
+
+    var name    = student["name"]?.ToString()   ?? "Unknown Student";
+    var initials = name.Length >= 2 ? name.Substring(0,1).ToUpper() + name.Split(' ').Last().Substring(0,1).ToUpper() : name.Substring(0,1).ToUpper();
+
+    var preAssessment  = assessment["pre_assessment"]  as Newtonsoft.Json.Linq.JObject;
+    var postAssessment = assessment["post_assessment"] as Newtonsoft.Json.Linq.JObject;
+
+    int completedNodes = nodes.Count(n => n["status"]?.ToString() == "completed");
+    int totalNodes     = 65;
+}
+
+@section styles {
+    <link href="~/Content/StudentStyles.css" rel="stylesheet" />
+}
+
+<div class="dashboard-container">
+    <!-- Back + header -->
+    <div class="page-back-bar">
+        <a href="@(ViewBag.BackUrl ?? Url.Action("Index", "Student"))" class="btn-back">
+            <span class="glyphicon glyphicon-arrow-left"></span> Back
+        </a>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert-banner error">Could not load student data: @ViewBag.Error</div>
+    }
+
+    <!-- ── PROFILE HEADER ─────────────────────────────────────── -->
+    <div class="student-profile-header">
+        <div class="student-avatar-lg">@initials</div>
+        <div class="student-profile-info">
+            <h1>@name</h1>
+            <div class="student-meta-row">
+                @if (student["nickname"] != null) { <span class="meta-tag">@student["nickname"]</span> }
+                @if (student["grade"] != null)    { <span class="meta-tag">Grade @student["grade"]</span> }
+                @if (student["gender"] != null)   { <span class="meta-tag">@student["gender"]</span> }
+                @if (student["school_name"] != null) { <span class="meta-tag school">@student["school_name"]</span> }
+                @if (student["barangay"] != null) { <span class="meta-tag">Brgy. @student["barangay"]</span> }
+            </div>
+            <div class="student-stats-inline">
+                <div class="inline-stat">
+                    <span class="glyphicon glyphicon-star"></span>
+                    <strong>@(student["total_xp"] ?? 0)</strong> XP
+                </div>
+                <div class="inline-stat">
+                    <span class="glyphicon glyphicon-fire"></span>
+                    <strong>@(student["streak_days"] ?? 0)</strong> day streak
+                </div>
+                <div class="inline-stat">
+                    <span class="glyphicon glyphicon-ok"></span>
+                    <strong>@completedNodes / @totalNodes</strong> nodes done
+                </div>
+                @{
+                    var level  = student["placement_level"]?.ToString() ?? "";
+                    var status = student["status"]?.ToString() ?? "inactive";
+                }
+                @if (!string.IsNullOrEmpty(level)) {
+                    <span class="level-badge @level.ToLower()">@level</span>
+                }
+                <span class="status-dot @status"></span><span style="font-size:.82rem;color:#64748B;">@status</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TAB NAV ────────────────────────────────────────────── -->
+    <div class="tab-nav">
+        <button class="tab-btn active" data-tab="assessment">Assessment</button>
+        <button class="tab-btn" data-tab="lessons">Lessons</button>
+        <button class="tab-btn" data-tab="games">Games</button>
+        <button class="tab-btn" data-tab="badges">Badges</button>
+    </div>
+
+    <!-- ── TAB: ASSESSMENT ────────────────────────────────────── -->
+    <div class="tab-pane active" id="tab-assessment">
+        <div class="two-col-grid">
+            <!-- Pre-Assessment -->
+            <div class="dashboard-section assessment-card pre">
+                <div class="section-header">
+                    <div>
+                        <h2>Pre-Assessment</h2>
+                        <p>@(preAssessment?["date"]?.ToString() ?? "Not completed")</p>
+                    </div>
+                    <span class="level-badge @(preAssessment?["level"]?.ToString()?.ToLower() ?? "")">
+                        @(preAssessment?["level"]?.ToString() ?? "—")
+                    </span>
+                </div>
+                @if (preAssessment != null)
+                {
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <span class="stat-label">Theta (θ)</span>
+                            <span class="stat-value">@(Math.Round((double)(preAssessment["theta"] ?? 0), 3))</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Accuracy</span>
+                            <span class="stat-value">@(preAssessment["accuracy"] ?? "—")</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Items</span>
+                            <span class="stat-value">@(preAssessment["total_items"] ?? "—")</span>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:#64748B;text-transform:uppercase;letter-spacing:.5px;">Category Scores</h4>
+                        <canvas id="chartPreCategories" style="max-height:200px;"></canvas>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">Pre-assessment not yet taken.</div>
+                }
+            </div>
+
+            <!-- Post-Assessment -->
+            <div class="dashboard-section assessment-card post">
+                <div class="section-header">
+                    <div>
+                        <h2>Post-Assessment</h2>
+                        <p>@(postAssessment?["date"]?.ToString() ?? "Not completed")</p>
+                    </div>
+                    <span class="level-badge @(postAssessment?["level"]?.ToString()?.ToLower() ?? "")">
+                        @(postAssessment?["level"]?.ToString() ?? "—")
+                    </span>
+                </div>
+                @if (postAssessment != null)
+                {
+                    <div class="stats-row">
+                        <div class="stat-box">
+                            <span class="stat-label">Theta (θ)</span>
+                            <span class="stat-value positive">@(Math.Round((double)(postAssessment["theta"] ?? 0), 3))</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Accuracy</span>
+                            <span class="stat-value">@(postAssessment["accuracy"] ?? "—")</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-label">Growth</span>
+                            <span class="stat-value positive">
+                                @if (preAssessment != null && postAssessment != null)
+                                {
+                                    var growth = Math.Round((double)(postAssessment["theta"] ?? 0) - (double)(preAssessment["theta"] ?? 0), 3);
+                                    @(growth > 0 ? "+" + growth : growth.ToString())
+                                }
+                                else { @("—") }
+                            </span>
+                        </div>
+                    </div>
+                    <div style="margin-top:16px;">
+                        <h4 style="font-size:.85rem;font-weight:700;margin-bottom:12px;color:#64748B;text-transform:uppercase;letter-spacing:.5px;">Category Scores</h4>
+                        <canvas id="chartPostCategories" style="max-height:200px;"></canvas>
+                    </div>
+                }
+                else
+                {
+                    <div class="empty-state">Post-assessment not yet available.</div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ── TAB: LESSONS ───────────────────────────────────────── -->
+    <div class="tab-pane" id="tab-lessons">
+        <div class="dashboard-section">
+            <div class="section-header">
+                <div>
+                    <h2>Lesson Progress</h2>
+                    <p>@completedNodes of @totalNodes nodes completed</p>
+                </div>
+                <div class="progress-pill-wrap">
+                    <div class="progress-pill">
+                        <div class="progress-fill" style="width:@(totalNodes > 0 ? (completedNodes * 100 / totalNodes) : 0)%"></div>
+                    </div>
+                    <span class="progress-pct">@(totalNodes > 0 ? (completedNodes * 100 / totalNodes) : 0)%</span>
+                </div>
+            </div>
+
+            @if (modules.Any())
+            {
+                @foreach (var mod in modules)
+                {
+                    var modNodes = mod["nodes"] as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+                    var modDone  = modNodes.Count(n => n["status"]?.ToString() == "completed");
+                    <div class="module-block">
+                        <div class="module-header">
+                            <span class="module-title">@mod["module_title"]</span>
+                            <span class="module-progress-tag">@modDone / @modNodes.Count</span>
+                        </div>
+                        <div class="node-grid">
+                            @foreach (var node in modNodes)
+                            {
+                                var nStatus = node["status"]?.ToString() ?? "locked";
+                                var nTitle  = node["title"]?.ToString() ?? "Node";
+                                var nScore  = node["quiz_score"]?.ToString();
+                                var nPath   = node["quiz_path"]?.ToString();
+                                <div class="node-cell @nStatus" title="@nTitle — @nStatus@(nScore != null ? " | Score: "+nScore : "")@(nPath != null ? " | Path: "+nPath : "")">
+                                    <span class="node-status-icon">
+                                        @switch (nStatus)
+                                        {
+                                            case "completed":   { <text>&#10003;</text> break; }
+                                            case "in_progress": { <text>&#9654;</text> break; }
+                                            default:            { <text>&#128274;</text> break; }
+                                        }
+                                    </span>
+                                    <span class="node-num">@(node["node_number"] ?? "")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else if (nodes.Any())
+            {
+                <!-- Fallback: flat node list grouped by module_id -->
+                @for (int m = 1; m <= 5; m++)
+                {
+                    var mNodes = nodes.Where(n => (int)(n["module_id"] ?? 0) == m).ToList();
+                    if (!mNodes.Any()) continue;
+                    <div class="module-block">
+                        <div class="module-header">
+                            <span class="module-title">Module @m</span>
+                            <span class="module-progress-tag">@mNodes.Count(n => n["status"]?.ToString() == "completed") / @mNodes.Count</span>
+                        </div>
+                        <div class="node-grid">
+                            @foreach (var node in mNodes)
+                            {
+                                var nStatus = node["status"]?.ToString() ?? "locked";
+                                <div class="node-cell @nStatus" title="@(node["title"] ?? "Node")">
+                                    <span class="node-status-icon">
+                                        @switch (nStatus)
+                                        {
+                                            case "completed":   { <text>&#10003;</text> break; }
+                                            case "in_progress": { <text>&#9654;</text> break; }
+                                            default:            { <text>&#128274;</text> break; }
+                                        }
+                                    </span>
+                                    <span class="node-num">@(node["node_number"] ?? "")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-state">No lesson progress recorded yet.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ── TAB: GAMES ─────────────────────────────────────────── -->
+    <div class="tab-pane" id="tab-games">
+        <div class="dashboard-section">
+            <div class="section-header">
+                <div>
+                    <h2>Game Performance</h2>
+                    <p>@games.Count games played</p>
+                </div>
+            </div>
+            @if (games.Any())
+            {
+                <div class="table-responsive">
+                    <table class="lr-table">
+                        <thead>
+                            <tr>
+                                <th>Game Type</th>
+                                <th>Score</th>
+                                <th>Accuracy</th>
+                                <th>XP Earned</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var g in games)
+                            {
+                                <tr>
+                                    <td>@(g["game_type"] ?? "—")</td>
+                                    <td>@(g["score"] ?? "—")</td>
+                                    <td>@(g["accuracy"] ?? "—")</td>
+                                    <td>+@(g["xp_earned"] ?? 0)</td>
+                                    <td>@(g["played_at"] ?? "—")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">No game activity recorded yet.</div>
+            }
+        </div>
+    </div>
+
+    <!-- ── TAB: BADGES ────────────────────────────────────────── -->
+    <div class="tab-pane" id="tab-badges">
+        <div class="dashboard-section">
+            <div class="section-header">
+                <div>
+                    <h2>Badges & Achievements</h2>
+                    <p>@badges.Count badges earned</p>
+                </div>
+            </div>
+            @if (badges.Any())
+            {
+                <div class="badges-grid">
+                    @foreach (var b in badges)
+                    {
+                        <div class="badge-card">
+                            <div class="badge-icon">@(b["icon"] ?? "🏅")</div>
+                            <div class="badge-name">@(b["name"] ?? "Badge")</div>
+                            <div class="badge-type">@(b["type"] ?? "")</div>
+                            <div class="badge-date">@(b["earned_at"] ?? "")</div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">No badges earned yet.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.tab-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.tab-btn').forEach(function (b) { b.classList.remove('active'); });
+                document.querySelectorAll('.tab-pane').forEach(function (p) { p.classList.remove('active'); });
+                btn.classList.add('active');
+                document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Category radar charts
+        var categories = ['Phonics', 'Vocabulary', 'Grammar', 'Comprehension', 'Creating Text'];
+
+        @if (preAssessment != null)
+        {
+            <text>
+            new Chart(document.getElementById('chartPreCategories'), {
+                type: 'radar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Pre-Assessment',
+                        data: [
+                            @(preAssessment["phonics"] ?? 0),
+                            @(preAssessment["vocabulary"] ?? 0),
+                            @(preAssessment["grammar"] ?? 0),
+                            @(preAssessment["comprehension"] ?? 0),
+                            @(preAssessment["creating_text"] ?? 0)
+                        ],
+                        backgroundColor: 'rgba(124,58,237,0.15)',
+                        borderColor: '#7C3AED',
+                        pointBackgroundColor: '#7C3AED'
+                    }]
+                },
+                options: { responsive: true, scales: { r: { min: 0, max: 100 } } }
+            });
+            </text>
+        }
+
+        @if (postAssessment != null)
+        {
+            <text>
+            new Chart(document.getElementById('chartPostCategories'), {
+                type: 'radar',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        label: 'Post-Assessment',
+                        data: [
+                            @(postAssessment["phonics"] ?? 0),
+                            @(postAssessment["vocabulary"] ?? 0),
+                            @(postAssessment["grammar"] ?? 0),
+                            @(postAssessment["comprehension"] ?? 0),
+                            @(postAssessment["creating_text"] ?? 0)
+                        ],
+                        backgroundColor: 'rgba(17,176,103,0.15)',
+                        borderColor: '#11B067',
+                        pointBackgroundColor: '#11B067'
+                    }]
+                },
+                options: { responsive: true, scales: { r: { min: 0, max: 100 } } }
+            });
+            </text>
+        }
+    </script>
+}

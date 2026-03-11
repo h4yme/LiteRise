@@ -1,0 +1,212 @@
+@{
+    ViewBag.Title = "Teacher Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var students = ViewBag.Students as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+}
+
+@section styles {
+    <link href="~/Content/DashboardStyles.css" rel="stylesheet" />
+    <link href="~/Content/StudentStyles.css" rel="stylesheet" />
+}
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>My Class Dashboard</h1>
+        <p class="subtitle">Welcome back, @Session["UserName"] — @DateTime.Now.ToString("MMMM d, yyyy")</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert-banner error">Could not load data: @ViewBag.Error</div>
+    }
+
+    <!-- KPI Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon"><span class="glyphicon glyphicon-education"></span></div>
+            <div class="metric-content">
+                <h3>@ViewBag.Total</h3>
+                <p>My Students</p>
+                <span class="metric-label">Assigned</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon"><span class="glyphicon glyphicon-list-alt"></span></div>
+            <div class="metric-content">
+                <h3>@ViewBag.PreCompleted</h3>
+                <p>Pre-Assessment Done</p>
+                <span class="metric-change positive">@ViewBag.PreCompleted / @ViewBag.Total</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon"><span class="glyphicon glyphicon-signal"></span></div>
+            <div class="metric-content">
+                <h3>@ViewBag.AvgPreTheta</h3>
+                <p>Avg Pre-θ Score</p>
+                <span class="metric-label">Class avg</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon"><span class="glyphicon glyphicon-book"></span></div>
+            <div class="metric-content">
+                <h3>@ViewBag.AvgLessons</h3>
+                <p>Avg Lessons Done</p>
+                <span class="metric-label">Out of 65</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <h4>Level Distribution</h4>
+            <canvas id="chartLevels"></canvas>
+        </div>
+        <div class="chart-card wide">
+            <h4>Pre-θ vs Post-θ (Top 15 Students)</h4>
+            <canvas id="chartTheta"></canvas>
+        </div>
+    </div>
+
+    <!-- Needs Attention -->
+    @{
+        var needsAttention = students.Where(s =>
+            s["status"]?.ToString() == "inactive" ||
+            s["pre_theta"] == null
+        ).Take(5).ToList();
+    }
+    @if (needsAttention.Any())
+    {
+        <div class="dashboard-section">
+            <div class="section-header">
+                <div>
+                    <h2>Needs Attention</h2>
+                    <p>Students inactive or missing pre-assessment</p>
+                </div>
+            </div>
+            <div class="activity-list">
+                @foreach (var s in needsAttention)
+                {
+                    var issue = s["pre_theta"] == null ? "Pre-assessment not taken" : "Inactive";
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <span class="glyphicon glyphicon-warning-sign" style="color:#F97316;"></span>
+                        </div>
+                        <div class="activity-content">
+                            <h5>@s["name"]</h5>
+                            <p>@issue — Last active: @(s["last_active"] ?? "never")</p>
+                        </div>
+                        <a href="@Url.Action("Details", "TeacherStudents", new { id = s["student_id"] })"
+                           class="view-details-btn">View</a>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- Recent Students Table -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <div>
+                <h2>My Students</h2>
+                <p>Showing top @Math.Min(students.Count, 10) of @students.Count</p>
+            </div>
+            <a href="@Url.Action("Index", "TeacherStudents")" class="view-details-btn">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="lr-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Grade</th>
+                        <th>Level</th>
+                        <th>Pre-θ</th>
+                        <th>Post-θ</th>
+                        <th>Lessons</th>
+                        <th>XP</th>
+                        <th>Last Active</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in students.Take(10))
+                    {
+                        var level = s["placement_level"]?.ToString() ?? "";
+                        <tr>
+                            <td>
+                                <div class="student-name-cell">
+                                    <div class="avatar-sm">@(s["name"]?.ToString()?.Substring(0,1).ToUpper())</div>
+                                    <span>@s["name"]</span>
+                                </div>
+                            </td>
+                            <td>@(s["grade"] ?? "—")</td>
+                            <td><span class="level-badge @level.ToLower()">@(string.IsNullOrEmpty(level) ? "—" : level)</span></td>
+                            <td>@(s["pre_theta"] ?? "—")</td>
+                            <td>@(s["post_theta"] ?? "—")</td>
+                            <td>@(s["lessons_done"] ?? "0")</td>
+                            <td>@(s["total_xp"] ?? 0)</td>
+                            <td>@(s["last_active"] ?? "—")</td>
+                            <td>
+                                <a href="@Url.Action("Details", "TeacherStudents", new { id = s["student_id"] })"
+                                   class="btn-view-sm">View</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!students.Any())
+                    {
+                        <tr><td colspan="9" class="empty-state">No students assigned.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var levelData = { beginner: 0, intermediate: 0, advanced: 0 };
+            var thetaLabels = [], preData = [], postData = [];
+
+            @foreach (var s in students)
+            {
+                var lv = (s["placement_level"]?.ToString() ?? "").ToLower();
+                var sn = (s["name"]?.ToString() ?? "").Replace("'", "\\'");
+                <text>
+                if ('@lv') levelData['@lv'] = (levelData['@lv'] || 0) + 1;
+                if (thetaLabels.length < 15) {
+                    thetaLabels.push('@sn');
+                    preData.push(@(s["pre_theta"] ?? "null"));
+                    postData.push(@(s["post_theta"] ?? "null"));
+                }
+                </text>
+            }
+
+            new Chart(document.getElementById('chartLevels'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Beginner', 'Intermediate', 'Advanced'],
+                    datasets: [{
+                        data: [levelData.beginner || 0, levelData.intermediate || 0, levelData.advanced || 0],
+                        backgroundColor: ['#7C3AED', '#11B067', '#FDC94A'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, cutout: '60%' }
+            });
+
+            new Chart(document.getElementById('chartTheta'), {
+                type: 'bar',
+                data: {
+                    labels: thetaLabels,
+                    datasets: [
+                        { label: 'Pre-θ',  data: preData,  backgroundColor: 'rgba(124,58,237,0.7)', borderRadius: 4 },
+                        { label: 'Post-θ', data: postData, backgroundColor: 'rgba(17,176,103,0.7)', borderRadius: 4 }
+                    ]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: false } } }
+            });
+        })();
+    </script>
+}

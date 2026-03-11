@@ -1,0 +1,207 @@
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var students = ViewBag.Students as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+    var schools  = ViewBag.Schools  as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+}
+
+@section styles {
+    <link href="~/Content/DashboardStyles.css" rel="stylesheet" />
+}
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>Dashboard</h1>
+        <p class="subtitle">System-wide overview — @DateTime.Now.ToString("MMMM d, yyyy")</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert-banner error">Could not load data: @ViewBag.Error</div>
+    }
+
+    <!-- KPI Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon">
+                <span class="glyphicon glyphicon-education"></span>
+            </div>
+            <div class="metric-content">
+                <h3>@ViewBag.TotalStudents</h3>
+                <p>Total Students</p>
+                <span class="metric-label">All time</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <span class="glyphicon glyphicon-home"></span>
+            </div>
+            <div class="metric-content">
+                <h3>@ViewBag.TotalSchools</h3>
+                <p>Partner Schools</p>
+                <span class="metric-label">Registered</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <span class="glyphicon glyphicon-user"></span>
+            </div>
+            <div class="metric-content">
+                <h3>@ViewBag.ActiveStudents</h3>
+                <p>Active Students</p>
+                <span class="metric-change positive">&#9650; Live</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon">
+                <span class="glyphicon glyphicon-star"></span>
+            </div>
+            <div class="metric-content">
+                <h3>@ViewBag.AvgXP</h3>
+                <p>Average XP</p>
+                <span class="metric-label">Per student</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="charts-row">
+        <div class="chart-card">
+            <h4>Students by School</h4>
+            <canvas id="chartBySchool"></canvas>
+        </div>
+        <div class="chart-card">
+            <h4>Activity Status</h4>
+            <canvas id="chartStatus"></canvas>
+        </div>
+        <div class="chart-card wide">
+            <h4>Placement Level Distribution</h4>
+            <canvas id="chartLevel"></canvas>
+        </div>
+    </div>
+
+    <!-- Recent Students -->
+    <div class="dashboard-section">
+        <div class="section-header">
+            <div>
+                <h2>Recent Students</h2>
+                <p>Latest @Math.Min(students.Count, 10) of @students.Count registered students</p>
+            </div>
+            <a href="@Url.Action("Index", "Student")" class="view-details-btn">View All</a>
+        </div>
+        <div class="table-responsive">
+            <table class="lr-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>School</th>
+                        <th>Grade</th>
+                        <th>Level</th>
+                        <th>XP</th>
+                        <th>Last Active</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in students.Take(10))
+                    {
+                        var level  = s["placement_level"]?.ToString() ?? "—";
+                        var status = s["status"]?.ToString() ?? "inactive";
+                        <tr>
+                            <td>
+                                <a href="@Url.Action("Details", "Student", new { id = s["student_id"] })" class="student-link">
+                                    @s["name"]
+                                </a>
+                            </td>
+                            <td>@(s["school_name"] ?? "—")</td>
+                            <td>@(s["grade"] ?? "—")</td>
+                            <td><span class="level-badge @level.ToLower()">@level</span></td>
+                            <td>@(s["total_xp"] ?? 0)</td>
+                            <td>@(s["last_active"] ?? "—")</td>
+                            <td><span class="status-dot @status"></span> @status</td>
+                        </tr>
+                    }
+                    @if (!students.Any())
+                    {
+                        <tr><td colspan="7" class="empty-state">No students found.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        (function () {
+            var isDark = document.body.classList.contains('dark-mode');
+            var textColor = isDark ? '#94A3B8' : '#64748B';
+            Chart.defaults.color = textColor;
+            Chart.defaults.borderColor = isDark ? 'rgba(255,255,255,0.06)' : '#E2E8F0';
+
+            // Build data from Razor
+            var schoolData = {};
+            var statusData = { active: 0, inactive: 0 };
+            var levelData  = { beginner: 0, intermediate: 0, advanced: 0 };
+
+            @foreach (var s in students)
+            {
+                var sn = (s["school_name"]?.ToString() ?? "Unknown").Replace("'", "\\'");
+                var st = s["status"]?.ToString() ?? "inactive";
+                var lv = (s["placement_level"]?.ToString() ?? "").ToLower();
+                <text>
+                schoolData['@sn'] = (schoolData['@sn'] || 0) + 1;
+                statusData['@st'] = (statusData['@st'] || 0) + 1;
+                if ('@lv') levelData['@lv'] = (levelData['@lv'] || 0) + 1;
+                </text>
+            }
+
+            // Schools bar chart
+            var schoolLabels = Object.keys(schoolData);
+            var schoolCounts = schoolLabels.map(function(k){ return schoolData[k]; });
+            new Chart(document.getElementById('chartBySchool'), {
+                type: 'bar',
+                data: {
+                    labels: schoolLabels,
+                    datasets: [{
+                        label: 'Students',
+                        data: schoolCounts,
+                        backgroundColor: '#11B067',
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+
+            // Status doughnut
+            new Chart(document.getElementById('chartStatus'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['Active', 'Inactive'],
+                    datasets: [{
+                        data: [statusData.active || 0, statusData.inactive || 0],
+                        backgroundColor: ['#11B067', '#E2E8F0'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, cutout: '65%' }
+            });
+
+            // Level bar
+            new Chart(document.getElementById('chartLevel'), {
+                type: 'bar',
+                data: {
+                    labels: ['Beginner', 'Intermediate', 'Advanced'],
+                    datasets: [{
+                        label: 'Students',
+                        data: [levelData.beginner || 0, levelData.intermediate || 0, levelData.advanced || 0],
+                        backgroundColor: ['#7C3AED', '#11B067', '#FDC94A'],
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
+        })();
+    </script>
+}

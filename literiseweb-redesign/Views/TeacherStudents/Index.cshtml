@@ -1,0 +1,147 @@
+@{
+    ViewBag.Title = "My Students";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var students = ViewBag.Students as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+}
+
+@section styles {
+    <link href="~/Content/StudentStyles.css" rel="stylesheet" />
+}
+
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>My Students</h1>
+        <p class="subtitle">@students.Count students in your class</p>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert-banner error">Could not load data: @ViewBag.Error</div>
+    }
+
+    <!-- Filters -->
+    <div class="dashboard-section" style="margin-bottom:20px;">
+        <div class="filter-row">
+            <input type="text" id="searchInput" class="filter-input" placeholder="Search by name..." />
+            <select id="filterLevel" class="filter-select">
+                <option value="">All Levels</option>
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+            <select id="filterStatus" class="filter-select">
+                <option value="">All Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+            </select>
+            <button id="btnResetFilters" class="btn-outline-sm">Reset</button>
+        </div>
+    </div>
+
+    <div class="dashboard-section">
+        <div class="section-header">
+            <div>
+                <h2>Student Roster</h2>
+                <p id="tableCount">Showing @students.Count students</p>
+            </div>
+            <button class="view-details-btn" onclick="exportCSV()">Export CSV</button>
+        </div>
+        <div class="table-responsive">
+            <table class="lr-table" id="studentTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Grade</th>
+                        <th>Level</th>
+                        <th>Pre-θ</th>
+                        <th>Post-θ</th>
+                        <th>Lessons Done</th>
+                        <th>XP</th>
+                        <th>Last Active</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="studentBody">
+                    @foreach (var s in students)
+                    {
+                        var level  = s["placement_level"]?.ToString() ?? "";
+                        var status = s["status"]?.ToString() ?? "inactive";
+                        <tr data-name="@(s["name"]?.ToString()?.ToLower())"
+                            data-level="@level"
+                            data-status="@status">
+                            <td>
+                                <div class="student-name-cell">
+                                    <div class="avatar-sm">@(s["name"]?.ToString()?.Substring(0,1).ToUpper())</div>
+                                    <span>@s["name"]</span>
+                                </div>
+                            </td>
+                            <td>@(s["grade"] ?? "—")</td>
+                            <td><span class="level-badge @level.ToLower()">@(string.IsNullOrEmpty(level) ? "—" : level)</span></td>
+                            <td>@(s["pre_theta"] ?? "—")</td>
+                            <td>@(s["post_theta"] ?? "—")</td>
+                            <td>@(s["lessons_done"] ?? "0")</td>
+                            <td>@(s["total_xp"] ?? 0)</td>
+                            <td>@(s["last_active"] ?? "—")</td>
+                            <td><span class="status-dot @status"></span> @status</td>
+                            <td>
+                                <a href="@Url.Action("Details", "TeacherStudents", new { id = s["student_id"] })"
+                                   class="btn-view-sm">View</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!students.Any())
+                    {
+                        <tr><td colspan="10" class="empty-state">No students assigned.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        (function () {
+            var rows = document.querySelectorAll('#studentBody tr[data-name]');
+            function applyFilters() {
+                var search = document.getElementById('searchInput').value.toLowerCase();
+                var level  = document.getElementById('filterLevel').value;
+                var status = document.getElementById('filterStatus').value;
+                var visible = 0;
+                rows.forEach(function (row) {
+                    var show = (!search || row.dataset.name.includes(search))
+                            && (!level  || row.dataset.level  === level)
+                            && (!status || row.dataset.status === status);
+                    row.style.display = show ? '' : 'none';
+                    if (show) visible++;
+                });
+                document.getElementById('tableCount').textContent = 'Showing ' + visible + ' students';
+            }
+            document.getElementById('searchInput').addEventListener('input', applyFilters);
+            document.getElementById('filterLevel').addEventListener('change', applyFilters);
+            document.getElementById('filterStatus').addEventListener('change', applyFilters);
+            document.getElementById('btnResetFilters').addEventListener('click', function () {
+                document.getElementById('searchInput').value = '';
+                document.getElementById('filterLevel').value = '';
+                document.getElementById('filterStatus').value = '';
+                applyFilters();
+            });
+        })();
+
+        function exportCSV() {
+            var rows = document.querySelectorAll('#studentTable tr');
+            var csv  = [];
+            rows.forEach(function (row) {
+                if (row.style.display === 'none') return;
+                var cols = row.querySelectorAll('th, td');
+                var line = [];
+                cols.forEach(function (c, i) { if (i < cols.length - 1) line.push('"' + c.innerText.replace(/"/g, '""') + '"'); });
+                csv.push(line.join(','));
+            });
+            var blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+            var a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+            a.download = 'my-students.csv'; a.click();
+        }
+    </script>
+}

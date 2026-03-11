@@ -14,7 +14,7 @@ namespace Website.Filters
 
             if (session == null || session["UserId"] == null)
             {
-                filterContext.Result = new RedirectResult("~/Account/Login");
+                filterContext.Result = new RedirectResult("~/Login");
                 return;
             }
 
