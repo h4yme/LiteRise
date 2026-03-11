@@ -150,7 +150,25 @@ namespace Website.Services
         public async Task<JArray> GetBadgesAsync(int studentId)
         {
             var token = await GetJsonAsync($"get_badges.php?student_id={studentId}");
-            return token as JArray ?? new JArray();
+            // Response is { success, earned_count, total_count, badges: [...] }
+            var all = token is JObject obj && obj["badges"] is JArray arr
+                      ? arr
+                      : token as JArray ?? new JArray();
+
+            // Filter to earned only and remap to field names the view expects
+            var result = new JArray();
+            foreach (var b in all)
+            {
+                if (b["earned"]?.ToObject<bool>() != true) continue;
+                result.Add(new JObject
+                {
+                    ["icon"]      = b["badge_icon_url"],
+                    ["name"]      = b["badge_name"],
+                    ["type"]      = b["badge_category"],
+                    ["earned_at"] = b["date_earned"]
+                });
+            }
+            return result;
         }
 
         // ── Schools ───────────────────────────────────────────────────
