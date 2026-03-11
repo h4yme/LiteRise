@@ -52,12 +52,12 @@ public class PortalController : ControllerBase
                         ELSE 'inactive'
                     END                                                 AS status,
                     CONVERT(varchar(10), S.LastLogin, 120)              AS last_active,
-                    S.CurrentAbility                                    AS pre_theta,
-                    NULL                                                AS post_theta,
+                    S.PreAssessmentTheta                                AS pre_theta,
+                    S.PostAssessmentTheta                               AS post_theta,
                     CASE
-                        WHEN S.CurrentAbility IS NULL     THEN NULL
-                        WHEN S.CurrentAbility < -0.5      THEN 'beginner'
-                        WHEN S.CurrentAbility <  0.5      THEN 'intermediate'
+                        WHEN S.PreAssessmentTheta IS NULL  THEN NULL
+                        WHEN S.PreAssessmentTheta < -0.5   THEN 'beginner'
+                        WHEN S.PreAssessmentTheta <  0.5   THEN 'intermediate'
                         ELSE 'advanced'
                     END                                                 AS placement_level,
                     COALESCE(lp.lessons_done, 0)                        AS lessons_done
@@ -114,12 +114,12 @@ public class PortalController : ControllerBase
                         ELSE 'inactive'
                     END                                                 AS status,
                     CONVERT(varchar(10), S.LastLogin, 120)              AS last_active,
-                    S.CurrentAbility                                    AS pre_theta,
-                    NULL                                                AS post_theta,
+                    S.PreAssessmentTheta                                AS pre_theta,
+                    S.PostAssessmentTheta                               AS post_theta,
                     CASE
-                        WHEN S.CurrentAbility IS NULL     THEN NULL
-                        WHEN S.CurrentAbility < -0.5      THEN 'beginner'
-                        WHEN S.CurrentAbility <  0.5      THEN 'intermediate'
+                        WHEN S.PreAssessmentTheta IS NULL  THEN NULL
+                        WHEN S.PreAssessmentTheta < -0.5   THEN 'beginner'
+                        WHEN S.PreAssessmentTheta <  0.5   THEN 'intermediate'
                         ELSE 'advanced'
                     END                                                 AS placement_level,
                     S.PreAssessmentCompleted                            AS pre_assessment_done,
