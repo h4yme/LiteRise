@@ -12,9 +12,14 @@ namespace Website.Controllers
         // GET /Login
         public ActionResult Index()
         {
-            // Already logged in → skip straight to students
+            // Already logged in → redirect based on role
             if (Session["UserId"] != null)
-                return RedirectToAction("Index", "Student");
+            {
+                var existingRole = Session["UserRole"]?.ToString()?.ToLower() ?? "admin";
+                return existingRole == "teacher"
+                    ? RedirectToAction("Index", "TeacherDashboard")
+                    : RedirectToAction("Index", "Dashboard");
+            }
 
             return View("LoginView");
         }
@@ -48,7 +53,11 @@ namespace Website.Controllers
                     Session["UserRole"]  = result["role"]?.ToString();
                     Session["SchoolId"]  = result["school_id"]?.ToObject<int?>();
                     Session["AuthToken"] = result["token"]?.ToString();
-                    return RedirectToAction("Index", "Student");
+
+                    var loginRole = result["role"]?.ToString()?.ToLower() ?? "admin";
+                    return loginRole == "teacher"
+                        ? RedirectToAction("Index", "TeacherDashboard")
+                        : RedirectToAction("Index", "Dashboard");
                 }
 
                 ViewBag.ErrorMessage = result?["message"]?.ToString()
