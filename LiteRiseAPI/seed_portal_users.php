@@ -22,10 +22,15 @@
  * ─────────────────────────────────────────────────────────────────────────────
  */
 
-// ── DB config — adjust as needed ──────────────────────────────────────────────
-$dsn    = 'sqlsrv:Server=localhost;Database=LiteRiseDB';
-$dbUser = 'sa';
-$dbPass = 'YourStrong!Passw0rd';
+// ── DB config ─────────────────────────────────────────────────────────────────
+// Reads from environment variables — set DB_PASSWORD in your server environment.
+$dsn    = sprintf(
+    'sqlsrv:Server=%s;Database=%s',
+    getenv('DB_SERVER') ?: 'literise.database.windows.net',
+    getenv('DB_NAME')   ?: 'literisedb'
+);
+$dbUser = getenv('DB_USER') ?: 'SAliterise';
+$dbPass = getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, [

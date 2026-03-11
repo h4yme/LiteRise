@@ -46,11 +46,16 @@ if (!in_array($role, ['admin', 'teacher'], true)) {
 
 // ── DB connection ──────────────────────────────────────────────────────────────
 
-// Adjust these to match your server's SQL Server connection details.
-// The DSN uses the ODBC Driver for SQL Server (available via php-sqlsrv or PDO_ODBC).
-$dsn    = 'sqlsrv:Server=localhost;Database=LiteRiseDB';
-$dbUser = 'sa';           // change to your SQL login
-$dbPass = 'YourStrong!Passw0rd'; // change to your SQL password
+// Credentials are read from environment variables (set in your web server config
+// or a .env loader).  Set DB_PASSWORD in your server environment — do NOT
+// hard-code it here.
+$dsn    = sprintf(
+    'sqlsrv:Server=%s;Database=%s',
+    getenv('DB_SERVER') ?: 'literise.database.windows.net',
+    getenv('DB_NAME')   ?: 'literisedb'
+);
+$dbUser = getenv('DB_USER') ?: 'SAliterise';
+$dbPass = getenv('DB_PASSWORD') ?: '';
 
 try {
     $pdo = new PDO($dsn, $dbUser, $dbPass, [
