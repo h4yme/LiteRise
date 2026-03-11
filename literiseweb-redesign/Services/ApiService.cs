@@ -121,10 +121,10 @@ namespace Website.Services
             return token as JArray ?? new JArray();
         }
 
-        /// <summary>Returns module ladder structure (5 modules × 13 nodes).</summary>
+        /// <summary>Returns module ladder structure (5 modules × 13 nodes) for the portal.</summary>
         public async Task<JArray> GetModuleLadderAsync(int studentId)
         {
-            var token = await GetJsonAsync($"get_module_ladder.php?student_id={studentId}");
+            var token = await GetJsonAsync($"get_portal_module_ladder.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
@@ -140,7 +140,7 @@ namespace Website.Services
         /// <summary>Returns game result history for a student.</summary>
         public async Task<JArray> GetGameResultsAsync(int studentId)
         {
-            var token = await GetJsonAsync($"get_game_data.php?student_id={studentId}");
+            var token = await GetJsonAsync($"get_game_results.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 

@@ -2,7 +2,7 @@
 /**
  * Get Module Ladder API
  * GET /get_module_ladder.php?student_id=1&module_id=1
- * 
+ *
  * Returns all nodes for a module with student progress
  */
 
@@ -23,14 +23,14 @@ try {
     $stmt = $conn->prepare("SELECT CurrentNodeID, PlacementLevel FROM Students WHERE StudentID = ?");
     $stmt->execute([$studentId]);
     $student = $stmt->fetch();
-    
+
     if (!$student) {
         sendError("Student not found", 404);
     }
-    
+
     // Get all nodes for module with progress
     $stmt = $conn->prepare("
-        SELECT N.*, 
+        SELECT N.*,
                COALESCE(SNP.LessonCompleted, 0) as LessonCompleted,
                COALESCE(SNP.GameCompleted, 0) as GameCompleted,
                COALESCE(SNP.QuizCompleted, 0) as QuizCompleted
@@ -41,7 +41,7 @@ try {
     ");
     $stmt->execute([$studentId, $moduleId]);
     $nodes = $stmt->fetchAll();
-    
+
     // Get visible supplemental nodes for this specific student
     $stmt = $conn->prepare("
         SELECT sn.SupplementalNodeID, sn.AfterNodeID, sn.Title, sn.NodeType,
@@ -55,14 +55,14 @@ try {
     ");
     $stmt->execute([$moduleId, $studentId]);
     $supplementalNodes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    
+
     sendResponse([
         'nodes' => $nodes,
         'supplementalNodes' => $supplementalNodes,
         'currentNodeId' => $student['CurrentNodeID'],
         'placementLevel' => $student['PlacementLevel']
     ]);
-    
+
 } catch (PDOException $e) {
     error_log("Database error in get_module_ladder: " . $e->getMessage());
     sendError("Failed to retrieve module ladder", 500, $e->getMessage());
