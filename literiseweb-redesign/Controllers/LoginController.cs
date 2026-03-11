@@ -13,7 +13,7 @@ namespace Website.Controllers
         public ActionResult Index()
         {
             // Already logged in → skip straight to students
-            if (Session["UserRole"] != null)
+            if (Session["UserId"] != null)
                 return RedirectToAction("Index", "Student");
 
             return View("LoginView");
@@ -42,7 +42,7 @@ namespace Website.Controllers
                 bool success = result?["success"]?.ToObject<bool>() ?? false;
                 if (success)
                 {
-                    Session["UserId"]    = result["admin_id"]?.ToObject<int?>();
+                    Session["UserId"]    = result["user_id"]?.ToObject<int?>();
                     Session["UserEmail"] = result["email"]?.ToString();
                     Session["UserName"]  = result["name"]?.ToString();
                     Session["UserRole"]  = result["role"]?.ToString();
