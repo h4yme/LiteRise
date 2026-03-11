@@ -114,10 +114,10 @@ namespace Website.Services
 
         // ── Lessons & Modules ─────────────────────────────────────────
 
-        /// <summary>Returns 65-node lesson progress for a student.</summary>
+        /// <summary>Returns 65-node lesson progress for a student (portal view).</summary>
         public async Task<JArray> GetNodeProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"get_node_progress.php?student_id={studentId}");
+            var token = await GetJsonAsync($"get_portal_node_progress.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
