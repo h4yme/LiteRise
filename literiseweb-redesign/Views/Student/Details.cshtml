@@ -17,6 +17,7 @@
 
     int completedNodes = nodes.Count(n => n["status"]?.ToString() == "completed");
     int totalNodes     = 65;
+    int progressPct    = totalNodes > 0 ? completedNodes * 100 / totalNodes : 0;
 }
 
 @section styles {
@@ -179,9 +180,9 @@
                 </div>
                 <div class="progress-pill-wrap">
                     <div class="progress-pill">
-                        <div class="progress-fill" style="width:@(totalNodes > 0 ? (completedNodes * 100 / totalNodes) : 0)%"></div>
+                        <div class="progress-fill" style="width:@(progressPct)%"></div>
                     </div>
-                    <span class="progress-pct">@(totalNodes > 0 ? (completedNodes * 100 / totalNodes) : 0)%</span>
+                    <span class="progress-pct">@progressPct%</span>
                 </div>
             </div>
 
@@ -222,7 +223,7 @@
             else if (nodes.Any())
             {
                 <!-- Fallback: flat node list grouped by module_id -->
-                @for (int m = 1; m <= 5; m++)
+                for (int m = 1; m <= 5; m++)
                 {
                     var mNodes = nodes.Where(n => (int)(n["module_id"] ?? 0) == m).ToList();
                     if (!mNodes.Any()) { continue; }

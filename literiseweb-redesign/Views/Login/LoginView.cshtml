@@ -134,7 +134,20 @@
 
         .form-options { display: flex; justify-content: space-between; align-items: center; font-size: .84rem; }
         .remember { display: flex; align-items: center; gap: 7px; cursor: pointer; color: #64748B; }
-        .remember input { accent-color: #11B067; }
+        .remember input[type="checkbox"] {
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
+            width: 15px; height: 15px; border: 1.5px solid #CBD5E1; border-radius: 3px;
+            background: #fff; cursor: pointer; position: relative; vertical-align: middle;
+            transition: background .15s, border-color .15s;
+        }
+        .remember input[type="checkbox"]:checked {
+            background: #11B067; border-color: #11B067;
+        }
+        .remember input[type="checkbox"]:checked::after {
+            content: ''; position: absolute; left: 4px; top: 1px;
+            width: 5px; height: 8px; border: 2px solid #fff;
+            border-top: none; border-left: none; transform: rotate(45deg);
+        }
         .forgot { color: #11B067; text-decoration: none; font-weight: 700; }
         .forgot:hover { color: #0EA05A; }
 
