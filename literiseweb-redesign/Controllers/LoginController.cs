@@ -42,10 +42,11 @@ namespace Website.Controllers
                 bool success = result?["success"]?.ToObject<bool>() ?? false;
                 if (success)
                 {
-                    Session["UserId"]    = result["userId"]?.ToObject<int?>();
-                    Session["UserEmail"] = email;
-                    Session["UserName"]  = result["fullName"]?.ToString();
+                    Session["UserId"]    = result["user_id"]?.ToObject<int?>();
+                    Session["UserEmail"] = result["email"]?.ToString() ?? email;
+                    Session["UserName"]  = result["name"]?.ToString();
                     Session["UserRole"]  = result["role"]?.ToString();
+                    Session["SchoolId"]  = result["school_id"]?.ToObject<int?>();
                     Session["AuthToken"] = result["token"]?.ToString();
                     return RedirectToAction("Index", "Student");
                 }
