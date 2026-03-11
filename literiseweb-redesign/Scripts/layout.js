@@ -69,10 +69,10 @@
 
         btn.addEventListener('click', function (e) {
             e.stopPropagation();
-            var isOpen = panel.classList.contains('open');
+            var isOpen = panel.classList.contains('show');
             closeAllDropdowns();
             if (!isOpen) {
-                panel.classList.add('open');
+                panel.classList.add('show');
                 btn.setAttribute('aria-expanded', 'true');
             }
         });
@@ -81,7 +81,7 @@
     function closeAllDropdowns() {
         ['notificationsPanel', 'settingsDropdown'].forEach(function (id) {
             var el = document.getElementById(id);
-            if (el) el.classList.remove('open');
+            if (el) el.classList.remove('show');
         });
         ['notificationsToggle', 'settingsToggle'].forEach(function (id) {
             var el = document.getElementById(id);
@@ -106,10 +106,10 @@
     var btnConfirm    = document.getElementById('btnLogoutConfirm');
 
     function openLogoutModal() {
-        if (logoutModal) logoutModal.classList.add('open');
+        if (logoutModal) logoutModal.classList.add('show');
     }
     function closeLogoutModal() {
-        if (logoutModal) logoutModal.classList.remove('open');
+        if (logoutModal) logoutModal.classList.remove('show');
     }
 
     if (logoutLink)  logoutLink.addEventListener('click', openLogoutModal);
