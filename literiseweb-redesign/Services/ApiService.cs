@@ -61,7 +61,7 @@ namespace Website.Services
                 request.Headers.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _authToken);
             var resp = await _http.SendAsync(request);
-            resp.EnsureSuccessStatusCode();
+            // Read body regardless of status so login failures (401) return JSON, not an exception
             var json = await resp.Content.ReadAsStringAsync();
             return JToken.Parse(json);
         }
