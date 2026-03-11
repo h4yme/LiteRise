@@ -2,6 +2,20 @@
     ViewBag.Title = "Teacher Dashboard";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var students = ViewBag.Students as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
+
+    // Precompute chart data server-side to avoid @foreach inside <script>
+    var levelData = new {
+        beginner     = students.Count(s => (s["placement_level"]?.ToString() ?? "").ToLower() == "beginner"),
+        intermediate = students.Count(s => (s["placement_level"]?.ToString() ?? "").ToLower() == "intermediate"),
+        advanced     = students.Count(s => (s["placement_level"]?.ToString() ?? "").ToLower() == "advanced")
+    };
+    var thetaRows = students.Take(15).Select(s => new {
+        name = (s["name"]?.ToString() ?? "").Replace("'", "\\'"),
+        pre  = s["pre_theta"]  == null ? (double?)null : s["pre_theta"].ToObject<double?>(),
+        post = s["post_theta"] == null ? (double?)null : s["post_theta"].ToObject<double?>()
+    });
+    var levelJson = Newtonsoft.Json.JsonConvert.SerializeObject(levelData);
+    var thetaJson = Newtonsoft.Json.JsonConvert.SerializeObject(thetaRows);
 }
 
 @section styles {
@@ -166,22 +180,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         (function () {
-            var levelData = { beginner: 0, intermediate: 0, advanced: 0 };
-            var thetaLabels = [], preData = [], postData = [];
+            var levelData  = @Html.Raw(levelJson);
+            var thetaRows  = @Html.Raw(thetaJson);
 
-            @foreach (var s in students)
-            {
-                var lv = (s["placement_level"]?.ToString() ?? "").ToLower();
-                var sn = (s["name"]?.ToString() ?? "").Replace("'", "\\'");
-                <text>
-                if ('@lv') levelData['@lv'] = (levelData['@lv'] || 0) + 1;
-                if (thetaLabels.length < 15) {
-                    thetaLabels.push('@sn');
-                    preData.push(@(s["pre_theta"] ?? "null"));
-                    postData.push(@(s["post_theta"] ?? "null"));
-                }
-                </text>
-            }
+            var thetaLabels = thetaRows.map(function (r) { return r.name; });
+            var preData     = thetaRows.map(function (r) { return r.pre; });
+            var postData    = thetaRows.map(function (r) { return r.post; });
 
             new Chart(document.getElementById('chartLevels'), {
                 type: 'doughnut',

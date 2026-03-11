@@ -39,19 +39,19 @@ namespace Website.Controllers
             {
                 var result = await _api.PortalLoginAsync(email, password, role);
 
-                bool success = result?["success"]?.Value<bool>() ?? false;
+                bool success = result?["success"]?.ToObject<bool>() ?? false;
                 if (success)
                 {
-                    Session["UserId"]    = result["admin_id"]?.Value<int>();
-                    Session["UserEmail"] = result["email"]?.Value<string>();
-                    Session["UserName"]  = result["name"]?.Value<string>();
-                    Session["UserRole"]  = result["role"]?.Value<string>();
-                    Session["SchoolId"]  = result["school_id"]?.Value<int?>();
-                    Session["AuthToken"] = result["token"]?.Value<string>();
+                    Session["UserId"]    = result["admin_id"]?.ToObject<int?>();
+                    Session["UserEmail"] = result["email"]?.ToString();
+                    Session["UserName"]  = result["name"]?.ToString();
+                    Session["UserRole"]  = result["role"]?.ToString();
+                    Session["SchoolId"]  = result["school_id"]?.ToObject<int?>();
+                    Session["AuthToken"] = result["token"]?.ToString();
                     return RedirectToAction("Index", "Student");
                 }
 
-                ViewBag.ErrorMessage = result?["message"]?.Value<string>()
+                ViewBag.ErrorMessage = result?["message"]?.ToString()
                                        ?? "Invalid email or password.";
             }
             catch (Exception ex)

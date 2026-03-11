@@ -187,7 +187,7 @@
 
             @if (modules.Any())
             {
-                @foreach (var mod in modules)
+                foreach (var mod in modules)
                 {
                     var modNodes = mod["nodes"] as Newtonsoft.Json.Linq.JArray ?? new Newtonsoft.Json.Linq.JArray();
                     var modDone  = modNodes.Count(n => n["status"]?.ToString() == "completed");
@@ -225,7 +225,7 @@
                 @for (int m = 1; m <= 5; m++)
                 {
                     var mNodes = nodes.Where(n => (int)(n["module_id"] ?? 0) == m).ToList();
-                    if (!mNodes.Any()) continue;
+                    if (!mNodes.Any()) { continue; }
                     <div class="module-block">
                         <div class="module-header">
                             <span class="module-title">Module @m</span>
