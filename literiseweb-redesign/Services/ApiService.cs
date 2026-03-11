@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web.Configuration;
 using Newtonsoft.Json;
@@ -11,9 +9,9 @@ using Newtonsoft.Json.Linq;
 namespace Website.Services
 {
     /// <summary>
-    /// Thin wrapper around the LiteRise C# API.
+    /// Thin wrapper around the LiteRise PHP API.
     /// Base URL is read from Web.config key "ApiBaseUrl".
-    /// Default: http://localhost:5000
+    /// Default: http://192.168.1.13/api
     /// </summary>
     public class ApiService
     {
@@ -24,7 +22,7 @@ namespace Website.Services
         static ApiService()
         {
             _base = WebConfigurationManager.AppSettings["ApiBaseUrl"]
-                    ?? "http://localhost:5000";
+                    ?? "http://192.168.1.13/api";
 
             _http = new HttpClient
             {
@@ -46,61 +44,62 @@ namespace Website.Services
             var request = new HttpRequestMessage(HttpMethod.Get, endpoint);
             if (!string.IsNullOrEmpty(_authToken))
                 request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _authToken);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _authToken);
             var resp = await _http.SendAsync(request);
             resp.EnsureSuccessStatusCode();
             var json = await resp.Content.ReadAsStringAsync();
             return JToken.Parse(json);
         }
 
-        private async Task<JToken> PostJsonAsync(string endpoint, object data)
+        private async Task<JToken> PostJsonAsync(string endpoint, Dictionary<string, string> data)
         {
-            var json    = JsonConvert.SerializeObject(data);
             var request = new HttpRequestMessage(HttpMethod.Post, endpoint)
             {
-                Content = new StringContent(json, Encoding.UTF8, "application/json")
+                Content = new FormUrlEncodedContent(data)
             };
             if (!string.IsNullOrEmpty(_authToken))
                 request.Headers.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _authToken);
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _authToken);
             var resp = await _http.SendAsync(request);
             resp.EnsureSuccessStatusCode();
-            var body = await resp.Content.ReadAsStringAsync();
-            return JToken.Parse(body);
+            var json = await resp.Content.ReadAsStringAsync();
+            return JToken.Parse(json);
         }
 
         // ── Portal Auth ───────────────────────────────────────────────
 
         /// <summary>
         /// Authenticates an Admin or Teacher for the web portal.
-        /// Returns: { success, user_id, name, email, role, token, school_id, message }
+        /// role: "admin" | "teacher"
+        /// Returns: { success, user_id, name, email, role, message }
         /// </summary>
         public async Task<JObject> PortalLoginAsync(string email, string password, string role)
         {
-            var token = await PostJsonAsync("api/auth/portal-login", new
+            var data = new Dictionary<string, string>
             {
-                email,
-                password,
-                role
-            });
+                ["email"]    = email,
+                ["password"] = password,
+                ["role"]     = role
+            };
+            var token = await PostJsonAsync("portal_login.php", data);
             return token as JObject ?? new JObject();
         }
 
         // ── Students ──────────────────────────────────────────────────
 
-        /// <summary>Returns full student list with progress summary.</summary>
+        /// <summary>Returns full student list with portal summary fields.</summary>
         public async Task<JArray> GetStudentsAsync(int? schoolId = null)
         {
-            var url = "api/portal/students";
+            var url = "get_all_students.php";
             if (schoolId.HasValue) url += $"?school_id={schoolId}";
             var token = await GetJsonAsync(url);
             return token as JArray ?? new JArray();
         }
 
-        /// <summary>Returns portal-summary detail for a single student.</summary>
+        /// <summary>Returns detailed progress for a single student.</summary>
         public async Task<JObject> GetStudentProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/portal/students/{studentId}");
+            var token = await GetJsonAsync($"get_student_progress.php?student_id={studentId}");
             return token as JObject ?? new JObject();
         }
 
@@ -109,33 +108,30 @@ namespace Website.Services
         /// <summary>Returns pre and post assessment results for a student.</summary>
         public async Task<JObject> GetPlacementProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/progress/placement?student_id={studentId}");
+            var token = await GetJsonAsync($"get_placement_progress.php?student_id={studentId}");
             return token as JObject ?? new JObject();
         }
 
         // ── Lessons & Modules ─────────────────────────────────────────
 
-        /// <summary>Returns 65-node progress for a student.</summary>
+        /// <summary>Returns 65-node lesson progress for a student.</summary>
         public async Task<JArray> GetNodeProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/portal/students/{studentId}/nodes");
+            var token = await GetJsonAsync($"get_node_progress.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
         /// <summary>Returns module ladder structure (5 modules × 13 nodes).</summary>
         public async Task<JArray> GetModuleLadderAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/learning/module-ladder?student_id={studentId}");
-            // The C# API wraps in { success, modules } — unwrap if needed
-            if (token is JObject obj && obj["modules"] is JArray arr)
-                return arr;
+            var token = await GetJsonAsync($"get_module_ladder.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
         /// <summary>Returns lesson progress summary per lesson.</summary>
         public async Task<JArray> GetLessonProgressAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/portal/students/{studentId}/lesson-progress");
+            var token = await GetJsonAsync($"get_lesson_progress.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
@@ -144,7 +140,7 @@ namespace Website.Services
         /// <summary>Returns game result history for a student.</summary>
         public async Task<JArray> GetGameResultsAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/portal/students/{studentId}/games");
+            var token = await GetJsonAsync($"get_game_data.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
@@ -153,10 +149,7 @@ namespace Website.Services
         /// <summary>Returns badges earned by a student.</summary>
         public async Task<JArray> GetBadgesAsync(int studentId)
         {
-            var token = await GetJsonAsync($"api/badge?student_id={studentId}");
-            // The C# API returns { success, allBadges, earnedBadges } — return earnedBadges
-            if (token is JObject obj && obj["earnedBadges"] is JArray arr)
-                return arr;
+            var token = await GetJsonAsync($"get_badges.php?student_id={studentId}");
             return token as JArray ?? new JArray();
         }
 
@@ -165,7 +158,7 @@ namespace Website.Services
         /// <summary>Returns all schools.</summary>
         public async Task<JArray> GetSchoolsAsync()
         {
-            var token = await GetJsonAsync("api/portal/schools");
+            var token = await GetJsonAsync("get_schools.php");
             return token as JArray ?? new JArray();
         }
     }
