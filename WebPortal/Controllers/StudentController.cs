@@ -55,16 +55,21 @@ namespace Website.Controllers
         // =========================================================================
         // Details — Student 5-tab profile page
         // =========================================================================
-        public async Task<ActionResult> Details(int id)
+        public async Task<ActionResult> Details(int? id)
         {
+            if (id == null || id <= 0)
+            {
+                ViewBag.Error = "Invalid student ID.";
+                return RedirectToAction("Index");
+            }
             try
             {
-                var profileTask    = _api.GetPortalStudentAsync(id);
-                var placementTask  = _api.GetPlacementProgressAsync(id);
-                var progressTask   = _api.GetStudentProgressAsync(id);
-                var ladderTask     = _api.GetModuleLadderAsync(id);
-                var gamesTask      = _api.GetGameResultsAsync(id);
-                var badgesTask     = _api.GetBadgesAsync(id);
+                var profileTask    = _api.GetPortalStudentAsync(id.Value);
+                var placementTask  = _api.GetPlacementProgressAsync(id.Value);
+                var progressTask   = _api.GetStudentProgressAsync(id.Value);
+                var ladderTask     = _api.GetModuleLadderAsync(id.Value);
+                var gamesTask      = _api.GetGameResultsAsync(id.Value);
+                var badgesTask     = _api.GetBadgesAsync(id.Value);
 
                 await Task.WhenAll(profileTask, placementTask, progressTask,
                                    ladderTask, gamesTask, badgesTask);
@@ -75,7 +80,7 @@ namespace Website.Controllers
                 ViewBag.LadderJson     = JsonConvert.SerializeObject(ladderTask.Result);
                 ViewBag.GamesJson      = JsonConvert.SerializeObject(gamesTask.Result);
                 ViewBag.BadgesJson     = JsonConvert.SerializeObject(badgesTask.Result);
-                ViewBag.StudentId      = id;
+                ViewBag.StudentId      = id.Value;
                 ViewBag.UserName       = Session["UserName"]?.ToString() ?? "Admin";
             }
             catch (Exception ex)
@@ -87,7 +92,7 @@ namespace Website.Controllers
                 ViewBag.LadderJson    = "[]";
                 ViewBag.GamesJson     = "[]";
                 ViewBag.BadgesJson    = "[]";
-                ViewBag.StudentId     = id;
+                ViewBag.StudentId     = id.Value;
             }
 
             return View("Details");

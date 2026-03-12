@@ -193,7 +193,7 @@ function renderTable(rows) {
             ? '<span class="badge bg-success-subtle text-success">Active</span>'
             : '<span class="badge bg-secondary-subtle text-secondary">Inactive</span>';
         html += '<tr>' +
-            '<td><a href="/Student/Details/' + s.id + '" class="student-name-link">' + esc(s.FullName || s.full_name || '—') + '</a></td>' +
+            '<td><a href="/Student/Details/' + s.student_id + '" class="student-name-link">' + esc(s.name || '—') + '</a></td>' +
             '<td>' + esc(s.grade || '—') + '</td>' +
             '<td>' + esc(s.school_name || '—') + '</td>' +
             '<td>' + levelBadge(level) + '</td>' +
@@ -202,7 +202,7 @@ function renderTable(rows) {
             '<td>' + (s.total_xp   != null ? Number(s.total_xp).toLocaleString() : '—') + '</td>' +
             '<td>' + fmtDate(s.last_active) + '</td>' +
             '<td>' + statusBadge + '</td>' +
-            '<td><a href="/Student/Details/' + s.id + '" class="btn btn-sm btn-outline-primary py-0 px-2">View</a></td>' +
+            '<td><a href="/Student/Details/' + s.student_id + '" class="btn btn-sm btn-outline-primary py-0 px-2">View</a></td>' +
             '</tr>';
     });
     tbody.innerHTML = html;
@@ -216,7 +216,7 @@ function filterStudents() {
     var level  = document.getElementById('levelFilter').value;
 
     var filtered = STUDENTS.filter(function (s) {
-        var name   = (s.FullName || s.full_name || '').toLowerCase();
+        var name   = (s.name || '').toLowerCase();
         var sname  = (s.school_name || '').toLowerCase();
         if (q && !name.includes(q) && !sname.includes(q)) return false;
         if (grade  && String(s.grade)       !== grade)  return false;
