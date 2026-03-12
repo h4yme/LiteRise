@@ -30,35 +30,24 @@ namespace Website.Controllers
                 var result = await api.PortalLoginAsync(email.Trim(), password, role ?? "admin");
 
                 if (result == null)
-                {
-                    ViewBag.Error = "No response from server. Check API connection.";
-                    return View("LoginView");
-                }
+                    return Content("DEBUG: API returned null — check ApiBaseUrl in web.config", "text/plain");
 
                 // ── Serialise to JObject so we can inspect actual field names ──
                 var json = JsonConvert.SerializeObject(result);
                 var obj  = JObject.Parse(json);
 
-                // Accept token under any common field name
+                // DEBUG: return raw JSON so we can see the real API response shape
+                // Remove this block once login works
                 string token = obj.Value<string>("token")
                             ?? obj.Value<string>("auth_token")
                             ?? obj.Value<string>("access_token")
                             ?? obj.Value<string>("jwt");
 
-                // Accept status / success flags
                 string status  = obj.Value<string>("status") ?? "";
                 bool   success = obj.Value<bool?>("success") ?? false;
 
                 if (string.IsNullOrEmpty(token) && status != "success" && !success)
-                {
-                    // Surface the API's own message if available
-                    string msg = obj.Value<string>("message")
-                              ?? obj.Value<string>("error")
-                              ?? obj.Value<string>("msg")
-                              ?? "Invalid credentials. Please try again.";
-                    ViewBag.Error = msg;
-                    return View("LoginView");
-                }
+                    return Content("DEBUG API RESPONSE:\n" + json, "text/plain");
 
                 // If the API returned success but token is nested, try data object
                 if (string.IsNullOrEmpty(token))
@@ -70,10 +59,7 @@ namespace Website.Controllers
                 }
 
                 if (string.IsNullOrEmpty(token))
-                {
-                    ViewBag.Error = "Login succeeded but no token was returned. Contact support.";
-                    return View("LoginView");
-                }
+                    return Content("DEBUG: success=true but no token found.\nFull response:\n" + json, "text/plain");
 
                 // ── Persist session ───────────────────────────────────────────
                 Session["AuthToken"] = token;
@@ -93,8 +79,7 @@ namespace Website.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.Error = "Login failed: " + ex.Message;
-                return View("LoginView");
+                return Content("DEBUG EXCEPTION: " + ex.GetType().Name + "\n" + ex.Message + "\n\n" + ex.ToString(), "text/plain");
             }
         }
 
