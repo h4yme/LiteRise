@@ -5,18 +5,11 @@ using Website.Services;
 
 namespace Website.Controllers
 {
-    // =========================================================================
-    // LoginController
-    // Handles portal login for Admin and Teacher roles.
-    // On success: stores AuthToken, UserRole, SchoolId, UserName in Session
-    // and redirects to the appropriate dashboard.
-    // =========================================================================
     public class LoginController : AsyncController
     {
         [HttpGet]
         public ActionResult Index()
         {
-            // Already logged in → redirect
             if (Session["AuthToken"] != null)
                 return RedirectToDashboard(Session["UserRole"]?.ToString());
 
@@ -24,8 +17,7 @@ namespace Website.Controllers
         }
 
         [HttpPost]
-        [ActionName("Index")]
-        public async Task<ActionResult> LoginPost(string email, string password, string role)
+        public async Task<ActionResult> Login(string email, string password, string role)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
@@ -44,11 +36,12 @@ namespace Website.Controllers
                     return View("LoginView");
                 }
 
-                // ── Persist session ───────────────────────────────────────────
                 Session["AuthToken"] = (string)result.token;
                 Session["UserRole"]  = (string)(result.role ?? role ?? "admin");
                 Session["UserName"]  = (string)(result.name ?? result.email ?? email);
-                Session["SchoolId"]  = result.school_id != null ? (string)result.school_id.ToString() : null;
+                Session["SchoolId"]  = result.school_id != null
+                    ? result.school_id.ToString()
+                    : null;
 
                 return RedirectToDashboard(Session["UserRole"]?.ToString());
             }
@@ -66,7 +59,6 @@ namespace Website.Controllers
             return RedirectToAction("Index", "Login");
         }
 
-        // ── Helper ─────────────────────────────────────────────────────────────
         private ActionResult RedirectToDashboard(string role)
         {
             if (string.Equals(role, "teacher", StringComparison.OrdinalIgnoreCase))
