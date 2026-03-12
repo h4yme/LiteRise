@@ -14,7 +14,6 @@ namespace Website.Controllers
     // Displays KPI cards, demographics, engagement, and performance charts.
     // =========================================================================
     [AuthFilter]
-    [AuthorizeAdmin]
     public class DashboardController : AsyncController
     {
         private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());

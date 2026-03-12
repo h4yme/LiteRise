@@ -12,9 +12,6 @@ namespace Website.Controllers
         [HttpGet]
         public ActionResult Index()
         {
-            if (Session["AuthToken"] != null)
-                return RedirectToDashboard(Session["UserRole"]?.ToString());
-
             return View("LoginView");
         }
 
