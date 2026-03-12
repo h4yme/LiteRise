@@ -334,5 +334,78 @@ namespace Website.Services
         /// <summary>Alias for GetNodeProgressAsync — used by Student/TeacherStudents detail pages.</summary>
         public Task<dynamic> GetStudentProgressAsync(int studentId)
             => GetNodeProgressAsync(studentId);
+
+        // ═════════════════════════════════════════════════════════════════════
+        // SCHOOL CRUD
+        // ═════════════════════════════════════════════════════════════════════
+
+        public async Task<dynamic> CreateSchoolAsync(string schoolName, string barangay)
+        {
+            var payload = JsonConvert.SerializeObject(new { school_name = schoolName, barangay });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/create_school.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<dynamic> UpdateSchoolAsync(int schoolId, string schoolName, string barangay)
+        {
+            var payload = JsonConvert.SerializeObject(new { school_id = schoolId, school_name = schoolName, barangay });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/update_school.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<dynamic> DeleteSchoolAsync(int schoolId)
+        {
+            var payload = JsonConvert.SerializeObject(new { school_id = schoolId });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/delete_school.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // PORTAL ACCOUNT CRUD
+        // ═════════════════════════════════════════════════════════════════════
+
+        public async Task<System.Collections.Generic.List<dynamic>> GetPortalAccountsAsync()
+        {
+            var response = await _client.GetAsync($"{_baseUrl}/get_portal_accounts.php");
+            response.EnsureSuccessStatusCode();
+            var json = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<System.Collections.Generic.List<dynamic>>(json)
+                   ?? new System.Collections.Generic.List<dynamic>();
+        }
+
+        public async Task<dynamic> CreatePortalAccountAsync(string name, string email, string password, string role, string schoolId)
+        {
+            int? sid = int.TryParse(schoolId, out int s) ? s : (int?)null;
+            var payload = JsonConvert.SerializeObject(new { name, email, password, role, school_id = sid });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/create_portal_account.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<dynamic> UpdatePortalAccountAsync(string id, string name, string email, string password, string role, string schoolId)
+        {
+            int sid = int.TryParse(schoolId, out int s) ? s : 0;
+            var payload = JsonConvert.SerializeObject(new { id = int.Parse(id), name, email, password, role, school_id = sid > 0 ? (int?)sid : null });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/update_portal_account.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
+
+        public async Task<dynamic> SetPortalAccountActiveAsync(string id, bool isActive)
+        {
+            var payload = JsonConvert.SerializeObject(new { id = int.Parse(id), is_active = isActive });
+            var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync($"{_baseUrl}/set_portal_account_active.php", content);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+        }
     }
 }

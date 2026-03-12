@@ -1,0 +1,462 @@
+@{
+    ViewBag.Title = "Schools";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section styles {
+<style>
+    .schools-page { }
+    .page-subtitle { color: var(--text-secondary); font-size: 0.85rem }
+
+    /* ── Filter / toolbar ───────────────────────────────────────────────── */
+    .filter-bar {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 16px 20px;
+        margin-bottom: 16px; display: flex; align-items: center;
+        flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-xs)
+    }
+    body.dark-mode .filter-bar { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .filter-bar label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); margin: 0 }
+    .filter-bar select, .filter-bar input[type=text] {
+        padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius-md);
+        font-size: 0.85rem; background: var(--bg); color: var(--text); min-width: 160px
+    }
+    .filter-bar select:focus, .filter-bar input[type=text]:focus {
+        outline: none; border-color: var(--green); box-shadow: 0 0 0 2px rgba(17,176,103,0.15)
+    }
+    body.dark-mode .filter-bar select, body.dark-mode .filter-bar input[type=text] {
+        background: var(--dark-card); border-color: rgba(255,255,255,0.1); color: var(--text)
+    }
+    .btn-reset {
+        padding: 7px 16px; border-radius: var(--radius-md); font-size: 0.85rem;
+        font-weight: 600; border: 1px solid var(--border);
+        background: var(--bg); color: var(--text-secondary); cursor: pointer; transition: all 0.2s
+    }
+    .btn-reset:hover { background: var(--green-pale); color: var(--green); border-color: var(--green) }
+
+    /* ── Schools panel ──────────────────────────────────────────────────── */
+    .schools-panel {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-xs)
+    }
+    body.dark-mode .schools-panel { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .panel-toolbar {
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 14px 20px; border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 10px
+    }
+    body.dark-mode .panel-toolbar { border-bottom-color: rgba(255,255,255,0.08) }
+    .panel-toolbar-left { display: flex; align-items: center; gap: 10px }
+    .panel-toolbar-left input[type=text] {
+        padding: 7px 12px; border: 1px solid var(--border); border-radius: var(--radius-md);
+        font-size: 0.85rem; background: var(--bg); color: var(--text); width: 220px
+    }
+    .panel-toolbar-left input[type=text]:focus {
+        outline: none; border-color: var(--green); box-shadow: 0 0 0 2px rgba(17,176,103,0.15)
+    }
+    body.dark-mode .panel-toolbar-left input[type=text] {
+        background: var(--dark-muted); border-color: rgba(255,255,255,0.1); color: var(--text)
+    }
+    .panel-toolbar-right { display: flex; gap: 8px }
+    .btn-add {
+        padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 700;
+        background: var(--green); color: #fff; border: none; cursor: pointer; transition: background 0.2s
+    }
+    .btn-add:hover { background: var(--green-dark) }
+    .btn-export {
+        padding: 8px 16px; border-radius: var(--radius-md); font-size: 0.85rem; font-weight: 600;
+        background: var(--bg-white); color: var(--text-secondary); border: 1px solid var(--border);
+        cursor: pointer; transition: all 0.2s
+    }
+    .btn-export:hover { background: var(--green-pale); color: var(--green) }
+
+    /* ── Table ──────────────────────────────────────────────────────────── */
+    .schools-table { width: 100%; border-collapse: collapse; font-size: 0.88rem }
+    .schools-table th {
+        padding: 10px 14px; text-align: left; font-size: 0.75rem; font-weight: 700;
+        color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px;
+        background: var(--bg); border-bottom: 2px solid var(--border); cursor: pointer;
+        user-select: none; white-space: nowrap
+    }
+    .schools-table th:hover { color: var(--green) }
+    body.dark-mode .schools-table th {
+        background: rgba(255,255,255,.04); color: #64748B; border-bottom-color: rgba(255,255,255,.08)
+    }
+    .schools-table td {
+        padding: 12px 14px; border-bottom: 1px solid var(--border);
+        color: var(--text-secondary); vertical-align: middle
+    }
+    .schools-table tr:last-child td { border-bottom: none }
+    .schools-table tr:hover td { background: var(--green-pale) }
+    body.dark-mode .schools-table td { border-bottom-color: rgba(255,255,255,.06); color: #94A3B8 }
+    body.dark-mode .schools-table tr:hover td { background: rgba(17,176,103,.06) }
+    .school-name-link { font-weight: 700; color: var(--text); text-decoration: none }
+    .school-name-link:hover { color: var(--green) }
+    .school-code-badge {
+        display: inline-block; padding: 2px 8px; background: var(--green-pale);
+        color: var(--green); border-radius: 4px; font-size: 0.75rem; font-weight: 700
+    }
+    .pct-bar-wrap { display: flex; align-items: center; gap: 8px }
+    .pct-bar-track { flex: 1; height: 6px; background: var(--border); border-radius: 3px; max-width: 100px }
+    .pct-bar-fill { height: 6px; background: var(--green); border-radius: 3px; transition: width 0.3s }
+    .actions-btn {
+        background: none; border: none; cursor: pointer; color: var(--text-muted);
+        padding: 4px 8px; border-radius: var(--radius-sm); font-size: 1.1rem; transition: background 0.2s
+    }
+    .actions-btn:hover { background: var(--border); color: var(--text) }
+    .dropdown-actions {
+        position: absolute; right: 14px; background: var(--bg-white);
+        border: 1px solid var(--border); border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md); z-index: 100; min-width: 120px; overflow: hidden; display: none
+    }
+    body.dark-mode .dropdown-actions { background: var(--dark-card); border-color: rgba(255,255,255,0.1) }
+    .dropdown-actions.open { display: block }
+    .dropdown-actions a {
+        display: flex; align-items: center; gap: 8px; padding: 9px 14px;
+        font-size: 0.85rem; color: var(--text-secondary); text-decoration: none; transition: background 0.2s
+    }
+    .dropdown-actions a:hover { background: var(--green-pale); color: var(--green) }
+    .dropdown-actions a.danger:hover { background: var(--red-pale); color: var(--red) }
+    .empty-state { text-align: center; color: var(--text-muted); padding: 32px; font-style: italic }
+
+    /* ── Modal ──────────────────────────────────────────────────────────── */
+    .modal-overlay {
+        display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.55);
+        z-index: 2000; align-items: center; justify-content: center; padding: 20px
+    }
+    .modal-overlay.open { display: flex }
+    .modal-box {
+        background: var(--bg-white); border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-lg); width: 100%; max-width: 440px; padding: 28px;
+        animation: slideIn 0.2s
+    }
+    body.dark-mode .modal-box { background: var(--dark-card) }
+    @@keyframes slideIn { from { transform: translateY(-20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+    .modal-box h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 20px; color: var(--text) }
+    .form-group { margin-bottom: 16px }
+    .form-group label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 6px; color: var(--text) }
+    .form-group input, .form-group select {
+        width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-md);
+        font-size: 0.88rem; background: var(--bg); color: var(--text)
+    }
+    .form-group input:focus, .form-group select:focus {
+        outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(17,176,103,0.1)
+    }
+    body.dark-mode .form-group input, body.dark-mode .form-group select {
+        background: var(--dark-muted); border-color: rgba(255,255,255,0.1); color: var(--text)
+    }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px }
+    .btn-cancel {
+        padding: 9px 20px; border-radius: var(--radius-md); font-size: 0.88rem;
+        font-weight: 600; border: 1px solid var(--border);
+        background: var(--bg); color: var(--text-secondary); cursor: pointer; transition: all 0.2s
+    }
+    .btn-cancel:hover { background: var(--border) }
+    .btn-save {
+        padding: 9px 20px; border-radius: var(--radius-md); font-size: 0.88rem;
+        font-weight: 700; background: var(--green); color: #fff; border: none;
+        cursor: pointer; transition: background 0.2s
+    }
+    .btn-save:hover { background: var(--green-dark) }
+</style>
+}
+
+<div class="schools-page">
+
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-school me-2 text-success"></i>School List</h2>
+            <p class="page-subtitle mb-0">Manage schools and view student information</p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert-banner error" style="margin-bottom:16px;">@ViewBag.Error</div>
+    }
+
+    <!-- Filter Bar -->
+    <div class="filter-bar">
+        <label>Barangay:</label>
+        <select id="barangayFilter" onchange="filterSchools()">
+            <option value="">All Barangays</option>
+        </select>
+        <button class="btn-reset" onclick="resetFilters()">Reset Filters</button>
+    </div>
+
+    <!-- Schools Panel -->
+    <div class="schools-panel">
+        <div class="panel-toolbar">
+            <div class="panel-toolbar-left">
+                <input type="text" id="searchInput" placeholder="Search schools…" oninput="filterSchools()" />
+            </div>
+            <div class="panel-toolbar-right">
+                <button class="btn-add" onclick="openSchoolModal()">+ Add New School</button>
+                <button class="btn-export" onclick="exportCsv()">Export to CSV</button>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="schools-table" id="schoolsTable">
+                <thead>
+                    <tr>
+                        <th onclick="sortBy('school_name')">School Name <span id="sort_school_name"></span></th>
+                        <th onclick="sortBy('school_code')">School ID <span id="sort_school_code"></span></th>
+                        <th onclick="sortBy('barangay')">Barangay <span id="sort_barangay"></span></th>
+                        <th onclick="sortBy('pct')">% of Total Students <span id="sort_pct"></span></th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="schoolsTbody">
+                    <tr><td colspan="5" class="empty-state">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- ── Add / Edit School Modal ─────────────────────────────────────────────── -->
+<div class="modal-overlay" id="schoolModal">
+    <div class="modal-box">
+        <h3 id="modalTitle"><i class="fas fa-school me-2 text-success"></i>Add New School</h3>
+        <input type="hidden" id="schoolId" value="" />
+        <div class="form-group">
+            <label for="schoolName">School Name <span style="color:var(--red)">*</span></label>
+            <input type="text" id="schoolName" placeholder="Enter school name" />
+        </div>
+        <div class="form-group">
+            <label for="schoolBarangay">Barangay <span style="color:var(--red)">*</span></label>
+            <input type="text" id="schoolBarangay" placeholder="Enter barangay" />
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeSchoolModal()">Cancel</button>
+            <button class="btn-save" id="btnSaveSchool" onclick="saveSchool()">
+                <i class="fas fa-save me-1"></i>Save School
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Dropdown Actions (portal) ─────────────────────────────────────────────── -->
+<div class="dropdown-actions" id="actionsMenu">
+    <a href="javascript:void(0);" id="actionEdit"><i class="fas fa-edit"></i> Edit</a>
+    <a href="javascript:void(0);" id="actionDelete" class="danger"><i class="fas fa-trash"></i> Delete</a>
+</div>
+
+@section scripts {
+<script>
+(function () {
+    var SCHOOLS  = @Html.Raw(ViewBag.SchoolsJson  ?? "[]");
+    var STUDENTS = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+    var TOTAL    = STUDENTS.length || @(ViewBag.TotalStudents ?? 0);
+
+    var sortField = 'school_name', sortAsc = true;
+    var activeMenuSchoolId = null;
+
+    // ── Enrich schools with student counts ─────────────────────────────────
+    var schoolData = SCHOOLS.map(function(sc) {
+        var name  = sc.school_name || sc.SchoolName || '';
+        var count = STUDENTS.filter(function(s) {
+            return (s.school_name || '') === name;
+        }).length;
+        var pct   = TOTAL > 0 ? Math.round(count / TOTAL * 1000) / 10 : 0;
+        return Object.assign({}, sc, { _count: count, _pct: pct });
+    });
+
+    // ── Populate barangay dropdown ──────────────────────────────────────────
+    var barangays = [...new Set(schoolData.map(function(sc) {
+        return sc.barangay || sc.Barangay || '';
+    }).filter(Boolean))].sort();
+    var bEl = document.getElementById('barangayFilter');
+    barangays.forEach(function(b) {
+        var o = document.createElement('option'); o.value = b; o.textContent = b;
+        bEl.appendChild(o);
+    });
+
+    // ── Sort helper ────────────────────────────────────────────────────────
+    function sortBy(field) {
+        if (sortField === field) sortAsc = !sortAsc;
+        else { sortField = field; sortAsc = true; }
+        ['school_name','school_code','barangay','pct'].forEach(function(f) {
+            var el = document.getElementById('sort_' + f);
+            if (el) el.textContent = '';
+        });
+        var el = document.getElementById('sort_' + field);
+        if (el) el.textContent = sortAsc ? ' ▲' : ' ▼';
+        filterSchools();
+    }
+    window.sortBy = sortBy;
+
+    // ── Filter + render ─────────────────────────────────────────────────────
+    function filterSchools() {
+        var q  = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
+        var br = document.getElementById('barangayFilter')?.value || '';
+
+        var filtered = schoolData.filter(function(sc) {
+            var name = (sc.school_name || sc.SchoolName || '').toLowerCase();
+            var code = (sc.school_code || sc.SchoolCode || '').toLowerCase();
+            var bar  = sc.barangay || sc.Barangay || '';
+            var matchQ  = !q  || name.includes(q) || code.includes(q);
+            var matchBr = !br || bar === br;
+            return matchQ && matchBr;
+        });
+
+        // Sort
+        filtered.sort(function(a, b) {
+            var va, vb;
+            if (sortField === 'pct') {
+                va = a._pct; vb = b._pct;
+            } else if (sortField === 'school_code') {
+                va = a.school_code || a.SchoolCode || ''; vb = b.school_code || b.SchoolCode || '';
+            } else if (sortField === 'barangay') {
+                va = a.barangay || a.Barangay || ''; vb = b.barangay || b.Barangay || '';
+            } else {
+                va = a.school_name || a.SchoolName || ''; vb = b.school_name || b.SchoolName || '';
+            }
+            if (typeof va === 'string') return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+            return sortAsc ? va - vb : vb - va;
+        });
+
+        renderTable(filtered);
+    }
+    window.filterSchools = filterSchools;
+
+    function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function renderTable(list) {
+        var tbody = document.getElementById('schoolsTbody');
+        if (!list.length) {
+            tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No schools found.</td></tr>';
+            return;
+        }
+        var html = '';
+        list.forEach(function(sc) {
+            var id   = sc.school_id || sc.SchoolID || sc.id || '';
+            var name = sc.school_name || sc.SchoolName || '—';
+            var code = sc.school_code || sc.SchoolCode || '—';
+            var bar  = sc.barangay || sc.Barangay || '—';
+            var pct  = sc._pct || 0;
+            var maxBar = 100;
+            html += '<tr>' +
+                '<td><span class="school-name-link">' + esc(name) + '</span></td>' +
+                '<td><span class="school-code-badge">' + esc(code) + '</span></td>' +
+                '<td>' + esc(bar) + '</td>' +
+                '<td><div class="pct-bar-wrap">' +
+                    '<div class="pct-bar-track"><div class="pct-bar-fill" style="width:' + Math.min(pct, 100) + '%"></div></div>' +
+                    '<span>' + pct.toFixed(1) + '%</span>' +
+                '</div></td>' +
+                '<td style="position:relative;">' +
+                    '<button class="actions-btn" onclick="toggleMenu(event,' + JSON.stringify(id) + ',' + JSON.stringify(name) + ',' + JSON.stringify(bar) + ')">&#8942;</button>' +
+                '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    }
+
+    // ── Actions dropdown ────────────────────────────────────────────────────
+    window.toggleMenu = function(e, id, name, bar) {
+        e.stopPropagation();
+        var menu = document.getElementById('actionsMenu');
+        if (activeMenuSchoolId === id && menu.classList.contains('open')) {
+            menu.classList.remove('open');
+            activeMenuSchoolId = null;
+            return;
+        }
+        activeMenuSchoolId = id;
+        var btn  = e.currentTarget;
+        var rect = btn.getBoundingClientRect();
+        menu.style.top  = (rect.bottom + window.scrollY + 4) + 'px';
+        menu.style.left = (rect.left   + window.scrollX - 80) + 'px';
+        menu.style.position = 'fixed';
+        menu.classList.add('open');
+        document.getElementById('actionEdit').onclick   = function() { openEditModal(id, name, bar); menu.classList.remove('open'); };
+        document.getElementById('actionDelete').onclick = function() { deleteSchool(id, name); menu.classList.remove('open'); };
+    };
+    document.addEventListener('click', function() {
+        var menu = document.getElementById('actionsMenu');
+        if (menu) menu.classList.remove('open');
+        activeMenuSchoolId = null;
+    });
+
+    // ── Modal ───────────────────────────────────────────────────────────────
+    window.openSchoolModal = function() {
+        document.getElementById('schoolId').value      = '';
+        document.getElementById('schoolName').value    = '';
+        document.getElementById('schoolBarangay').value = '';
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-school me-2 text-success"></i>Add New School';
+        document.getElementById('schoolModal').classList.add('open');
+    };
+    window.closeSchoolModal = function() {
+        document.getElementById('schoolModal').classList.remove('open');
+    };
+    function openEditModal(id, name, bar) {
+        document.getElementById('schoolId').value       = id;
+        document.getElementById('schoolName').value     = name;
+        document.getElementById('schoolBarangay').value = bar;
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit me-2 text-success"></i>Edit School';
+        document.getElementById('schoolModal').classList.add('open');
+    }
+
+    // ── Save school ─────────────────────────────────────────────────────────
+    window.saveSchool = async function() {
+        var id       = document.getElementById('schoolId').value.trim();
+        var name     = document.getElementById('schoolName').value.trim();
+        var barangay = document.getElementById('schoolBarangay').value.trim();
+
+        if (!name)     { alert('School name is required.'); return; }
+        if (!barangay) { alert('Barangay is required.'); return; }
+
+        var btn = document.getElementById('btnSaveSchool');
+        btn.disabled = true; btn.textContent = 'Saving…';
+
+        try {
+            var url = id ? '/Schools/UpdateSchool' : '/Schools/CreateSchool';
+            var res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ SchoolId: parseInt(id) || 0, SchoolName: name, Barangay: barangay })
+            });
+            var data = await res.json();
+            if (data && data.success === false) throw new Error(data.error || 'Save failed.');
+            closeSchoolModal();
+            location.reload();
+        } catch (err) {
+            alert('Failed to save school: ' + err.message);
+        } finally {
+            btn.disabled = false; btn.innerHTML = '<i class="fas fa-save me-1"></i>Save School';
+        }
+    };
+
+    // ── Delete school ───────────────────────────────────────────────────────
+    async function deleteSchool(id, name) {
+        if (!confirm('Delete school "' + name + '"? This cannot be undone.')) return;
+        try {
+            var res  = await fetch('/Schools/DeleteSchool', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify({ id: parseInt(id) })
+            });
+            var data = await res.json();
+            if (data && data.success === false) throw new Error(data.error || 'Delete failed.');
+            location.reload();
+        } catch (err) {
+            alert('Failed to delete school: ' + err.message);
+        }
+    }
+
+    // ── Reset filters ───────────────────────────────────────────────────────
+    window.resetFilters = function() {
+        document.getElementById('barangayFilter').value = '';
+        document.getElementById('searchInput').value   = '';
+        filterSchools();
+    };
+
+    // ── Export CSV ──────────────────────────────────────────────────────────
+    window.exportCsv = function() { window.location.href = '/Schools/ExportCsv'; };
+
+    // ── Init ────────────────────────────────────────────────────────────────
+    filterSchools();
+    document.getElementById('sort_school_name').textContent = ' ▲';
+})();
+</script>
+}

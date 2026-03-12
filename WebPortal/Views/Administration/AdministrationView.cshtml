@@ -180,7 +180,7 @@
                     <label for="aRole" class="form-label fw-semibold" style="font-size:13px;">
                         Role <span class="text-danger">*</span>
                     </label>
-                    <select id="aRole" class="form-select form-select-sm" onchange="onRoleChange()">
+                    <select id="aRole" class="form-select form-select-sm" onchange="handleAdminRoleChange()">
                         <option value="">— Select role —</option>
                         <option value="Admin">Admin</option>
                         <option value="Teacher">Teacher</option>
@@ -189,7 +189,7 @@
                 </div>
 
                 <!-- School dropdown — shown only when Role = Teacher -->
-                <div class="mb-3" id="schoolFieldWrapper" style="display:none;">
+                <div class="mb-3" id="aSchoolGroup" style="display:none;">
                     <label for="aSchool" class="form-label fw-semibold" style="font-size:13px;">
                         Assigned School <span class="text-danger">*</span>
                     </label>

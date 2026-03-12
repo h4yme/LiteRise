@@ -6,8 +6,37 @@
 'use strict';
 
 // ─── State ────────────────────────────────────────────────────────────────────
-window.allAdmins = [];
+window.allAdmins  = [];
+window.allSchools = [];
 let _pendingDeactivateId = null;
+
+// ─── Load schools for the modal dropdown ──────────────────────────────────────
+async function loadSchools() {
+    try {
+        const res  = await fetch('/Administration/GetSchools', { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!res.ok) return;
+        const data = await res.json();
+        window.allSchools = Array.isArray(data) ? data : [];
+        populateSchoolDropdown();
+    } catch (err) {
+        console.warn('[AdministrationScript] loadSchools failed:', err);
+    }
+}
+
+function populateSchoolDropdown(selectedId) {
+    const select = document.getElementById('aSchool');
+    if (!select) return;
+    select.innerHTML = '<option value="">— Select school —</option>';
+    window.allSchools.forEach(function(sc) {
+        const id   = sc.school_id || sc.SchoolID || sc.id || '';
+        const name = sc.school_name || sc.SchoolName || '';
+        const opt  = document.createElement('option');
+        opt.value       = id;
+        opt.textContent = name;
+        if (String(id) === String(selectedId)) opt.selected = true;
+        select.appendChild(opt);
+    });
+}
 
 // ─── Fetch & load ─────────────────────────────────────────────────────────────
 async function loadAdmins() {
@@ -172,18 +201,18 @@ function escHtml(str) {
 
 // ─── Add account modal ────────────────────────────────────────────────────────
 function openAddAdmin() {
-    document.getElementById('aId').value     = '';
-    document.getElementById('aName').value   = '';
-    document.getElementById('aEmail').value  = '';
-    document.getElementById('aPassword').value = '';
-    document.getElementById('aRole').value   = '';
-    document.getElementById('aSchool').value = '';
+    document.getElementById('aId').value        = '';
+    document.getElementById('aName').value      = '';
+    document.getElementById('aEmail').value     = '';
+    document.getElementById('aPassword').value  = '';
+    document.getElementById('aRole').value      = '';
 
-    const title = document.getElementById('adminModalTitle');
+    const title = document.getElementById('adminModalTitleText');
     if (title) title.textContent = 'Add Account';
 
+    populateSchoolDropdown();
     const schoolGroup = document.getElementById('aSchoolGroup');
-    if (schoolGroup) schoolGroup.classList.add('d-none');
+    if (schoolGroup) schoolGroup.style.display = 'none';
 
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('adminModal'));
     modal.show();
@@ -202,11 +231,11 @@ function openEditAdmin(id) {
     document.getElementById('aEmail').value    = admin.email || '';
     document.getElementById('aPassword').value = '';
     document.getElementById('aRole').value     = admin.role || '';
-    document.getElementById('aSchool').value   = admin.school || admin.schoolName || '';
 
-    const title = document.getElementById('adminModalTitle');
+    const title = document.getElementById('adminModalTitleText');
     if (title) title.textContent = 'Edit Account';
 
+    populateSchoolDropdown(admin.school_id || admin.schoolId || '');
     handleAdminRoleChange();
 
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('adminModal'));
@@ -218,11 +247,7 @@ function handleAdminRoleChange() {
     const role        = (document.getElementById('aRole')?.value || '').toLowerCase();
     const schoolGroup = document.getElementById('aSchoolGroup');
     if (!schoolGroup) return;
-    if (role === 'teacher') {
-        schoolGroup.classList.remove('d-none');
-    } else {
-        schoolGroup.classList.add('d-none');
-    }
+    schoolGroup.style.display = role === 'teacher' ? '' : 'none';
 }
 
 // ─── Save account ─────────────────────────────────────────────────────────────
@@ -384,5 +409,6 @@ function bindEvents() {
 // ─── Entry point ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     bindEvents();
+    loadSchools();
     loadAdmins();
 });
