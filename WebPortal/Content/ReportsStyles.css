@@ -48,10 +48,12 @@
 }
 
 .report-card {
+    background: #fff;
     border: 1px solid #e9ecef;
-    border-radius: 8px;
-    padding: 20px;
-    transition: all 0.2s;
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    transition: box-shadow .2s, border-color .2s;
     cursor: default;
 }
 
