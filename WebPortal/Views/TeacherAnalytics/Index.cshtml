@@ -2,7 +2,7 @@
     ViewBag.Title = "Class Analytics";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@Styles.Render("~/Content/TeacherAnalyticsStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/TeacherAnalyticsStyles.css" /> }
 
 <div class="ta-wrapper">
 
@@ -489,4 +489,4 @@
     };
 </script>
 
-@Scripts.Render("~/Scripts/TeacherAnalyticsScript.js")
+@section scripts { <script src="/Scripts/TeacherAnalyticsScript.js"></script> }

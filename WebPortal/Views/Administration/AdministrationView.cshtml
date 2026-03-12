@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/AdministrationStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/AdministrationStyles.css" /> }
 
 <div class="admin-accounts-page">
 
@@ -218,4 +218,4 @@
 ══════════════════════════════════════════════════════════════════ -->
 <div class="toast-container position-fixed top-0 end-0 p-3" id="toastContainer" style="z-index:9999;"></div>
 
-@Scripts.Render("~/Scripts/AdministrationScript.js")
+@section scripts { <script src="/Scripts/AdministrationScript.js"></script> }

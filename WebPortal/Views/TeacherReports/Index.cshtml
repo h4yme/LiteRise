@@ -2,7 +2,7 @@
     ViewBag.Title = "Progress Reports";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-@Styles.Render("~/Content/TeacherReportsStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/TeacherReportsStyles.css" /> }
 
 <div class="reports-page">
 
@@ -108,4 +108,4 @@
     window.studentsData = @Html.Raw(ViewBag.StudentsJson ?? "[]");
 </script>
 
-@Scripts.Render("~/Scripts/TeacherReportsScript.js")
+@section scripts { <script src="/Scripts/TeacherReportsScript.js"></script> }

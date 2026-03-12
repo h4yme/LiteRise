@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/AnalyticsStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/AnalyticsStyles.css" /> }
 
 <div class="analytics-wrapper">
 
@@ -454,4 +454,4 @@
     };
 </script>
 
-@Scripts.Render("~/Scripts/AnalyticsScript.js")
+@section scripts { <script src="/Scripts/AnalyticsScript.js"></script> }

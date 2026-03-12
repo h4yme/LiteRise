@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/ReportsStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/ReportsStyles.css" /> }
 
 <div class="reports-page">
 
@@ -175,4 +175,4 @@
     window.schoolsData  = @Html.Raw(ViewBag.SchoolsJson  ?? "[]");
 </script>
 
-@Scripts.Render("~/Scripts/ReportsScript.js")
+@section scripts { <script src="/Scripts/ReportsScript.js"></script> }

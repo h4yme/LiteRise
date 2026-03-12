@@ -3,7 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@Styles.Render("~/Content/NotificationsStyles.css")
+@section styles { <link rel="stylesheet" href="/Content/NotificationsStyles.css" /> }
 
 <style>
     /* ── Notifications page styles ───────────────────────────────────────── */
@@ -678,4 +678,4 @@
     </div>
 </div>
 
-@Scripts.Render("~/Scripts/NotificationsScript.js")
+@section scripts { <script src="/Scripts/NotificationsScript.js"></script> }
