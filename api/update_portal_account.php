@@ -1,9 +1,8 @@
 <?php
 // ============================================================
 // update_portal_account.php  POST  (admin only)
-// Updates an existing portal account.
+// id format: "admin_N" or "teacher_N"
 // Body: { id, name, email, password?, role, school_id? }
-// Response: { success, message }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -22,72 +21,89 @@ if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
 }
 
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
-$id       = (int)($body['id']       ?? 0);
-$name     = trim($body['name']      ?? '');
-$email    = trim($body['email']     ?? '');
-$password = $body['password']       ?? '';
-$role     = trim($body['role']      ?? '');
+$id       = trim($body['id']       ?? '');   // "admin_1" or "teacher_1"
+$name     = trim($body['name']     ?? '');
+$email    = trim($body['email']    ?? '');
+$password = $body['password']      ?? '';
+$role     = ucfirst(strtolower(trim($body['role'] ?? '')));
 $schoolId = isset($body['school_id']) && $body['school_id'] !== '' ? (int)$body['school_id'] : null;
 
-if ($id <= 0 || !$name || !$email || !$role) {
+if (!$id || !$name || !$email || !$role) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'id, name, email, and role are required.']);
     exit;
 }
-
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid email address.']);
     exit;
 }
-
 if (!empty($password) && strlen($password) < 8) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters.']);
     exit;
 }
 
-$role = ucfirst(strtolower($role));
-if (!in_array($role, ['Admin', 'Teacher'])) {
+// Parse prefixed id
+$parts  = explode('_', $id, 2);
+$table  = $parts[0];   // "admin" or "teacher"
+$rawId  = (int)($parts[1] ?? 0);
+
+if ($rawId <= 0 || !in_array($table, ['admin', 'teacher'])) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Role must be Admin or Teacher.']);
+    echo json_encode(['success' => false, 'message' => 'Invalid account id.']);
     exit;
 }
 
 try {
-    $pdo = getConnection();
+    $pdo  = getConnection();
+    $hash = !empty($password) ? password_hash($password, PASSWORD_BCRYPT) : null;
 
-    // Check email uniqueness (exclude self)
-    $check = $pdo->prepare("SELECT COUNT(*) FROM dbo.PortalUsers WHERE Email = ? AND UserID <> ?");
-    $check->execute([$email, $id]);
-    if ((int)$check->fetchColumn() > 0) {
-        http_response_code(409);
-        echo json_encode(['success' => false, 'message' => 'Another account with this email already exists.']);
-        exit;
-    }
+    if ($table === 'admin') {
+        // Check email uniqueness (exclude self)
+        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ? AND AdminID <> ?");
+        $chk->execute([$email, $rawId]);
+        if ((int)$chk->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'Another admin with this email already exists.']);
+            exit;
+        }
 
-    if (!empty($password)) {
-        $hash = password_hash($password, PASSWORD_BCRYPT);
-        $stmt = $pdo->prepare("
-            UPDATE dbo.PortalUsers
-            SET FullName = ?, Email = ?, PasswordHash = ?, Role = ?, SchoolID = ?
-            WHERE UserID = ?
-        ");
-        $stmt->execute([$name, $email, $hash, $role, $schoolId, $id]);
+        if ($hash) {
+            $stmt = $pdo->prepare("UPDATE dbo.Admins SET Username=?, Email=?, PasswordHash=? WHERE AdminID=?");
+            $stmt->execute([$name, $email, $hash, $rawId]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE dbo.Admins SET Username=?, Email=? WHERE AdminID=?");
+            $stmt->execute([$name, $email, $rawId]);
+        }
+
     } else {
-        $stmt = $pdo->prepare("
-            UPDATE dbo.PortalUsers
-            SET FullName = ?, Email = ?, Role = ?, SchoolID = ?
-            WHERE UserID = ?
-        ");
-        $stmt->execute([$name, $email, $role, $schoolId, $id]);
+        // Split FirstName / LastName
+        $nameParts = explode(' ', $name, 2);
+        $firstName = $nameParts[0];
+        $lastName  = $nameParts[1] ?? '';
+
+        // Check email uniqueness (exclude self)
+        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ? AND TeacherID <> ?");
+        $chk->execute([$email, $rawId]);
+        if ((int)$chk->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'Another teacher with this email already exists.']);
+            exit;
+        }
+
+        if ($hash) {
+            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, Password=?, SchoolID=? WHERE TeacherID=?");
+            $stmt->execute([$firstName, $lastName, $email, $hash, $schoolId, $rawId]);
+        } else {
+            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, SchoolID=? WHERE TeacherID=?");
+            $stmt->execute([$firstName, $lastName, $email, $schoolId, $rawId]);
+        }
     }
 
-    if ($stmt->rowCount() === 0) {
-        echo json_encode(['success' => false, 'message' => 'Account not found.']);
-    } else {
-        echo json_encode(['success' => true, 'message' => 'Account updated successfully.']);
-    }
+    echo $stmt->rowCount()
+        ? json_encode(['success' => true, 'message' => 'Account updated successfully.'])
+        : json_encode(['success' => false, 'message' => 'Account not found.']);
 
 } catch (Exception $e) {
     http_response_code(500);

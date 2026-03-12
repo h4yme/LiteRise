@@ -1,9 +1,10 @@
 <?php
 // ============================================================
 // create_portal_account.php  POST  (admin only)
-// Creates a new admin or teacher portal account.
+// Role=Admin  → INSERT into dbo.Admins
+// Role=Teacher → INSERT into dbo.Teachers
+//
 // Body: { name, email, password, role, school_id? }
-// Response: { success, message, id }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -25,7 +26,7 @@ $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 $name     = trim($body['name']      ?? '');
 $email    = trim($body['email']     ?? '');
 $password = $body['password']       ?? '';
-$role     = trim($body['role']      ?? '');
+$role     = ucfirst(strtolower(trim($body['role'] ?? '')));
 $schoolId = isset($body['school_id']) && $body['school_id'] !== '' ? (int)$body['school_id'] : null;
 
 if (!$name || !$email || !$password || !$role) {
@@ -33,53 +34,72 @@ if (!$name || !$email || !$password || !$role) {
     echo json_encode(['success' => false, 'message' => 'name, email, password, and role are required.']);
     exit;
 }
-
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Invalid email address.']);
     exit;
 }
-
 if (strlen($password) < 8) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters.']);
     exit;
 }
-
-$role = ucfirst(strtolower($role));
 if (!in_array($role, ['Admin', 'Teacher'])) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Role must be Admin or Teacher.']);
     exit;
 }
 
+$hash = password_hash($password, PASSWORD_BCRYPT);
+
 try {
     $pdo = getConnection();
 
-    // Check email uniqueness
-    $check = $pdo->prepare("SELECT COUNT(*) FROM dbo.PortalUsers WHERE Email = ?");
-    $check->execute([$email]);
-    if ((int)$check->fetchColumn() > 0) {
-        http_response_code(409);
-        echo json_encode(['success' => false, 'message' => 'An account with this email already exists.']);
-        exit;
+    if ($role === 'Admin') {
+        // Check duplicate email in Admins
+        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ?");
+        $chk->execute([$email]);
+        if ((int)$chk->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'An admin with this email already exists.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO dbo.Admins (Username, Email, PasswordHash, IsActive, CreatedDate)
+            OUTPUT INSERTED.AdminID
+            VALUES (?, ?, ?, 1, GETUTCDATE())
+        ");
+        $stmt->execute([$name, $email, $hash]);
+        $newId = (int)$stmt->fetchColumn();
+
+        echo json_encode(['success' => true, 'message' => 'Admin account created.', 'id' => "admin_$newId"]);
+
+    } else {
+        // Split name into FirstName / LastName
+        $parts     = explode(' ', $name, 2);
+        $firstName = $parts[0];
+        $lastName  = $parts[1] ?? '';
+
+        // Check duplicate email in Teachers
+        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ?");
+        $chk->execute([$email]);
+        if ((int)$chk->fetchColumn() > 0) {
+            http_response_code(409);
+            echo json_encode(['success' => false, 'message' => 'A teacher with this email already exists.']);
+            exit;
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, SchoolID, IsActive, DateCreated)
+            OUTPUT INSERTED.TeacherID
+            VALUES (?, ?, ?, ?, ?, 1, GETUTCDATE())
+        ");
+        $stmt->execute([$firstName, $lastName, $email, $hash, $schoolId]);
+        $newId = (int)$stmt->fetchColumn();
+
+        echo json_encode(['success' => true, 'message' => 'Teacher account created.', 'id' => "teacher_$newId"]);
     }
-
-    $hash = password_hash($password, PASSWORD_BCRYPT);
-
-    $stmt = $pdo->prepare("
-        INSERT INTO dbo.PortalUsers (FullName, Email, PasswordHash, Role, SchoolID, IsActive, CreatedAt)
-        OUTPUT INSERTED.UserID
-        VALUES (?, ?, ?, ?, ?, 1, GETUTCDATE())
-    ");
-    $stmt->execute([$name, $email, $hash, $role, $schoolId]);
-    $newId = (int)$stmt->fetchColumn();
-
-    echo json_encode([
-        'success' => true,
-        'message' => 'Account created successfully.',
-        'id'      => $newId,
-    ]);
 
 } catch (Exception $e) {
     http_response_code(500);

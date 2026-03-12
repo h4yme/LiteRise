@@ -1,8 +1,7 @@
 <?php
 // ============================================================
 // get_portal_accounts.php  GET  (admin only)
-// Returns all portal admin/teacher accounts.
-// Used by: AdministrationController.GetAdmins()
+// UNIONs dbo.Admins and dbo.Teachers into one list.
 //
 // Response: [
 //   { id, name, email, role, school, school_id, lastLogin, isActive }
@@ -27,29 +26,49 @@ if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
 try {
     $pdo = getConnection();
 
-    $rows = $pdo->query("
+    // ── Admins ────────────────────────────────────────────────────────────
+    $admins = $pdo->query("
         SELECT
-            pu.UserID                                   AS id,
-            pu.FullName                                 AS name,
-            pu.Email                                    AS email,
-            pu.Role                                     AS role,
-            ISNULL(sc.SchoolName, '')                  AS school,
-            pu.SchoolID                                AS school_id,
-            CONVERT(VARCHAR(19), pu.LastLogin, 120)   AS lastLogin,
-            CAST(pu.IsActive AS BIT)                   AS isActive
-        FROM  dbo.PortalUsers pu
-        LEFT  JOIN dbo.Schools sc ON sc.SchoolID = pu.SchoolID
-        ORDER BY pu.FullName
+            'admin_' + CAST(AdminID AS VARCHAR)              AS id,
+            AdminID                                          AS raw_id,
+            ISNULL(Username, Email)                          AS name,
+            Email                                            AS email,
+            'Admin'                                          AS role,
+            ''                                               AS school,
+            NULL                                             AS school_id,
+            CONVERT(VARCHAR(19), LastLoginDate, 120)         AS lastLogin,
+            CAST(IsActive AS BIT)                            AS isActive
+        FROM dbo.Admins
     ")->fetchAll(PDO::FETCH_ASSOC);
 
-    foreach ($rows as &$row) {
-        $row['id']       = (int)$row['id'];
+    // ── Teachers ──────────────────────────────────────────────────────────
+    $teachers = $pdo->query("
+        SELECT
+            'teacher_' + CAST(t.TeacherID AS VARCHAR)        AS id,
+            t.TeacherID                                       AS raw_id,
+            RTRIM(ISNULL(t.FirstName,'') + ' ' + ISNULL(t.LastName,'')) AS name,
+            t.Email                                           AS email,
+            'Teacher'                                         AS role,
+            ISNULL(sc.SchoolName, '')                        AS school,
+            t.SchoolID                                       AS school_id,
+            CONVERT(VARCHAR(19), t.LastLoginDate, 120)       AS lastLogin,
+            CAST(t.IsActive AS BIT)                          AS isActive
+        FROM dbo.Teachers t
+        LEFT JOIN dbo.Schools sc ON sc.SchoolID = t.SchoolID
+    ")->fetchAll(PDO::FETCH_ASSOC);
+
+    $all = array_merge($admins, $teachers);
+
+    foreach ($all as &$row) {
+        $row['raw_id']   = (int)$row['raw_id'];
         $row['school_id']= $row['school_id'] !== null ? (int)$row['school_id'] : null;
         $row['isActive'] = (bool)$row['isActive'];
     }
     unset($row);
 
-    echo json_encode($rows, JSON_UNESCAPED_UNICODE);
+    usort($all, fn($a, $b) => strcmp($a['name'], $b['name']));
+
+    echo json_encode($all, JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {
     http_response_code(500);

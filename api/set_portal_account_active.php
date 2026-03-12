@@ -1,9 +1,8 @@
 <?php
 // ============================================================
 // set_portal_account_active.php  POST  (admin only)
-// Activates or deactivates a portal account.
+// id format: "admin_N" or "teacher_N"
 // Body: { id, is_active: bool }
-// Response: { success, message }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -22,26 +21,40 @@ if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
 }
 
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
-$id       = (int)($body['id']        ?? 0);
+$id       = trim($body['id']        ?? '');
 $isActive = isset($body['is_active']) ? (bool)$body['is_active'] : null;
 
-if ($id <= 0 || $isActive === null) {
+if (!$id || $isActive === null) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'id and is_active are required.']);
     exit;
 }
 
-try {
-    $pdo  = getConnection();
-    $stmt = $pdo->prepare("UPDATE dbo.PortalUsers SET IsActive = ? WHERE UserID = ?");
-    $stmt->execute([$isActive ? 1 : 0, $id]);
+$parts = explode('_', $id, 2);
+$table = $parts[0];
+$rawId = (int)($parts[1] ?? 0);
 
-    if ($stmt->rowCount() === 0) {
-        echo json_encode(['success' => false, 'message' => 'Account not found.']);
+if ($rawId <= 0 || !in_array($table, ['admin', 'teacher'])) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Invalid account id.']);
+    exit;
+}
+
+try {
+    $pdo   = getConnection();
+    $flag  = $isActive ? 1 : 0;
+
+    if ($table === 'admin') {
+        $stmt = $pdo->prepare("UPDATE dbo.Admins SET IsActive = ? WHERE AdminID = ?");
     } else {
-        $msg = $isActive ? 'Account reactivated.' : 'Account deactivated.';
-        echo json_encode(['success' => true, 'message' => $msg]);
+        $stmt = $pdo->prepare("UPDATE dbo.Teachers SET IsActive = ? WHERE TeacherID = ?");
     }
+    $stmt->execute([$flag, $rawId]);
+
+    $msg = $isActive ? 'Account reactivated.' : 'Account deactivated.';
+    echo $stmt->rowCount()
+        ? json_encode(['success' => true, 'message' => $msg])
+        : json_encode(['success' => false, 'message' => 'Account not found.']);
 
 } catch (Exception $e) {
     http_response_code(500);

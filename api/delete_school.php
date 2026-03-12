@@ -1,9 +1,8 @@
 <?php
 // ============================================================
 // delete_school.php  POST  (admin only)
-// Soft-deletes a school by setting IsActive = 0.
-// Body: { school_id: int }
-// Response: { success, message }
+// Soft-deletes a school (IsActive = 0).
+// Body: { school_id }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -31,12 +30,9 @@ if ($schoolId <= 0) {
 }
 
 try {
-    $pdo  = getConnection();
+    $pdo = getConnection();
 
-    // Prevent deletion if students are still assigned
-    $count = (int)$pdo->prepare("SELECT COUNT(*) FROM dbo.Students WHERE SchoolID = ?")
-                       ->execute([$schoolId]) ? $pdo->query("SELECT COUNT(*) FROM dbo.Students WHERE SchoolID = $schoolId")->fetchColumn() : 0;
-
+    // Block deletion if students are still assigned
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM dbo.Students WHERE SchoolID = ?");
     $stmt->execute([$schoolId]);
     $studentCount = (int)$stmt->fetchColumn();

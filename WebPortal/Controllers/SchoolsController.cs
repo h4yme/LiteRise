@@ -72,7 +72,7 @@ namespace Website.Controllers
 
             try
             {
-                var result = await _api.CreateSchoolAsync(model.SchoolName, model.Barangay);
+                var result = await _api.CreateSchoolAsync(model.SchoolName, model.District, model.Address, model.City, model.Province);
                 return Json(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace Website.Controllers
 
             try
             {
-                var result = await _api.UpdateSchoolAsync(model.SchoolId, model.SchoolName, model.Barangay);
+                var result = await _api.UpdateSchoolAsync(model.SchoolId, model.SchoolName, model.District, model.Address, model.City, model.Province);
                 return Json(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -141,15 +141,16 @@ namespace Website.Controllers
             int total = students.Count;
 
             var lines = new System.Text.StringBuilder();
-            lines.AppendLine("School Name,School Code,Barangay,Students,% of Total");
+            lines.AppendLine("School Name,District,City,Province,Students,% of Total");
             foreach (var sc in schoolList)
             {
                 string name     = (string)sc.school_name ?? "";
-                string code     = (string)sc.school_code ?? (string)sc.school_id?.ToString() ?? "";
-                string barangay = (string)sc.barangay    ?? "";
+                string district = (string)sc.district    ?? "";
+                string city     = (string)sc.city        ?? "";
+                string province = (string)sc.province    ?? "";
                 int    count    = students.Count(s => (string)s.school_name == name);
                 double pct      = total > 0 ? Math.Round((double)count / total * 100, 1) : 0;
-                lines.AppendLine($"\"{name}\",\"{code}\",\"{barangay}\",{count},{pct}%");
+                lines.AppendLine($"\"{name}\",\"{district}\",\"{city}\",\"{province}\",{count},{pct}%");
             }
 
             byte[] bytes = System.Text.Encoding.UTF8.GetBytes(lines.ToString());
@@ -160,7 +161,10 @@ namespace Website.Controllers
         {
             public int    SchoolId   { get; set; }
             public string SchoolName { get; set; }
-            public string Barangay   { get; set; }
+            public string District   { get; set; }
+            public string Address    { get; set; }
+            public string City       { get; set; }
+            public string Province   { get; set; }
         }
     }
 }

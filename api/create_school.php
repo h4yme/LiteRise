@@ -1,9 +1,8 @@
 <?php
 // ============================================================
 // create_school.php  POST  (admin only)
-// Creates a new school record.
-// Body: { school_name: string, barangay: string }
-// Response: { success, school_id, school_code, school_name, barangay }
+// Body: { school_name, district, address, city, province }
+// Response: { success, school_id, school_name, ... }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -21,9 +20,12 @@ if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
     exit;
 }
 
-$body = json_decode(file_get_contents('php://input'), true) ?? [];
+$body       = json_decode(file_get_contents('php://input'), true) ?? [];
 $schoolName = trim($body['school_name'] ?? '');
-$barangay   = trim($body['barangay']    ?? '');
+$district   = trim($body['district']    ?? '');
+$address    = trim($body['address']     ?? '');
+$city       = trim($body['city']        ?? '');
+$province   = trim($body['province']    ?? '');
 
 if (!$schoolName) {
     http_response_code(400);
@@ -32,26 +34,22 @@ if (!$schoolName) {
 }
 
 try {
-    $pdo = getConnection();
-
-    // Generate next school code
-    $maxId = (int)$pdo->query("SELECT ISNULL(MAX(SchoolID), 0) FROM dbo.Schools")->fetchColumn();
-    $code  = 'SCH' . str_pad($maxId + 1, 3, '0', STR_PAD_LEFT);
-
+    $pdo  = getConnection();
     $stmt = $pdo->prepare("
-        INSERT INTO dbo.Schools (SchoolCode, SchoolName, Barangay, IsActive)
+        INSERT INTO dbo.Schools (SchoolName, District, Address, City, Province, IsActive, DateCreated)
         OUTPUT INSERTED.SchoolID
-        VALUES (?, ?, ?, 1)
+        VALUES (?, ?, ?, ?, ?, 1, GETUTCDATE())
     ");
-    $stmt->execute([$code, $schoolName, $barangay]);
+    $stmt->execute([$schoolName, $district, $address, $city, $province]);
     $newId = (int)$stmt->fetchColumn();
 
     echo json_encode([
         'success'     => true,
         'school_id'   => $newId,
-        'school_code' => $code,
         'school_name' => $schoolName,
-        'barangay'    => $barangay,
+        'district'    => $district,
+        'city'        => $city,
+        'province'    => $province,
     ], JSON_UNESCAPED_UNICODE);
 
 } catch (Exception $e) {

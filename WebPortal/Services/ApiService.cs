@@ -339,18 +339,18 @@ namespace Website.Services
         // SCHOOL CRUD
         // ═════════════════════════════════════════════════════════════════════
 
-        public async Task<dynamic> CreateSchoolAsync(string schoolName, string barangay)
+        public async Task<dynamic> CreateSchoolAsync(string schoolName, string district, string address, string city, string province)
         {
-            var payload = JsonConvert.SerializeObject(new { school_name = schoolName, barangay });
+            var payload = JsonConvert.SerializeObject(new { school_name = schoolName, district, address, city, province });
             var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
             var response = await _client.PostAsync($"{_baseUrl}/create_school.php", content);
             response.EnsureSuccessStatusCode();
             return JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
         }
 
-        public async Task<dynamic> UpdateSchoolAsync(int schoolId, string schoolName, string barangay)
+        public async Task<dynamic> UpdateSchoolAsync(int schoolId, string schoolName, string district, string address, string city, string province)
         {
-            var payload = JsonConvert.SerializeObject(new { school_id = schoolId, school_name = schoolName, barangay });
+            var payload = JsonConvert.SerializeObject(new { school_id = schoolId, school_name = schoolName, district, address, city, province });
             var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
             var response = await _client.PostAsync($"{_baseUrl}/update_school.php", content);
             response.EnsureSuccessStatusCode();
