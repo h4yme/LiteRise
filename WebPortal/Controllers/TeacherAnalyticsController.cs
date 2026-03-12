@@ -26,7 +26,7 @@ namespace Website.Controllers
         // ─────────────────────────────────────────────────────────────────────
         public async Task<ActionResult> Index()
         {
-            var schoolId = Session["SchoolId"]?.ToString();
+            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid) ? sid : (int?)null;
 
             List<dynamic> students;
             try

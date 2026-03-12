@@ -34,7 +34,7 @@ namespace Website.Controllers
         // =========================================================================
         public async Task<ActionResult> Index()
         {
-            var schoolId = Session["SchoolId"]?.ToString();
+            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid0) ? sid0 : (int?)null;
             List<dynamic> students;
 
             try
@@ -105,7 +105,7 @@ namespace Website.Controllers
         [HttpPost]
         public async Task<ActionResult> GenerateClassReport()
         {
-            var schoolId = Session["SchoolId"]?.ToString();
+            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid1) ? sid1 : (int?)null;
             List<dynamic> students;
 
             try
@@ -235,7 +235,7 @@ namespace Website.Controllers
         [HttpGet]
         public async Task<ActionResult> ExportClassCsv()
         {
-            var schoolId = Session["SchoolId"]?.ToString();
+            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid2) ? sid2 : (int?)null;
             List<dynamic> students;
 
             try
