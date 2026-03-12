@@ -391,8 +391,7 @@ namespace Website.Services
 
         public async Task<dynamic> UpdatePortalAccountAsync(string id, string name, string email, string password, string role, string schoolId)
         {
-            int sid = int.TryParse(schoolId, out int s) ? s : 0;
-            var payload = JsonConvert.SerializeObject(new { id = int.Parse(id), name, email, password, role, school_id = sid > 0 ? (int?)sid : null });
+            var payload = JsonConvert.SerializeObject(new { id, name, email, password, role });
             var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
             var response = await _client.PostAsync($"{_baseUrl}/update_portal_account.php", content);
             response.EnsureSuccessStatusCode();
@@ -401,7 +400,7 @@ namespace Website.Services
 
         public async Task<dynamic> SetPortalAccountActiveAsync(string id, bool isActive)
         {
-            var payload = JsonConvert.SerializeObject(new { id = int.Parse(id), is_active = isActive });
+            var payload = JsonConvert.SerializeObject(new { id, is_active = isActive });
             var content = new System.Net.Http.StringContent(payload, System.Text.Encoding.UTF8, "application/json");
             var response = await _client.PostAsync($"{_baseUrl}/set_portal_account_active.php", content);
             response.EnsureSuccessStatusCode();

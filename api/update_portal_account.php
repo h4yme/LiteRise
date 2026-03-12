@@ -2,7 +2,7 @@
 // ============================================================
 // update_portal_account.php  POST  (admin only)
 // id format: "admin_N" or "teacher_N"
-// Body: { id, name, email, password?, role, school_id? }
+// Body: { id, name, email, password?, role }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -26,7 +26,6 @@ $name     = trim($body['name']     ?? '');
 $email    = trim($body['email']    ?? '');
 $password = $body['password']      ?? '';
 $role     = ucfirst(strtolower(trim($body['role'] ?? '')));
-$schoolId = isset($body['school_id']) && $body['school_id'] !== '' ? (int)$body['school_id'] : null;
 
 if (!$id || !$name || !$email || !$role) {
     http_response_code(400);
@@ -93,11 +92,11 @@ try {
         }
 
         if ($hash) {
-            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, Password=?, SchoolID=? WHERE TeacherID=?");
-            $stmt->execute([$firstName, $lastName, $email, $hash, $schoolId, $rawId]);
+            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, Password=? WHERE TeacherID=?");
+            $stmt->execute([$firstName, $lastName, $email, $hash, $rawId]);
         } else {
-            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, SchoolID=? WHERE TeacherID=?");
-            $stmt->execute([$firstName, $lastName, $email, $schoolId, $rawId]);
+            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=? WHERE TeacherID=?");
+            $stmt->execute([$firstName, $lastName, $email, $rawId]);
         }
     }
 
@@ -105,7 +104,7 @@ try {
         ? json_encode(['success' => true, 'message' => 'Account updated successfully.'])
         : json_encode(['success' => false, 'message' => 'Account not found.']);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

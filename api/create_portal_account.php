@@ -4,7 +4,7 @@
 // Role=Admin  → INSERT into dbo.Admins
 // Role=Teacher → INSERT into dbo.Teachers
 //
-// Body: { name, email, password, role, school_id? }
+// Body: { name, email, password, role }
 // ============================================================
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -27,7 +27,6 @@ $name     = trim($body['name']      ?? '');
 $email    = trim($body['email']     ?? '');
 $password = $body['password']       ?? '';
 $role     = ucfirst(strtolower(trim($body['role'] ?? '')));
-$schoolId = isset($body['school_id']) && $body['school_id'] !== '' ? (int)$body['school_id'] : null;
 
 if (!$name || !$email || !$password || !$role) {
     http_response_code(400);
@@ -91,17 +90,17 @@ try {
         }
 
         $stmt = $pdo->prepare("
-            INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, SchoolID, IsActive, DateCreated)
+            INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, IsActive, DateCreated)
             OUTPUT INSERTED.TeacherID
-            VALUES (?, ?, ?, ?, ?, 1, GETUTCDATE())
+            VALUES (?, ?, ?, ?, 1, GETUTCDATE())
         ");
-        $stmt->execute([$firstName, $lastName, $email, $hash, $schoolId]);
+        $stmt->execute([$firstName, $lastName, $email, $hash]);
         $newId = (int)$stmt->fetchColumn();
 
         echo json_encode(['success' => true, 'message' => 'Teacher account created.', 'id' => "teacher_$newId"]);
     }
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

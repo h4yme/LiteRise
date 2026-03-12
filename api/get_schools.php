@@ -6,7 +6,7 @@
 //
 // Response: [
 //   { school_id, school_name, district, address, city, province,
-//     student_count, is_active, date_created }
+//     is_active, date_created }
 // ]
 // ============================================================
 header('Content-Type: application/json');
@@ -28,7 +28,7 @@ if (!$auth) {
 try {
     $pdo = getConnection();
 
-    $rows = $pdo->query("
+    $stmt = $pdo->query("
         SELECT
             sc.SchoolID                                        AS school_id,
             sc.SchoolName                                      AS school_name,
@@ -36,27 +36,28 @@ try {
             ISNULL(sc.Address,   '')                          AS address,
             ISNULL(sc.City,      '')                          AS city,
             ISNULL(sc.Province,  '')                          AS province,
-            COUNT(s.StudentID)                                 AS student_count,
             CAST(ISNULL(sc.IsActive, 1) AS BIT)              AS is_active,
             CONVERT(VARCHAR(19), sc.DateCreated, 120)         AS date_created
         FROM  dbo.Schools sc
-        LEFT  JOIN dbo.Students s ON s.SchoolID = sc.SchoolID
         WHERE sc.IsActive = 1
-        GROUP BY sc.SchoolID, sc.SchoolName, sc.District, sc.Address,
-                 sc.City, sc.Province, sc.IsActive, sc.DateCreated
         ORDER BY sc.SchoolName
-    ")->fetchAll(PDO::FETCH_ASSOC);
+    ");
+
+    if ($stmt === false) {
+        throw new \RuntimeException('Query failed: ' . implode(', ', $pdo->errorInfo()));
+    }
+
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     foreach ($rows as &$row) {
-        $row['school_id']     = (int)$row['school_id'];
-        $row['student_count'] = (int)$row['student_count'];
-        $row['is_active']     = (bool)$row['is_active'];
+        $row['school_id'] = (int)$row['school_id'];
+        $row['is_active'] = (bool)$row['is_active'];
     }
     unset($row);
 
     echo json_encode($rows, JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
