@@ -1,0 +1,327 @@
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var today = DateTime.Now.ToString("MMMM d, yyyy");
+}
+
+@section styles {
+<style>
+    /* ── Page header ──────────────────────────────────────────────── */
+    .dash-header { margin-bottom: 24px }
+    .dash-header h1 { font-size: 1.6rem; font-weight: 800; color: var(--text); margin: 0 0 2px }
+    .dash-header p  { font-size: 0.85rem; color: var(--text-secondary); margin: 0 }
+
+    /* ── KPI Cards ────────────────────────────────────────────────── */
+    .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px }
+    @@media(max-width:900px){ .kpi-grid { grid-template-columns: repeat(2,1fr) } }
+    @@media(max-width:480px){ .kpi-grid { grid-template-columns: 1fr } }
+    .kpi-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px 22px;
+        box-shadow: var(--shadow-xs); display: flex; align-items: center; gap: 16px;
+        transition: box-shadow 0.2s
+    }
+    .kpi-card:hover { box-shadow: var(--shadow-md) }
+    body.dark-mode .kpi-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .kpi-icon {
+        width: 48px; height: 48px; border-radius: var(--radius-md);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px
+    }
+    .kpi-icon.green  { background: var(--green-pale);  color: var(--green) }
+    .kpi-icon.yellow { background: var(--yellow-pale); color: #D97706 }
+    .kpi-icon.orange { background: var(--orange-pale); color: var(--orange) }
+    .kpi-icon.purple { background: var(--purple-pale); color: var(--purple) }
+    .kpi-value { font-size: 1.9rem; font-weight: 800; color: var(--text); line-height: 1 }
+    .kpi-label { font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px; font-weight: 500 }
+    .kpi-sub   { font-size: 0.75rem; margin-top: 4px; font-weight: 600 }
+    .kpi-sub.green  { color: var(--green) }
+    .kpi-sub.yellow { color: #D97706 }
+    .kpi-sub.orange { color: var(--orange) }
+    .kpi-sub.purple { color: var(--purple) }
+
+    /* ── Chart Row ────────────────────────────────────────────────── */
+    .charts-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 24px }
+    @@media(max-width:1100px){ .charts-row { grid-template-columns: repeat(2,1fr) } }
+    @@media(max-width:700px) { .charts-row { grid-template-columns: 1fr } }
+    .chart-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-xs)
+    }
+    body.dark-mode .chart-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .chart-card h3 { font-size: 0.92rem; font-weight: 700; color: var(--text); margin: 0 0 14px }
+    .chart-card canvas { max-height: 200px }
+
+    /* ── Recent Students ──────────────────────────────────────────── */
+    .recent-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-xs)
+    }
+    body.dark-mode .recent-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .recent-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px }
+    .recent-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 0 }
+    .recent-header small { font-size: 0.78rem; color: var(--text-muted) }
+    .btn-view-all {
+        font-size: 0.8rem; font-weight: 700; color: var(--green);
+        background: var(--green-pale); border: none; border-radius: var(--radius-pill);
+        padding: 5px 14px; text-decoration: none; cursor: pointer; transition: background 0.2s
+    }
+    .btn-view-all:hover { background: #c6efd8; color: var(--green-dark); text-decoration: none }
+    .chart-legend { display: flex; gap: 16px; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 8px }
+    .chart-legend span { display: flex; align-items: center; gap: 5px }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0 }
+</style>
+}
+
+<div class="dash-header">
+    <h1>Dashboard</h1>
+    <p>System-wide overview &mdash; @today</p>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert-banner error" style="margin-bottom:20px;">@ViewBag.Error</div>
+}
+
+<!-- ── KPI Cards ─────────────────────────────────────────────────────────── -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon green"><i class="fas fa-user-graduate"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.TotalStudents ?? 0)</div>
+            <div class="kpi-label">Total Students</div>
+            <div class="kpi-sub green">All time</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon yellow"><i class="fas fa-school"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.TotalSchools ?? 0)</div>
+            <div class="kpi-label">Partner Schools</div>
+            <div class="kpi-sub yellow">Registered</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon orange"><i class="fas fa-user-check"></i></div>
+        <div>
+            <div class="kpi-value" id="kpiActive">@(ViewBag.ActiveStudents ?? 0)</div>
+            <div class="kpi-label">Active Students</div>
+            <div class="kpi-sub orange">&#9650; Live</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fas fa-star"></i></div>
+        <div>
+            <div class="kpi-value" id="kpiAvgXp">@(ViewBag.AverageXp > 0 ? ViewBag.AverageXp.ToString() : "—")</div>
+            <div class="kpi-label">Average XP</div>
+            <div class="kpi-sub purple">Per student</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts ─────────────────────────────────────────────────────────────── -->
+<div class="charts-row">
+    <div class="chart-card">
+        <h3>Students by School</h3>
+        <canvas id="schoolChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3>Activity Status</h3>
+        <div class="chart-legend">
+            <span><span class="legend-dot" style="background:#11B067"></span>Active</span>
+            <span><span class="legend-dot" style="background:#CBD5E0"></span>Inactive</span>
+        </div>
+        <canvas id="activityChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3>Placement Level Distribution</h3>
+        <canvas id="levelChart"></canvas>
+    </div>
+</div>
+
+<!-- ── Recent Students ───────────────────────────────────────────────────── -->
+<div class="recent-card">
+    <div class="recent-header">
+        <div>
+            <h3>Recent Students</h3>
+            <small id="recentSubtitle">Latest students</small>
+        </div>
+        <a href="/Student" class="btn-view-all">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="lr-table" id="recentTable">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>SCHOOL</th>
+                    <th>GRADE</th>
+                    <th>LEVEL</th>
+                    <th>XP</th>
+                    <th>LAST ACTIVE</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="recentTbody">
+                <tr><td colspan="7" class="empty-state">Loading&hellip;</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+<script>
+(function () {
+    var STUDENTS = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+    var SCHOOLS  = @Html.Raw(ViewBag.SchoolsJson  ?? "[]");
+
+    var cutoff7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    // ── Recalculate KPI values client-side (more accurate) ───────────────
+    var active = STUDENTS.filter(function(s){
+        return s.last_active && new Date(s.last_active) >= cutoff7;
+    }).length;
+    var avgXp = STUDENTS.length
+        ? Math.round(STUDENTS.reduce(function(a,s){ return a + (Number(s.total_xp) || 0); }, 0) / STUDENTS.length)
+        : 0;
+
+    document.getElementById('kpiActive').textContent  = active;
+    document.getElementById('kpiAvgXp').textContent   = avgXp > 0 ? avgXp : (STUDENTS.length ? avgXp : '—');
+    document.getElementById('recentSubtitle').textContent =
+        'Latest ' + Math.min(STUDENTS.length, 10) + ' of ' + STUDENTS.length + ' registered students';
+
+    // ── Helper: theta → level ─────────────────────────────────────────────
+    function thetaLevel(t) {
+        if (t === null || t === undefined || t === '' || t === 'null') return null;
+        var v = parseFloat(t);
+        if (isNaN(v)) return null;
+        if (v < -0.5) return 'Beginner';
+        if (v <= 0.5) return 'Intermediate';
+        return 'Advanced';
+    }
+
+    // ── Chart 1: Students by School ───────────────────────────────────────
+    (function buildSchoolChart() {
+        var counts = {};
+        STUDENTS.forEach(function(s) {
+            var sc = s.school_name || 'Unknown';
+            counts[sc] = (counts[sc] || 0) + 1;
+        });
+        var labels = Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; }).slice(0,8);
+        var data   = labels.map(function(l){ return counts[l]; });
+        var colors = ['#11B067','#22C55E','#4ADE80','#86EFAC','#14B8A6','#2DD4BF','#34D399','#6EE7B7'];
+        new Chart(document.getElementById('schoolChart').getContext('2d'), {
+            type: 'bar',
+            data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 5 }] },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    })();
+
+    // ── Chart 2: Activity Status ──────────────────────────────────────────
+    (function buildActivityChart() {
+        var activeCount   = active;
+        var inactiveCount = STUDENTS.length - active;
+        new Chart(document.getElementById('activityChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Active', 'Inactive'],
+                datasets: [{
+                    data: [activeCount, inactiveCount],
+                    backgroundColor: ['#11B067', '#CBD5E0'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    })();
+
+    // ── Chart 3: Placement Level Distribution ─────────────────────────────
+    (function buildLevelChart() {
+        var counts = { Beginner: 0, Intermediate: 0, Advanced: 0, Unplaced: 0 };
+        STUDENTS.forEach(function(s) {
+            var lv = thetaLevel(s.pre_theta);
+            if (lv) counts[lv]++;
+            else counts['Unplaced']++;
+        });
+        var labels = ['Beginner', 'Intermediate', 'Advanced', 'Unplaced'];
+        var data   = labels.map(function(l){ return counts[l]; });
+        new Chart(document.getElementById('levelChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: ['#7C3AED','#11B067','#F97316','#94A3B8'],
+                    borderRadius: 5
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    })();
+
+    // ── Recent Students Table ─────────────────────────────────────────────
+    (function buildTable() {
+        var tbody  = document.getElementById('recentTbody');
+        var recent = STUDENTS.slice().sort(function(a, b) {
+            var da = a.last_active ? new Date(a.last_active) : new Date(0);
+            var db = b.last_active ? new Date(b.last_active) : new Date(0);
+            return db - da;
+        }).slice(0, 10);
+
+        if (!recent.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No students found.</td></tr>';
+            return;
+        }
+
+        function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+        function fmtDate(d) {
+            if (!d) return '—';
+            try { return new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+            catch(e) { return d; }
+        }
+        function levelBadgeClass(lv) {
+            if (lv === 'Beginner')    return 'level-badge beginner';
+            if (lv === 'Intermediate') return 'level-badge intermediate';
+            if (lv === 'Advanced')    return 'level-badge advanced';
+            return 'level-badge';
+        }
+
+        var html = '';
+        recent.forEach(function(s) {
+            var lv     = thetaLevel(s.pre_theta) || 'Unplaced';
+            var status = (s.status || 'active').toLowerCase();
+            var isActive = status === 'active' || (s.last_active && new Date(s.last_active) >= cutoff7);
+            var statusHtml = isActive
+                ? '<span><span class="status-dot active"></span>Active</span>'
+                : '<span><span class="status-dot inactive"></span>Inactive</span>';
+            html += '<tr>' +
+                '<td><a href="/Student/Details/' + s.student_id + '" class="student-link">' + esc(s.name || '—') + '</a></td>' +
+                '<td>' + esc(s.school_name || '—') + '</td>' +
+                '<td>' + esc(s.grade || '—') + '</td>' +
+                '<td><span class="' + levelBadgeClass(lv) + '">' + lv + '</span></td>' +
+                '<td>' + (s.total_xp != null ? Number(s.total_xp).toLocaleString() : '—') + '</td>' +
+                '<td>' + fmtDate(s.last_active) + '</td>' +
+                '<td>' + statusHtml + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    })();
+})();
+</script>
+}

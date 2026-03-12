@@ -1,0 +1,317 @@
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var today = DateTime.Now.ToString("MMMM d, yyyy");
+}
+
+@section styles {
+<style>
+    .dash-header { margin-bottom: 24px }
+    .dash-header h1 { font-size: 1.6rem; font-weight: 800; color: var(--text); margin: 0 0 2px }
+    .dash-header p  { font-size: 0.85rem; color: var(--text-secondary); margin: 0 }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 24px }
+    @@media(max-width:900px){ .kpi-grid { grid-template-columns: repeat(2,1fr) } }
+    @@media(max-width:480px){ .kpi-grid { grid-template-columns: 1fr } }
+    .kpi-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px 22px;
+        box-shadow: var(--shadow-xs); display: flex; align-items: center; gap: 16px
+    }
+    body.dark-mode .kpi-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .kpi-icon {
+        width: 48px; height: 48px; border-radius: var(--radius-md);
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 20px
+    }
+    .kpi-icon.green  { background: var(--green-pale);  color: var(--green) }
+    .kpi-icon.yellow { background: var(--yellow-pale); color: #D97706 }
+    .kpi-icon.teal   { background: var(--teal-pale);   color: var(--teal) }
+    .kpi-icon.purple { background: var(--purple-pale); color: var(--purple) }
+    .kpi-value { font-size: 1.9rem; font-weight: 800; color: var(--text); line-height: 1 }
+    .kpi-label { font-size: 0.82rem; color: var(--text-secondary); margin-top: 2px; font-weight: 500 }
+    .kpi-sub   { font-size: 0.75rem; margin-top: 4px; font-weight: 600 }
+    .kpi-sub.green  { color: var(--green) }
+    .kpi-sub.yellow { color: #D97706 }
+    .kpi-sub.teal   { color: var(--teal) }
+    .kpi-sub.purple { color: var(--purple) }
+
+    .charts-row { display: grid; grid-template-columns: repeat(2,1fr); gap: 16px; margin-bottom: 24px }
+    @@media(max-width:700px) { .charts-row { grid-template-columns: 1fr } }
+    .chart-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-xs)
+    }
+    body.dark-mode .chart-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .chart-card h3 { font-size: 0.92rem; font-weight: 700; color: var(--text); margin: 0 0 14px }
+    .chart-card canvas { max-height: 200px }
+
+    .needs-card, .roster-card {
+        background: var(--bg-white); border: 1px solid var(--border);
+        border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-xs); margin-bottom: 20px
+    }
+    body.dark-mode .needs-card, body.dark-mode .roster-card { background: var(--dark-card); border-color: rgba(255,255,255,0.08) }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px }
+    .section-header h3 { font-size: 0.95rem; font-weight: 700; color: var(--text); margin: 0 }
+    .section-header small { font-size: 0.78rem; color: var(--text-muted) }
+    .btn-view-all {
+        font-size: 0.8rem; font-weight: 700; color: var(--green);
+        background: var(--green-pale); border: none; border-radius: var(--radius-pill);
+        padding: 5px 14px; text-decoration: none; cursor: pointer; transition: background 0.2s
+    }
+    .btn-view-all:hover { background: #c6efd8; color: var(--green-dark); text-decoration: none }
+    .attention-badge {
+        display: inline-flex; align-items: center; gap: 5px;
+        font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px
+    }
+    .attention-badge.missing { background: var(--yellow-pale); color: #D97706 }
+    .attention-badge.inactive { background: var(--red-pale); color: var(--red) }
+</style>
+}
+
+<div class="dash-header">
+    <h1>Dashboard</h1>
+    <p>@(ViewBag.SchoolName ?? "My Class") &mdash; @today</p>
+</div>
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert-banner error" style="margin-bottom:20px;">@ViewBag.Error</div>
+}
+
+<!-- ── KPI Cards ─────────────────────────────────────────────────────────── -->
+<div class="kpi-grid">
+    <div class="kpi-card">
+        <div class="kpi-icon green"><i class="fas fa-users"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.TotalStudents ?? 0)</div>
+            <div class="kpi-label">Total Students</div>
+            <div class="kpi-sub green">Enrolled</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon yellow"><i class="fas fa-clipboard-check"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.AssessedStudents ?? 0)</div>
+            <div class="kpi-label">Assessed Students</div>
+            <div class="kpi-sub yellow">Pre-assessment done</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon teal"><i class="fas fa-chart-line"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.AvgPreTheta ?? "—")</div>
+            <div class="kpi-label">Avg Pre-&theta;</div>
+            <div class="kpi-sub teal">Class average</div>
+        </div>
+    </div>
+    <div class="kpi-card">
+        <div class="kpi-icon purple"><i class="fas fa-book-open"></i></div>
+        <div>
+            <div class="kpi-value">@(ViewBag.AvgLessonsDone ?? 0)</div>
+            <div class="kpi-label">Avg Lessons Done</div>
+            <div class="kpi-sub purple">Per student</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Charts ─────────────────────────────────────────────────────────────── -->
+<div class="charts-row">
+    <div class="chart-card">
+        <h3>Placement Level Distribution</h3>
+        <canvas id="levelChart"></canvas>
+    </div>
+    <div class="chart-card">
+        <h3>Activity Status (Last 7 Days)</h3>
+        <canvas id="activityChart"></canvas>
+    </div>
+</div>
+
+<!-- ── Needs Attention ───────────────────────────────────────────────────── -->
+<div class="needs-card">
+    <div class="section-header">
+        <h3><i class="fas fa-exclamation-triangle" style="color:#F97316;margin-right:6px;"></i>Needs Attention</h3>
+        <small id="needsSubtitle"></small>
+    </div>
+    <div class="table-responsive">
+        <table class="lr-table" id="needsTable">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>SCHOOL</th>
+                    <th>GRADE</th>
+                    <th>PRE-&theta;</th>
+                    <th>LAST ACTIVE</th>
+                    <th>ISSUE</th>
+                </tr>
+            </thead>
+            <tbody id="needsTbody">
+                <tr><td colspan="6" class="empty-state">Loading&hellip;</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ── Student Roster ────────────────────────────────────────────────────── -->
+<div class="roster-card">
+    <div class="section-header">
+        <div>
+            <h3>Student Roster</h3>
+            <small id="rosterSubtitle"></small>
+        </div>
+        <a href="/TeacherStudents" class="btn-view-all">View All</a>
+    </div>
+    <div class="table-responsive">
+        <table class="lr-table" id="rosterTable">
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>GRADE</th>
+                    <th>PRE-&theta;</th>
+                    <th>POST-&theta;</th>
+                    <th>XP</th>
+                    <th>LAST ACTIVE</th>
+                    <th>STATUS</th>
+                </tr>
+            </thead>
+            <tbody id="rosterTbody">
+                <tr><td colspan="7" class="empty-state">Loading&hellip;</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+<script>
+(function () {
+    var STUDENTS       = @Html.Raw(ViewBag.StudentsJson       ?? "[]");
+    var NEEDS_ATT      = @Html.Raw(ViewBag.NeedsAttentionJson ?? "[]");
+    var cutoff7 = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+    function esc(v) { return String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmtDate(d) {
+        if (!d) return '—';
+        try { return new Date(d).toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }); }
+        catch(e) { return d; }
+    }
+    function thetaLevel(t) {
+        if (t === null || t === undefined || t === '' || t === 'null') return null;
+        var v = parseFloat(t);
+        if (isNaN(v)) return null;
+        if (v < -0.5) return 'Beginner';
+        if (v <= 0.5) return 'Intermediate';
+        return 'Advanced';
+    }
+    function levelBadgeClass(lv) {
+        if (lv === 'Beginner')     return 'level-badge beginner';
+        if (lv === 'Intermediate') return 'level-badge intermediate';
+        if (lv === 'Advanced')     return 'level-badge advanced';
+        return 'level-badge';
+    }
+
+    // ── Chart: Level Distribution ─────────────────────────────────────────
+    (function() {
+        var counts = { Beginner:0, Intermediate:0, Advanced:0, Unplaced:0 };
+        STUDENTS.forEach(function(s) {
+            var lv = thetaLevel(s.pre_theta);
+            if (lv) counts[lv]++; else counts['Unplaced']++;
+        });
+        var labels = ['Beginner','Intermediate','Advanced','Unplaced'];
+        new Chart(document.getElementById('levelChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ data: labels.map(function(l){ return counts[l]; }),
+                    backgroundColor: ['#7C3AED','#11B067','#F97316','#94A3B8'], borderRadius: 5 }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    })();
+
+    // ── Chart: Activity Status ────────────────────────────────────────────
+    (function() {
+        var active = STUDENTS.filter(function(s){ return s.last_active && new Date(s.last_active) >= cutoff7; }).length;
+        new Chart(document.getElementById('activityChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Active','Inactive'],
+                datasets: [{ data: [active, STUDENTS.length - active],
+                    backgroundColor: ['#11B067','#CBD5E0'], borderRadius: 5 }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+                    y: { beginAtZero: true, ticks: { stepSize: 1, font: { size: 10 } }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                }
+            }
+        });
+    })();
+
+    // ── Needs Attention Table ─────────────────────────────────────────────
+    (function() {
+        var tbody = document.getElementById('needsTbody');
+        document.getElementById('needsSubtitle').textContent = NEEDS_ATT.length + ' student(s) need attention';
+        if (!NEEDS_ATT.length) {
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-state">All students are on track.</td></tr>';
+            return;
+        }
+        var html = '';
+        NEEDS_ATT.forEach(function(s) {
+            var missingAssessment = !s.pre_theta || s.pre_theta === 'null';
+            var inactive = !s.last_active || new Date(s.last_active) < cutoff7;
+            var badges = '';
+            if (missingAssessment) badges += '<span class="attention-badge missing">Missing Assessment</span> ';
+            if (inactive) badges += '<span class="attention-badge inactive">Inactive 7+ Days</span>';
+            html += '<tr>' +
+                '<td><a href="/TeacherStudents/Details/' + s.student_id + '" class="student-link">' + esc(s.name || '—') + '</a></td>' +
+                '<td>' + esc(s.school_name || '—') + '</td>' +
+                '<td>' + esc(s.grade || '—') + '</td>' +
+                '<td>' + (s.pre_theta && s.pre_theta !== 'null' ? parseFloat(s.pre_theta).toFixed(2) : '—') + '</td>' +
+                '<td>' + fmtDate(s.last_active) + '</td>' +
+                '<td>' + badges + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    })();
+
+    // ── Student Roster Table ──────────────────────────────────────────────
+    (function() {
+        var tbody = document.getElementById('rosterTbody');
+        document.getElementById('rosterSubtitle').textContent = STUDENTS.length + ' students enrolled';
+        if (!STUDENTS.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No students found.</td></tr>';
+            return;
+        }
+        var recent = STUDENTS.slice().sort(function(a,b){
+            var da = a.last_active ? new Date(a.last_active) : new Date(0);
+            var db = b.last_active ? new Date(b.last_active) : new Date(0);
+            return db - da;
+        }).slice(0, 15);
+        var html = '';
+        recent.forEach(function(s) {
+            var lv = thetaLevel(s.pre_theta) || 'Unplaced';
+            var isActive = (s.status || '').toLowerCase() === 'active' || (s.last_active && new Date(s.last_active) >= cutoff7);
+            var statusHtml = isActive
+                ? '<span><span class="status-dot active"></span>Active</span>'
+                : '<span><span class="status-dot inactive"></span>Inactive</span>';
+            html += '<tr>' +
+                '<td><a href="/TeacherStudents/Details/' + s.student_id + '" class="student-link">' + esc(s.name || '—') + '</a></td>' +
+                '<td>' + esc(s.grade || '—') + '</td>' +
+                '<td>' + (s.pre_theta  && s.pre_theta  !== 'null' ? parseFloat(s.pre_theta ).toFixed(2) : '—') + '</td>' +
+                '<td>' + (s.post_theta && s.post_theta !== 'null' ? parseFloat(s.post_theta).toFixed(2) : '—') + '</td>' +
+                '<td>' + (s.total_xp != null ? Number(s.total_xp).toLocaleString() : '—') + '</td>' +
+                '<td>' + fmtDate(s.last_active) + '</td>' +
+                '<td>' + statusHtml + '</td>' +
+                '</tr>';
+        });
+        tbody.innerHTML = html;
+    })();
+})();
+</script>
+}
