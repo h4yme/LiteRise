@@ -24,8 +24,8 @@ namespace Website.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(string email, string password, string role)
+        [ActionName("Index")]
+        public async Task<ActionResult> LoginPost(string email, string password, string role)
         {
             if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
             {
