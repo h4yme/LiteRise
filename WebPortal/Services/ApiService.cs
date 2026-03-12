@@ -29,13 +29,23 @@ namespace Website.Services
         // ─────────────────────────────────────────────────────────────────────
         public async Task<dynamic> LoginAsync(string email, string password, string role)
         {
-            var payload = JsonConvert.SerializeObject(new { email, password, role });
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            // portal_login.php reads $_POST — must send form-encoded, NOT JSON
+            var content = new System.Net.Http.FormUrlEncodedContent(new[]
+            {
+                new System.Collections.Generic.KeyValuePair<string, string>("email",    email),
+                new System.Collections.Generic.KeyValuePair<string, string>("password", password),
+                new System.Collections.Generic.KeyValuePair<string, string>("role",     role ?? "admin"),
+            });
 
             var response = await _client.PostAsync($"{_baseUrl}/portal_login.php", content);
-            response.EnsureSuccessStatusCode();
 
             var responseString = await response.Content.ReadAsStringAsync();
+
+            // On 4xx the PHP returns a JSON error body — deserialise it so the
+            // caller can surface the API's own message instead of a raw exception
+            if (!response.IsSuccessStatusCode)
+                return JsonConvert.DeserializeObject<dynamic>(responseString);
+
             return JsonConvert.DeserializeObject<dynamic>(responseString);
         }
 
