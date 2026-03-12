@@ -1,0 +1,227 @@
+@{
+    ViewBag.Title = "Students";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/StudentStyles.css")
+
+<div class="students-page">
+
+    <!-- PAGE HEADER -->
+    <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
+        <div>
+            <h2 class="mb-1"><i class="fas fa-user-graduate me-2 text-success"></i>Students</h2>
+            <p class="page-subtitle mb-0">Browse and manage the student roster</p>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="exportCsv()">
+                <i class="fas fa-download me-1"></i>Export CSV
+            </button>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <strong>Warning:</strong> @ViewBag.Error
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- STATS ROW -->
+    <div class="summary-cards" style="grid-template-columns:repeat(4,1fr);">
+        <div class="summary-card">
+            <div class="card-icon blue"><i class="fas fa-users" style="color:#1d4ed8;"></i></div>
+            <div class="card-body">
+                <div class="value" id="statTotal">@(ViewBag.TotalStudents ?? 0)</div>
+                <div class="label">Total Students</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="card-icon green"><i class="fas fa-circle-check" style="color:#15803d;"></i></div>
+            <div class="card-body">
+                <div class="value" id="statActive">—</div>
+                <div class="label">Active (7 days)</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="card-icon yellow"><i class="fas fa-school" style="color:#a16207;"></i></div>
+            <div class="card-body">
+                <div class="value" id="statSchools">—</div>
+                <div class="label">Schools</div>
+            </div>
+        </div>
+        <div class="summary-card">
+            <div class="card-icon red"><i class="fas fa-star" style="color:#b91c1c;"></i></div>
+            <div class="card-body">
+                <div class="value" id="statAvgXp">—</div>
+                <div class="label">Avg XP</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- STUDENT TABLE PANEL -->
+    <div class="accounts-panel">
+        <div class="panel-toolbar">
+            <h3><i class="fas fa-list me-2 text-secondary"></i>Student Roster</h3>
+            <div class="toolbar-filters flex-wrap gap-2">
+                <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search name, school…" style="width:200px;" oninput="filterStudents()">
+                <select id="gradeFilter" class="form-select form-select-sm" style="width:130px;" onchange="filterStudents()">
+                    <option value="">All Grades</option>
+                </select>
+                <select id="schoolFilter" class="form-select form-select-sm" style="width:160px;" onchange="filterStudents()">
+                    <option value="">All Schools</option>
+                </select>
+                <select id="levelFilter" class="form-select form-select-sm" style="width:140px;" onchange="filterStudents()">
+                    <option value="">All Levels</option>
+                    <option value="Beginner">Beginner</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle students-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Grade</th>
+                        <th>School</th>
+                        <th>Level</th>
+                        <th>Pre-θ</th>
+                        <th>Post-θ</th>
+                        <th>XP</th>
+                        <th>Last Active</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="studentTbody">
+                    <tr><td colspan="10" class="text-center text-muted py-4">Loading…</td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center px-3 pb-3">
+            <small class="text-muted" id="rowCount"></small>
+        </div>
+    </div>
+
+</div>
+
+<script>
+var STUDENTS = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+var SCHOOLS  = @Html.Raw(ViewBag.SchoolsJson  ?? "[]");
+
+(function () {
+    // ── Stats ───────────────────────────────────────────────────────────────
+    var cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    var active = STUDENTS.filter(function (s) {
+        return s.last_active && new Date(s.last_active) >= cutoff;
+    }).length;
+    var schoolSet = new Set(STUDENTS.map(function (s) { return s.school_name; }).filter(Boolean));
+    var avgXp = STUDENTS.length
+        ? Math.round(STUDENTS.reduce(function (a, s) { return a + (s.total_xp || 0); }, 0) / STUDENTS.length)
+        : 0;
+
+    document.getElementById('statActive').textContent  = active;
+    document.getElementById('statSchools').textContent = schoolSet.size;
+    document.getElementById('statAvgXp').textContent   = avgXp;
+
+    // ── Populate filter dropdowns ───────────────────────────────────────────
+    var grades  = [...new Set(STUDENTS.map(function (s) { return s.grade; }).filter(Boolean))].sort();
+    var schoolGradeEl = document.getElementById('gradeFilter');
+    grades.forEach(function (g) {
+        var o = document.createElement('option'); o.value = g; o.textContent = 'Grade ' + g;
+        schoolGradeEl.appendChild(o);
+    });
+
+    var schoolEl = document.getElementById('schoolFilter');
+    [...schoolSet].sort().forEach(function (sc) {
+        var o = document.createElement('option'); o.value = sc; o.textContent = sc;
+        schoolEl.appendChild(o);
+    });
+
+    renderTable(STUDENTS);
+})();
+
+function thetaToLevel(t) {
+    if (t === null || t === undefined || t === '') return '—';
+    var v = parseFloat(t);
+    if (isNaN(v)) return '—';
+    if (v < -0.5) return 'Beginner';
+    if (v <= 0.5) return 'Intermediate';
+    return 'Advanced';
+}
+
+function levelBadge(level) {
+    var map = { 'Beginner': 'secondary', 'Intermediate': 'warning', 'Advanced': 'success' };
+    var cls = map[level] || 'light';
+    return '<span class="badge bg-' + cls + '">' + level + '</span>';
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    catch (e) { return d; }
+}
+
+function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderTable(rows) {
+    var tbody = document.getElementById('studentTbody');
+    if (!rows.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="text-center text-muted py-4">No students found.</td></tr>';
+        document.getElementById('rowCount').textContent = '';
+        return;
+    }
+    var html = '';
+    rows.forEach(function (s) {
+        var level = thetaToLevel(s.pre_theta);
+        var status = (s.status || 'active').toLowerCase();
+        var statusBadge = status === 'active'
+            ? '<span class="badge bg-success-subtle text-success">Active</span>'
+            : '<span class="badge bg-secondary-subtle text-secondary">Inactive</span>';
+        html += '<tr>' +
+            '<td><a href="/Student/Details/' + s.id + '" class="student-name-link">' + esc(s.FullName || s.full_name || '—') + '</a></td>' +
+            '<td>' + esc(s.grade || '—') + '</td>' +
+            '<td>' + esc(s.school_name || '—') + '</td>' +
+            '<td>' + levelBadge(level) + '</td>' +
+            '<td>' + (s.pre_theta  != null ? parseFloat(s.pre_theta ).toFixed(2)  : '—') + '</td>' +
+            '<td>' + (s.post_theta != null ? parseFloat(s.post_theta).toFixed(2) : '—') + '</td>' +
+            '<td>' + (s.total_xp   != null ? Number(s.total_xp).toLocaleString() : '—') + '</td>' +
+            '<td>' + fmtDate(s.last_active) + '</td>' +
+            '<td>' + statusBadge + '</td>' +
+            '<td><a href="/Student/Details/' + s.id + '" class="btn btn-sm btn-outline-primary py-0 px-2">View</a></td>' +
+            '</tr>';
+    });
+    tbody.innerHTML = html;
+    document.getElementById('rowCount').textContent = 'Showing ' + rows.length + ' of ' + STUDENTS.length + ' students';
+}
+
+function filterStudents() {
+    var q      = document.getElementById('searchInput').value.trim().toLowerCase();
+    var grade  = document.getElementById('gradeFilter').value;
+    var school = document.getElementById('schoolFilter').value;
+    var level  = document.getElementById('levelFilter').value;
+
+    var filtered = STUDENTS.filter(function (s) {
+        var name   = (s.FullName || s.full_name || '').toLowerCase();
+        var sname  = (s.school_name || '').toLowerCase();
+        if (q && !name.includes(q) && !sname.includes(q)) return false;
+        if (grade  && String(s.grade)       !== grade)  return false;
+        if (school && (s.school_name || '') !== school) return false;
+        if (level  && thetaToLevel(s.pre_theta) !== level) return false;
+        return true;
+    });
+    renderTable(filtered);
+}
+
+function exportCsv() {
+    window.location.href = '/Student/ExportCsv';
+}
+</script>
+
+@Scripts.Render("~/Scripts/StudentScript.js")

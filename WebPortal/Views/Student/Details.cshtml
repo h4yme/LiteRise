@@ -1,0 +1,216 @@
+@{
+    ViewBag.Title = "Student Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/StudentStyles.css")
+
+<div class="students-page">
+
+    <div class="mb-3">
+        <a href="/Student/Index" class="btn btn-sm btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i>Back to Students
+        </a>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning" role="alert">
+            <strong>Warning:</strong> @ViewBag.Error
+        </div>
+    }
+
+    <!-- PROFILE HEADER -->
+    <div class="student-profile-header mb-4" id="profileHeader">
+        <div class="profile-avatar" id="profileAvatar">—</div>
+        <div class="profile-info">
+            <h2 id="profileName">Loading…</h2>
+            <p class="text-muted mb-1" id="profileMeta"></p>
+            <span class="badge" id="profileLevel">—</span>
+        </div>
+        <div class="profile-stats ms-auto d-flex gap-4">
+            <div class="text-center">
+                <div class="fs-4 fw-bold text-success" id="profileXp">—</div>
+                <div class="small text-muted">Total XP</div>
+            </div>
+            <div class="text-center">
+                <div class="fs-4 fw-bold text-primary" id="profileLessons">—</div>
+                <div class="small text-muted">Lessons Done</div>
+            </div>
+            <div class="text-center">
+                <div class="fs-4 fw-bold text-warning" id="profileBadges">—</div>
+                <div class="small text-muted">Badges</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TABS -->
+    <ul class="nav nav-tabs mb-3" id="profileTabs">
+        <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tabProfile">Profile</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabAssessment">Assessment</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabLessons">Lessons</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabGames">Games</a></li>
+        <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tabBadges">Badges</a></li>
+    </ul>
+
+    <div class="tab-content">
+
+        <!-- TAB 1: Profile -->
+        <div class="tab-pane fade show active" id="tabProfile">
+            <div class="accounts-panel p-4" id="profileTable">
+                <p class="text-muted">Loading…</p>
+            </div>
+        </div>
+
+        <!-- TAB 2: Assessment -->
+        <div class="tab-pane fade" id="tabAssessment">
+            <div class="accounts-panel p-4" id="assessmentContent">
+                <p class="text-muted">Loading…</p>
+            </div>
+        </div>
+
+        <!-- TAB 3: Lessons -->
+        <div class="tab-pane fade" id="tabLessons">
+            <div class="accounts-panel" id="lessonsContent">
+                <p class="text-muted p-4">Loading…</p>
+            </div>
+        </div>
+
+        <!-- TAB 4: Games -->
+        <div class="tab-pane fade" id="tabGames">
+            <div class="accounts-panel" id="gamesContent">
+                <p class="text-muted p-4">Loading…</p>
+            </div>
+        </div>
+
+        <!-- TAB 5: Badges -->
+        <div class="tab-pane fade" id="tabBadges">
+            <div class="accounts-panel p-4" id="badgesContent">
+                <p class="text-muted">Loading…</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+var PROFILE   = @Html.Raw(ViewBag.ProfileJson   ?? "{}");
+var PLACEMENT = @Html.Raw(ViewBag.PlacementJson ?? "{}");
+var PROGRESS  = @Html.Raw(ViewBag.ProgressJson  ?? "[]");
+var LADDER    = @Html.Raw(ViewBag.LadderJson    ?? "[]");
+var GAMES     = @Html.Raw(ViewBag.GamesJson     ?? "[]");
+var BADGES    = @Html.Raw(ViewBag.BadgesJson    ?? "[]");
+
+function esc(s) {
+    return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function thetaToLevel(t) {
+    if (t == null || t === '') return '—';
+    var v = parseFloat(t);
+    if (isNaN(v)) return '—';
+    if (v < -0.5) return 'Beginner';
+    if (v <= 0.5) return 'Intermediate';
+    return 'Advanced';
+}
+
+function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    catch(e) { return d; }
+}
+
+function infoRow(label, value) {
+    return '<tr><th class="text-muted fw-normal" style="width:200px">' + esc(label) + '</th><td>' + esc(String(value ?? '—')) + '</td></tr>';
+}
+
+(function initProfile() {
+    var p = PROFILE;
+    var name = p.FullName || p.full_name || p.name || 'Student';
+    var initials = name.trim().split(/\s+/).map(function(w){ return w[0]; }).join('').substring(0,2).toUpperCase();
+
+    document.getElementById('profileAvatar').textContent = initials;
+    document.getElementById('profileName').textContent   = name;
+    document.getElementById('profileMeta').textContent   = [p.grade ? 'Grade ' + p.grade : null, p.school_name, p.barangay].filter(Boolean).join(' · ');
+
+    var level = p.placement_level || thetaToLevel(p.pre_theta);
+    var levelMap = { beginner: 'bg-secondary', intermediate: 'bg-warning text-dark', advanced: 'bg-success' };
+    var levelEl = document.getElementById('profileLevel');
+    levelEl.textContent = level ? (level.charAt(0).toUpperCase() + level.slice(1)) : '—';
+    levelEl.className = 'badge ' + (levelMap[level] || 'bg-light text-dark');
+
+    document.getElementById('profileXp').textContent      = p.total_xp != null ? Number(p.total_xp).toLocaleString() : '—';
+    document.getElementById('profileLessons').textContent = p.lessons_done != null ? p.lessons_done : '—';
+    document.getElementById('profileBadges').textContent  = Array.isArray(BADGES) ? BADGES.length : '—';
+
+    // Profile table
+    document.getElementById('profileTable').innerHTML =
+        '<table class="table table-borderless mb-0">' +
+        infoRow('Full Name', name) +
+        infoRow('Grade', p.grade) +
+        infoRow('School', p.school_name) +
+        infoRow('Barangay', p.barangay) +
+        infoRow('Email', p.email) +
+        infoRow('Status', p.status) +
+        infoRow('Last Active', fmtDate(p.last_active)) +
+        infoRow('Registered', fmtDate(p.created_at || p.registered_at)) +
+        '</table>';
+
+    // Assessment tab
+    var pl = PLACEMENT;
+    document.getElementById('assessmentContent').innerHTML =
+        '<table class="table table-borderless mb-0">' +
+        infoRow('Pre-Assessment θ', pl.pre_theta != null ? parseFloat(pl.pre_theta).toFixed(3) : (p.pre_theta != null ? parseFloat(p.pre_theta).toFixed(3) : '—')) +
+        infoRow('Post-Assessment θ', pl.post_theta != null ? parseFloat(pl.post_theta).toFixed(3) : (p.post_theta != null ? parseFloat(p.post_theta).toFixed(3) : '—')) +
+        infoRow('Placement Level', pl.placement_level || p.placement_level || '—') +
+        infoRow('Growth (Δθ)', (pl.pre_theta != null && pl.post_theta != null) ? (parseFloat(pl.post_theta) - parseFloat(pl.pre_theta)).toFixed(3) : '—') +
+        infoRow('Date Taken', fmtDate(pl.created_at || pl.date_taken)) +
+        '</table>';
+
+    // Lessons tab
+    var lessons = Array.isArray(PROGRESS) ? PROGRESS : [];
+    if (!lessons.length) {
+        document.getElementById('lessonsContent').innerHTML = '<p class="text-muted p-4">No lesson progress recorded.</p>';
+    } else {
+        var lHtml = '<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Lesson</th><th>Module</th><th>Score</th><th>Completed</th></tr></thead><tbody>';
+        lessons.forEach(function(l) {
+            lHtml += '<tr><td>' + esc(l.lesson_title || l.lesson_name || '—') + '</td>' +
+                '<td>' + esc(l.module_title || l.module_name || '—') + '</td>' +
+                '<td>' + (l.score != null ? l.score + '%' : '—') + '</td>' +
+                '<td>' + fmtDate(l.completed_at || l.date_completed) + '</td></tr>';
+        });
+        document.getElementById('lessonsContent').innerHTML = lHtml + '</tbody></table></div>';
+    }
+
+    // Games tab
+    var games = Array.isArray(GAMES) ? GAMES : [];
+    if (!games.length) {
+        document.getElementById('gamesContent').innerHTML = '<p class="text-muted p-4">No game results recorded.</p>';
+    } else {
+        var gHtml = '<div class="table-responsive"><table class="table align-middle"><thead><tr><th>Game</th><th>Score</th><th>XP Earned</th><th>Played</th></tr></thead><tbody>';
+        games.forEach(function(g) {
+            gHtml += '<tr><td>' + esc(g.game_type || g.game_name || '—') + '</td>' +
+                '<td>' + (g.score != null ? g.score : '—') + '</td>' +
+                '<td>' + (g.xp_earned != null ? g.xp_earned : '—') + '</td>' +
+                '<td>' + fmtDate(g.played_at || g.created_at) + '</td></tr>';
+        });
+        document.getElementById('gamesContent').innerHTML = gHtml + '</tbody></table></div>';
+    }
+
+    // Badges tab
+    var badges = Array.isArray(BADGES) ? BADGES : [];
+    if (!badges.length) {
+        document.getElementById('badgesContent').innerHTML = '<p class="text-muted">No badges earned yet.</p>';
+    } else {
+        var bHtml = '<div class="d-flex flex-wrap gap-3">';
+        badges.forEach(function(b) {
+            bHtml += '<div class="badge-card text-center p-3" style="width:130px;background:#f9fafb;border-radius:10px;">' +
+                '<div class="fs-2 mb-1">' + esc(b.icon || '🏅') + '</div>' +
+                '<div class="small fw-semibold">' + esc(b.name || b.badge_name || '—') + '</div>' +
+                '<div class="text-muted" style="font-size:11px">' + fmtDate(b.earned_at || b.awarded_at) + '</div>' +
+                '</div>';
+        });
+        document.getElementById('badgesContent').innerHTML = bHtml + '</div>';
+    }
+})();
+</script>
