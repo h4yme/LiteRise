@@ -35,27 +35,40 @@ namespace Website.Controllers
             ViewBag.StudentsJson = JsonConvert.SerializeObject(students);
 
             // ── Aggregate totals ──────────────────────────────────────────────
-            int total     = students.Count;
-            int preCount  = students.Count(s => s.pre_theta  != null);
-            int postCount = students.Count(s => s.post_theta != null);
+            int total     = 0;
+            int preCount  = 0;
+            int postCount = 0;
+            int beginnerCount     = 0;
+            int intermediateCount = 0;
+            int advancedCount     = 0;
+            double avgPreTheta    = 0;
+            double avgPostTheta   = 0;
+            double avgGrowth      = 0;
 
-            // Level counts (placement_level field)
-            int beginnerCount     = students.Count(s => (string)s.placement_level == "beginner");
-            int intermediateCount = students.Count(s => (string)s.placement_level == "intermediate");
-            int advancedCount     = students.Count(s => (string)s.placement_level == "advanced");
+            try
+            {
+                total     = students.Count;
+                preCount  = students.Count(s => (double?)s.pre_theta  != null);
+                postCount = students.Count(s => (double?)s.post_theta != null);
 
-            // Average pre / post theta (only over students that have values)
-            double avgPreTheta  = 0;
-            double avgPostTheta = 0;
-            double avgGrowth    = 0;
+                // Level counts (placement_level field)
+                beginnerCount     = students.Count(s => (string)s.placement_level == "beginner");
+                intermediateCount = students.Count(s => (string)s.placement_level == "intermediate");
+                advancedCount     = students.Count(s => (string)s.placement_level == "advanced");
 
-            var preStudents  = students.Where(s => s.pre_theta  != null).ToList();
-            var postStudents = students.Where(s => s.post_theta != null).ToList();
-            var bothStudents = students.Where(s => s.pre_theta  != null && s.post_theta != null).ToList();
+                // Average pre / post theta (only over students that have numeric values)
+                var preStudents  = students.Where(s => (double?)s.pre_theta  != null).ToList();
+                var postStudents = students.Where(s => (double?)s.post_theta != null).ToList();
+                var bothStudents = students.Where(s => (double?)s.pre_theta  != null && (double?)s.post_theta != null).ToList();
 
-            if (preStudents.Count  > 0) avgPreTheta  = preStudents .Average(s => (double)s.pre_theta);
-            if (postStudents.Count > 0) avgPostTheta = postStudents.Average(s => (double)s.post_theta);
-            if (bothStudents.Count > 0) avgGrowth    = bothStudents.Average(s => (double)s.post_theta - (double)s.pre_theta);
+                if (preStudents.Count  > 0) avgPreTheta  = preStudents .Average(s => (double)s.pre_theta);
+                if (postStudents.Count > 0) avgPostTheta = postStudents.Average(s => (double)s.post_theta);
+                if (bothStudents.Count > 0) avgGrowth    = bothStudents.Average(s => (double)s.post_theta - (double)s.pre_theta);
+            }
+            catch
+            {
+                // Server-side stat cards default to 0; charts are computed client-side from STUDENTS_DATA
+            }
 
             // ── ViewBag assignments ───────────────────────────────────────────
             ViewBag.TotalStudents      = total;
@@ -97,8 +110,9 @@ namespace Website.Controllers
 
             foreach (var s in students)
             {
-                if (s.pre_theta == null) continue;
-                double theta = (double)s.pre_theta;
+                double? preVal = (double?)s.pre_theta;
+                if (preVal == null) continue;
+                double theta = preVal.Value;
 
                 if      (theta >= -3   && theta < -2  ) bucketCounts[0]++;
                 else if (theta >= -2   && theta < -1  ) bucketCounts[1]++;
@@ -114,7 +128,7 @@ namespace Website.Controllers
             int begCount  = students.Count(s => (string)s.placement_level == "beginner");
             int intCount  = students.Count(s => (string)s.placement_level == "intermediate");
             int advCount  = students.Count(s => (string)s.placement_level == "advanced");
-            int nullCount = students.Count(s => s.placement_level == null);
+            int nullCount = students.Count(s => (double?)s.pre_theta == null);
 
             // ── Pre vs Post theta per school ──────────────────────────────────
             var schoolGroups = students
@@ -122,11 +136,11 @@ namespace Website.Controllers
                 .Select(g => new
                 {
                     school      = g.Key,
-                    avgPre      = g.Where(s => s.pre_theta  != null).Any()
-                                    ? Math.Round(g.Where(s => s.pre_theta  != null).Average(s => (double)s.pre_theta),  3)
+                    avgPre      = g.Where(s => (double?)s.pre_theta  != null).Any()
+                                    ? Math.Round(g.Where(s => (double?)s.pre_theta  != null).Average(s => (double)s.pre_theta),  3)
                                     : (double?)null,
-                    avgPost     = g.Where(s => s.post_theta != null).Any()
-                                    ? Math.Round(g.Where(s => s.post_theta != null).Average(s => (double)s.post_theta), 3)
+                    avgPost     = g.Where(s => (double?)s.post_theta != null).Any()
+                                    ? Math.Round(g.Where(s => (double?)s.post_theta != null).Average(s => (double)s.post_theta), 3)
                                     : (double?)null,
                     studentCount= g.Count()
                 })

@@ -44,45 +44,85 @@ namespace Website.Controllers
             ViewBag.StudentsJson = JsonConvert.SerializeObject(students);
 
             // ── Aggregate totals ──────────────────────────────────────────────
-            int total     = students.Count;
-            int preCount  = students.Count(s => s.pre_theta  != null);
-            int postCount = students.Count(s => s.post_theta != null);
+            int total             = 0;
+            int preCount          = 0;
+            int postCount         = 0;
+            int beginnerCount     = 0;
+            int intermediateCount = 0;
+            int advancedCount     = 0;
+            double avgPreTheta    = 0;
+            double avgPostTheta   = 0;
+            double avgGrowth      = 0;
+            double avgLessonsDone = 0;
+            double lessonCompletionRate = 0;
+            double avgStreak      = 0;
+            int activeCount       = 0;
+            double activePercent  = 0;
+            double avgXp          = 0;
+            string schoolName     = "My School";
 
-            // Level distribution from placement_level field
-            int beginnerCount     = students.Count(s => (string)s.placement_level == "beginner");
-            int intermediateCount = students.Count(s => (string)s.placement_level == "intermediate");
-            int advancedCount     = students.Count(s => (string)s.placement_level == "advanced");
+            try
+            {
+                total     = students.Count;
+                preCount  = students.Count(s => (double?)s.pre_theta  != null);
+                postCount = students.Count(s => (double?)s.post_theta != null);
 
-            // Average pre / post theta (only over students that have values)
-            double avgPreTheta  = 0;
-            double avgPostTheta = 0;
-            double avgGrowth    = 0;
+                // Level distribution from placement_level field
+                beginnerCount     = students.Count(s => (string)s.placement_level == "beginner");
+                intermediateCount = students.Count(s => (string)s.placement_level == "intermediate");
+                advancedCount     = students.Count(s => (string)s.placement_level == "advanced");
 
-            var preStudents  = students.Where(s => s.pre_theta  != null).ToList();
-            var postStudents = students.Where(s => s.post_theta != null).ToList();
-            var bothStudents = students.Where(s => s.pre_theta  != null && s.post_theta != null).ToList();
+                var preStudents  = students.Where(s => (double?)s.pre_theta  != null).ToList();
+                var postStudents = students.Where(s => (double?)s.post_theta != null).ToList();
+                var bothStudents = students.Where(s => (double?)s.pre_theta  != null && (double?)s.post_theta != null).ToList();
 
-            if (preStudents.Count  > 0) avgPreTheta  = preStudents .Average(s => (double)s.pre_theta);
-            if (postStudents.Count > 0) avgPostTheta = postStudents.Average(s => (double)s.post_theta);
-            if (bothStudents.Count > 0) avgGrowth    = bothStudents.Average(s =>
-                (double)s.post_theta - (double)s.pre_theta);
+                if (preStudents.Count  > 0) avgPreTheta  = preStudents .Average(s => (double)s.pre_theta);
+                if (postStudents.Count > 0) avgPostTheta = postStudents.Average(s => (double)s.post_theta);
+                if (bothStudents.Count > 0) avgGrowth    = bothStudents.Average(s =>
+                    (double)s.post_theta - (double)s.pre_theta);
 
-            // Average lessons done
-            double avgLessonsDone = total > 0
-                ? students.Average(s => s.lessons_done != null ? (double)s.lessons_done : 0.0)
-                : 0;
+                // Average lessons done
+                avgLessonsDone = total > 0
+                    ? students.Average(s => (double?)s.lessons_done != null ? (double)s.lessons_done : 0.0)
+                    : 0;
 
-            // Lesson completion rate (lessons_done / total modules = 13 assumed)
-            const int totalModules = 13;
-            double lessonCompletionRate = avgLessonsDone > 0
-                ? Math.Min(Math.Round(avgLessonsDone / totalModules * 100, 1), 100)
-                : 0;
+                // Lesson completion rate (lessons_done / total modules = 13 assumed)
+                const int totalModules = 13;
+                lessonCompletionRate = avgLessonsDone > 0
+                    ? Math.Min(Math.Round(avgLessonsDone / totalModules * 100, 1), 100)
+                    : 0;
+
+                // Engagement stats
+                avgStreak = total > 0
+                    ? students.Average(s => (double?)s.streak_days != null ? (double)s.streak_days : 0.0)
+                    : 0;
+
+                activeCount = students.Count(s =>
+                {
+                    if (s.last_active == null) return false;
+                    if (DateTime.TryParse((string)s.last_active, out DateTime lastActive))
+                        return (DateTime.UtcNow - lastActive).TotalDays <= 7;
+                    return false;
+                });
+
+                activePercent = total > 0
+                    ? Math.Round((double)activeCount / total * 100, 1)
+                    : 0;
+
+                avgXp = total > 0
+                    ? students.Average(s => (double?)s.total_xp != null ? (double)s.total_xp : 0.0)
+                    : 0;
+
+                schoolName = students.Count > 0
+                    ? (string)students[0].school_name ?? "My School"
+                    : "My School";
+            }
+            catch
+            {
+                // Server-side stat cards default to 0; charts computed client-side from STUDENTS_DATA
+            }
 
             // ── Category averages placeholder ─────────────────────────────────
-            // Per-student category progress requires a dedicated per-student
-            // placement endpoint. These are computed client-side from placement
-            // progress data fetched via the "Load Category Scores" button.
-            // Server-side placeholder values reflect class-level estimates only.
             var categoryAverages = new
             {
                 phonics        = 0,
@@ -92,32 +132,6 @@ namespace Website.Controllers
                 creatingText   = 0,
                 note           = "Category data loaded client-side via per-student fetch."
             };
-
-            // ── Engagement stats ──────────────────────────────────────────────
-            double avgStreak = total > 0
-                ? students.Average(s => s.streak_days != null ? (double)s.streak_days : 0.0)
-                : 0;
-
-            int activeCount = students.Count(s =>
-            {
-                if (s.last_active == null) return false;
-                if (DateTime.TryParse((string)s.last_active, out DateTime lastActive))
-                    return (DateTime.UtcNow - lastActive).TotalDays <= 7;
-                return false;
-            });
-
-            double activePercent = total > 0
-                ? Math.Round((double)activeCount / total * 100, 1)
-                : 0;
-
-            double avgXp = total > 0
-                ? students.Average(s => s.total_xp != null ? (double)s.total_xp : 0.0)
-                : 0;
-
-            // ── School name (from first student record) ───────────────────────
-            string schoolName = students.Count > 0
-                ? (string)students[0].school_name ?? "My School"
-                : "My School";
 
             // ── ViewBag assignments ───────────────────────────────────────────
             ViewBag.TotalStudents         = total;

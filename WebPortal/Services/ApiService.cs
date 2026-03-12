@@ -131,11 +131,18 @@ namespace Website.Services
         // ─────────────────────────────────────────────────────────────────────
         public async Task<dynamic> GetBadgesAsync(int studentId)
         {
-            var response = await _client.GetAsync($"{_baseUrl}/get_badges.php?student_id={studentId}");
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                var response = await _client.GetAsync($"{_baseUrl}/get_badges.php?student_id={studentId}");
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<dynamic>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<dynamic>(responseString);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -160,14 +167,21 @@ namespace Website.Services
         // ─────────────────────────────────────────────────────────────────────
         public async Task<dynamic> GetAssessmentItemsAsync()
         {
-            var payload = JsonConvert.SerializeObject(new { });
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            try
+            {
+                var payload = JsonConvert.SerializeObject(new { });
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"{_baseUrl}/get_preassessment_items.php", content);
-            response.EnsureSuccessStatusCode();
+                var response = await _client.PostAsync($"{_baseUrl}/get_preassessment_items.php", content);
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<dynamic>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<dynamic>(responseString);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -176,14 +190,21 @@ namespace Website.Services
         // ─────────────────────────────────────────────────────────────────────
         public async Task<dynamic> GetQuizQuestionsAsync(int nodeId)
         {
-            var payload = JsonConvert.SerializeObject(new { node_id = nodeId });
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            try
+            {
+                var payload = JsonConvert.SerializeObject(new { node_id = nodeId });
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"{_baseUrl}/get_quiz_questions.php", content);
-            response.EnsureSuccessStatusCode();
+                var response = await _client.PostAsync($"{_baseUrl}/get_quiz_questions.php", content);
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<dynamic>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<dynamic>(responseString);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -192,14 +213,21 @@ namespace Website.Services
         // ─────────────────────────────────────────────────────────────────────
         public async Task<dynamic> GetLessonProgressAsync(int studentId)
         {
-            var payload = JsonConvert.SerializeObject(new { student_id = studentId });
-            var content = new StringContent(payload, Encoding.UTF8, "application/json");
+            try
+            {
+                var payload = JsonConvert.SerializeObject(new { student_id = studentId });
+                var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-            var response = await _client.PostAsync($"{_baseUrl}/get_lesson_progress.php", content);
-            response.EnsureSuccessStatusCode();
+                var response = await _client.PostAsync($"{_baseUrl}/get_lesson_progress.php", content);
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<dynamic>(responseString);
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JsonConvert.DeserializeObject<dynamic>(responseString);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
