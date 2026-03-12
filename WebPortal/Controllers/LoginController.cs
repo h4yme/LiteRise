@@ -30,14 +30,14 @@ namespace Website.Controllers
                 var result = await api.PortalLoginAsync(email.Trim(), password, role ?? "admin");
 
                 if (result == null)
-                    return Content("DEBUG: API returned null — check ApiBaseUrl in web.config", "text/plain");
+                {
+                    ViewBag.Error = "No response from server. Check API connection.";
+                    return View("LoginView");
+                }
 
-                // ── Serialise to JObject so we can inspect actual field names ──
                 var json = JsonConvert.SerializeObject(result);
                 var obj  = JObject.Parse(json);
 
-                // DEBUG: return raw JSON so we can see the real API response shape
-                // Remove this block once login works
                 string token = obj.Value<string>("token")
                             ?? obj.Value<string>("auth_token")
                             ?? obj.Value<string>("access_token")
@@ -47,9 +47,13 @@ namespace Website.Controllers
                 bool   success = obj.Value<bool?>("success") ?? false;
 
                 if (string.IsNullOrEmpty(token) && status != "success" && !success)
-                    return Content("DEBUG API RESPONSE:\n" + json, "text/plain");
+                {
+                    ViewBag.Error = obj.Value<string>("message")
+                                 ?? obj.Value<string>("error")
+                                 ?? "Invalid credentials. Please try again.";
+                    return View("LoginView");
+                }
 
-                // If the API returned success but token is nested, try data object
                 if (string.IsNullOrEmpty(token))
                 {
                     var data = obj["data"] as JObject;
@@ -59,9 +63,14 @@ namespace Website.Controllers
                 }
 
                 if (string.IsNullOrEmpty(token))
-                    return Content("DEBUG: success=true but no token found.\nFull response:\n" + json, "text/plain");
+                {
+                    ViewBag.Error = "Login succeeded but no token was returned.";
+                    return View("LoginView");
+                }
 
                 // ── Persist session ───────────────────────────────────────────
+                // AuthFilter checks Session["UserId"] — must be set for auth to pass
+                Session["UserId"]    = obj.Value<string>("user_id") ?? obj["user_id"]?.ToString();
                 Session["AuthToken"] = token;
                 Session["UserRole"]  = obj.Value<string>("role")
                                     ?? obj.Value<string>("user_role")
@@ -79,7 +88,8 @@ namespace Website.Controllers
             }
             catch (Exception ex)
             {
-                return Content("DEBUG EXCEPTION: " + ex.GetType().Name + "\n" + ex.Message + "\n\n" + ex.ToString(), "text/plain");
+                ViewBag.Error = "Login failed: " + ex.Message;
+                return View("LoginView");
             }
         }
 
