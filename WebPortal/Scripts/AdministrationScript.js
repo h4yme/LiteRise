@@ -269,16 +269,21 @@ async function saveAdmin() {
 
 // ─── Deactivate flow ──────────────────────────────────────────────────────────
 function deactivateAdmin(id, name) {
-    _pendingDeactivateId = id;
-
-    const nameEl = document.getElementById('deactivateName');
-    if (nameEl) nameEl.textContent = name;
-
-    const confirmBtn = document.getElementById('confirmDeactivateBtn');
-    if (confirmBtn) confirmBtn.dataset.pendingId = id;
-
-    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('deactivateModal'));
-    modal.show();
+    Swal.fire({
+        title: 'Deactivate Account',
+        html: 'You are about to deactivate the account for:<br><strong>' + name + '</strong><br><small style="color:#6b7280">This will prevent them from logging in. You can reactivate at any time.</small>',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#DC2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Confirm Deactivate',
+        cancelButtonText: 'Cancel'
+    }).then(function (result) {
+        if (result.isConfirmed) {
+            _pendingDeactivateId = id;
+            confirmDeactivate();
+        }
+    });
 }
 
 async function confirmDeactivate() {
@@ -288,9 +293,6 @@ async function confirmDeactivate() {
     try {
         const res = await postJson('/Administration/DeactivateAdmin', { id });
         if (!res.ok) throw new Error(`Server responded ${res.status}`);
-
-        const modal = bootstrap.Modal.getInstance(document.getElementById('deactivateModal'));
-        if (modal) modal.hide();
 
         showToast('Account deactivated.', 'success');
         _pendingDeactivateId = null;
@@ -377,8 +379,6 @@ function bindEvents() {
     // Role change inside modal
     document.getElementById('aRole')?.addEventListener('change', handleAdminRoleChange);
 
-    // Confirm deactivate
-    document.getElementById('confirmDeactivateBtn')?.addEventListener('click', confirmDeactivate);
 }
 
 // ─── Entry point ──────────────────────────────────────────────────────────────

@@ -246,29 +246,48 @@
             scheduledFor: sendNow ? null : scheduledFor
         };
 
-        // Disable send button to prevent double submit
-        var sendBtn = document.getElementById('sendNotifBtn');
-        if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = sendNow ? 'Sending…' : 'Scheduling…'; }
+        function doSend() {
+            // Disable send button to prevent double submit
+            var sendBtn = document.getElementById('sendNotifBtn');
+            if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = sendNow ? 'Sending…' : 'Scheduling…'; }
 
-        fetch('/Notifications/SendNotification', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify(payload)
-        })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res && res.success === false) throw new Error(res.message || 'Operation failed.');
-                var msg = sendNow ? 'Notification sent successfully.' : 'Notification scheduled successfully.';
-                showToast(msg, 'success');
-                clearCompose();
-                loadNotifications();
+            fetch('/Notifications/SendNotification', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify(payload)
             })
-            .catch(function (err) {
-                showToast(err.message || 'Failed to send notification.', 'danger');
-            })
-            .finally(function () {
-                if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = sendNow ? 'Send Now' : 'Schedule'; }
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res && res.success === false) throw new Error(res.message || 'Operation failed.');
+                    var msg = sendNow ? 'Notification sent successfully.' : 'Notification scheduled successfully.';
+                    showToast(msg, 'success');
+                    clearCompose();
+                    loadNotifications();
+                })
+                .catch(function (err) {
+                    showToast(err.message || 'Failed to send notification.', 'danger');
+                })
+                .finally(function () {
+                    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = sendNow ? 'Send Now' : 'Schedule'; }
+                });
+        }
+
+        if (!target || target === 'All') {
+            Swal.fire({
+                title: 'Confirm Send',
+                html: 'You are about to send a notification to <strong>ALL students</strong>.<br><small style="color:#6b7280">This action cannot be undone.</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#11B067',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, Send',
+                cancelButtonText: 'Cancel'
+            }).then(function (result) {
+                if (result.isConfirmed) doSend();
             });
+        } else {
+            doSend();
+        }
     }
 
     function clearCompose() {

@@ -40,6 +40,8 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewBag.Title - LiteRise</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
              /* ── Bootstrap 3 Glyphicons (offline-safe subset) ──────────── */
              @@font-face {
@@ -628,26 +630,6 @@
         </div>
     </div>
 
-    <!-- ══ LOGOUT MODAL ═════════════════════════════════════════ -->
-    <div id="logoutModal" class="logout-modal">
-        <div class="logout-modal-content">
-            <button class="logout-modal-close" id="logoutModalClose" aria-label="Close modal">&times;</button>
-            <div class="logout-modal-icon">
-                <svg viewBox="0 0 100 100" fill="none">
-                    <circle cx="50" cy="50" r="45" fill="#FEE2E2" />
-                    <path d="M50 30C38.95 30 30 38.95 30 50C30 61.05 38.95 70 50 70C61.05 70 70 61.05 70 50C70 38.95 61.05 30 50 30ZM54 55H46V47H54V55ZM54 43H46V35H54V43Z"
-                          fill="#DC2626" />
-                </svg>
-            </div>
-            <h2>Log Out</h2>
-            <p>Are you sure you want to log out?</p>
-            <div class="logout-modal-buttons">
-                <button class="btn-logout-cancel" id="btnLogoutCancel">Cancel</button>
-                <button class="btn-logout-confirm" id="btnLogoutConfirm">Yes, Log Out</button>
-            </div>
-        </div>
-    </div>
-
     @RenderSection("modals", required: false)
     @RenderSection("scripts", required: false)
 
@@ -716,24 +698,28 @@
         document.addEventListener('click', function (e) {
             if (!e.target.closest('.dropdown-container')) closeAllDropdowns();
         });
-        // ── Logout modal ───────────────────────────────────────────
-        var logoutLink  = document.getElementById('logoutLink');
-        var logoutModal = document.getElementById('logoutModal');
-        var modalClose  = document.getElementById('logoutModalClose');
-        var btnCancel   = document.getElementById('btnLogoutCancel');
-        var btnConfirm  = document.getElementById('btnLogoutConfirm');
-        var LOGOUT_URL  = '@Url.Action("Logout", "Login")';
-        function openLogoutModal()  { if (logoutModal) logoutModal.classList.add('show'); }
-        function closeLogoutModal() { if (logoutModal) logoutModal.classList.remove('show'); }
-        if (logoutLink)  logoutLink.addEventListener('click', openLogoutModal);
-        if (modalClose)  modalClose.addEventListener('click', closeLogoutModal);
-        if (btnCancel)   btnCancel.addEventListener('click', closeLogoutModal);
-        if (btnConfirm)  btnConfirm.addEventListener('click', function () {
-            window.location.href = LOGOUT_URL || '/Login/Logout';
-        });
-        if (logoutModal) logoutModal.addEventListener('click', function (e) {
-            if (e.target === logoutModal) closeLogoutModal();
-        });
+        // ── Logout confirmation ────────────────────────────────────
+        var logoutLink = document.getElementById('logoutLink');
+        var LOGOUT_URL = '@Url.Action("Logout", "Login")';
+        if (logoutLink) {
+            logoutLink.addEventListener('click', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Log Out',
+                    text: 'Are you sure you want to log out?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#DC2626',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, Log Out',
+                    cancelButtonText: 'Cancel'
+                }).then(function (result) {
+                    if (result.isConfirmed) {
+                        window.location.href = LOGOUT_URL || '/Login/Logout';
+                    }
+                });
+            });
+        }
     })();
     </script>
 </body>

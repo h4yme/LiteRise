@@ -748,10 +748,21 @@
     }
 
     function deactivateAdmin(id, name) {
-        pendingDeactivateId = id;
-        var nameEl = document.getElementById('deactivateName');
-        if (nameEl) nameEl.textContent = name || 'this administrator';
-        showModal('deactivateModal');
+        Swal.fire({
+            title: 'Confirm Deactivation',
+            html: 'Are you sure you want to deactivate <strong>' + escHtml(name || 'this administrator') + '</strong>?<br><small style="color:#6b7280">They will no longer be able to log in until reactivated.</small>',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#DC2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Deactivate',
+            cancelButtonText: 'Cancel'
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                pendingDeactivateId = id;
+                confirmDeactivate();
+            }
+        });
     }
 
     function confirmDeactivate() {
@@ -765,7 +776,6 @@
             .then(function (r) { return r.json(); })
             .then(function (res) {
                 if (res && res.success === false) throw new Error(res.message || 'Operation failed.');
-                hideModal('deactivateModal');
                 showToast('Administrator status updated.', 'success');
                 pendingDeactivateId = null;
                 loadAdmins();
