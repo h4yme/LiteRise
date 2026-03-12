@@ -278,5 +278,23 @@ namespace Website.Services
                 return null;
             }
         }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // COMPATIBILITY ALIASES
+        // These methods map legacy names used by existing controllers to the
+        // canonical implementations above.
+        // ═════════════════════════════════════════════════════════════════════
+
+        /// <summary>Alias for LoginAsync — used by LoginController.</summary>
+        public Task<dynamic> PortalLoginAsync(string email, string password, string role)
+            => LoginAsync(email, password, role);
+
+        /// <summary>Alias for GetAllStudentsAsync — used by Dashboard/Student/TeacherDashboard/TeacherStudents controllers.</summary>
+        public Task<System.Collections.Generic.List<dynamic>> GetStudentsAsync(int? schoolId = null)
+            => GetAllStudentsAsync(schoolId);
+
+        /// <summary>Alias for GetNodeProgressAsync — used by Student/TeacherStudents detail pages.</summary>
+        public Task<dynamic> GetStudentProgressAsync(int studentId)
+            => GetNodeProgressAsync(studentId);
     }
 }
