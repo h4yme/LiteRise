@@ -29,33 +29,41 @@
     }
 
     <!-- STATS ROW -->
-    <div class="summary-cards">
-        <div class="summary-card">
-            <div class="card-icon blue"><i class="fas fa-users" style="color:#1d4ed8;"></i></div>
-            <div class="card-body">
-                <div class="value" id="statTotal">@(ViewBag.TotalStudents ?? 0)</div>
-                <div class="label">Total Students</div>
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="summary-card d-flex align-items-center gap-3">
+                <div class="card-icon blue"><i class="fas fa-users" style="color:#1d4ed8;"></i></div>
+                <div>
+                    <div class="sc-value" id="statTotal">@(ViewBag.TotalStudents ?? 0)</div>
+                    <div class="sc-label">Total Students</div>
+                </div>
             </div>
         </div>
-        <div class="summary-card">
-            <div class="card-icon green"><i class="fas fa-circle-check" style="color:#15803d;"></i></div>
-            <div class="card-body">
-                <div class="value" id="statActive">—</div>
-                <div class="label">Active (7 days)</div>
+        <div class="col-6 col-md-3">
+            <div class="summary-card d-flex align-items-center gap-3">
+                <div class="card-icon green"><i class="fas fa-circle-check" style="color:#15803d;"></i></div>
+                <div>
+                    <div class="sc-value" id="statActive">—</div>
+                    <div class="sc-label">Active (7 days)</div>
+                </div>
             </div>
         </div>
-        <div class="summary-card">
-            <div class="card-icon yellow"><i class="fas fa-school" style="color:#a16207;"></i></div>
-            <div class="card-body">
-                <div class="value" id="statSchools">—</div>
-                <div class="label">Schools</div>
+        <div class="col-6 col-md-3">
+            <div class="summary-card d-flex align-items-center gap-3">
+                <div class="card-icon yellow"><i class="fas fa-school" style="color:#a16207;"></i></div>
+                <div>
+                    <div class="sc-value" id="statSchools">—</div>
+                    <div class="sc-label">Schools</div>
+                </div>
             </div>
         </div>
-        <div class="summary-card">
-            <div class="card-icon red"><i class="fas fa-star" style="color:#b91c1c;"></i></div>
-            <div class="card-body">
-                <div class="value" id="statAvgXp">—</div>
-                <div class="label">Avg XP</div>
+        <div class="col-6 col-md-3">
+            <div class="summary-card d-flex align-items-center gap-3">
+                <div class="card-icon red"><i class="fas fa-star" style="color:#b91c1c;"></i></div>
+                <div>
+                    <div class="sc-value" id="statAvgXp">—</div>
+                    <div class="sc-label">Avg XP</div>
+                </div>
             </div>
         </div>
     </div>
@@ -64,7 +72,7 @@
     <div class="accounts-panel">
         <div class="panel-toolbar">
             <h3><i class="fas fa-list me-2 text-secondary"></i>Student Roster</h3>
-            <div class="toolbar-filters flex-wrap gap-2">
+            <div class="toolbar-filters d-flex flex-row flex-wrap align-items-center gap-2">
                 <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Search name, school…" style="width:200px;" oninput="filterStudents()">
                 <select id="gradeFilter" class="form-select form-select-sm" style="width:130px;" onchange="filterStudents()">
                     <option value="">All Grades</option>

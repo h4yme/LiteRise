@@ -37,7 +37,7 @@
          TAB NAVIGATION
     ══════════════════════════════════════════════════════════════════ -->
     <div class="tab-nav-container">
-        <div class="tab-header-row">
+        <div class="tab-header-row d-flex flex-row overflow-auto flex-nowrap">
             <button class="tab-header active" data-tab="demographics">
                 <i class="fas fa-users"></i> Demographics
             </button>
@@ -69,14 +69,14 @@
             </div>
 
             <!-- Filters -->
-            <div class="filters-row">
-                <div class="filter-group">
+            <div class="filters-row d-flex flex-wrap align-items-end gap-3 mb-3 p-3">
+                <div class="filter-group" style="min-width:150px;">
                     <label for="schoolFilter" class="filter-label">School</label>
                     <select id="schoolFilter" class="filter-select form-select form-select-sm">
                         <option value="">All Schools</option>
                     </select>
                 </div>
-                <div class="filter-group">
+                <div class="filter-group" style="min-width:150px;">
                     <label for="barangayFilter" class="filter-label">Barangay</label>
                     <select id="barangayFilter" class="filter-select form-select form-select-sm">
                         <option value="">All Barangays</option>
@@ -87,22 +87,26 @@
             </div>
 
             <!-- Stat cards -->
-            <div class="stats-row" id="demoStatsRow">
-                <div class="stat-card">
+            <div class="row g-3 mb-3 stats-row" id="demoStatsRow">
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTotalStudents">@(ViewBag.TotalStudents ?? 0)</div>
                     <div class="stat-label">Total Students</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTotalSchools">—</div>
                     <div class="stat-label">Schools</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statActiveStudents">—</div>
                     <div class="stat-label">Active Students</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statInactiveStudents">—</div>
                     <div class="stat-label">Inactive Students</div>
+                </div>
                 </div>
             </div>
 
@@ -163,22 +167,26 @@
                 <p class="section-subtitle">Streaks, login activity, and student retention</p>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-card">
+            <div class="row g-3 mb-3 stats-row">
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statAvgStreak">—</div>
                     <div class="stat-label">Avg Streak (days)</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statMaxStreak">—</div>
                     <div class="stat-label">Longest Streak</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statActiveRate">—</div>
                     <div class="stat-label">Active Rate</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statAvgXp">—</div>
                     <div class="stat-label">Avg Total XP</div>
+                </div>
                 </div>
             </div>
 
@@ -221,22 +229,26 @@
                 <p class="section-subtitle">XP accumulation, lessons completed, and ability growth</p>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-card">
+            <div class="row g-3 mb-3 stats-row">
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTotalXp">—</div>
                     <div class="stat-label">Total XP (all students)</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statAvgLessons">—</div>
                     <div class="stat-label">Avg Lessons Done</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTopXpStudent">—</div>
                     <div class="stat-label">Top XP Student</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statAvgLessonsDone">—</div>
                     <div class="stat-label">Avg Lessons / Student</div>
+                </div>
                 </div>
             </div>
 
@@ -280,16 +292,18 @@
             </div>
 
             <!-- Assessment stat cards -->
-            <div class="stats-row">
-                <div class="stat-card">
+            <div class="row g-3 mb-3 stats-row">
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statPreAssessmentTaken">@(ViewBag.PreAssessmentCount ?? 0)</div>
                     <div class="stat-label">Pre-Assessment Taken</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statPostAssessmentTaken">@(ViewBag.PostAssessmentCount ?? 0)</div>
                     <div class="stat-label">Post-Assessment Taken</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statPrePostGrowth">
                         @{
                             var growth = ViewBag.AvgGrowth;
@@ -306,11 +320,13 @@
                     </div>
                     <div class="stat-label">Pre → Post Growth (avg θ)</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statLevelDistSummary">
                         @(ViewBag.BeginnerCount ?? 0) / @(ViewBag.IntermediateCount ?? 0) / @(ViewBag.AdvancedCount ?? 0)
                     </div>
                     <div class="stat-label">Beg / Int / Adv</div>
+                </div>
                 </div>
             </div>
 
@@ -381,22 +397,26 @@
                 </span>
             </div>
 
-            <div class="stats-row">
-                <div class="stat-card">
+            <div class="row g-3 mb-3 stats-row">
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTotalPlays">—</div>
                     <div class="stat-label">Total Game Plays</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statAvgAccuracy">—</div>
                     <div class="stat-label">Avg Accuracy</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTopGame">—</div>
                     <div class="stat-label">Most Played Game</div>
                 </div>
-                <div class="stat-card">
+                </div>
+                <div class="col-6 col-md-3"><div class="stat-card">
                     <div class="stat-value" id="statTotalGameXp">—</div>
                     <div class="stat-label">Total XP via Games</div>
+                </div>
                 </div>
             </div>
 
