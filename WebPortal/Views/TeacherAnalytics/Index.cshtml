@@ -1,0 +1,491 @@
+@{
+    ViewBag.Title = "Class Analytics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="ta-wrapper">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Class Analytics</h1>
+            <p class="page-subtitle">@ViewBag.SchoolName — @ViewBag.TotalStudents students enrolled</p>
+        </div>
+        <div class="page-header-right">
+            <button class="btn btn-outline-secondary btn-sm" id="taExportCsvBtn">
+                <i class="fas fa-download"></i> Export CSV
+            </button>
+            <button class="btn btn-outline-secondary btn-sm ms-2" id="taToggleDarkMode">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <strong>Warning:</strong> @ViewBag.Error
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB NAVIGATION
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-nav-container">
+        <div class="tab-header-row">
+            <button class="tab-header active" data-tab="ta-overview">
+                <i class="fas fa-chart-pie"></i> Overview
+            </button>
+            <button class="tab-header" data-tab="ta-skills">
+                <i class="fas fa-star"></i> Skills
+            </button>
+            <button class="tab-header" data-tab="ta-engagement">
+                <i class="fas fa-fire"></i> Engagement
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB PANELS
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panels">
+
+        <!-- ── OVERVIEW TAB ──────────────────────────────────────────── -->
+        <div class="tab-panel active" id="tab-ta-overview">
+            <div class="content-header">
+                <h2 class="section-title">Class Overview</h2>
+                <p class="section-subtitle">High-level summary of student performance and progress</p>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="ovTotalStudents">@(ViewBag.TotalStudents ?? 0)</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ovPreDone">@(ViewBag.PreAssessmentCount ?? 0)</div>
+                    <div class="stat-label">Pre-Assessment Done</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ovAvgPreTheta">
+                        @{
+                            var pre = ViewBag.AvgPreTheta;
+                            @(pre != null ? ((double)pre).ToString("F3") : "—")
+                        }
+                    </div>
+                    <div class="stat-label">Avg Pre-θ</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="ovLessonRate">@(ViewBag.LessonCompletionRate ?? 0)%</div>
+                    <div class="stat-label">Lesson Completion Rate</div>
+                </div>
+            </div>
+
+            <!-- Charts Grid 2-column -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <!-- Level Distribution Doughnut -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Level Distribution</h3>
+                            <span class="chart-subtitle">Beginner / Intermediate / Advanced</span>
+                        </div>
+                        <div class="chart-container chart-container-sm">
+                            <canvas id="levelDistChart"></canvas>
+                        </div>
+                        <div class="chart-legend-row mt-2">
+                            <span class="legend-dot" style="background:#dc3545;"></span>
+                            <span class="legend-label me-3">Beginner (@(ViewBag.BeginnerCount ?? 0))</span>
+                            <span class="legend-dot" style="background:#ffc107;"></span>
+                            <span class="legend-label me-3">Intermediate (@(ViewBag.IntermediateCount ?? 0))</span>
+                            <span class="legend-dot" style="background:#11B067;"></span>
+                            <span class="legend-label">Advanced (@(ViewBag.AdvancedCount ?? 0))</span>
+                        </div>
+                    </div>
+
+                    <!-- Pre vs Post Theta Bar Chart -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Class Avg Pre vs Post θ</h3>
+                            <span class="chart-subtitle">IRT ability estimate comparison</span>
+                        </div>
+                        <div class="chart-container chart-container-sm">
+                            <canvas id="prePostChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <!-- Lesson Completion per Module Bar Chart -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Lesson Completion by Module</h3>
+                            <span class="chart-subtitle">Estimated from total lessons done</span>
+                        </div>
+                        <div class="chart-container chart-container-sm">
+                            <canvas id="moduleCompletionChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Student Performance Scatter Chart -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Student Performance: XP vs θ</h3>
+                            <span class="chart-subtitle">Each dot is one student (pre-theta)</span>
+                        </div>
+                        <div class="chart-container chart-container-sm">
+                            <canvas id="studentScatterChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SKILLS TAB ─────────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-ta-skills">
+            <div class="content-header">
+                <h2 class="section-title">Skills Analysis</h2>
+                <p class="section-subtitle">Category scores based on pre-assessment results</p>
+            </div>
+
+            <!-- Info banner -->
+            <div class="info-banner" id="skillsInfoBanner">
+                <i class="fas fa-info-circle"></i>
+                <span>
+                    Category data loads from placement progress.
+                    Click <strong>Load Category Scores</strong> to fetch per-student data.
+                </span>
+            </div>
+
+            <!-- Category Radar Chart -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Class Average — Category Radar</h3>
+                            <span class="chart-subtitle">Phonics, Vocabulary, Grammar, Comprehension, Creating Text</span>
+                        </div>
+                        <div class="chart-container chart-container-radar">
+                            <canvas id="categoryRadarChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Per-Student Heatmap Table -->
+            <div class="table-panel mt-3">
+                <div class="table-panel-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="chart-title mb-0">Per-Student Category Scores</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-primary btn-sm" id="loadCategoryScoresBtn">
+                            <i class="fas fa-sync-alt me-1"></i> Load Category Scores
+                        </button>
+                        <div id="catLoadSpinner" class="spinner-border spinner-border-sm text-primary d-none" role="status"></div>
+                    </div>
+                </div>
+
+                <!-- Heatmap legend -->
+                <div class="d-flex align-items-center gap-3 px-3 pb-2 flex-wrap">
+                    <span class="heatmap-legend-block heatmap-red"></span><span class="small me-2">&lt; 50%</span>
+                    <span class="heatmap-legend-block heatmap-yellow"></span><span class="small me-2">50–70%</span>
+                    <span class="heatmap-legend-block heatmap-green"></span><span class="small">≥ 70%</span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="analytics-table" id="categoryHeatmapTable">
+                        <thead>
+                            <tr>
+                                <th>Student Name</th>
+                                <th>Phonics</th>
+                                <th>Vocabulary</th>
+                                <th>Grammar</th>
+                                <th>Comprehension</th>
+                                <th>Creating Text</th>
+                                <th>Overall Level</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryHeatmapBody">
+                            <!-- populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ENGAGEMENT TAB ─────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-ta-engagement">
+            <div class="content-header">
+                <h2 class="section-title">Engagement</h2>
+                <p class="section-subtitle">Streaks, login activity, XP, and inactive student alerts</p>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="engAvgStreak">@(ViewBag.AvgStreak ?? 0)</div>
+                    <div class="stat-label">Avg Streak (days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="engActivePercent">@(ViewBag.ActivePercent ?? 0)%</div>
+                    <div class="stat-label">Active Students (7d)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="engAvgXp">@(ViewBag.AvgXp ?? 0)</div>
+                    <div class="stat-label">Avg XP</div>
+                </div>
+            </div>
+
+            <!-- Engagement Charts -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <!-- Weekly Login Frequency Line Chart -->
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Weekly Login Frequency</h3>
+                            <span class="chart-subtitle">Last 8 weeks — sample data (connect log_session.php for live)</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="loginFreqChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <!-- Streak Distribution Histogram -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Streak Distribution</h3>
+                            <span class="chart-subtitle">Bucketed by streak_days</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="streakDistChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- XP Distribution Bar Chart -->
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">XP Distribution</h3>
+                            <span class="chart-subtitle">Student XP bucket counts</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="xpDistChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inactive Students Table -->
+            <div class="table-panel mt-3">
+                <div class="table-panel-header">
+                    <h3 class="chart-title">Inactive Students</h3>
+                    <span class="text-muted small">Last active &gt; 7 days ago</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="analytics-table" id="inactiveStudentsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Last Active</th>
+                                <th>Lessons Done</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inactiveTableBody">
+                            <!-- populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.tab-panels -->
+</div><!-- /.ta-wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════════════
+     INLINE STYLES (scoped to Teacher Analytics)
+══════════════════════════════════════════════════════════════════ -->
+<style>
+    /* ── Layout wrappers ─────────────────────────────────────── */
+    .ta-wrapper { padding: 1.5rem; font-family: 'Visby', sans-serif; }
+
+    .page-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .page-title  { font-size: 1.6rem; font-weight: 700; margin: 0; color: #11B067; }
+    .page-subtitle { font-size: 0.9rem; color: #6c757d; margin: 0; }
+    .page-header-right { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+
+    /* ── Tab navigation ──────────────────────────────────────── */
+    .tab-nav-container { margin-bottom: 1.25rem; }
+    .tab-header-row    { display: flex; gap: 0.25rem; border-bottom: 2px solid #dee2e6; flex-wrap: wrap; }
+    .tab-header {
+        background: none; border: none; padding: 0.6rem 1.1rem;
+        font-weight: 600; font-size: 0.875rem; color: #6c757d; cursor: pointer;
+        border-radius: 8px 8px 0 0; transition: color .2s, background .2s;
+    }
+    .tab-header:hover  { background: #f8f9fa; color: #11B067; }
+    .tab-header.active { background: #fff; color: #11B067; border-bottom: 2px solid #11B067; }
+
+    /* ── Tab panels ──────────────────────────────────────────── */
+    .tab-panels  { position: relative; }
+    .tab-panel   { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── Stat cards ──────────────────────────────────────────── */
+    .stats-row {
+        display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 1rem; margin-bottom: 1.5rem;
+    }
+    .stat-card {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 1.25rem 1rem; text-align: center;
+    }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: #11B067; }
+    .stat-label { font-size: 0.8rem; color: #6c757d; margin-top: 0.25rem; }
+
+    /* ── Section headers ─────────────────────────────────────── */
+    .content-header { margin-bottom: 1.25rem; }
+    .section-title  { font-size: 1.25rem; font-weight: 700; margin: 0; }
+    .section-subtitle { font-size: 0.875rem; color: #6c757d; margin: 0; }
+
+    /* ── Charts grid ─────────────────────────────────────────── */
+    .charts-grid  { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; }
+    .charts-row   { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+    .chart-panel {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1.25rem;
+    }
+    .chart-panel-wide { grid-column: 1 / -1; }
+
+    .chart-panel-header { margin-bottom: 0.75rem; }
+    .chart-title   { font-size: 1rem; font-weight: 600; margin: 0; }
+    .chart-subtitle { font-size: 0.8rem; color: #6c757d; display: block; }
+
+    .chart-container        { position: relative; height: 280px; }
+    .chart-container-sm     { position: relative; height: 240px; }
+    .chart-container-radar  { position: relative; height: 320px; }
+
+    /* ── Chart legend ────────────────────────────────────────── */
+    .chart-legend-row { display: flex; align-items: center; flex-wrap: wrap; gap: 0.25rem; }
+    .legend-dot   { display: inline-block; width: 10px; height: 10px; border-radius: 50%; }
+    .legend-label { font-size: 0.8rem; color: #6c757d; }
+
+    /* ── Table panel ─────────────────────────────────────────── */
+    .table-panel {
+        background: #fff; border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); padding: 1.25rem; margin-bottom: 1.5rem;
+    }
+    .table-panel-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .analytics-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .analytics-table thead th {
+        background: #f8f9fa; color: #495057; font-weight: 600;
+        padding: 0.6rem 0.75rem; text-align: left; border-bottom: 2px solid #dee2e6;
+        white-space: nowrap;
+    }
+    .analytics-table tbody tr:nth-child(even) { background: #f8f9fa; }
+    .analytics-table tbody td { padding: 0.55rem 0.75rem; border-bottom: 1px solid #dee2e6; vertical-align: middle; }
+    .analytics-table tbody tr:hover { background: rgba(17,176,103,0.06); }
+
+    /* ── Heatmap cells ───────────────────────────────────────── */
+    .heatmap-red    { background: rgba(220,53,69,0.15) !important; color: #842029 !important; }
+    .heatmap-yellow { background: rgba(255,193,7,0.2) !important; color: #664d03 !important; }
+    .heatmap-green  { background: rgba(17,176,103,0.15) !important; color: #0a5c38 !important; }
+    .heatmap-none   { background: transparent; color: #6c757d; }
+
+    .heatmap-legend-block {
+        display: inline-block; width: 14px; height: 14px;
+        border-radius: 3px; border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    /* ── Info banner ─────────────────────────────────────────── */
+    .info-banner {
+        background: rgba(13,110,253,0.08); border-left: 4px solid #0d6efd;
+        border-radius: 0 8px 8px 0; padding: 0.75rem 1rem;
+        font-size: 0.875rem; margin-bottom: 1.25rem; color: #084298;
+        display: flex; align-items: flex-start; gap: 0.5rem;
+    }
+
+    /* ── Status badges ───────────────────────────────────────── */
+    .badge-active   { background: rgba(17,176,103,0.15); color: #0a5c38; border-radius: 4px; padding: 2px 8px; font-size: 0.78rem; }
+    .badge-inactive { background: rgba(220,53,69,0.12); color: #842029; border-radius: 4px; padding: 2px 8px; font-size: 0.78rem; }
+    .badge-pending  { background: rgba(255,193,7,0.18); color: #664d03; border-radius: 4px; padding: 2px 8px; font-size: 0.78rem; }
+
+    /* ── Level badges ────────────────────────────────────────── */
+    .level-beginner     { color: #dc3545; font-weight: 600; }
+    .level-intermediate { color: #ffc107; font-weight: 600; }
+    .level-advanced     { color: #11B067; font-weight: 600; }
+
+    /* ── Responsive tweaks ───────────────────────────────────── */
+    @@media (max-width: 768px) {
+        .charts-row { grid-template-columns: 1fr; }
+        .stats-row  { grid-template-columns: 1fr 1fr; }
+    }
+
+    /* ══════════════════════════════════════════════════════════
+       DARK MODE
+    ══════════════════════════════════════════════════════════ */
+    body.dark-mode .ta-wrapper        { color: #e9ecef; }
+    body.dark-mode .page-title        { color: #3dd68c; }
+    body.dark-mode .stat-card,
+    body.dark-mode .chart-panel,
+    body.dark-mode .table-panel       { background: #1e2530; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+    body.dark-mode .stat-value        { color: #3dd68c; }
+    body.dark-mode .stat-label,
+    body.dark-mode .page-subtitle,
+    body.dark-mode .section-subtitle,
+    body.dark-mode .chart-subtitle,
+    body.dark-mode .legend-label      { color: #adb5bd; }
+    body.dark-mode .tab-header        { color: #adb5bd; }
+    body.dark-mode .tab-header:hover  { background: #2a3242; color: #3dd68c; }
+    body.dark-mode .tab-header.active { background: #1e2530; color: #3dd68c; border-bottom-color: #3dd68c; }
+    body.dark-mode .tab-header-row    { border-bottom-color: #3d4a5c; }
+    body.dark-mode .analytics-table thead th { background: #2a3242; color: #adb5bd; border-bottom-color: #3d4a5c; }
+    body.dark-mode .analytics-table tbody tr:nth-child(even) { background: #252d3a; }
+    body.dark-mode .analytics-table tbody td { border-bottom-color: #3d4a5c; }
+    body.dark-mode .analytics-table tbody tr:hover { background: rgba(61,214,140,0.07); }
+    body.dark-mode .heatmap-red    { background: rgba(220,53,69,0.25) !important; color: #f8d7da !important; }
+    body.dark-mode .heatmap-yellow { background: rgba(255,193,7,0.2) !important;  color: #fff3cd !important; }
+    body.dark-mode .heatmap-green  { background: rgba(17,176,103,0.2) !important; color: #d1f2e3 !important; }
+    body.dark-mode .info-banner    { background: rgba(13,110,253,0.12); color: #9ec5fe; }
+    body.dark-mode .section-title,
+    body.dark-mode .chart-title    { color: #e9ecef; }
+</style>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     SERVER → CLIENT DATA BRIDGE
+══════════════════════════════════════════════════════════════════ -->
+<script>
+    window.STUDENTS_DATA = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+    window.TA_SERVER = {
+        totalStudents:        @(ViewBag.TotalStudents        ?? 0),
+        preAssessmentCount:   @(ViewBag.PreAssessmentCount   ?? 0),
+        postAssessmentCount:  @(ViewBag.PostAssessmentCount  ?? 0),
+        beginnerCount:        @(ViewBag.BeginnerCount        ?? 0),
+        intermediateCount:    @(ViewBag.IntermediateCount    ?? 0),
+        advancedCount:        @(ViewBag.AdvancedCount        ?? 0),
+        avgPreTheta:          @(ViewBag.AvgPreTheta          ?? 0),
+        avgPostTheta:         @(ViewBag.AvgPostTheta         ?? 0),
+        avgGrowth:            @(ViewBag.AvgGrowth            ?? 0),
+        avgLessonsDone:       @(ViewBag.AvgLessonsDone       ?? 0),
+        lessonCompletionRate: @(ViewBag.LessonCompletionRate ?? 0),
+        avgStreak:            @(ViewBag.AvgStreak            ?? 0),
+        activeCount:          @(ViewBag.ActiveCount          ?? 0),
+        activePercent:        @(ViewBag.ActivePercent        ?? 0),
+        avgXp:                @(ViewBag.AvgXp                ?? 0),
+        schoolName:           '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(ViewBag.SchoolName ?? "My School"))',
+        userName:             '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(ViewBag.UserName  ?? "Teacher"))'
+    };
+</script>
+
+@Scripts.Render("~/Scripts/TeacherAnalyticsScript.js")

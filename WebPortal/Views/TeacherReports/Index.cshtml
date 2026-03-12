@@ -1,0 +1,111 @@
+@{
+    ViewBag.Title = "Progress Reports";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/TeacherReportsStyles.css")
+
+<div class="reports-page">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Progress Reports</h1>
+            <p class="page-subtitle">
+                Generate and export reports for
+                <strong>@ViewBag.SchoolName</strong>
+            </p>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Warning:</strong> @ViewBag.Error
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         REPORT CARDS ROW
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="report-cards-row">
+
+        <!-- ── Card 1: Individual Student Report ─────────────────────── -->
+        <div class="report-card">
+            <div class="report-card-icon">
+                <i class="fas fa-user-graduate"></i>
+            </div>
+            <h3>Individual Student Report</h3>
+            <p class="desc">
+                Generate a detailed progress report for a single student, including
+                assessment scores, lesson completion, and module progress.
+            </p>
+
+            <div class="form-group mb-3">
+                <label for="studentSelect" class="form-label">Select Student</label>
+                <select id="studentSelect" class="form-select">
+                    <option value="">— Choose a student —</option>
+                </select>
+            </div>
+
+            <div class="btn-group-stack">
+                <button class="btn btn-primary" onclick="generateStudentReport()">
+                    <i class="fas fa-file-alt me-2"></i>Generate Report
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Card 2: Class Summary Report ──────────────────────────── -->
+        <div class="report-card">
+            <div class="report-card-icon report-card-icon--class">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3>Class Summary Report</h3>
+            <p class="desc">
+                Export a full summary of all
+                <strong>@(ViewBag.TotalStudents)</strong> students, including level
+                distribution, average assessment scores, and lesson progress.
+            </p>
+
+            <div class="btn-group-stack">
+                <button class="btn btn-primary" onclick="generateClassReport()">
+                    <i class="fas fa-print me-2"></i>Generate Class Report
+                </button>
+                <button class="btn btn-outline-secondary" onclick="exportCsv()">
+                    <i class="fas fa-file-csv me-2"></i>Export CSV
+                </button>
+            </div>
+        </div>
+
+    </div><!-- /.report-cards-row -->
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         INLINE PREVIEW PANE
+    ══════════════════════════════════════════════════════════════════ -->
+    <div id="reportPreview" class="report-preview" style="display:none;">
+        <!-- Populated by TeacherReportsScript.js -->
+    </div>
+
+    <!-- Loading overlay (shown while fetching report data) -->
+    <div id="reportLoading" class="report-loading" style="display:none;">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading…</span>
+        </div>
+        <p class="mt-2 text-muted">Fetching student data…</p>
+    </div>
+
+</div><!-- /.reports-page -->
+
+<!-- ── Toast notification container ──────────────────────────────────── -->
+<div id="trToastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index:1100;">
+</div>
+
+<!-- ── Inject student data for JS ─────────────────────────────────────── -->
+<script>
+    window.studentsData = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+</script>
+
+@Scripts.Render("~/Scripts/TeacherReportsScript.js")

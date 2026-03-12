@@ -1,0 +1,232 @@
+/* =====================================================
+   LiteRise — Teacher Analytics Page Styles
+   ===================================================== */
+
+.teacher-analytics-page .page-header {
+    margin-bottom: 24px;
+}
+
+.teacher-analytics-page .page-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 4px 0;
+}
+
+.teacher-analytics-page .page-header p {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ── Stat cards row ── */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-card .stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+}
+
+.stat-card .stat-icon.green  { background: #d1fae5; }
+.stat-card .stat-icon.blue   { background: #dbeafe; }
+.stat-card .stat-icon.purple { background: #ede9fe; }
+.stat-card .stat-icon.orange { background: #ffedd5; }
+
+.stat-card .stat-info .value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+}
+
+.stat-card .stat-info .label {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* ── Tab container (shared with analytics) ── */
+.tab-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.tab-headers {
+    display: flex;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.tab-header {
+    flex: 1;
+    padding: 14px 20px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-header:hover { background: #e9ecef; color: #495057; }
+.tab-header.active { color: #0d6efd; background: #fff; border-bottom-color: #0d6efd; }
+
+.tab-content-container { padding: 24px; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Charts grid ── */
+.charts-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-box {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.chart-box h4 {
+    margin: 0 0 12px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.chart-box canvas { max-height: 280px; }
+
+/* ── Heatmap table ── */
+.heatmap-table-wrapper {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.heatmap-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.heatmap-table th {
+    padding: 10px 14px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.heatmap-table th:first-child { text-align: left; }
+
+.heatmap-table td {
+    padding: 10px 14px;
+    text-align: center;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.heatmap-table td:first-child { text-align: left; font-weight: 500; color: #374151; }
+
+.heat-cell {
+    display: inline-block;
+    min-width: 52px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+.heat-cell.high   { background: #d1fae5; color: #065f46; }
+.heat-cell.medium { background: #fef9c3; color: #854d0e; }
+.heat-cell.low    { background: #fee2e2; color: #991b1b; }
+.heat-cell.na     { background: #f3f4f6; color: #9ca3af; }
+
+/* ── Inactive students table ── */
+.inactive-table-wrapper { overflow-x: auto; margin-top: 16px; }
+
+.inactive-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.inactive-table th,
+.inactive-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #e9ecef;
+    text-align: left;
+}
+
+.inactive-table th {
+    background: #f8f9fa;
+    font-size: 12px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Dark mode */
+body.dark-mode .stat-card,
+body.dark-mode .tab-container,
+body.dark-mode .chart-box { background: #2D3748; }
+body.dark-mode .tab-headers { background: #1A202C; border-bottom-color: #4A5568; }
+body.dark-mode .tab-header { color: #A0AEC0; }
+body.dark-mode .tab-header:hover { background: #374151; color: #E2E8F0; }
+body.dark-mode .tab-header.active { background: #2D3748; color: #63B3ED; border-bottom-color: #63B3ED; }
+body.dark-mode .stat-card .stat-info .value { color: #E2E8F0; }
+body.dark-mode .stat-card .stat-info .label { color: #9CA3AF; }
+body.dark-mode .chart-box h4 { color: #E2E8F0; }
+body.dark-mode .chart-box { background: #374151; }
+body.dark-mode .heatmap-table th { background: #1A202C; color: #9CA3AF; border-bottom-color: #4A5568; }
+body.dark-mode .heatmap-table td { border-bottom-color: #374151; }
+body.dark-mode .heatmap-table td:first-child { color: #CBD5E0; }
+body.dark-mode .inactive-table th { background: #1A202C; color: #9CA3AF; }
+body.dark-mode .inactive-table td { border-bottom-color: #374151; color: #CBD5E0; }
+
+@media (max-width: 992px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .charts-grid-2 { grid-template-columns: 1fr; }
+}
+@media (max-width: 576px) {
+    .stats-row { grid-template-columns: 1fr; }
+}

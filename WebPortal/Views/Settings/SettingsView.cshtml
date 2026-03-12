@@ -1,0 +1,352 @@
+@{
+    ViewBag.Title = "Settings";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@Styles.Render("~/Content/SettingsStyles.css")
+
+<div class="settings-wrapper">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Settings</h1>
+            <p class="page-subtitle">Manage your profile, security, and system configuration</p>
+        </div>
+        <div class="page-header-right">
+            <span class="user-badge">
+                <i class="fas fa-user-shield"></i>
+                <span id="headerUserName">@ViewBag.UserName</span>
+            </span>
+            <button class="btn btn-outline-secondary btn-sm ms-2" id="toggleDarkMode">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TWO-COLUMN LAYOUT
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="settings-layout">
+
+        <!-- ── LEFT SIDEBAR ───────────────────────────────────────────── -->
+        <aside class="settings-sidebar">
+            <div class="sidebar-header">
+                <div class="avatar-circle" id="sidebarAvatar">A</div>
+                <div class="sidebar-user-info">
+                    <span class="sidebar-name" id="sidebarName">@ViewBag.UserName</span>
+                    <span class="sidebar-role">Administrator</span>
+                </div>
+            </div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#" class="nav-link active" data-section="profile">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="security">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Security</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="sysconfig">
+                        <i class="fas fa-cogs"></i>
+                        <span>System Config</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="irt">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>IRT Parameters</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-section="audit">
+                        <i class="fas fa-history"></i>
+                        <span>Audit Log</span>
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- ── RIGHT CONTENT ──────────────────────────────────────────── -->
+        <main class="settings-content">
+
+            <!-- ── PROFILE SECTION ──────────────────────────────────── -->
+            <section class="settings-section active" id="section-profile">
+                <div class="section-header">
+                    <h3><i class="fas fa-user me-2"></i>Profile</h3>
+                    <p>Update your display name and email address.</p>
+                </div>
+
+                <div class="avatar-section">
+                    <div class="avatar-circle large" id="profileAvatar">A</div>
+                    <div class="avatar-info">
+                        <h4 id="profileDisplayName">Loading...</h4>
+                        <p id="profileRole">Administrator</p>
+                        <p class="text-muted" style="font-size:12px;">
+                            Last login: <span id="profileLastLogin">—</span>
+                        </p>
+                    </div>
+                </div>
+
+                <form id="profileForm" onsubmit="return false;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" id="profileName" class="input-field"
+                                   placeholder="Enter your full name" autocomplete="name" />
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email Address</label>
+                            <input type="email" id="profileEmail" class="input-field"
+                                   placeholder="Enter your email" autocomplete="email" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="profileRoleDisplay">Role</label>
+                        <input type="text" id="profileRoleDisplay" class="input-field" readonly />
+                        <span class="hint">Role cannot be changed from this panel.</span>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary-custom" onclick="saveProfile()">
+                            <i class="fas fa-save me-1"></i> Save Profile
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ── SECURITY SECTION ─────────────────────────────────── -->
+            <section class="settings-section" id="section-security">
+                <div class="section-header">
+                    <h3><i class="fas fa-shield-alt me-2"></i>Security</h3>
+                    <p>Change your account password. Choose a strong password of at least 8 characters.</p>
+                </div>
+
+                <form id="passwordForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="currentPassword" class="input-field"
+                                   placeholder="Enter current password" autocomplete="current-password" />
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('currentPassword', this)" aria-label="Show/hide password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="newPassword" class="input-field"
+                                   placeholder="Enter new password (min. 8 characters)"
+                                   oninput="checkPasswordStrength(this.value)"
+                                   autocomplete="new-password" />
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('newPassword', this)" aria-label="Show/hide password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <span class="strength-label" id="strengthLabel"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="confirmPassword" class="input-field"
+                                   placeholder="Re-enter new password" autocomplete="new-password" />
+                            <button type="button" class="toggle-password" onclick="toggleVisibility('confirmPassword', this)" aria-label="Show/hide password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary-custom" onclick="changePassword()">
+                            <i class="fas fa-lock me-1"></i> Change Password
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ── SYSTEM CONFIG SECTION ────────────────────────────── -->
+            <section class="settings-section" id="section-sysconfig">
+                <div class="section-header">
+                    <h3><i class="fas fa-cogs me-2"></i>System Configuration</h3>
+                    <p>Configure assessment thresholds, feature flags, and maintenance mode.</p>
+                </div>
+
+                <form id="sysconfigForm" onsubmit="return false;">
+                    <div class="config-group">
+                        <h4><i class="fas fa-graduation-cap"></i> Assessment Settings</h4>
+                        <div class="config-grid">
+                            <div class="config-field">
+                                <label for="cfgPassingThreshold">Passing Threshold (%)</label>
+                                <input type="number" id="cfgPassingThreshold" class="input-field"
+                                       min="0" max="100" step="1" />
+                                <span class="range-hint">Range: 0–100</span>
+                            </div>
+                            <div class="config-field">
+                                <label for="cfgMaxLessons">Max Lessons Before Post-Assessment</label>
+                                <input type="number" id="cfgMaxLessons" class="input-field"
+                                       min="1" step="1" />
+                                <span class="range-hint">Minimum: 1</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <h4><i class="fas fa-toggle-on"></i> Feature Flags</h4>
+                        <div class="toggle-list">
+                            <div class="toggle-row">
+                                <div class="toggle-info">
+                                    <span class="toggle-label">Enable Game Module</span>
+                                    <span class="toggle-desc">Allow students to access interactive game activities.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="cfgEnableGameModule" />
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <div class="toggle-info">
+                                    <span class="toggle-label">Enable Badges</span>
+                                    <span class="toggle-desc">Award achievement badges to students for milestones.</span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="cfgEnableBadges" />
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <div class="toggle-info">
+                                    <span class="toggle-label maintenance-label">
+                                        <i class="fas fa-exclamation-triangle text-danger me-1"></i>
+                                        Maintenance Mode
+                                    </span>
+                                    <span class="toggle-desc text-danger">
+                                        <strong>Warning:</strong> Enabling this will lock out all students and teachers from the application.
+                                    </span>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="cfgMaintenanceMode" />
+                                    <span class="slider danger"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary-custom" onclick="saveSystemConfig()">
+                            <i class="fas fa-save me-1"></i> Save Config
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ── IRT PARAMETERS SECTION ───────────────────────────── -->
+            <section class="settings-section" id="section-irt">
+                <div class="section-header">
+                    <h3><i class="fas fa-sliders-h me-2"></i>IRT Parameters</h3>
+                    <p>Configure Item Response Theory adaptive testing parameters.</p>
+                </div>
+
+                <form id="irtForm" onsubmit="return false;">
+                    <div class="config-group">
+                        <h4><i class="fas fa-ruler-combined"></i> Adaptive Test Bounds</h4>
+                        <div class="config-grid">
+                            <div class="config-field">
+                                <label for="irtMinItems">Minimum Items</label>
+                                <input type="number" id="irtMinItems" class="input-field"
+                                       min="1" max="200" step="1" />
+                                <span class="range-hint">Minimum questions to administer per session.</span>
+                            </div>
+                            <div class="config-field">
+                                <label for="irtMaxItems">Maximum Items</label>
+                                <input type="number" id="irtMaxItems" class="input-field"
+                                       min="1" max="200" step="1" />
+                                <span class="range-hint">Maximum questions before forced termination.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="config-group">
+                        <h4><i class="fas fa-bullseye"></i> Stopping Rule</h4>
+                        <div class="config-grid" style="grid-template-columns: 1fr;">
+                            <div class="config-field">
+                                <label for="irtSemTarget">SEM Target</label>
+                                <input type="number" id="irtSemTarget" class="input-field"
+                                       min="0.01" max="2.0" step="0.01" style="max-width:200px;" />
+                                <span class="range-hint">
+                                    Standard Error of Measurement threshold (0.01–2.00). Testing stops when ability estimate SEM falls below this value.
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary-custom" onclick="saveIrtSettings()">
+                            <i class="fas fa-save me-1"></i> Save IRT Settings
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ── AUDIT LOG SECTION ─────────────────────────────────── -->
+            <section class="settings-section" id="section-audit">
+                <div class="section-header">
+                    <h3><i class="fas fa-history me-2"></i>Audit Log</h3>
+                    <p>Recent administrative activity across the system.</p>
+                </div>
+
+                <div class="audit-filters">
+                    <input type="text" id="auditSearch" class="form-control form-control-sm"
+                           placeholder="Search actions or targets..." oninput="filterAuditLog()" style="max-width:240px;" />
+                    <select id="auditActionFilter" class="form-select form-select-sm" onchange="filterAuditLog()" style="max-width:160px;">
+                        <option value="">All Actions</option>
+                        <option value="login">Login</option>
+                        <option value="create">Create</option>
+                        <option value="edit">Edit</option>
+                        <option value="delete">Delete</option>
+                        <option value="export">Export</option>
+                    </select>
+                    <button class="btn btn-outline-secondary btn-sm" onclick="loadAuditLog()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover audit-table" id="auditTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Admin</th>
+                                <th>Target</th>
+                                <th>Timestamp</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditTableBody">
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    <i class="fas fa-spinner fa-spin me-2"></i> Loading audit log...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+@Scripts.Render("~/Scripts/SettingsScript.js")

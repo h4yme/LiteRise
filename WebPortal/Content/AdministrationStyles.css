@@ -1,0 +1,347 @@
+/* =====================================================
+   LiteRise — Administration (Account Management) Styles
+   ===================================================== */
+
+.admin-accounts-page h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 4px 0;
+}
+
+.admin-accounts-page .page-subtitle {
+    color: #6c757d;
+    font-size: 14px;
+    margin-bottom: 24px;
+}
+
+/* ── Summary cards ── */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.summary-card .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.summary-card .card-icon.blue   { background: #dbeafe; }
+.summary-card .card-icon.green  { background: #d1fae5; }
+.summary-card .card-icon.yellow { background: #fef9c3; }
+.summary-card .card-icon.red    { background: #fee2e2; }
+
+.summary-card .card-body .value {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1;
+}
+
+.summary-card .card-body .label {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 4px;
+}
+
+/* ── Table panel ── */
+.accounts-panel {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.panel-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    border-bottom: 2px solid #e9ecef;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.panel-toolbar h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.toolbar-filters {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.toolbar-filters input,
+.toolbar-filters select {
+    padding: 7px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.toolbar-filters input:focus,
+.toolbar-filters select:focus { border-color: #0d6efd; }
+
+/* ── Accounts table ── */
+.accounts-table-wrapper { overflow-x: auto; }
+
+.accounts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.accounts-table thead { background: #f8f9fa; }
+
+.accounts-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e9ecef;
+    white-space: nowrap;
+}
+
+.accounts-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    vertical-align: middle;
+}
+
+.accounts-table tr:hover td { background: #f9fafb; }
+
+/* ── Avatar + name cell ── */
+.account-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.account-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #11B067, #0d6efd);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    flex-shrink: 0;
+}
+
+.account-name {
+    font-weight: 600;
+    color: #111827;
+    font-size: 14px;
+}
+
+.account-email {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* ── Role + Status badges ── */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.role-badge.admin   { background: #ede9fe; color: #6d28d9; }
+.role-badge.teacher { background: #dbeafe; color: #1d4ed8; }
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-badge.active   { background: #d1fae5; color: #065f46; }
+.status-badge.inactive { background: #f3f4f6; color: #6b7280; }
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-dot.active   { background: #22c55e; }
+.status-dot.inactive { background: #9ca3af; }
+
+/* ── Action buttons ── */
+.action-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.btn-action {
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+}
+
+.btn-action.edit        { background: #dbeafe; color: #1d4ed8; }
+.btn-action.edit:hover  { background: #bfdbfe; }
+
+.btn-action.reset        { background: #fef9c3; color: #854d0e; }
+.btn-action.reset:hover  { background: #fde68a; }
+
+.btn-action.deactivate        { background: #fee2e2; color: #991b1b; }
+.btn-action.deactivate:hover  { background: #fecaca; }
+
+.btn-action.activate        { background: #d1fae5; color: #065f46; }
+.btn-action.activate:hover  { background: #a7f3d0; }
+
+/* ── Add Account button ── */
+.btn-add-account {
+    padding: 9px 18px;
+    background: #11B067;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-add-account:hover { background: #0d9355; }
+
+/* ── Temp password display ── */
+.temp-password-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    margin: 16px 0;
+}
+
+.temp-password-box p {
+    font-size: 13px;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.temp-password-value {
+    font-size: 20px;
+    font-weight: 700;
+    font-family: monospace;
+    color: #065f46;
+    background: #fff;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 8px 16px;
+    display: inline-block;
+}
+
+.copy-btn {
+    margin-top: 8px;
+    padding: 6px 14px;
+    border: 1px solid #bbf7d0;
+    background: #fff;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    color: #065f46;
+}
+
+/* ── Pagination ── */
+.pagination-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    border-top: 1px solid #e9ecef;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.pagination-btns { display: flex; gap: 6px; }
+
+.page-btn {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    border-radius: 5px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.page-btn:hover  { background: #f3f4f6; }
+.page-btn.active { background: #0d6efd; color: #fff; border-color: #0d6efd; }
+.page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Dark Mode */
+body.dark-mode .summary-card,
+body.dark-mode .accounts-panel { background: #2D3748; }
+body.dark-mode .summary-card .card-body .value { color: #E2E8F0; }
+body.dark-mode .summary-card .card-body .label { color: #9CA3AF; }
+body.dark-mode .panel-toolbar { border-bottom-color: #4A5568; }
+body.dark-mode .panel-toolbar h3 { color: #E2E8F0; }
+body.dark-mode .toolbar-filters input,
+body.dark-mode .toolbar-filters select { background: #374151; color: #E2E8F0; border-color: #4A5568; }
+body.dark-mode .accounts-table thead { background: #1A202C; }
+body.dark-mode .accounts-table th { color: #9CA3AF; border-bottom-color: #4A5568; }
+body.dark-mode .accounts-table td { border-bottom-color: #374151; }
+body.dark-mode .accounts-table tr:hover td { background: #374151; }
+body.dark-mode .account-name { color: #E2E8F0; }
+body.dark-mode .account-email { color: #9CA3AF; }
+body.dark-mode .pagination-row { border-top-color: #4A5568; color: #9CA3AF; }
+body.dark-mode .page-btn { background: #374151; color: #E2E8F0; border-color: #4A5568; }
+body.dark-mode .page-btn:hover { background: #4B5563; }
+
+@media (max-width: 768px) {
+    .summary-cards { grid-template-columns: 1fr 1fr; }
+    .panel-toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-filters { flex-wrap: wrap; }
+}
+
+@media (max-width: 480px) {
+    .summary-cards { grid-template-columns: 1fr; }
+}

@@ -1,0 +1,457 @@
+@{
+    ViewBag.Title = "Analytics";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/AnalyticsStyles.css")
+
+<div class="analytics-wrapper">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h1 class="page-title">Analytics</h1>
+            <p class="page-subtitle">Monitor student progress, engagement, and learning outcomes</p>
+        </div>
+        <div class="page-header-right">
+            <button class="btn btn-outline-secondary btn-sm" id="exportCsvBtn">
+                <i class="fas fa-download"></i> Export CSV
+            </button>
+            <button class="btn btn-outline-secondary btn-sm ms-2" id="toggleDarkMode">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </div>
+
+    @if (ViewBag.Error != null)
+    {
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <strong>Warning:</strong> @ViewBag.Error
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB NAVIGATION
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-nav-container">
+        <div class="tab-header-row">
+            <button class="tab-header active" data-tab="demographics">
+                <i class="fas fa-users"></i> Demographics
+            </button>
+            <button class="tab-header" data-tab="engagement">
+                <i class="fas fa-fire"></i> Engagement
+            </button>
+            <button class="tab-header" data-tab="performance">
+                <i class="fas fa-chart-line"></i> Performance
+            </button>
+            <button class="tab-header" data-tab="assessment">
+                <i class="fas fa-clipboard-check"></i> Assessment
+            </button>
+            <button class="tab-header" data-tab="games">
+                <i class="fas fa-gamepad"></i> Games
+            </button>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TAB PANELS
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panels">
+
+        <!-- ── DEMOGRAPHICS TAB ──────────────────────────────────────── -->
+        <div class="tab-panel active" id="tab-demographics">
+            <div class="content-header">
+                <h2 class="section-title">Demographics</h2>
+                <p class="section-subtitle">Student distribution by school, grade, and gender</p>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-row">
+                <div class="filter-group">
+                    <label for="schoolFilter" class="filter-label">School</label>
+                    <select id="schoolFilter" class="filter-select form-select form-select-sm">
+                        <option value="">All Schools</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="barangayFilter" class="filter-label">Barangay</label>
+                    <select id="barangayFilter" class="filter-select form-select form-select-sm">
+                        <option value="">All Barangays</option>
+                    </select>
+                </div>
+                <button class="btn btn-sm btn-primary" id="applyDemoFilters">Apply Filters</button>
+                <button class="btn btn-sm btn-outline-secondary" id="clearDemoFilters">Clear</button>
+            </div>
+
+            <!-- Stat cards -->
+            <div class="stats-row" id="demoStatsRow">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalStudents">@(ViewBag.TotalStudents ?? 0)</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalSchools">—</div>
+                    <div class="stat-label">Schools</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statActiveStudents">—</div>
+                    <div class="stat-label">Active Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statInactiveStudents">—</div>
+                    <div class="stat-label">Inactive Students</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Age / Grade Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="gradeDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Gender Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="genderDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Student Table -->
+            <div class="table-panel">
+                <div class="table-panel-header">
+                    <h3 class="chart-title">Student Roster</h3>
+                    <input type="text" id="demoTableSearch" class="form-control form-control-sm table-search" placeholder="Search students…">
+                </div>
+                <div class="table-responsive">
+                    <table class="analytics-table" id="demoStudentTable">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Name</th>
+                                <th>School</th>
+                                <th>Grade</th>
+                                <th>Gender</th>
+                                <th>Status</th>
+                                <th>Total XP</th>
+                            </tr>
+                        </thead>
+                        <tbody id="demoTableBody">
+                            <!-- populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="table-pagination" id="demoPagination"></div>
+            </div>
+        </div>
+
+        <!-- ── ENGAGEMENT TAB ─────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-engagement">
+            <div class="content-header">
+                <h2 class="section-title">Engagement</h2>
+                <p class="section-subtitle">Streaks, login activity, and student retention</p>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgStreak">—</div>
+                    <div class="stat-label">Avg Streak (days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statMaxStreak">—</div>
+                    <div class="stat-label">Longest Streak</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statActiveRate">—</div>
+                    <div class="stat-label">Active Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgXp">—</div>
+                    <div class="stat-label">Avg Total XP</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Streak Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="streakHistogramChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Active vs Inactive</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="activeInactiveChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Last Active – Login Frequency (by date)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="loginFrequencyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── PERFORMANCE TAB ────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-performance">
+            <div class="content-header">
+                <h2 class="section-title">Performance</h2>
+                <p class="section-subtitle">XP accumulation, lessons completed, and ability growth</p>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalXp">—</div>
+                    <div class="stat-label">Total XP (all students)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgLessons">—</div>
+                    <div class="stat-label">Avg Lessons Done</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTopXpStudent">—</div>
+                    <div class="stat-label">Top XP Student</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgLessonsDone">—</div>
+                    <div class="stat-label">Avg Lessons / Student</div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Ability Growth (Pre → Post θ)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="abilityGrowthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">XP Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="xpDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Lessons Completed Distribution</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="lessonsDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── ASSESSMENT TAB ─────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-assessment">
+            <div class="content-header">
+                <h2 class="section-title">Assessment Analytics</h2>
+                <p class="section-subtitle">IRT theta scores, placement levels, and pre/post assessment growth</p>
+            </div>
+
+            <!-- Assessment stat cards -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="statPreAssessmentTaken">@(ViewBag.PreAssessmentCount ?? 0)</div>
+                    <div class="stat-label">Pre-Assessment Taken</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statPostAssessmentTaken">@(ViewBag.PostAssessmentCount ?? 0)</div>
+                    <div class="stat-label">Post-Assessment Taken</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statPrePostGrowth">
+                        @{
+                            var growth = ViewBag.AvgGrowth;
+                            if (growth != null)
+                            {
+                                double g = (double)growth;
+                                @(g >= 0 ? "+" + g.ToString("F3") : g.ToString("F3"))
+                            }
+                            else
+                            {
+                                @("—")
+                            }
+                        }
+                    </div>
+                    <div class="stat-label">Pre → Post Growth (avg θ)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statLevelDistSummary">
+                        @(ViewBag.BeginnerCount ?? 0) / @(ViewBag.IntermediateCount ?? 0) / @(ViewBag.AdvancedCount ?? 0)
+                    </div>
+                    <div class="stat-label">Beg / Int / Adv</div>
+                </div>
+            </div>
+
+            <!-- Assessment charts grid -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Theta Distribution (Pre-Assessment)</h3>
+                            <span class="chart-subtitle">IRT θ score histogram</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="thetaDistributionChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Level Distribution</h3>
+                            <span class="chart-subtitle">Placement level breakdown</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="levelDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Pre vs Post Theta Growth per School</h3>
+                            <span class="chart-subtitle">Average θ score comparison by school</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="prePostGrowthChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Category Performance</h3>
+                            <span class="chart-subtitle">Per-category radar — requires <code>get_portal_placement_progress.php</code> per student</span>
+                        </div>
+                        <div class="chart-container chart-container-radar">
+                            <canvas id="categoryRadarChart"></canvas>
+                        </div>
+                        <div class="placeholder-note" id="radarPlaceholderNote">
+                            <i class="fas fa-info-circle"></i>
+                            Connect <strong>get_portal_placement_progress.php</strong> per student to populate category-level radar data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── GAMES TAB ──────────────────────────────────────────────── -->
+        <div class="tab-panel" id="tab-games">
+            <div class="content-header">
+                <h2 class="section-title">Game Analytics</h2>
+                <p class="section-subtitle">Play counts, accuracy, and XP earned across all game types</p>
+            </div>
+
+            <!-- Live data notice -->
+            <div class="info-banner" id="gamesInfoBanner">
+                <i class="fas fa-plug"></i>
+                <span>
+                    <strong>Sample data displayed.</strong>
+                    Connect <code>get_game_summary.php</code> endpoint for live game data.
+                </span>
+            </div>
+
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalPlays">—</div>
+                    <div class="stat-label">Total Game Plays</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statAvgAccuracy">—</div>
+                    <div class="stat-label">Avg Accuracy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTopGame">—</div>
+                    <div class="stat-label">Most Played Game</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="statTotalGameXp">—</div>
+                    <div class="stat-label">Total XP via Games</div>
+                </div>
+            </div>
+
+            <!-- Games charts grid -->
+            <div class="charts-grid">
+                <div class="charts-row">
+                    <div class="chart-panel chart-panel-wide">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Play Count by Game Type</h3>
+                        </div>
+                        <div class="chart-container chart-container-horizontal">
+                            <canvas id="gamePlayCountChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-row">
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">Average Accuracy by Game Type</h3>
+                            <span class="chart-subtitle">Percentage correct per game</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="gameAccuracyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-panel-header">
+                            <h3 class="chart-title">XP Earned via Games Over Time</h3>
+                            <span class="chart-subtitle">Last 8 weeks</span>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="gameXpTimeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- /.tab-panels -->
+</div><!-- /.analytics-wrapper -->
+
+<!-- Pass server-side data to the JS layer -->
+<script>
+    window.STUDENTS_DATA = @Html.Raw(ViewBag.StudentsJson ?? "[]");
+    window.ANALYTICS_SERVER = {
+        totalStudents:       @(ViewBag.TotalStudents      ?? 0),
+        preAssessmentCount:  @(ViewBag.PreAssessmentCount ?? 0),
+        postAssessmentCount: @(ViewBag.PostAssessmentCount ?? 0),
+        beginnerCount:       @(ViewBag.BeginnerCount      ?? 0),
+        intermediateCount:   @(ViewBag.IntermediateCount  ?? 0),
+        advancedCount:       @(ViewBag.AdvancedCount      ?? 0),
+        avgPreTheta:         @(ViewBag.AvgPreTheta        ?? 0),
+        avgPostTheta:        @(ViewBag.AvgPostTheta       ?? 0),
+        avgGrowth:           @(ViewBag.AvgGrowth          ?? 0)
+    };
+</script>
+
+@Scripts.Render("~/Scripts/AnalyticsScript.js")

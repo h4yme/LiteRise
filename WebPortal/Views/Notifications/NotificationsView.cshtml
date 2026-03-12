@@ -1,0 +1,708 @@
+@{
+    ViewBag.Title = "Notifications";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Styles.Render("~/Content/NotificationsStyles.css")
+
+<style>
+    /* ── Notifications page styles ───────────────────────────────────────── */
+    .notifications-wrapper {
+        padding: 0 4px;
+    }
+
+    .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .page-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin: 0;
+        color: #1a1a2e;
+    }
+
+    .page-subtitle {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin: 4px 0 0;
+    }
+
+    body.dark-mode .page-title  { color: #e9ecef; }
+    body.dark-mode .page-subtitle { color: #adb5bd; }
+
+    /* ── Two-column layout ───────────────────────────────────────────────── */
+    .notifications-layout {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .notifications-left  { flex: 0 0 60%; min-width: 0; }
+    .notifications-right { flex: 0 0 calc(40% - 24px); min-width: 0; position: sticky; top: 80px; }
+
+    @media (max-width: 991px) {
+        .notifications-layout  { flex-direction: column; }
+        .notifications-left,
+        .notifications-right   { flex: none; width: 100%; position: static; }
+    }
+
+    /* ── Section card ────────────────────────────────────────────────────── */
+    .section-card {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    body.dark-mode .section-card { background: #1e2330; }
+
+    .section-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    body.dark-mode .section-card-header { border-color: #2d3548; }
+
+    .section-card-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin: 0;
+        color: #1a1a2e;
+    }
+
+    body.dark-mode .section-card-title { color: #e9ecef; }
+
+    /* ── Filter row ──────────────────────────────────────────────────────── */
+    .filter-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        flex-wrap: wrap;
+    }
+
+    body.dark-mode .filter-row {
+        background: #252b3b;
+        border-color: #2d3548;
+    }
+
+    .status-tabs {
+        display: flex;
+        gap: 4px;
+    }
+
+    .status-tab {
+        padding: 5px 14px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background: #fff;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        color: #495057;
+        transition: all 0.15s;
+    }
+
+    .status-tab.active,
+    .status-tab:hover {
+        background: #11B067;
+        border-color: #11B067;
+        color: #fff;
+    }
+
+    body.dark-mode .status-tab {
+        background: #1e2330;
+        border-color: #3a4560;
+        color: #adb5bd;
+    }
+
+    body.dark-mode .status-tab.active,
+    body.dark-mode .status-tab:hover {
+        background: #11B067;
+        border-color: #11B067;
+        color: #fff;
+    }
+
+    .filter-row .form-select,
+    .filter-row .form-control {
+        font-size: 0.8125rem;
+        border-radius: 6px;
+    }
+
+    body.dark-mode .filter-row .form-select,
+    body.dark-mode .filter-row .form-control {
+        background: #1e2330;
+        border-color: #3a4560;
+        color: #e9ecef;
+    }
+
+    /* ── Notification list ───────────────────────────────────────────────── */
+    .notifications-list {
+        padding: 12px 16px;
+        min-height: 200px;
+    }
+
+    .notification-card {
+        background: #fff;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin-bottom: 10px;
+        transition: box-shadow 0.15s;
+    }
+
+    .notification-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+
+    body.dark-mode .notification-card {
+        background: #252b3b;
+        border-color: #2d3548;
+    }
+
+    .notif-card-row1 {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .notif-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #1a1a2e;
+        flex: 1;
+    }
+
+    body.dark-mode .notif-title { color: #e9ecef; }
+
+    .notif-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    .notif-badge-info        { background: #dbeafe; color: #1d4ed8; }
+    .notif-badge-achievement { background: #fef9c3; color: #a16207; }
+    .notif-badge-reminder    { background: #ffedd5; color: #c2410c; }
+
+    body.dark-mode .notif-badge-info        { background: #1e3a5f; color: #93c5fd; }
+    body.dark-mode .notif-badge-achievement { background: #422006; color: #fcd34d; }
+    body.dark-mode .notif-badge-reminder    { background: #431407; color: #fdba74; }
+
+    .notif-card-row2 {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 0.775rem;
+        color: #6c757d;
+        flex-wrap: wrap;
+    }
+
+    body.dark-mode .notif-card-row2 { color: #8899bb; }
+
+    .notif-meta-item {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .status-dot-sent      { background: #11B067; }
+    .status-dot-scheduled { background: #0d6efd; }
+    .status-dot-failed    { background: #dc3545; }
+
+    /* ── Empty state ─────────────────────────────────────────────────────── */
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #adb5bd;
+    }
+
+    .empty-state i { font-size: 2.5rem; margin-bottom: 12px; display: block; }
+
+    body.dark-mode .empty-state { color: #495057; }
+
+    /* ── Compose panel ───────────────────────────────────────────────────── */
+    .compose-panel {
+        padding: 20px;
+    }
+
+    .compose-panel .form-label {
+        font-size: 0.8125rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+        color: #495057;
+    }
+
+    body.dark-mode .compose-panel .form-label { color: #adb5bd; }
+
+    .compose-panel .form-control,
+    .compose-panel .form-select {
+        border-radius: 6px;
+        font-size: 0.875rem;
+        border-color: #dee2e6;
+    }
+
+    body.dark-mode .compose-panel .form-control,
+    body.dark-mode .compose-panel .form-select {
+        background: #252b3b;
+        border-color: #3a4560;
+        color: #e9ecef;
+    }
+
+    body.dark-mode .compose-panel .form-control::placeholder { color: #5a6a8a; }
+
+    .char-counter {
+        font-size: 0.75rem;
+        text-align: right;
+        margin-top: 3px;
+        color: #6c757d;
+    }
+
+    .char-counter.warn  { color: #f59e0b; }
+    .char-counter.over  { color: #dc3545; font-weight: 600; }
+
+    /* ── Target radio group ──────────────────────────────────────────────── */
+    .target-radio-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .target-radio-group .form-check {
+        margin: 0;
+    }
+
+    .target-radio-group .form-check-label {
+        font-size: 0.8125rem;
+        cursor: pointer;
+    }
+
+    /* ── Schedule toggle ─────────────────────────────────────────────────── */
+    .send-toggle {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .send-toggle-btn {
+        flex: 1;
+        padding: 7px;
+        border-radius: 6px;
+        border: 1px solid #dee2e6;
+        background: #f8f9fa;
+        font-size: 0.8125rem;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.15s;
+        color: #495057;
+    }
+
+    .send-toggle-btn.active {
+        background: #11B067;
+        border-color: #11B067;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    body.dark-mode .send-toggle-btn {
+        background: #1e2330;
+        border-color: #3a4560;
+        color: #adb5bd;
+    }
+
+    body.dark-mode .send-toggle-btn.active {
+        background: #11B067;
+        border-color: #11B067;
+        color: #fff;
+    }
+
+    /* ── Template quick-inserts ──────────────────────────────────────────── */
+    .templates-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 12px;
+    }
+
+    .template-btn {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 20px;
+        border: 1px solid #11B067;
+        background: transparent;
+        color: #11B067;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .template-btn:hover {
+        background: #11B067;
+        color: #fff;
+    }
+
+    /* ── Action buttons row ──────────────────────────────────────────────── */
+    .compose-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .btn-send {
+        flex: 1;
+        background: #11B067;
+        border-color: #11B067;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+    }
+
+    .btn-send:hover {
+        background: #0d9056;
+        border-color: #0d9056;
+        color: #fff;
+    }
+
+    /* ── Toast container ─────────────────────────────────────────────────── */
+    .toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+    }
+
+    /* ── Modal dark mode ─────────────────────────────────────────────────── */
+    body.dark-mode .modal-content {
+        background: #1e2330;
+        color: #e9ecef;
+        border: 1px solid #2d3548;
+    }
+
+    body.dark-mode .modal-header { border-color: #2d3548; }
+    body.dark-mode .modal-footer { border-color: #2d3548; }
+    body.dark-mode .modal-title  { color: #e9ecef; }
+    body.dark-mode .btn-close    { filter: invert(1); }
+
+    body.dark-mode .form-check-input {
+        background-color: #252b3b;
+        border-color: #3a4560;
+    }
+
+    /* ── Preview card ────────────────────────────────────────────────────── */
+    .preview-notif-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e9ecef;
+    }
+
+    body.dark-mode .preview-notif-card {
+        background: #252b3b;
+        border-color: #3a4560;
+    }
+
+    .preview-notif-title {
+        font-weight: 700;
+        font-size: 1rem;
+        margin-bottom: 6px;
+        color: #1a1a2e;
+    }
+
+    body.dark-mode .preview-notif-title { color: #e9ecef; }
+
+    .preview-notif-body {
+        font-size: 0.875rem;
+        color: #495057;
+        line-height: 1.5;
+    }
+
+    body.dark-mode .preview-notif-body { color: #adb5bd; }
+
+    .preview-notif-meta {
+        margin-top: 12px;
+        font-size: 0.775rem;
+        color: #6c757d;
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+</style>
+
+<div class="notifications-wrapper">
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         PAGE HEADER
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fas fa-bell me-2 text-success"></i>Notifications</h1>
+            <p class="page-subtitle">Send and manage push notifications to students</p>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════════════════
+         TWO-COLUMN LAYOUT
+    ══════════════════════════════════════════════════════════════════ -->
+    <div class="notifications-layout">
+
+        <!-- ══════════════════════════════════════════════════
+             LEFT — Notification History
+        ═══════════════════════════════════════════════════ -->
+        <div class="notifications-left">
+            <div class="section-card">
+                <!-- Header -->
+                <div class="section-card-header">
+                    <h2 class="section-card-title"><i class="fas fa-history me-2 text-secondary"></i>Sent Notifications</h2>
+                    <button class="btn btn-sm btn-success d-lg-none" id="composeMobileBtn" style="border-radius:8px;">
+                        <i class="fas fa-pen me-1"></i>Compose
+                    </button>
+                </div>
+
+                <!-- Filter row -->
+                <div class="filter-row">
+                    <div class="status-tabs">
+                        <button class="status-tab active" data-status="all">All</button>
+                        <button class="status-tab" data-status="Sent">Sent</button>
+                        <button class="status-tab" data-status="Scheduled">Scheduled</button>
+                    </div>
+                    <select id="typeFilter" class="form-select form-select-sm" style="width:130px;">
+                        <option value="">All Types</option>
+                        <option value="Info">Info</option>
+                        <option value="Achievement">Achievement</option>
+                        <option value="Reminder">Reminder</option>
+                    </select>
+                    <input type="text" id="notifSearch" class="form-control form-control-sm" placeholder="Search notifications…" style="flex:1; min-width:140px;">
+                </div>
+
+                <!-- List -->
+                <div class="notifications-list" id="notificationsList">
+                    <div class="empty-state" id="notifLoadingState">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading notifications…</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══════════════════════════════════════════════════
+             RIGHT — Compose Panel
+        ═══════════════════════════════════════════════════ -->
+        <div class="notifications-right" id="composePanelWrapper">
+            <div class="section-card">
+                <div class="section-card-header">
+                    <h2 class="section-card-title"><i class="fas fa-pen me-2 text-success"></i>Compose Notification</h2>
+                </div>
+                <div class="compose-panel">
+
+                    <!-- Templates -->
+                    <div class="mb-3">
+                        <label class="form-label">Quick Templates</label>
+                        <div class="templates-row" id="templateButtons">
+                            <span class="text-muted" style="font-size:0.8rem;">Loading…</span>
+                        </div>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="mb-3">
+                        <label class="form-label" for="notifTitle">Title <span class="text-danger">*</span></label>
+                        <input type="text" id="notifTitle" class="form-control" placeholder="Notification title" maxlength="100">
+                    </div>
+
+                    <!-- Message -->
+                    <div class="mb-3">
+                        <label class="form-label" for="notifBody">Message <span class="text-danger">*</span></label>
+                        <textarea id="notifBody" class="form-control" rows="4"
+                                  placeholder="Write your message here…" maxlength="500"></textarea>
+                        <div class="char-counter" id="charCounter">0 / 500</div>
+                    </div>
+
+                    <!-- Target -->
+                    <div class="mb-3">
+                        <label class="form-label">Target Audience <span class="text-danger">*</span></label>
+                        <div class="target-radio-group">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="targetRadio" id="targetAll" value="All" checked>
+                                <label class="form-check-label" for="targetAll">All Students</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="targetRadio" id="targetSchool" value="BySchool">
+                                <label class="form-check-label" for="targetSchool">By School</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="targetRadio" id="targetGrade" value="ByGrade">
+                                <label class="form-check-label" for="targetGrade">By Grade Level</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- School dropdown (conditional) -->
+                    <div class="mb-3 d-none" id="schoolDropdownWrapper">
+                        <label class="form-label" for="schoolSelect">School <span class="text-danger">*</span></label>
+                        <select id="schoolSelect" class="form-select">
+                            <option value="">— Select school —</option>
+                            <option value="1">Bagong Pag-asa Elementary</option>
+                            <option value="2">Mapayapa Elementary</option>
+                            <option value="3">Mabini Central Elementary</option>
+                            <option value="4">Rizal National Elementary</option>
+                            <option value="5">Pag-asa Elementary School</option>
+                        </select>
+                    </div>
+
+                    <!-- Grade dropdown (conditional) -->
+                    <div class="mb-3 d-none" id="gradeDropdownWrapper">
+                        <label class="form-label" for="gradeSelect">Grade Level <span class="text-danger">*</span></label>
+                        <select id="gradeSelect" class="form-select">
+                            <option value="">— Select grade —</option>
+                            <option value="1">Grade 1</option>
+                            <option value="2">Grade 2</option>
+                            <option value="3">Grade 3</option>
+                            <option value="4">Grade 4</option>
+                            <option value="5">Grade 5</option>
+                            <option value="6">Grade 6</option>
+                        </select>
+                    </div>
+
+                    <!-- Type -->
+                    <div class="mb-3">
+                        <label class="form-label" for="notifType">Notification Type</label>
+                        <select id="notifType" class="form-select">
+                            <option value="Info">Info</option>
+                            <option value="Achievement">Achievement</option>
+                            <option value="Reminder">Reminder</option>
+                        </select>
+                    </div>
+
+                    <!-- Send Now vs Schedule -->
+                    <div class="mb-3">
+                        <label class="form-label">Send Timing</label>
+                        <div class="send-toggle">
+                            <button type="button" class="send-toggle-btn active" id="sendNowBtn" data-mode="now">
+                                <i class="fas fa-paper-plane me-1"></i>Send Now
+                            </button>
+                            <button type="button" class="send-toggle-btn" id="scheduleBtn" data-mode="schedule">
+                                <i class="far fa-clock me-1"></i>Schedule
+                            </button>
+                        </div>
+                        <div class="d-none" id="scheduledAtWrapper">
+                            <label class="form-label" for="scheduledAt">Schedule Date &amp; Time <span class="text-danger">*</span></label>
+                            <input type="datetime-local" id="scheduledAt" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="compose-actions">
+                        <button type="button" class="btn btn-outline-secondary" id="previewBtn" style="border-radius:8px;">
+                            <i class="far fa-eye me-1"></i>Preview
+                        </button>
+                        <button type="button" class="btn btn-send" id="sendNotifBtn">
+                            <i class="fas fa-paper-plane me-1"></i>Send
+                        </button>
+                    </div>
+
+                </div><!-- /.compose-panel -->
+            </div>
+        </div>
+
+    </div><!-- /.notifications-layout -->
+</div><!-- /.notifications-wrapper -->
+
+<!-- ══════════════════════════════════════════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════════════════════════════════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     PREVIEW MODAL
+══════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="far fa-eye me-2 text-primary"></i>Notification Preview
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3" style="font-size:0.8125rem;">
+                    This is how the notification will appear on students' devices.
+                </p>
+                <!-- Simulated phone notification -->
+                <div class="preview-notif-card">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div style="width:32px;height:32px;border-radius:8px;background:#11B067;display:flex;align-items:center;justify-content:center;">
+                            <i class="fas fa-book-open text-white" style="font-size:0.875rem;"></i>
+                        </div>
+                        <div>
+                            <div style="font-size:0.75rem;font-weight:600;color:#6c757d;">LiteRise</div>
+                            <div style="font-size:0.7rem;color:#adb5bd;" id="previewTime">Just now</div>
+                        </div>
+                        <span class="notif-badge ms-auto" id="previewBadge">Info</span>
+                    </div>
+                    <div class="preview-notif-title" id="previewTitle">Notification Title</div>
+                    <div class="preview-notif-body" id="previewBody">Message body goes here…</div>
+                    <div class="preview-notif-meta">
+                        <span><i class="fas fa-users me-1"></i><span id="previewTarget">All Students</span></span>
+                        <span><i class="fas fa-tag me-1"></i><span id="previewType">Info</span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-send" id="previewSendBtn" style="min-width:100px;">
+                    <i class="fas fa-paper-plane me-1"></i>Send
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════
+     CONFIRM MODAL (for "All Students" target)
+══════════════════════════════════════════════════════════════════ -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Confirm Send
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-1">You are about to send a notification to</p>
+                <p class="fw-bold fs-5">ALL students</p>
+                <p class="text-muted" style="font-size:0.85rem;">This action cannot be undone. Are you sure?</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-send" id="confirmSendBtn" style="min-width:100px;">
+                    <i class="fas fa-paper-plane me-1"></i>Confirm Send
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/Scripts/NotificationsScript.js")
