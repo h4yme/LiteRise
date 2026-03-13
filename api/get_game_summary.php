@@ -18,23 +18,17 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 try {
-    $pdo = getConnection();
 
     // ── Totals ────────────────────────────────────────────────
-    $totals = $pdo->query("
+    $totals = $conn->query("
         SELECT
             COUNT(*)                     AS total_plays,
             ROUND(AVG(CAST(Accuracy AS FLOAT)), 2) AS avg_accuracy,
@@ -43,7 +37,7 @@ try {
     ")->fetch(PDO::FETCH_ASSOC);
 
     // ── Most-played game type ─────────────────────────────────
-    $mostPlayed = $pdo->query("
+    $mostPlayed = $conn->query("
         SELECT TOP 1 GameType
         FROM   dbo.GameResults
         GROUP  BY GameType
@@ -51,7 +45,7 @@ try {
     ")->fetchColumn();
 
     // ── Per-game-type breakdown ───────────────────────────────
-    $byType = $pdo->query("
+    $byType = $conn->query("
         SELECT
             GameType                                   AS game_type,
             COUNT(*)                                   AS play_count,
@@ -70,7 +64,7 @@ try {
     unset($row);
 
     // ── XP over time — last 8 ISO weeks ───────────────────────
-    $xpOverTime = $pdo->query("
+    $xpOverTime = $conn->query("
         SELECT
             CONCAT('W', DATEPART(iso_week, PlayedAt)) AS week_label,
             SUM(XPEarned)                             AS xp_total
@@ -96,7 +90,7 @@ try {
         'xp_over_time' => $xpOverTime,
     ], JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

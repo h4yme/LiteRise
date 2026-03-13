@@ -8,17 +8,12 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 $id       = trim($body['id']       ?? '');   // "admin_1" or "teacher_1"
@@ -55,12 +50,10 @@ if ($rawId <= 0 || !in_array($table, ['admin', 'teacher'])) {
 }
 
 try {
-    $pdo  = getConnection();
     $hash = !empty($password) ? password_hash($password, PASSWORD_BCRYPT) : null;
 
     if ($table === 'admin') {
-        // Check email uniqueness (exclude self)
-        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ? AND AdminID <> ?");
+        $chk = $conn->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ? AND AdminID <> ?");
         $chk->execute([$email, $rawId]);
         if ((int)$chk->fetchColumn() > 0) {
             http_response_code(409);
@@ -69,21 +62,19 @@ try {
         }
 
         if ($hash) {
-            $stmt = $pdo->prepare("UPDATE dbo.Admins SET Username=?, Email=?, PasswordHash=? WHERE AdminID=?");
+            $stmt = $conn->prepare("UPDATE dbo.Admins SET Username=?, Email=?, PasswordHash=? WHERE AdminID=?");
             $stmt->execute([$name, $email, $hash, $rawId]);
         } else {
-            $stmt = $pdo->prepare("UPDATE dbo.Admins SET Username=?, Email=? WHERE AdminID=?");
+            $stmt = $conn->prepare("UPDATE dbo.Admins SET Username=?, Email=? WHERE AdminID=?");
             $stmt->execute([$name, $email, $rawId]);
         }
 
     } else {
-        // Split FirstName / LastName
         $nameParts = explode(' ', $name, 2);
         $firstName = $nameParts[0];
         $lastName  = $nameParts[1] ?? '';
 
-        // Check email uniqueness (exclude self)
-        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ? AND TeacherID <> ?");
+        $chk = $conn->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ? AND TeacherID <> ?");
         $chk->execute([$email, $rawId]);
         if ((int)$chk->fetchColumn() > 0) {
             http_response_code(409);
@@ -92,10 +83,10 @@ try {
         }
 
         if ($hash) {
-            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, Password=? WHERE TeacherID=?");
+            $stmt = $conn->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=?, Password=? WHERE TeacherID=?");
             $stmt->execute([$firstName, $lastName, $email, $hash, $rawId]);
         } else {
-            $stmt = $pdo->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=? WHERE TeacherID=?");
+            $stmt = $conn->prepare("UPDATE dbo.Teachers SET FirstName=?, LastName=?, Email=? WHERE TeacherID=?");
             $stmt->execute([$firstName, $lastName, $email, $rawId]);
         }
     }

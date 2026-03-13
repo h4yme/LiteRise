@@ -23,17 +23,12 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 // Default date range: last 30 days
 $startDate = $_GET['start_date'] ?? date('Y-m-d', strtotime('-30 days'));
@@ -45,14 +40,13 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) $startDate = date('Y-m-d',
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate))   $endDate   = date('Y-m-d');
 
 try {
-    $pdo = getConnection();
 
     $schoolFilter = $schoolId ? 'AND s.SchoolID = ?' : '';
     $params       = [$startDate, $endDate];
     if ($schoolId) $params[] = $schoolId;
 
     // ── Summary totals ────────────────────────────────────────
-    $summary = $pdo->prepare("
+    $summary = $conn->prepare("
         SELECT
             COUNT(*)                               AS total_sessions,
             COUNT(DISTINCT ts.StudentID)           AS unique_students,
@@ -68,7 +62,7 @@ try {
     $totals = $summary->fetch(PDO::FETCH_ASSOC);
 
     // ── Daily login counts ────────────────────────────────────
-    $dailyStmt = $pdo->prepare("
+    $dailyStmt = $conn->prepare("
         SELECT
             CONVERT(varchar(10), ts.LoginAt, 23)   AS date,
             COUNT(*)                               AS login_count,
@@ -90,7 +84,7 @@ try {
     unset($d);
 
     // ── Session list (latest 500) ─────────────────────────────
-    $sessStmt = $pdo->prepare("
+    $sessStmt = $conn->prepare("
         SELECT TOP 500
             ts.SessionID                                              AS session_id,
             ts.StudentID                                              AS student_id,
@@ -128,7 +122,7 @@ try {
         'sessions'         => $sessions,
     ], JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

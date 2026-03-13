@@ -1,26 +1,24 @@
 <?php
-// ============================================================
-// create_portal_account.php  POST  (admin only)
-// Role=Admin  → INSERT into dbo.Admins
-// Role=Teacher → INSERT into dbo.Teachers
-//
-// Body: { name, email, password, role }
-// ============================================================
+/**
+ * create_portal_account.php
+ * Creates a new admin or teacher account.
+ *
+ * POST /api/create_portal_account.php
+ *
+ * Requires: Bearer JWT (portal token)
+ * Body: { name, email, password, role }
+ *   role: "Admin" or "Teacher"
+ */
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 $name     = trim($body['name']      ?? '');
@@ -52,11 +50,8 @@ if (!in_array($role, ['Admin', 'Teacher'])) {
 $hash = password_hash($password, PASSWORD_BCRYPT);
 
 try {
-    $pdo = getConnection();
-
     if ($role === 'Admin') {
-        // Check duplicate email in Admins
-        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ?");
+        $chk = $conn->prepare("SELECT COUNT(*) FROM dbo.Admins WHERE Email = ?");
         $chk->execute([$email]);
         if ((int)$chk->fetchColumn() > 0) {
             http_response_code(409);
@@ -64,7 +59,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("
+        $stmt = $conn->prepare("
             INSERT INTO dbo.Admins (Username, Email, PasswordHash, IsActive, CreatedDate)
             OUTPUT INSERTED.AdminID
             VALUES (?, ?, ?, 1, GETUTCDATE())
@@ -75,13 +70,11 @@ try {
         echo json_encode(['success' => true, 'message' => 'Admin account created.', 'id' => "admin_$newId"]);
 
     } else {
-        // Split name into FirstName / LastName
         $parts     = explode(' ', $name, 2);
         $firstName = $parts[0];
         $lastName  = $parts[1] ?? '';
 
-        // Check duplicate email in Teachers
-        $chk = $pdo->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ?");
+        $chk = $conn->prepare("SELECT COUNT(*) FROM dbo.Teachers WHERE Email = ?");
         $chk->execute([$email]);
         if ((int)$chk->fetchColumn() > 0) {
             http_response_code(409);
@@ -89,7 +82,7 @@ try {
             exit;
         }
 
-        $stmt = $pdo->prepare("
+        $stmt = $conn->prepare("
             INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, IsActive, DateCreated)
             OUTPUT INSERTED.TeacherID
             VALUES (?, ?, ?, ?, 1, GETUTCDATE())
@@ -103,4 +96,5 @@ try {
 } catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    error_log('create_portal_account error: ' . $e->getMessage());
 }

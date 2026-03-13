@@ -8,17 +8,12 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 $body     = json_decode(file_get_contents('php://input'), true) ?? [];
 $id       = trim($body['id']        ?? '');
@@ -41,13 +36,12 @@ if ($rawId <= 0 || !in_array($table, ['admin', 'teacher'])) {
 }
 
 try {
-    $pdo   = getConnection();
     $flag  = $isActive ? 1 : 0;
 
     if ($table === 'admin') {
-        $stmt = $pdo->prepare("UPDATE dbo.Admins SET IsActive = ? WHERE AdminID = ?");
+        $stmt = $conn->prepare("UPDATE dbo.Admins SET IsActive = ? WHERE AdminID = ?");
     } else {
-        $stmt = $pdo->prepare("UPDATE dbo.Teachers SET IsActive = ? WHERE TeacherID = ?");
+        $stmt = $conn->prepare("UPDATE dbo.Teachers SET IsActive = ? WHERE TeacherID = ?");
     }
     $stmt->execute([$flag, $rawId]);
 
@@ -56,7 +50,7 @@ try {
         ? json_encode(['success' => true, 'message' => $msg])
         : json_encode(['success' => false, 'message' => 'Account not found.']);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

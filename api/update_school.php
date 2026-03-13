@@ -1,23 +1,23 @@
 <?php
-// ============================================================
-// update_school.php  POST  (admin only)
-// Body: { school_id, school_name, district, address, city, province }
-// ============================================================
+/**
+ * update_school.php
+ * Updates an existing school record.
+ *
+ * POST /api/update_school.php
+ *
+ * Requires: Bearer JWT (portal token)
+ * Body: { school_id, school_name, district, address, city, province }
+ */
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 $body       = json_decode(file_get_contents('php://input'), true) ?? [];
 $schoolId   = (int)($body['school_id']   ?? 0);
@@ -34,8 +34,7 @@ if ($schoolId <= 0 || !$schoolName) {
 }
 
 try {
-    $pdo  = getConnection();
-    $stmt = $pdo->prepare("
+    $stmt = $conn->prepare("
         UPDATE dbo.Schools
         SET SchoolName = ?, District = ?, Address = ?, City = ?, Province = ?
         WHERE SchoolID = ?
@@ -46,7 +45,8 @@ try {
         ? json_encode(['success' => true, 'message' => 'School updated.'])
         : json_encode(['success' => false, 'message' => 'School not found.']);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    error_log('update_school error: ' . $e->getMessage());
 }

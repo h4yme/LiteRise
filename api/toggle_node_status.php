@@ -11,8 +11,8 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -21,12 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-$auth = verifyToken();
-if (!$auth || strtolower($auth['role'] ?? '') !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Admin access required']);
-    exit;
-}
+requireAuth();
 
 $body    = json_decode(file_get_contents('php://input'), true) ?? [];
 $nodeId  = isset($body['node_id'])  ? (int)$body['node_id']      : null;
@@ -39,10 +34,8 @@ if (!$nodeId || $enabled === null) {
 }
 
 try {
-    $pdo = getConnection();
-
     // Verify node exists
-    $stmt = $pdo->prepare('SELECT NodeID FROM dbo.Nodes WHERE NodeID = ?');
+    $stmt = $conn->prepare('SELECT NodeID FROM dbo.Nodes WHERE NodeID = ?');
     $stmt->execute([$nodeId]);
     if (!$stmt->fetch()) {
         http_response_code(404);
@@ -51,8 +44,8 @@ try {
     }
 
     $isActive = $enabled ? 1 : 0;
-    $pdo->prepare('UPDATE dbo.Nodes SET IsActive = ? WHERE NodeID = ?')
-        ->execute([$isActive, $nodeId]);
+    $upd = $conn->prepare('UPDATE dbo.Nodes SET IsActive = ? WHERE NodeID = ?');
+    $upd->execute([$isActive, $nodeId]);
 
     $action = $enabled ? 'enabled' : 'disabled';
     echo json_encode([
@@ -62,7 +55,7 @@ try {
         'is_active' => $enabled,
     ]);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

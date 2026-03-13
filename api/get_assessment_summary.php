@@ -19,23 +19,17 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Authorization, Content-Type');
 
-require_once __DIR__ . '/../src/auth.php';
-require_once __DIR__ . '/../src/db.php';
+require_once __DIR__ . '/src/db.php';
+require_once __DIR__ . '/src/auth.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') { http_response_code(204); exit; }
 
-$auth = verifyToken();
-if (!$auth) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+requireAuth();
 
 try {
-    $pdo = getConnection();
 
     // ── Theta averages & counts ───────────────────────────────
-    $row = $pdo->query("
+    $row = $conn->query("
         SELECT
             COUNT(CASE WHEN PreAssessmentCompleted = 1 THEN 1 END)  AS pre_taken,
             COUNT(CASE WHEN PostAssessmentCompleted = 1 THEN 1 END) AS post_taken,
@@ -50,7 +44,7 @@ try {
     ")->fetch(PDO::FETCH_ASSOC);
 
     // ── Level distribution ────────────────────────────────────
-    $levels = $pdo->query("
+    $levels = $conn->query("
         SELECT
             SUM(CASE WHEN PreAssessmentLevel = 1 THEN 1 ELSE 0 END) AS beginner,
             SUM(CASE WHEN PreAssessmentLevel = 2 THEN 1 ELSE 0 END) AS intermediate,
@@ -60,7 +54,7 @@ try {
     ")->fetch(PDO::FETCH_ASSOC);
 
     // ── Per-school comparison ─────────────────────────────────
-    $schools = $pdo->query("
+    $schools = $conn->query("
         SELECT
             ISNULL(sc.SchoolName, 'Unknown')                        AS school_name,
             ROUND(AVG(CASE WHEN s.InitialAbility IS NOT NULL
@@ -96,7 +90,7 @@ try {
         'school_comparison' => $schools,
     ], JSON_UNESCAPED_UNICODE);
 
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
