@@ -601,7 +601,7 @@
         fetch('/Masterfile/GetAdmins')
             .then(function (r) { return r.json(); })
             .then(function (data) {
-                window.allAdmins = Array.isArray(data) ? data : (data.admins || []);
+                window.allAdmins = Array.isArray(data) ? data : (data.data || data.admins || []);
                 filterAdmins();
             })
             .catch(function (err) {
@@ -616,7 +616,7 @@
 
         var all = window.allAdmins || [];
         var filtered = all.filter(function (a) {
-            var matchSearch = !search || (a.firstName + ' ' + a.lastName).toLowerCase().includes(search.toLowerCase()) ||
+            var matchSearch = !search || (a.name || '').toLowerCase().includes(search.toLowerCase()) ||
                               (a.email || '').toLowerCase().includes(search.toLowerCase());
             var matchRole   = !role   || (a.role || '') === role;
             return matchSearch && matchRole;
@@ -634,14 +634,16 @@
         }
 
         tbody.innerHTML = list.map(function (a) {
-            var fullName   = ((a.firstName || '') + ' ' + (a.lastName || '')).trim();
-            var initials   = ((a.firstName || ' ')[0] + (a.lastName || ' ')[0]).toUpperCase();
+            var fullName   = (a.name || '').trim();
+            var parts      = fullName.split(' ');
+            var initials   = ((parts[0] || ' ')[0] + ((parts[1] || ' ')[0])).toUpperCase();
             var roleBadge  = roleColorClass(a.role);
             var active     = a.isActive !== false;
             var statusBadge = active
                 ? '<span class="badge bg-success">Active</span>'
                 : '<span class="badge bg-secondary">Inactive</span>';
             var lastLogin  = a.lastLogin ? formatDate(a.lastLogin) : 'Never';
+            var safeId     = escJs(String(a.id || ''));
 
             return '<tr>' +
                 '<td><div class="d-flex align-items-center gap-2">' +
@@ -654,10 +656,10 @@
                 '<td>' + lastLogin + '</td>' +
                 '<td>' + statusBadge + '</td>' +
                 '<td>' +
-                  '<button class="btn btn-sm btn-outline-primary me-1" onclick="openEditAdmin(' + a.id + ')">Edit</button>' +
+                  '<button class="btn btn-sm btn-outline-primary me-1" onclick="openEditAdmin(\'' + safeId + '\')">Edit</button>' +
                   (active
-                    ? '<button class="btn btn-sm btn-outline-danger" onclick="deactivateAdmin(' + a.id + ',\'' + escJs(fullName) + '\')">Deactivate</button>'
-                    : '<button class="btn btn-sm btn-outline-success" onclick="deactivateAdmin(' + a.id + ',\'' + escJs(fullName) + '\')">Activate</button>') +
+                    ? '<button class="btn btn-sm btn-outline-danger" onclick="toggleAdmin(\'' + safeId + '\',\'' + escJs(fullName) + '\',true)">Deactivate</button>'
+                    : '<button class="btn btn-sm btn-outline-success" onclick="toggleAdmin(\'' + safeId + '\',\'' + escJs(fullName) + '\',false)">Activate</button>') +
                 '</td>' +
                 '</tr>';
         }).join('');
@@ -674,61 +676,54 @@
     }
 
     function openAddAdmin() {
-        var form = document.getElementById('adminForm');
-        if (form) form.reset();
-        var hiddenId = document.getElementById('adminId');
-        if (hiddenId) hiddenId.value = '';
-        var title = document.getElementById('adminModalTitle');
-        if (title) title.textContent = 'Add Administrator';
+        ['aId','aName','aEmail','aPassword','aRole','aSchool'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        var title = document.getElementById('adminModalLabel');
+        if (title) title.textContent = 'Add Account';
         handleAdminRoleChange();
         showModal('adminModal');
     }
 
     function openEditAdmin(id) {
-        var a = (window.allAdmins || []).find(function (x) { return x.id === id; });
-        if (!a) { showToast('Admin not found.', 'danger'); return; }
+        var a = (window.allAdmins || []).find(function (x) { return String(x.id) === String(id); });
+        if (!a) { showToast('Account not found.', 'danger'); return; }
 
-        setVal('adminId',        a.id);
-        setVal('adminFirstName', a.firstName);
-        setVal('adminLastName',  a.lastName);
-        setVal('adminEmail',     a.email);
-        setVal('adminRole',      a.role);
-        setVal('adminSchool',    a.school);
+        setVal('aId',    a.id);
+        setVal('aName',  a.name || '');
+        setVal('aEmail', a.email || '');
+        setVal('aPassword', '');
+        setVal('aRole',  a.role || '');
+        setVal('aSchool', a.school || '');
 
-        var title = document.getElementById('adminModalTitle');
-        if (title) title.textContent = 'Edit Administrator';
+        var title = document.getElementById('adminModalLabel');
+        if (title) title.textContent = 'Edit Account';
         handleAdminRoleChange();
         showModal('adminModal');
     }
 
     function handleAdminRoleChange() {
-        var role       = getVal('adminRole');
-        var schoolGrp  = document.getElementById('aSchoolGroup');
+        var role      = getVal('aRole');
+        var schoolGrp = document.getElementById('aSchoolGroup');
         if (schoolGrp) schoolGrp.style.display = role === 'Teacher' ? '' : 'none';
     }
 
     function saveAdmin() {
-        var firstName = getVal('adminFirstName');
-        var lastName  = getVal('adminLastName');
-        var email     = getVal('adminEmail');
-        var role      = getVal('adminRole');
-        var school    = getVal('adminSchool');
+        var name     = getVal('aName');
+        var email    = getVal('aEmail');
+        var password = getVal('aPassword');
+        var role     = getVal('aRole');
+        var school   = getVal('aSchool');
+        var id       = getVal('aId') || '';
 
-        if (!firstName.trim()) { showToast('First name is required.', 'danger'); return; }
-        if (!lastName.trim())  { showToast('Last name is required.',  'danger'); return; }
-        if (!email.trim())     { showToast('Email is required.',      'danger'); return; }
+        if (!name.trim())  { showToast('Full name is required.', 'danger'); return; }
+        if (!email.trim()) { showToast('Email is required.',     'danger'); return; }
         if (!validateEmail(email)) { showToast('Please enter a valid email address.', 'danger'); return; }
-        if (!role)             { showToast('Role is required.',       'danger'); return; }
+        if (!role)         { showToast('Role is required.',      'danger'); return; }
         if (role === 'Teacher' && !school.trim()) { showToast('School is required for Teacher role.', 'danger'); return; }
 
-        var payload = {
-            id:        getVal('adminId') || 0,
-            firstName: firstName,
-            lastName:  lastName,
-            email:     email,
-            role:      role,
-            school:    school
-        };
+        var payload = { id: id, name: name, email: email, password: password, role: role, school: school };
 
         fetch('/Masterfile/SaveAdmin', {
             method:  'POST',
@@ -737,52 +732,45 @@
         })
             .then(function (r) { return r.json(); })
             .then(function (res) {
-                if (res && res.success === false) throw new Error(res.message || 'Save failed.');
+                if (res && res.success === false) throw new Error(res.error || res.message || 'Save failed.');
                 hideModal('adminModal');
-                showToast('Administrator saved successfully.', 'success');
+                showToast('Account saved successfully.', 'success');
                 loadAdmins();
             })
             .catch(function (err) {
-                showToast(err.message || 'Failed to save administrator.', 'danger');
+                showToast(err.message || 'Failed to save account.', 'danger');
             });
     }
 
-    function deactivateAdmin(id, name) {
+    function toggleAdmin(id, name, isCurrentlyActive) {
+        var action = isCurrentlyActive ? 'Deactivate' : 'Activate';
+        var color  = isCurrentlyActive ? '#DC2626' : '#16a34a';
         Swal.fire({
-            title: 'Confirm Deactivation',
-            html: 'Are you sure you want to deactivate <strong>' + escHtml(name || 'this administrator') + '</strong>?<br><small style="color:#6b7280">They will no longer be able to log in until reactivated.</small>',
+            title: 'Confirm ' + action,
+            html: 'Are you sure you want to ' + action.toLowerCase() + ' <strong>' + escHtml(name || 'this account') + '</strong>?',
             icon: 'warning',
             showCancelButton: true,
-            confirmButtonColor: '#DC2626',
+            confirmButtonColor: color,
             cancelButtonColor: '#6b7280',
-            confirmButtonText: 'Deactivate',
+            confirmButtonText: action,
             cancelButtonText: 'Cancel'
         }).then(function (result) {
-            if (result.isConfirmed) {
-                pendingDeactivateId = id;
-                confirmDeactivate();
-            }
-        });
-    }
-
-    function confirmDeactivate() {
-        if (!pendingDeactivateId) return;
-
-        fetch('/Masterfile/DeactivateAdmin', {
-            method:  'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body:    JSON.stringify({ id: pendingDeactivateId })
-        })
-            .then(function (r) { return r.json(); })
-            .then(function (res) {
-                if (res && res.success === false) throw new Error(res.message || 'Operation failed.');
-                showToast('Administrator status updated.', 'success');
-                pendingDeactivateId = null;
-                loadAdmins();
+            if (!result.isConfirmed) return;
+            fetch('/Masterfile/SetAccountActive', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body:    JSON.stringify({ id: id, isActive: !isCurrentlyActive })
             })
-            .catch(function (err) {
-                showToast(err.message || 'Failed to update administrator.', 'danger');
-            });
+                .then(function (r) { return r.json(); })
+                .then(function (res) {
+                    if (res && res.success === false) throw new Error(res.error || res.message || 'Operation failed.');
+                    showToast('Account ' + (isCurrentlyActive ? 'deactivated' : 'activated') + '.', 'success');
+                    loadAdmins();
+                })
+                .catch(function (err) {
+                    showToast(err.message || 'Failed to update account.', 'danger');
+                });
+        });
     }
 
     // ═══════════════════════════════════════════════════════════════════════

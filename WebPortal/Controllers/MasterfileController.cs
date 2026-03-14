@@ -138,6 +138,7 @@ namespace Website.Controllers
 
         // ─────────────────────────────────────────────────────────────────────
         // SaveAdmin – create or update an administrator/teacher account
+        // id: "" or "0" = create new; "admin_N" or "teacher_N" = update existing
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
         public async Task<JsonResult> SaveAdmin(AdminModel model)
@@ -148,15 +149,15 @@ namespace Website.Controllers
                     return Json(new { success = false, error = "Invalid account data." });
 
                 dynamic result;
-                if (model.Id <= 0)
+                bool isNew = string.IsNullOrEmpty(model.Id) || model.Id == "0";
+
+                if (isNew)
                 {
                     result = await _api.CreatePortalAccountAsync(model.Name, model.Email, model.Password, model.Role, null);
                 }
                 else
                 {
-                    string prefix     = string.Equals(model.Role, "Admin", StringComparison.OrdinalIgnoreCase) ? "admin" : "teacher";
-                    string prefixedId = $"{prefix}_{model.Id}";
-                    result = await _api.UpdatePortalAccountAsync(prefixedId, model.Name, model.Email, model.Password, model.Role, null);
+                    result = await _api.UpdatePortalAccountAsync(model.Id, model.Name, model.Email, model.Password, model.Role, null);
                 }
 
                 return Json(new { success = true, message = "Account saved successfully.", data = result });
@@ -169,16 +170,17 @@ namespace Website.Controllers
 
         // ─────────────────────────────────────────────────────────────────────
         // SetAccountActive – enable or disable a portal account
+        // Body: { id: "admin_N"|"teacher_N", isActive: bool }
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<JsonResult> SetAccountActive(string id, bool isActive)
+        public async Task<JsonResult> SetAccountActive(SetActiveModel model)
         {
             try
             {
-                if (string.IsNullOrEmpty(id))
+                if (model == null || string.IsNullOrEmpty(model.Id))
                     return Json(new { success = false, error = "Invalid account ID." });
 
-                var result = await _api.SetPortalAccountActiveAsync(id, isActive);
+                var result = await _api.SetPortalAccountActiveAsync(model.Id, model.IsActive);
                 return Json(new { success = true, data = result });
             }
             catch (Exception ex)
@@ -260,12 +262,18 @@ namespace Website.Controllers
 
         public class AdminModel
         {
-            public int    Id       { get; set; }
+            public string Id       { get; set; }   // "" | "0" = new; "admin_N" | "teacher_N" = existing
             public string Name     { get; set; }
             public string Email    { get; set; }
             public string Password { get; set; }
             public string Role     { get; set; }   // Admin | Teacher
             public string School   { get; set; }   // applicable when Role == Teacher
+            public bool   IsActive { get; set; }
+        }
+
+        public class SetActiveModel
+        {
+            public string Id       { get; set; }
             public bool   IsActive { get; set; }
         }
     }
