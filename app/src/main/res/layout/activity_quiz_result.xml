@@ -1,282 +1,319 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true">
+    android:background="#F0EBFF">
 
-    <FrameLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <!-- Fun Celebration Background -->
-        <ImageView
+        <!-- ═══════════════════════════════════════ -->
+        <!--  HERO SECTION                           -->
+        <!-- ═══════════════════════════════════════ -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/bg_module"
-            android:scaleType="centerCrop"
-            android:alpha="0.1" />
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_result_header">
 
+            <!-- Celebration Lottie (plays behind Leo) -->
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieResult"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                app:lottie_rawRes="@raw/lottie_result_celebrate"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                app:lottie_speed="0.85" />
+
+            <!-- Hero content stacked over Lottie -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingTop="28dp"
+                android:paddingBottom="56dp"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp">
+
+                <!-- Leo mascot + glow ring -->
+                <FrameLayout
+                    android:layout_width="200dp"
+                    android:layout_height="200dp">
+
+                    <ImageView
+                        android:layout_width="200dp"
+                        android:layout_height="200dp"
+                        android:src="@drawable/leo_glow_circle"
+                        android:alpha="0.30"
+                        android:layout_gravity="center" />
+
+                    <ImageView
+                        android:id="@+id/ivResultIcon"
+                        android:layout_width="180dp"
+                        android:layout_height="180dp"
+                        android:src="@drawable/leo_result_celebrate"
+                        android:layout_gravity="center"
+                        android:scaleType="fitCenter" />
+
+                </FrameLayout>
+
+                <!-- Dynamic result title -->
+                <TextView
+                    android:id="@+id/tvResultTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Amazing Work!"
+                    android:textSize="28sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="@color/white"
+                    android:gravity="center"
+                    android:layout_marginTop="12dp"
+                    android:shadowColor="#40000000"
+                    android:shadowDx="0"
+                    android:shadowDy="2"
+                    android:shadowRadius="4" />
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+        <!-- ═══════════════════════════════════════ -->
+        <!--  WHITE CONTENT CARD (overlaps hero)     -->
+        <!-- ═══════════════════════════════════════ -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:background="@drawable/bg_white_top_round_result"
+            android:layout_marginTop="-32dp"
+            android:paddingTop="12dp"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="36dp"
+            android:elevation="8dp">
 
-            <!-- Celebration Emojis -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="🎉✨🏆✨🎉"
-                android:textSize="36sp"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="12dp" />
-
-            <!-- Result Icon - Dynamic based on performance -->
-            <ImageView
-                android:id="@+id/ivResultIcon"
-                android:layout_width="140dp"
-                android:layout_height="140dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_trophy"
-                android:tint="@color/gold"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Result Title -->
-            <TextView
-                android:id="@+id/tvResultTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="🏆 Amazing Work!"
-                android:textSize="32sp"
-                android:fontFamily="@font/visby_bold"
-                android:textColor="@color/color_charcoal"
-                android:gravity="center"
+            <!-- Drag handle -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:background="#DDD6F3"
                 android:layout_marginBottom="24dp" />
 
-            <!-- Score Card - Super Fun! -->
-            <androidx.cardview.widget.CardView
+            <!-- ── Stats Row ── -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="12dp"
-                app:cardBackgroundColor="@color/gradient_start">
+                android:orientation="horizontal"
+                android:weightSum="2"
+                android:layout_marginBottom="12dp">
 
+                <!-- Score stat -->
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:padding="28dp"
-                    android:gravity="center">
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="16dp"
+                    android:layout_marginEnd="6dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="⭐ Your Score ⭐"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:fontFamily="@font/visby_bold"
-                        android:layout_marginBottom="12dp" />
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_star_half"
+                        app:tint="#7C3AED"
+                        android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:id="@+id/tvScore"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="100%"
-                        android:textColor="@color/white"
-                        android:textSize="64sp"
+                        android:text="87%"
+                        android:textSize="34sp"
                         android:fontFamily="@font/visby_bold"
+                        android:textColor="#7C3AED" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Score"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:textColor="#9CA3AF" />
+
+                </LinearLayout>
+
+                <!-- Correct stat -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:background="@drawable/bg_stat_card"
+                    android:padding="16dp"
+                    android:layout_marginStart="6dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_check_circle"
+                        app:tint="#F97316"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
                         android:id="@+id/tvCorrectCount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="5 / 5 correct answers!"
-                        android:textColor="@color/white"
-                        android:textSize="18sp"
-                        android:fontFamily="@font/visby_medium"
-                        android:layout_marginBottom="20dp" />
-
-                    <!-- XP Badge -->
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        app:cardCornerRadius="20dp"
-                        app:cardElevation="6dp"
-                        app:cardBackgroundColor="@color/gold">
-
-                        <TextView
-                            android:id="@+id/tvXpAwarded"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="⭐ +100 XP"
-                            android:textColor="@color/color_charcoal"
-                            android:textSize="24sp"
-                            android:fontFamily="@font/visby_bold"
-                            android:paddingStart="24dp"
-                            android:paddingEnd="24dp"
-                            android:paddingTop="12dp"
-                            android:paddingBottom="12dp" />
-
-                    </androidx.cardview.widget.CardView>
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Adaptive Decision Card -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/white">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:text="🎯"
-                            android:textSize="32sp"
-                            android:gravity="center" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="What's Next?"
-                            android:textColor="@color/color_charcoal"
-                            android:textSize="18sp"
-                            android:fontFamily="@font/visby_bold" />
-
-                    </LinearLayout>
+                        android:text="4 / 5"
+                        android:textSize="34sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#F97316" />
 
                     <TextView
-                        android:id="@+id/tvAdaptiveDecision"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Ready to Proceed"
-                        android:textColor="@color/green_500"
-                        android:textSize="20sp"
-                        android:fontFamily="@font/visby_bold"
-                        android:layout_marginBottom="4dp" />
+                        android:text="Correct"
+                        android:textSize="12sp"
+                        android:fontFamily="@font/visby_regular"
+                        android:textColor="#9CA3AF" />
 
                 </LinearLayout>
 
-            </androidx.cardview.widget.CardView>
+            </LinearLayout>
 
-            <!-- Next Steps Card with Fun Icons -->
+            <!-- ── XP Earned Badge ── -->
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="6dp"
-                app:cardBackgroundColor="@color/white">
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#FFF9E6">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="20dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:text="📝"
-                            android:textSize="32sp"
-                            android:gravity="center" />
-
-                        <TextView
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="12dp"
-                            android:text="Your Journey"
-                            android:textColor="@color/color_charcoal"
-                            android:textSize="18sp"
-                            android:fontFamily="@font/visby_bold" />
-
-                    </LinearLayout>
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="14dp">
 
                     <TextView
-                        android:id="@+id/tvNextSteps"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="You've done great! Keep up the amazing work! 🌟"
-                        android:textColor="@color/color_charcoal"
-                        android:textSize="16sp"
-                        android:fontFamily="@font/visby_regular"
-                        android:lineSpacingMultiplier="1.5" />
+                        android:text="⭐"
+                        android:textSize="20sp"
+                        android:layout_marginEnd="8dp" />
+
+                    <TextView
+                        android:id="@+id/tvXpAwarded"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="+80 XP Earned!"
+                        android:textSize="17sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#92400E" />
 
                 </LinearLayout>
 
             </androidx.cardview.widget.CardView>
 
-            <!-- Action Buttons -->
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EDE9FE"
+                android:layout_marginBottom="20dp" />
+
+            <!-- ── What's Next section ── -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WHAT'S NEXT"
+                android:textSize="11sp"
+                android:fontFamily="@font/visby_bold"
+                android:textColor="#9CA3AF"
+                android:letterSpacing="0.1"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Decision status pill (background set dynamically) -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardDecision"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="14dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="#DCFCE7">
+
+                <TextView
+                    android:id="@+id/tvAdaptiveDecision"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="✓  Ready to Proceed"
+                    android:textSize="13sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#166534"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingTop="9dp"
+                    android:paddingBottom="9dp" />
+
+            </androidx.cardview.widget.CardView>
+
+            <!-- Next steps description -->
+            <TextView
+                android:id="@+id/tvNextSteps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You've successfully completed this lesson!"
+                android:textSize="15sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#4B5563"
+                android:lineSpacingMultiplier="1.6"
+                android:layout_marginBottom="28dp" />
+
+            <!-- Continue Adventure button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnContinue"
                 style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
-                android:text="🚀 Continue Adventure!"
+                android:layout_height="56dp"
+                android:text="Continue Adventure"
                 android:textColor="@color/white"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:fontFamily="@font/visby_bold"
                 android:textAllCaps="false"
-                app:backgroundTint="@color/success_green"
-                app:cornerRadius="20dp"
+                app:backgroundTint="#7C3AED"
+                app:cornerRadius="16dp"
                 app:icon="@drawable/ic_arrow_right"
                 app:iconGravity="end"
                 app:iconTint="@color/white"
                 android:layout_marginBottom="12dp" />
 
+            <!-- Try Again button (shown only for intervention) -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnRetakeQuiz"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="🔄 Try Quiz Again"
-                android:textColor="@color/orange_500"
-                android:textSize="16sp"
+                android:layout_height="52dp"
+                android:text="Try Again"
+                android:textColor="#7C3AED"
+                android:textSize="15sp"
                 android:fontFamily="@font/visby_bold"
                 android:textAllCaps="false"
-                app:strokeColor="@color/orange_500"
+                app:strokeColor="#7C3AED"
                 app:strokeWidth="2dp"
-                app:cornerRadius="20dp"
+                app:cornerRadius="16dp"
                 android:visibility="gone" />
-
-            <!-- Bottom Spacer -->
-            <View
-                android:layout_width="1dp"
-                android:layout_height="20dp" />
 
         </LinearLayout>
 
-    </FrameLayout>
+    </LinearLayout>
 
-</ScrollView>
+</androidx.core.widget.NestedScrollView>
