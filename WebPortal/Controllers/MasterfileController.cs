@@ -80,63 +80,20 @@ namespace Website.Controllers
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // GetAdmins – returns administrator account list
-        // Note: Dedicated admin-list endpoint not yet available; returns sample
-        //       data until the endpoint is integrated.
+        // GetAdmins – returns all admin and teacher accounts from the API
         // ─────────────────────────────────────────────────────────────────────
         [HttpGet]
-        public JsonResult GetAdmins()
+        public async Task<JsonResult> GetAdmins()
         {
-            var sampleAdmins = new List<object>
+            try
             {
-                new {
-                    id         = 1,
-                    name       = "Maria Santos",
-                    email      = "maria.santos@literise.edu.ph",
-                    role       = "Admin",
-                    school     = (string)null,
-                    lastLogin  = "2026-03-10 08:45",
-                    isActive   = true
-                },
-                new {
-                    id         = 2,
-                    name       = "Juan dela Cruz",
-                    email      = "juan.delacruz@pes.edu.ph",
-                    role       = "Teacher",
-                    school     = "Pag-asa Elementary School",
-                    lastLogin  = "2026-03-11 13:22",
-                    isActive   = true
-                },
-                new {
-                    id         = 3,
-                    name       = "Ana Reyes",
-                    email      = "ana.reyes@mces.edu.ph",
-                    role       = "Teacher",
-                    school     = "Mabini Central Elementary School",
-                    lastLogin  = "2026-03-09 09:05",
-                    isActive   = true
-                },
-                new {
-                    id         = 4,
-                    name       = "Carlos Bautista",
-                    email      = "carlos.bautista@literise.edu.ph",
-                    role       = "Admin",
-                    school     = (string)null,
-                    lastLogin  = "2026-02-28 16:10",
-                    isActive   = false
-                },
-                new {
-                    id         = 5,
-                    name       = "Liza Gomez",
-                    email      = "liza.gomez@rnes.edu.ph",
-                    role       = "Teacher",
-                    school     = "Rizal National Elementary School",
-                    lastLogin  = "2026-03-11 07:55",
-                    isActive   = true
-                }
-            };
-
-            return Json(new { success = true, data = sampleAdmins }, JsonRequestBehavior.AllowGet);
+                var accounts = await _api.GetPortalAccountsAsync();
+                return Json(new { success = true, data = accounts }, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -183,15 +140,66 @@ namespace Website.Controllers
         // SaveAdmin – create or update an administrator/teacher account
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
-        public JsonResult SaveAdmin(AdminModel model)
+        public async Task<JsonResult> SaveAdmin(AdminModel model)
         {
             try
             {
                 if (model == null)
                     return Json(new { success = false, error = "Invalid account data." });
 
-                // TODO: integrate _api.SaveAdminAsync(model) when endpoint is available
-                return Json(new { success = true, message = "Account saved successfully." });
+                dynamic result;
+                if (model.Id <= 0)
+                {
+                    result = await _api.CreatePortalAccountAsync(model.Name, model.Email, model.Password, model.Role, null);
+                }
+                else
+                {
+                    string prefix     = string.Equals(model.Role, "Admin", StringComparison.OrdinalIgnoreCase) ? "admin" : "teacher";
+                    string prefixedId = $"{prefix}_{model.Id}";
+                    result = await _api.UpdatePortalAccountAsync(prefixedId, model.Name, model.Email, model.Password, model.Role, null);
+                }
+
+                return Json(new { success = true, message = "Account saved successfully.", data = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SetAccountActive – enable or disable a portal account
+        // ─────────────────────────────────────────────────────────────────────
+        [HttpPost]
+        public async Task<JsonResult> SetAccountActive(string id, bool isActive)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                    return Json(new { success = false, error = "Invalid account ID." });
+
+                var result = await _api.SetPortalAccountActiveAsync(id, isActive);
+                return Json(new { success = true, data = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // ToggleNode – enable or disable a curriculum node
+        // ─────────────────────────────────────────────────────────────────────
+        [HttpPost]
+        public async Task<JsonResult> ToggleNode(int nodeId, bool enabled)
+        {
+            try
+            {
+                if (nodeId <= 0)
+                    return Json(new { success = false, error = "Invalid node ID." });
+
+                var result = await _api.ToggleNodeStatusAsync(nodeId, enabled);
+                return Json(new { success = true, data = result });
             }
             catch (Exception ex)
             {
