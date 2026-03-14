@@ -328,7 +328,7 @@ public class MusicManager {
 
 
 
-                mediaPlayer.setVolume(0.2f, 0.2f); // 30% volume - not too loud
+                mediaPlayer.setVolume(0.5f, 0.5f); // 30% volume - not too loud
 
 
 

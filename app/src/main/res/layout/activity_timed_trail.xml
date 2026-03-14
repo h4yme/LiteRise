@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="#F0EFFE"
     tools:context=".activities.games.TimedTrailActivity">
 
     <!-- Header -->
@@ -13,16 +13,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
         android:gravity="center_vertical"
-        android:background="@color/primary_blue">
+        android:background="@drawable/bg_header_purple">
 
         <ImageView
             android:id="@+id/btn_back"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:src="@drawable/ic_arrow_back"
             android:contentDescription="Back"
+            android:background="@drawable/bg_circle_white_alpha"
+            android:padding="6dp"
             app:tint="@color/white" />
 
         <TextView
@@ -31,23 +35,23 @@
             android:layout_weight="1"
             android:text="Timed Trail Race"
             android:textSize="20sp"
-            android:textStyle="bold"
             android:textColor="@color/white"
+            android:fontFamily="@font/visby_bold"
             android:gravity="center"
-            android:layout_marginStart="16dp" />
+            android:layout_marginStart="12dp" />
 
         <TextView
             android:id="@+id/tv_timer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="30 s"
-            android:textSize="18sp"
-            android:textStyle="bold"
+            android:textSize="16sp"
             android:textColor="@color/white"
+            android:fontFamily="@font/visby_bold"
             android:background="@drawable/bg_timer"
-            android:padding="8dp"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp" />
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp" />
+
     </LinearLayout>
 
     <!-- Race Track Section -->
@@ -57,8 +61,10 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/header"
         android:orientation="vertical"
-        android:padding="20dp"
-        android:background="@drawable/bg_gradient_blue">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="20dp"
+        android:background="@drawable/bg_gradient_purple_blue">
 
         <!-- Stats Row -->
         <LinearLayout
@@ -68,60 +74,104 @@
             android:gravity="center"
             android:layout_marginBottom="16dp">
 
-            <TextView
-                android:id="@+id/tv_score"
+            <!-- Score Chip -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0m"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:drawableStart="@drawable/ic_star"
-                android:drawablePadding="8dp"
-                android:layout_marginEnd="24dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_semi_white_pill"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp"
+                android:layout_marginEnd="12dp">
 
-            <TextView
-                android:id="@+id/tv_streak"
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_star"
+                    app:tint="#FFD700"
+                    android:contentDescription="Score"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tv_score"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0m"
+                    android:textSize="17sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/visby_bold" />
+
+            </LinearLayout>
+
+            <!-- Streak Chip -->
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Streak: 0"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:drawableStart="@drawable/ic_fire"
-                android:drawablePadding="8dp" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:background="@drawable/bg_semi_white_pill"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="8dp">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_fire"
+                    android:contentDescription="Streak"
+                    android:layout_marginEnd="6dp" />
+
+                <TextView
+                    android:id="@+id/tv_streak"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Streak: 0"
+                    android:textSize="15sp"
+                    android:textColor="@color/white"
+                    android:fontFamily="@font/visby_bold" />
+
+            </LinearLayout>
+
         </LinearLayout>
 
-        <!-- Avatar track row -->
+        <!-- Avatar Track Row -->
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:layout_marginBottom="4dp">
+            android:layout_height="62dp"
+            android:layout_marginBottom="10dp">
 
-            <!-- Finish flag marker -->
+            <!-- Subtle lane line -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_gravity="center_vertical"
+                android:background="#30FFFFFF"
+                android:layout_marginHorizontal="28dp" />
+
+            <!-- Finish flag -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end|center_vertical"
                 android:text="🏁"
-                android:textSize="22sp"/>
+                android:textSize="28sp" />
 
             <!-- Running avatar container -->
             <FrameLayout
                 android:id="@+id/avatarContainer"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
+                android:layout_width="56dp"
+                android:layout_height="56dp"
                 android:layout_gravity="start|center_vertical"
-                android:background="@drawable/bg_circle_purple">
+                android:background="@drawable/bg_circle_purple"
+                android:elevation="8dp">
 
                 <ImageView
                     android:id="@+id/iv_avatar"
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_avatar_running"
-                    app:tint="@color/white"
-                    android:contentDescription="Running Avatar"/>
+                    android:contentDescription="Running Avatar" />
 
             </FrameLayout>
 
@@ -131,27 +181,29 @@
         <ProgressBar
             android:id="@+id/progress_track"
             android:layout_width="match_parent"
-            android:layout_height="24dp"
+            android:layout_height="14dp"
             android:max="100"
             android:progress="0"
             style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:progressTint="@color/color_success"
-            android:progressBackgroundTint="@color/white"
+            android:progressTint="#50C878"
+            android:progressBackgroundTint="#40FFFFFF"
             android:background="@drawable/bg_track" />
 
-        <!-- Progress Text -->
+        <!-- Progress Label -->
         <TextView
             android:id="@+id/tv_progress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="0 / 100m"
-            android:textSize="14sp"
-            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textColor="#DDFFFFFF"
+            android:fontFamily="@font/visby_regular"
             android:layout_gravity="center"
             android:layout_marginTop="8dp" />
+
     </LinearLayout>
 
-    <!-- Question Card -->
+    <!-- Question + Options -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -162,96 +214,222 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingHorizontal="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="24dp">
 
+            <!-- Question section label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="QUESTION"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF"
+                android:fontFamily="@font/visby_bold"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Question Card -->
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/card_question"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="6dp"
+                app:strokeWidth="0dp"
                 android:layout_marginBottom="20dp">
 
-                <TextView
-                    android:id="@+id/tv_question"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="What is a sight word?"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:textColor="@color/text_primary"
-                    android:padding="24dp"
-                    android:gravity="center"
-                    android:minHeight="120dp" />
+                    android:orientation="vertical"
+                    android:background="#F5F0FF"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:id="@+id/tv_question"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="What is a sight word?"
+                        android:textSize="18sp"
+                        android:textColor="#1F2937"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:minHeight="80dp" />
+
+                </LinearLayout>
+
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Options -->
+            <!-- Answer section label -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CHOOSE YOUR ANSWER"
+                android:textSize="11sp"
+                android:textColor="#9CA3AF"
+                android:fontFamily="@font/visby_bold"
+                android:letterSpacing="0.12"
+                android:layout_marginBottom="10dp" />
+
+            <!-- Options Container -->
             <LinearLayout
                 android:id="@+id/options_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_option_1"
+                <!-- Option A -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Option 1"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:padding="16dp"
-                    android:layout_marginBottom="12dp"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/purple_600"
-                    android:textAlignment="textStart"
-                    android:gravity="start|center_vertical"
-                    style="@style/Widget.MaterialComponents.Button" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_option_2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Option 2"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:padding="16dp"
-                    android:layout_marginBottom="12dp"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/purple_600"
-                    android:textAlignment="textStart"
-                    android:gravity="start|center_vertical"
-                    style="@style/Widget.MaterialComponents.Button" />
+                    <TextView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:text="A"
+                        android:textSize="14sp"
+                        android:textColor="#7C3AED"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_marginEnd="10dp" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_option_3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Option 3"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:padding="16dp"
-                    android:layout_marginBottom="12dp"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/purple_600"
-                    android:textAlignment="textStart"
-                    android:gravity="start|center_vertical"
-                    style="@style/Widget.MaterialComponents.Button" />
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_option_1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Option 1"
+                        android:textSize="15sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/visby_bold"
+                        android:paddingVertical="14dp"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@color/purple_600"
+                        android:textAlignment="textStart"
+                        android:gravity="start|center_vertical"
+                        style="@style/Widget.MaterialComponents.Button" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_option_4"
+                </LinearLayout>
+
+                <!-- Option B -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Option 4"
-                    android:textSize="16sp"
-                    android:textColor="@color/white"
-                    android:padding="16dp"
-                    app:cornerRadius="12dp"
-                    android:backgroundTint="@color/purple_600"
-                    android:textAlignment="textStart"
-                    android:gravity="start|center_vertical"
-                    style="@style/Widget.MaterialComponents.Button" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:text="B"
+                        android:textSize="14sp"
+                        android:textColor="#7C3AED"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_marginEnd="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_option_2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Option 2"
+                        android:textSize="15sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/visby_bold"
+                        android:paddingVertical="14dp"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@color/purple_600"
+                        android:textAlignment="textStart"
+                        android:gravity="start|center_vertical"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+
+                <!-- Option C -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="10dp">
+
+                    <TextView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:text="C"
+                        android:textSize="14sp"
+                        android:textColor="#7C3AED"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_marginEnd="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_option_3"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Option 3"
+                        android:textSize="15sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/visby_bold"
+                        android:paddingVertical="14dp"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@color/purple_600"
+                        android:textAlignment="textStart"
+                        android:gravity="start|center_vertical"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+
+                <!-- Option D -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:text="D"
+                        android:textSize="14sp"
+                        android:textColor="#7C3AED"
+                        android:fontFamily="@font/visby_bold"
+                        android:gravity="center"
+                        android:background="@drawable/bg_light_purple"
+                        android:layout_marginEnd="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_option_4"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Option 4"
+                        android:textSize="15sp"
+                        android:textColor="@color/white"
+                        android:fontFamily="@font/visby_bold"
+                        android:paddingVertical="14dp"
+                        app:cornerRadius="16dp"
+                        android:backgroundTint="@color/purple_600"
+                        android:textAlignment="textStart"
+                        android:gravity="start|center_vertical"
+                        style="@style/Widget.MaterialComponents.Button" />
+
+                </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
+
     </ScrollView>
 
     <!-- Lottie: correct answer sparkle -->
@@ -264,7 +442,7 @@
         android:elevation="60dp"
         app:lottie_rawRes="@raw/lottie_sparkle_stars"
         app:lottie_loop="false"
-        app:lottie_autoPlay="false"/>
+        app:lottie_autoPlay="false" />
 
     <!-- Lottie: race complete celebration -->
     <com.airbnb.lottie.LottieAnimationView
@@ -276,6 +454,6 @@
         android:elevation="60dp"
         app:lottie_rawRes="@raw/lottie_result_celebrate"
         app:lottie_loop="false"
-        app:lottie_autoPlay="false"/>
+        app:lottie_autoPlay="false" />
 
 </RelativeLayout>
