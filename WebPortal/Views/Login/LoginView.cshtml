@@ -1,0 +1,154 @@
+@{
+    ViewBag.Title = "Sign In — LiteRise";
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background: #f0faf5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .login-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 40px 36px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+        }
+        .brand-logo {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #11B067;
+            letter-spacing: -0.5px;
+        }
+        .brand-logo span { color: #0d7a48; }
+        .btn-login {
+            background: #11B067;
+            border: none;
+            color: #fff;
+            font-weight: 600;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        .btn-login:hover { background: #0d9055; color: #fff; }
+        .form-control:focus {
+            border-color: #11B067;
+            box-shadow: 0 0 0 0.2rem rgba(17,176,103,0.2);
+        }
+        .error-box {
+            background: #fff5f5;
+            border: 1px solid #fed7d7;
+            color: #c53030;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .role-toggle { display: flex; gap: 8px; }
+        .role-toggle input[type="radio"] { display: none; }
+        .role-toggle label {
+            flex: 1;
+            text-align: center;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #6c757d;
+            transition: all 0.2s;
+        }
+        .role-toggle input[type="radio"]:checked + label {
+            background: #11B067;
+            color: #fff;
+            border-color: #11B067;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+
+        <!-- Brand -->
+        <div class="text-center mb-4">
+            <div class="brand-logo">Lite<span>Rise</span></div>
+            <p class="text-muted mt-1 mb-0" style="font-size:0.9rem;">Portal Sign In</p>
+        </div>
+
+        <!-- Error message -->
+        @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+        {
+            <div class="error-box mb-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
+                @ViewBag.Error
+            </div>
+        }
+
+        <!-- Login form -->
+        @using (Html.BeginForm("Login", "Login", FormMethod.Post))
+        {
+            <!-- Role toggle -->
+            <div class="mb-3">
+                <div class="role-toggle">
+                    <input type="radio" id="roleAdmin" name="role" value="admin" checked="checked" />
+                    <label for="roleAdmin">Admin</label>
+                    <input type="radio" id="roleTeacher" name="role" value="teacher" />
+                    <label for="roleTeacher">Teacher</label>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold" for="email">Email</label>
+                <input type="email" id="email" name="email" class="form-control"
+                       placeholder="you@example.com" required autofocus
+                       value="@(Request.Form["email"] ?? "")" />
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+                <label class="form-label fw-semibold" for="password">Password</label>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" class="form-control"
+                           placeholder="••••••••" required />
+                    <button type="button" class="btn btn-outline-secondary"
+                            onclick="togglePassword()" tabindex="-1"
+                            style="border-left:0;">
+                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-login w-100">Sign In</button>
+        }
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            const input = document.getElementById('password');
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+</body>
+</html>
