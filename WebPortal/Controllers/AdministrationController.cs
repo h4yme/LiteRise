@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Website.Filters;
@@ -16,6 +19,9 @@ namespace Website.Controllers
     {
         private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
 
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
+
         // ── Index ─────────────────────────────────────────────────────────────
         public ActionResult Index()
         {
@@ -24,11 +30,70 @@ namespace Website.Controllers
 
         // ── GetAdmins — returns a raw JSON array for AdministrationScript.js ──
         [HttpGet]
-        public async Task<JsonResult> GetAdmins()
+        public JsonResult GetAdmins()
         {
             try
             {
-                var accounts = await _api.GetPortalAccountsAsync();
+                var accounts = new List<object>();
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+
+                    const string adminSql = @"
+                        SELECT AdminID,
+                               ISNULL(Username, Email)   AS name,
+                               Email,
+                               CAST(IsActive AS BIT)     AS is_active,
+                               LastLoginDate
+                        FROM   dbo.Admins
+                        ORDER BY name";
+                    using (var cmd = new SqlCommand(adminSql, conn))
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            accounts.Add(new
+                            {
+                                id       = "admin_" + rdr["AdminID"],
+                                raw_id   = (int)rdr["AdminID"],
+                                name     = rdr["name"]?.ToString(),
+                                email    = rdr["Email"]?.ToString(),
+                                role     = "Admin",
+                                isActive = rdr["is_active"] != DBNull.Value && (bool)rdr["is_active"],
+                                lastLogin = rdr["LastLoginDate"] == DBNull.Value
+                                              ? (string)null
+                                              : ((DateTime)rdr["LastLoginDate"]).ToString("yyyy-MM-dd HH:mm")
+                            });
+                        }
+                    }
+
+                    const string teacherSql = @"
+                        SELECT TeacherID,
+                               RTRIM(ISNULL(FirstName,'') + ' ' + ISNULL(LastName,'')) AS name,
+                               Email,
+                               ISNULL(Department, '')    AS school,
+                               CAST(IsActive AS BIT)     AS is_active
+                        FROM   dbo.Teachers
+                        ORDER BY name";
+                    using (var cmd = new SqlCommand(teacherSql, conn))
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            accounts.Add(new
+                            {
+                                id       = "teacher_" + rdr["TeacherID"],
+                                raw_id   = (int)rdr["TeacherID"],
+                                name     = rdr["name"]?.ToString(),
+                                email    = rdr["Email"]?.ToString(),
+                                role     = "Teacher",
+                                school   = rdr["school"]?.ToString(),
+                                isActive = rdr["is_active"] != DBNull.Value && (bool)rdr["is_active"],
+                                lastLogin = (string)null
+                            });
+                        }
+                    }
+                }
                 return Json(accounts, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
