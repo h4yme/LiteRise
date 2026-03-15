@@ -1,154 +1,476 @@
+@inherits System.Web.Mvc.WebViewPage
 @{
-    ViewBag.Title = "Sign In — LiteRise";
     Layout = null;
+    ViewBag.Title = "Sign In";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewBag.Title</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <title>LiteRise Portal — Sign In</title>
     <style>
+        @@font-face {
+            font-family: 'Visby';
+            src: url('/Content/fonts/visby-font.otf') format('opentype');
+            font-weight: 400;
+        }
+        @@font-face {
+            font-family: 'Visby';
+            src: url('/Content/fonts/visby-bold.otf') format('opentype');
+            font-weight: 700;
+        }
+        @@font-face {
+            font-family: 'Visby';
+            src: url('/Content/fonts/visby-font-ExtraBold.otf') format('opentype');
+            font-weight: 800;
+        }
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
         body {
-            background: #f0faf5;
+            font-family: 'Visby', -apple-system, sans-serif;
+            background: #0F172A;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', sans-serif;
+            position: relative;
+            overflow: hidden;
         }
-        .login-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 40px 36px;
-            width: 100%;
-            max-width: 420px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.09);
+            /* Grid texture */
+            body::before {
+                content: '';
+                position: fixed;
+                inset: 0;
+                background-image: linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+                background-size: 48px 48px;
+                pointer-events: none;
+                z-index: 0;
+            }
+        /* Glow blobs */
+        .blobs {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
         }
-        .brand-logo {
-            font-size: 1.7rem;
-            font-weight: 800;
-            color: #11B067;
-            letter-spacing: -0.5px;
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .55;
         }
-        .brand-logo span { color: #0d7a48; }
-        .btn-login {
-            background: #11B067;
-            border: none;
-            color: #fff;
-            font-weight: 600;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: background 0.2s;
+        .blob-1 {
+            width: 420px;
+            height: 420px;
+            background: radial-gradient(circle, rgba(17,176,103,.28), transparent 70%);
+            top: -120px;
+            right: -80px;
         }
-        .btn-login:hover { background: #0d9055; color: #fff; }
-        .form-control:focus {
-            border-color: #11B067;
-            box-shadow: 0 0 0 0.2rem rgba(17,176,103,0.2);
+        .blob-2 {
+            width: 350px;
+            height: 350px;
+            background: radial-gradient(circle, rgba(124,58,237,.2), transparent 70%);
+            bottom: -90px;
+            left: -60px;
         }
-        .error-box {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
-            color: #c53030;
-            border-radius: 8px;
-            padding: 12px 16px;
-            font-size: 0.9rem;
+        .blob-3 {
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(253,201,74,.18), transparent 70%);
+            top: 42%;
+            left: 8%;
+        }
+        /* Branding */
+        .branding {
+            position: fixed;
+            top: 28px;
+            left: 36px;
+            z-index: 10;
             display: flex;
             align-items: center;
             gap: 10px;
         }
-        .role-toggle { display: flex; gap: 8px; }
-        .role-toggle input[type="radio"] { display: none; }
-        .role-toggle label {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            color: #6c757d;
-            transition: all 0.2s;
-        }
-        .role-toggle input[type="radio"]:checked + label {
-            background: #11B067;
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #0EA05A, #11B067);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: #fff;
-            border-color: #11B067;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 4px 14px rgba(17,176,103,.4);
+        }
+        .brand-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+        }
+        .portal-badge {
+            position: fixed;
+            top: 34px;
+            right: 36px;
+            z-index: 10;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.14);
+            border-radius: 999px;
+            padding: 4px 14px;
+            font-size: .78rem;
+            font-weight: 600;
+            color: rgba(255,255,255,.6);
+        }
+        /* Card */
+        .login-wrap {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,.97);
+            border-radius: 20px;
+            padding: 40px 36px;
+            box-shadow: 0 28px 70px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.08);
+        }
+        .card-head {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .card-logo {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #0EA05A, #11B067);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 28px;
+            box-shadow: 0 8px 24px rgba(17,176,103,.35);
+        }
+        .card-head h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: #0F172A;
+            margin-bottom: 6px;
+        }
+        .card-head p {
+            font-size: .85rem;
+            color: #64748B;
+        }
+        /* Role tabs */
+        .role-tabs {
+            display: flex;
+            gap: 6px;
+            background: #F1F5F9;
+            border-radius: 10px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+        .role-tab {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            font-size: .84rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            color: #64748B;
+            background: transparent;
+            font-family: inherit;
+        }
+            .role-tab.active {
+                background: #fff;
+                color: #11B067;
+                box-shadow: 0 1px 4px rgba(0,0,0,.1);
+            }
+        /* Error */
+        .error-msg {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FEE2E2;
+            color: #DC2626;
+            padding: 11px 14px;
+            border-radius: 8px;
+            margin-bottom: 18px;
+            font-size: .84rem;
             font-weight: 600;
         }
+        /* Form */
+        .form {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-label {
+            font-size: .83rem;
+            font-weight: 700;
+            color: #0F172A;
+        }
+        .input-wrap {
+            position: relative;
+        }
+        .input-icon {
+            position: absolute;
+            left: 13px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94A3B8;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+        }
+        .input-wrap input {
+            width: 100%;
+            padding: 12px 44px 12px 42px;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 10px;
+            font-size: .9rem;
+            background: #F8FAFC;
+            color: #0F172A;
+            transition: all .2s;
+            font-family: inherit;
+        }
+            .input-wrap input:focus {
+                outline: none;
+                border-color: #11B067;
+                background: #fff;
+                box-shadow: 0 0 0 3px rgba(17,176,103,.12);
+            }
+        .pw-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #94A3B8;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            transition: color .2s;
+        }
+            .pw-toggle:hover {
+                color: #11B067;
+            }
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: .84rem;
+        }
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            color: #64748B;
+        }
+            .remember input[type="checkbox"] {
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                appearance: none;
+                width: 15px;
+                height: 15px;
+                border: 1.5px solid #CBD5E1;
+                border-radius: 3px;
+                background: #fff;
+                cursor: pointer;
+                position: relative;
+                vertical-align: middle;
+                transition: background .15s, border-color .15s;
+            }
+                .remember input[type="checkbox"]:checked {
+                    background: #11B067;
+                    border-color: #11B067;
+                }
+                    .remember input[type="checkbox"]:checked::after {
+                        content: '';
+                        position: absolute;
+                        left: 4px;
+                        top: 1px;
+                        width: 5px;
+                        height: 8px;
+                        border: 2px solid #fff;
+                        border-top: none;
+                        border-left: none;
+                        transform: rotate(45deg);
+                    }
+        .forgot {
+            color: #11B067;
+            text-decoration: none;
+            font-weight: 700;
+        }
+            .forgot:hover {
+                color: #0EA05A;
+            }
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #0EA05A, #11B067, #22C55E);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 13px;
+            font-size: .97rem;
+            font-weight: 700;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all .25s;
+            box-shadow: 0 6px 20px rgba(17,176,103,.4);
+            width: 100%;
+        }
+            .btn-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 28px rgba(17,176,103,.55);
+            }
+            .btn-submit.loading {
+                opacity: .7;
+                pointer-events: none;
+            }
+        .card-foot {
+            text-align: center;
+            margin-top: 18px;
+            font-size: .82rem;
+            color: #94A3B8;
+        }
+            .card-foot a {
+                color: #11B067;
+                text-decoration: none;
+                font-weight: 600;
+            }
     </style>
 </head>
 <body>
-    <div class="login-card">
-
-        <!-- Brand -->
-        <div class="text-center mb-4">
-            <div class="brand-logo">Lite<span>Rise</span></div>
-            <p class="text-muted mt-1 mb-0" style="font-size:0.9rem;">Portal Sign In</p>
-        </div>
-
-        <!-- Error message -->
-        @if (!string.IsNullOrEmpty(ViewBag.Error as string))
-        {
-            <div class="error-box mb-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-                </svg>
-                @ViewBag.Error
+    <div class="blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="branding">
+        <div class="brand-icon">L</div>
+        <span class="brand-name">LiteRise</span>
+    </div>
+    <div class="portal-badge">Teacher &amp; Admin Portal</div>
+    <div class="login-wrap">
+        <div class="card">
+            <div class="card-head">
+                <div class="card-logo">📚</div>
+                <h1>Portal Sign In</h1>
+                <p>Enter your credentials to continue</p>
             </div>
-        }
-
-        <!-- Login form -->
-        @using (Html.BeginForm("Login", "Login", FormMethod.Post))
-        {
-            <!-- Role toggle -->
-            <div class="mb-3">
-                <div class="role-toggle">
-                    <input type="radio" id="roleAdmin" name="role" value="admin" checked="checked" />
-                    <label for="roleAdmin">Admin</label>
-                    <input type="radio" id="roleTeacher" name="role" value="teacher" />
-                    <label for="roleTeacher">Teacher</label>
+            <div class="role-tabs">
+                <button type="button" class="role-tab active" data-role="admin">🛡 Admin</button>
+                <button type="button" class="role-tab" data-role="teacher">📋 Teacher</button>
+            </div>
+            @if (!string.IsNullOrEmpty(ViewBag.Error as string))
+            {
+                <div class="error-msg">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
+                    @ViewBag.Error
                 </div>
-            </div>
-
-            <!-- Email -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold" for="email">Email</label>
-                <input type="email" id="email" name="email" class="form-control"
-                       placeholder="you@example.com" required autofocus
-                       value="@(Request.Form["email"] ?? "")" />
-            </div>
-
-            <!-- Password -->
-            <div class="mb-4">
-                <label class="form-label fw-semibold" for="password">Password</label>
-                <div class="input-group">
-                    <input type="password" id="password" name="password" class="form-control"
-                           placeholder="••••••••" required />
-                    <button type="button" class="btn btn-outline-secondary"
-                            onclick="togglePassword()" tabindex="-1"
-                            style="border-left:0;">
-                        <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
-                            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
+            }
+            @using (Html.BeginForm("Login", "Login", FormMethod.Post, new { id = "loginForm" }))
+            {
+                @Html.AntiForgeryToken()
+                @* Hidden field — value updated by role tab JS before submit *@
+                <input type="hidden" name="Role" id="roleInput" value="admin" />
+                <div class="form">
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                    <polyline points="22,6 12,13 2,6" />
+                                </svg>
+                            </span>
+                            @Html.TextBox("Email", "", new { type = "email", id = "email", placeholder = "your@email.com", required = "required", autocomplete = "email" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="input-icon">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                </svg>
+                            </span>
+                            @Html.Password("Password", "", new { id = "password", placeholder = "••••••••", required = "required", autocomplete = "current-password" })
+                            <button type="button" class="pw-toggle" id="pwToggle">
+                                <svg id="eyeOpen" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>
+                                <svg id="eyeClosed" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-options">
+                        <label class="remember">
+                            <input type="checkbox" name="RememberMe"> Remember me
+                        </label>
+                        <a href="#" class="forgot">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        Sign In
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
                         </svg>
                     </button>
                 </div>
+            }
+            <div class="card-foot">
+                Student app? <a href="/">Go to LiteRise home</a>
             </div>
-
-            <button type="submit" class="btn btn-login w-100">Sign In</button>
-        }
-
+        </div>
     </div>
-
     <script>
-        function togglePassword() {
-            const input = document.getElementById('password');
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
+        // Role tabs — update hidden input so the selected role is submitted
+        var roleInput = document.getElementById('roleInput');
+        document.querySelectorAll('.role-tab').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.role-tab').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+                roleInput.value = btn.getAttribute('data-role');
+            });
+        });
+        // Password toggle
+        document.getElementById('pwToggle').addEventListener('click', function () {
+            var inp = document.getElementById('password');
+            var show = inp.type === 'password';
+            inp.type = show ? 'text' : 'password';
+            document.getElementById('eyeOpen').style.display = show ? 'none' : 'block';
+            document.getElementById('eyeClosed').style.display = show ? 'block' : 'none';
+        });
+        // Loading state on submit
+        document.getElementById('loginForm').addEventListener('submit', function () {
+            var btn = document.getElementById('submitBtn');
+            btn.classList.add('loading');
+            btn.innerHTML = 'Signing in\u2026';
+        });
     </script>
 </body>
 </html>
