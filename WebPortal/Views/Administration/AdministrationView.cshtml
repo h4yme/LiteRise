@@ -441,7 +441,7 @@ function saveAdmin() {
     var schoolEl = document.getElementById('aSchool');
     var school   = schoolEl ? schoolEl.value.trim() : '';
     if (!name)  { showToast('Name is required.', 'warning'); return; }
-    if (!email || !/^[^\s@]+@@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('A valid email address is required.', 'warning'); return; }
+    if (!email || !/^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/.test(email)) { showToast('A valid email address is required.', 'warning'); return; }
     if (!role)  { showToast('Role is required.', 'warning'); return; }
     var payload = { id: id, name: name, email: email, password: password, role: role, school: school };
     postJson('/Administration/SaveAdmin', payload)
