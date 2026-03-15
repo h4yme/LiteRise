@@ -118,8 +118,9 @@ namespace Website.Controllers
                 if (pre.HasValue) { assessed++; sumPre += pre.Value; }
 
                 bool missingAssessment = !pre.HasValue;
+                DateTime d = DateTime.MinValue;
                 bool inactive = s.last_active == null ||
-                                !DateTime.TryParse((string)s.last_active, out DateTime d) || d < cutoff;
+                                !DateTime.TryParse((string)s.last_active, out d) || d < cutoff;
 
                 if ((missingAssessment || inactive) && needsAtt.Count < 10)
                     needsAtt.Add(s);
