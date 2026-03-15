@@ -71,10 +71,13 @@ namespace Website.Controllers
                         {
                             while (rdr.Read())
                             {
+                                var studentName = rdr["name"] == DBNull.Value ? "" : rdr["name"].ToString();
                                 students.Add(new
                                 {
                                     student_id  = (int)rdr["student_id"],
-                                    name        = rdr["name"]?.ToString(),
+                                    name        = studentName,
+                                    full_name   = studentName,   // alias for JS compatibility
+                                    FullName    = studentName,   // alias for JS compatibility
                                     grade       = rdr["grade"]?.ToString(),
                                     pre_theta   = rdr["pre_theta"]  == DBNull.Value ? (double?)null : (double)rdr["pre_theta"],
                                     post_theta  = rdr["post_theta"] == DBNull.Value ? (double?)null : (double)rdr["post_theta"],
