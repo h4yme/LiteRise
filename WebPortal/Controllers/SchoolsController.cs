@@ -1,60 +1,57 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Website.Filters;
-using Website.Services;
 using Newtonsoft.Json;
 
 namespace Website.Controllers
 {
     // =========================================================================
     // SchoolsController — Admin School Management
-    // Displays school list with per-school student counts.
+    // Queries Azure SQL directly using LiteRiseConnection.
     // =========================================================================
     [AuthFilter]
     [AuthorizeAdmin]
-    public class SchoolsController : AsyncController
+    public class SchoolsController : Controller
     {
-        private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
 
         // ── Index ─────────────────────────────────────────────────────────────
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            List<dynamic> students;
-            dynamic schools;
-
             try
             {
-                var studentsTask = _api.GetStudentsAsync();
-                var schoolsTask  = _api.GetSchoolsAsync();
-                await Task.WhenAll(studentsTask, schoolsTask);
-                students = studentsTask.Result ?? new List<dynamic>();
-                schools  = schoolsTask.Result;
+                var schools  = QuerySchools();
+                var students = QueryStudentSchools();
+
+                ViewBag.SchoolsJson   = JsonConvert.SerializeObject(schools);
+                ViewBag.StudentsJson  = JsonConvert.SerializeObject(students);
+                ViewBag.TotalStudents = students.Count;
             }
             catch (Exception ex)
             {
-                ViewBag.Error       = "Unable to load school data: " + ex.Message;
-                ViewBag.SchoolsJson = "[]";
+                ViewBag.Error         = "Unable to load school data: " + ex.Message;
+                ViewBag.SchoolsJson   = "[]";
+                ViewBag.StudentsJson  = "[]";
                 ViewBag.TotalStudents = 0;
-                return View("Index");
             }
-
-            ViewBag.SchoolsJson   = JsonConvert.SerializeObject(schools ?? new List<dynamic>());
-            ViewBag.StudentsJson  = JsonConvert.SerializeObject(students);
-            ViewBag.TotalStudents = students.Count;
 
             return View("Index");
         }
 
         // ── GetSchools — JSON endpoint for client-side use ────────────────────
         [HttpGet]
-        public async Task<JsonResult> GetSchools()
+        public JsonResult GetSchools()
         {
             try
             {
-                var schools = await _api.GetSchoolsAsync();
+                var schools = QuerySchools();
                 return Json(schools, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -65,15 +62,32 @@ namespace Website.Controllers
 
         // ── CreateSchool ──────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<JsonResult> CreateSchool(SchoolModel model)
+        public JsonResult CreateSchool(SchoolModel model)
         {
             if (model == null || string.IsNullOrWhiteSpace(model.SchoolName))
                 return Json(new { success = false, error = "School name is required." });
 
             try
             {
-                var result = await _api.CreateSchoolAsync(model.SchoolName, model.District, model.Address, model.City, model.Province);
-                return Json(new { success = true, data = result });
+                const string sql = @"
+                    INSERT INTO dbo.Schools (SchoolName, District, Address, City, Province, IsActive, DateCreated)
+                    VALUES (@name, @district, @address, @city, @province, 1, GETDATE())";
+
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name",     model.SchoolName ?? "");
+                        cmd.Parameters.AddWithValue("@district", model.District   ?? "");
+                        cmd.Parameters.AddWithValue("@address",  model.Address    ?? "");
+                        cmd.Parameters.AddWithValue("@city",     model.City       ?? "");
+                        cmd.Parameters.AddWithValue("@province", model.Province   ?? "");
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -83,15 +97,38 @@ namespace Website.Controllers
 
         // ── UpdateSchool ──────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<JsonResult> UpdateSchool(SchoolModel model)
+        public JsonResult UpdateSchool(SchoolModel model)
         {
             if (model == null || model.SchoolId <= 0)
                 return Json(new { success = false, error = "Invalid school ID." });
 
             try
             {
-                var result = await _api.UpdateSchoolAsync(model.SchoolId, model.SchoolName, model.District, model.Address, model.City, model.Province);
-                return Json(new { success = true, data = result });
+                const string sql = @"
+                    UPDATE dbo.Schools
+                    SET    SchoolName = @name,
+                           District   = @district,
+                           Address    = @address,
+                           City       = @city,
+                           Province   = @province
+                    WHERE  SchoolID   = @id";
+
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@name",     model.SchoolName ?? "");
+                        cmd.Parameters.AddWithValue("@district", model.District   ?? "");
+                        cmd.Parameters.AddWithValue("@address",  model.Address    ?? "");
+                        cmd.Parameters.AddWithValue("@city",     model.City       ?? "");
+                        cmd.Parameters.AddWithValue("@province", model.Province   ?? "");
+                        cmd.Parameters.AddWithValue("@id",       model.SchoolId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -101,15 +138,24 @@ namespace Website.Controllers
 
         // ── DeleteSchool ──────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<JsonResult> DeleteSchool(int id)
+        public JsonResult DeleteSchool(int id)
         {
             if (id <= 0)
                 return Json(new { success = false, error = "Invalid school ID." });
 
             try
             {
-                var result = await _api.DeleteSchoolAsync(id);
-                return Json(new { success = true, data = result });
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand("DELETE FROM dbo.Schools WHERE SchoolID = @id", conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
@@ -119,44 +165,115 @@ namespace Website.Controllers
 
         // ── ExportCsv ─────────────────────────────────────────────────────────
         [HttpGet]
-        public async Task<ActionResult> ExportCsv()
+        public ActionResult ExportCsv()
         {
             List<dynamic> students;
-            dynamic schools;
+            List<dynamic> schools;
             try
             {
-                var st = _api.GetStudentsAsync();
-                var sc = _api.GetSchoolsAsync();
-                await Task.WhenAll(st, sc);
-                students = st.Result ?? new List<dynamic>();
-                schools  = sc.Result;
+                schools  = QuerySchools();
+                students = QueryStudentSchools();
             }
             catch
             {
-                students = new List<dynamic>();
                 schools  = new List<dynamic>();
+                students = new List<dynamic>();
             }
 
-            var schoolList = schools as IEnumerable<dynamic> ?? new List<dynamic>();
             int total = students.Count;
-
-            var lines = new System.Text.StringBuilder();
+            var lines = new StringBuilder();
             lines.AppendLine("School Name,District,City,Province,Students,% of Total");
-            foreach (var sc in schoolList)
+
+            foreach (dynamic sc in schools)
             {
-                string name     = (string)sc.school_name ?? "";
-                string district = (string)sc.district    ?? "";
-                string city     = (string)sc.city        ?? "";
-                string province = (string)sc.province    ?? "";
-                int    count    = students.Count(s => (string)s.school_name == name);
-                double pct      = total > 0 ? Math.Round((double)count / total * 100, 1) : 0;
+                string name     = sc.school_name ?? "";
+                string district = sc.district    ?? "";
+                string city     = sc.city        ?? "";
+                string province = sc.province    ?? "";
+                int    count    = 0;
+                foreach (dynamic s in students)
+                    if ((string)s.school_name == name) count++;
+                double pct = total > 0 ? Math.Round((double)count / total * 100, 1) : 0;
                 lines.AppendLine($"\"{name}\",\"{district}\",\"{city}\",\"{province}\",{count},{pct}%");
             }
 
-            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(lines.ToString());
+            byte[] bytes = Encoding.UTF8.GetBytes(lines.ToString());
             return File(bytes, "text/csv", "schools_export.csv");
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // Private helpers
+        // ─────────────────────────────────────────────────────────────────────
+
+        private static List<dynamic> QuerySchools()
+        {
+            const string sql = @"
+                SELECT SchoolID                          AS school_id,
+                       SchoolName                        AS school_name,
+                       ISNULL(District,  '')             AS district,
+                       ISNULL(Address,   '')             AS address,
+                       ISNULL(City,      '')             AS city,
+                       ISNULL(Province,  '')             AS province
+                FROM   dbo.Schools
+                WHERE  ISNULL(IsActive, 1) = 1
+                ORDER  BY SchoolName";
+
+            var list = new List<dynamic>();
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        list.Add(new
+                        {
+                            school_id   = (int)rdr["school_id"],
+                            school_name = rdr["school_name"]?.ToString(),
+                            district    = rdr["district"]?.ToString(),
+                            address     = rdr["address"]?.ToString(),
+                            city        = rdr["city"]?.ToString(),
+                            province    = rdr["province"]?.ToString()
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        /// <summary>Returns a lightweight list of students with their school name for count calculations.</summary>
+        private static List<dynamic> QueryStudentSchools()
+        {
+            const string sql = @"
+                SELECT s.StudentID,
+                       ISNULL(sc.SchoolName, '') AS school_name
+                FROM   dbo.Students  s
+                LEFT   JOIN dbo.Schools sc ON sc.SchoolID = s.SchoolID";
+
+            var list = new List<dynamic>();
+            using (var conn = new SqlConnection(ConnStr))
+            {
+                conn.Open();
+                using (var cmd = new SqlCommand(sql, conn))
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        list.Add(new
+                        {
+                            student_id  = (int)rdr["StudentID"],
+                            school_name = rdr["school_name"]?.ToString()
+                        });
+                    }
+                }
+            }
+            return list;
+        }
+
+        // ═════════════════════════════════════════════════════════════════════
+        // Model
+        // ═════════════════════════════════════════════════════════════════════
         public class SchoolModel
         {
             public int    SchoolId   { get; set; }

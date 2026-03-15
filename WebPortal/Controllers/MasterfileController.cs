@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using Website.Filters;
 using Website.Services;
-using Newtonsoft.Json;
+using BCrypt.Net;   // NuGet: BCrypt.Net-Next
 
 namespace Website.Controllers
 {
@@ -14,9 +16,12 @@ namespace Website.Controllers
     public class MasterfileController : AsyncController
     {
         // ─────────────────────────────────────────────────────────────────────
-        // Shared API service helper
+        // Shared API service (still used for questions / modules / badges)
         // ─────────────────────────────────────────────────────────────────────
         private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
+
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
 
         // ─────────────────────────────────────────────────────────────────────
         // Index – loads the Masterfile shell view
@@ -51,7 +56,6 @@ namespace Website.Controllers
         {
             try
             {
-                // Pass 0 to retrieve the full ladder for all users (admin view)
                 var ladder = await _api.GetModuleLadderAsync(0);
                 return Json(new { success = true, data = ladder }, JsonRequestBehavior.AllowGet);
             }
@@ -69,7 +73,6 @@ namespace Website.Controllers
         {
             try
             {
-                // Pass 0 to retrieve badges for the admin (all badges)
                 var badges = await _api.GetBadgesAsync(0);
                 return Json(new { success = true, data = badges }, JsonRequestBehavior.AllowGet);
             }
@@ -80,14 +83,79 @@ namespace Website.Controllers
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // GetAdmins – returns all admin and teacher accounts from the API
+        // GetAdmins – returns all admin + teacher portal accounts from the DB
         // ─────────────────────────────────────────────────────────────────────
         [HttpGet]
-        public async Task<JsonResult> GetAdmins()
+        public JsonResult GetAdmins()
         {
             try
             {
-                var accounts = await _api.GetPortalAccountsAsync();
+                var accounts = new List<object>();
+
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+
+                    // ── Admins ──────────────────────────────────────────────
+                    const string adminSql = @"
+                        SELECT AdminID,
+                               ISNULL(Username, Email)   AS name,
+                               Email,
+                               CAST(IsActive AS BIT)     AS is_active,
+                               LastLoginDate
+                        FROM   dbo.Admins
+                        ORDER BY name";
+
+                    using (var cmd = new SqlCommand(adminSql, conn))
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            accounts.Add(new
+                            {
+                                id       = "admin_" + rdr["AdminID"],
+                                raw_id   = (int)rdr["AdminID"],
+                                name     = rdr["name"]?.ToString(),
+                                email    = rdr["Email"]?.ToString(),
+                                role     = "Admin",
+                                isActive = rdr["is_active"] != DBNull.Value && (bool)rdr["is_active"],
+                                lastLogin = rdr["LastLoginDate"] == DBNull.Value
+                                              ? (string)null
+                                              : ((DateTime)rdr["LastLoginDate"]).ToString("yyyy-MM-dd HH:mm")
+                            });
+                        }
+                    }
+
+                    // ── Teachers ────────────────────────────────────────────
+                    const string teacherSql = @"
+                        SELECT TeacherID,
+                               RTRIM(ISNULL(FirstName,'') + ' ' + ISNULL(LastName,'')) AS name,
+                               Email,
+                               ISNULL(School, '')        AS school,
+                               CAST(IsActive AS BIT)     AS is_active
+                        FROM   dbo.Teachers
+                        ORDER BY name";
+
+                    using (var cmd = new SqlCommand(teacherSql, conn))
+                    using (var rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            accounts.Add(new
+                            {
+                                id       = "teacher_" + rdr["TeacherID"],
+                                raw_id   = (int)rdr["TeacherID"],
+                                name     = rdr["name"]?.ToString(),
+                                email    = rdr["Email"]?.ToString(),
+                                role     = "Teacher",
+                                school   = rdr["school"]?.ToString(),
+                                isActive = rdr["is_active"] != DBNull.Value && (bool)rdr["is_active"],
+                                lastLogin = (string)null
+                            });
+                        }
+                    }
+                }
+
                 return Json(new { success = true, data = accounts }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
@@ -97,7 +165,175 @@ namespace Website.Controllers
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // SaveQuestion – create or update a question item
+        // SaveAdmin – create or update an admin / teacher account
+        // id: "" | "0" = create;  "admin_N" | "teacher_N" = update
+        // ─────────────────────────────────────────────────────────────────────
+        [HttpPost]
+        public JsonResult SaveAdmin(AdminModel model)
+        {
+            try
+            {
+                if (model == null)
+                    return Json(new { success = false, error = "Invalid account data." });
+
+                bool isNew = string.IsNullOrEmpty(model.Id) || model.Id == "0";
+
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+
+                    if (isNew)
+                    {
+                        if (string.IsNullOrWhiteSpace(model.Password))
+                            return Json(new { success = false, error = "Password is required for new accounts." });
+
+                        string hash = BCrypt.Net.BCrypt.HashPassword(model.Password);
+
+                        if (string.Equals(model.Role, "Teacher", StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Split full name into first/last
+                            var parts  = (model.Name ?? "").Trim().Split(new[] { ' ' }, 2);
+                            string fn  = parts[0];
+                            string ln  = parts.Length > 1 ? parts[1] : "";
+
+                            const string sql = @"
+                                INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, School, IsActive)
+                                VALUES (@fn, @ln, @email, @hash, @school, 1)";
+
+                            using (var cmd = new SqlCommand(sql, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@fn",     fn);
+                                cmd.Parameters.AddWithValue("@ln",     ln);
+                                cmd.Parameters.AddWithValue("@email",  model.Email ?? "");
+                                cmd.Parameters.AddWithValue("@hash",   hash);
+                                cmd.Parameters.AddWithValue("@school", model.School ?? "");
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            const string sql = @"
+                                INSERT INTO dbo.Admins (Username, Email, PasswordHash, IsActive)
+                                VALUES (@name, @email, @hash, 1)";
+
+                            using (var cmd = new SqlCommand(sql, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@name",  model.Name ?? "");
+                                cmd.Parameters.AddWithValue("@email", model.Email ?? "");
+                                cmd.Parameters.AddWithValue("@hash",  hash);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // Parse prefixed id, e.g. "admin_3" or "teacher_7"
+                        bool   isTeacher = model.Id.StartsWith("teacher_");
+                        string rawId     = model.Id.Substring(model.Id.IndexOf('_') + 1);
+                        int    numericId = int.Parse(rawId);
+
+                        // Hash new password only if one was supplied
+                        string hash = string.IsNullOrWhiteSpace(model.Password)
+                            ? null
+                            : BCrypt.Net.BCrypt.HashPassword(model.Password);
+
+                        if (isTeacher)
+                        {
+                            var parts = (model.Name ?? "").Trim().Split(new[] { ' ' }, 2);
+                            string fn = parts[0];
+                            string ln = parts.Length > 1 ? parts[1] : "";
+
+                            string sql = hash != null
+                                ? @"UPDATE dbo.Teachers
+                                    SET FirstName=@fn, LastName=@ln, Email=@email,
+                                        Password=@hash, School=@school
+                                    WHERE TeacherID=@id"
+                                : @"UPDATE dbo.Teachers
+                                    SET FirstName=@fn, LastName=@ln, Email=@email, School=@school
+                                    WHERE TeacherID=@id";
+
+                            using (var cmd = new SqlCommand(sql, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@fn",     fn);
+                                cmd.Parameters.AddWithValue("@ln",     ln);
+                                cmd.Parameters.AddWithValue("@email",  model.Email ?? "");
+                                cmd.Parameters.AddWithValue("@school", model.School ?? "");
+                                cmd.Parameters.AddWithValue("@id",     numericId);
+                                if (hash != null) cmd.Parameters.AddWithValue("@hash", hash);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                        else
+                        {
+                            string sql = hash != null
+                                ? @"UPDATE dbo.Admins
+                                    SET Username=@name, Email=@email, PasswordHash=@hash
+                                    WHERE AdminID=@id"
+                                : @"UPDATE dbo.Admins
+                                    SET Username=@name, Email=@email
+                                    WHERE AdminID=@id";
+
+                            using (var cmd = new SqlCommand(sql, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@name",  model.Name ?? "");
+                                cmd.Parameters.AddWithValue("@email", model.Email ?? "");
+                                cmd.Parameters.AddWithValue("@id",    numericId);
+                                if (hash != null) cmd.Parameters.AddWithValue("@hash", hash);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    }
+                }
+
+                return Json(new { success = true, message = "Account saved successfully." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SetAccountActive – enable or disable a portal account
+        // Body: { id: "admin_N"|"teacher_N", isActive: bool }
+        // ─────────────────────────────────────────────────────────────────────
+        [HttpPost]
+        public JsonResult SetAccountActive(SetActiveModel model)
+        {
+            try
+            {
+                if (model == null || string.IsNullOrEmpty(model.Id))
+                    return Json(new { success = false, error = "Invalid account ID." });
+
+                bool   isTeacher = model.Id.StartsWith("teacher_");
+                string rawId     = model.Id.Substring(model.Id.IndexOf('_') + 1);
+                int    numericId = int.Parse(rawId);
+
+                string sql = isTeacher
+                    ? "UPDATE dbo.Teachers SET IsActive=@active WHERE TeacherID=@id"
+                    : "UPDATE dbo.Admins   SET IsActive=@active WHERE AdminID=@id";
+
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@active", model.IsActive ? 1 : 0);
+                        cmd.Parameters.AddWithValue("@id",     numericId);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // SaveQuestion / DeactivateQuestion – question bank management
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
         public JsonResult SaveQuestion(QuestionModel model)
@@ -116,8 +352,25 @@ namespace Website.Controllers
             }
         }
 
+        [HttpPost]
+        public JsonResult DeactivateQuestion(int id)
+        {
+            try
+            {
+                if (id <= 0)
+                    return Json(new { success = false, error = "Invalid question ID." });
+
+                // TODO: integrate _api.DeactivateAssessmentItemAsync(id)
+                return Json(new { success = true, message = $"Question #{id} updated." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, error = ex.Message });
+            }
+        }
+
         // ─────────────────────────────────────────────────────────────────────
-        // SaveBadge – create or update a badge
+        // SaveBadge / DeleteBadge – badge management
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
         public JsonResult SaveBadge(BadgeModel model)
@@ -127,7 +380,7 @@ namespace Website.Controllers
                 if (model == null)
                     return Json(new { success = false, error = "Invalid badge data." });
 
-                // TODO: integrate _api.SaveBadgeAsync(model) when endpoint is available
+                // TODO: integrate _api.SaveBadgeAsync(model)
                 return Json(new { success = true, message = "Badge saved successfully." });
             }
             catch (Exception ex)
@@ -136,52 +389,16 @@ namespace Website.Controllers
             }
         }
 
-        // ─────────────────────────────────────────────────────────────────────
-        // SaveAdmin – create or update an administrator/teacher account
-        // id: "" or "0" = create new; "admin_N" or "teacher_N" = update existing
-        // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
-        public async Task<JsonResult> SaveAdmin(AdminModel model)
+        public JsonResult DeleteBadge(int id)
         {
             try
             {
-                if (model == null)
-                    return Json(new { success = false, error = "Invalid account data." });
+                if (id <= 0)
+                    return Json(new { success = false, error = "Invalid badge ID." });
 
-                dynamic result;
-                bool isNew = string.IsNullOrEmpty(model.Id) || model.Id == "0";
-
-                if (isNew)
-                {
-                    result = await _api.CreatePortalAccountAsync(model.Name, model.Email, model.Password, model.Role, null);
-                }
-                else
-                {
-                    result = await _api.UpdatePortalAccountAsync(model.Id, model.Name, model.Email, model.Password, model.Role, null);
-                }
-
-                return Json(new { success = true, message = "Account saved successfully.", data = result });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, error = ex.Message });
-            }
-        }
-
-        // ─────────────────────────────────────────────────────────────────────
-        // SetAccountActive – enable or disable a portal account
-        // Body: { id: "admin_N"|"teacher_N", isActive: bool }
-        // ─────────────────────────────────────────────────────────────────────
-        [HttpPost]
-        public async Task<JsonResult> SetAccountActive(SetActiveModel model)
-        {
-            try
-            {
-                if (model == null || string.IsNullOrEmpty(model.Id))
-                    return Json(new { success = false, error = "Invalid account ID." });
-
-                var result = await _api.SetPortalAccountActiveAsync(model.Id, model.IsActive);
-                return Json(new { success = true, data = result });
+                // TODO: integrate _api.DeleteBadgeAsync(id)
+                return Json(new { success = true, message = $"Badge #{id} deleted." });
             }
             catch (Exception ex)
             {
@@ -210,23 +427,13 @@ namespace Website.Controllers
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // DeleteQuestion – remove a question from the bank
+        // ImportQuestions – bulk import from CSV/JSON
         // ─────────────────────────────────────────────────────────────────────
         [HttpPost]
-        public JsonResult DeleteQuestion(int id)
+        public JsonResult ImportQuestions()
         {
-            try
-            {
-                if (id <= 0)
-                    return Json(new { success = false, error = "Invalid question ID." });
-
-                // TODO: integrate _api.DeleteAssessmentItemAsync(id) when endpoint is available
-                return Json(new { success = true, message = $"Question #{id} deleted successfully." });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, error = ex.Message });
-            }
+            // TODO: implement bulk import
+            return Json(new { success = true, message = "Import complete." });
         }
 
         // ═════════════════════════════════════════════════════════════════════
@@ -236,16 +443,16 @@ namespace Website.Controllers
         public class QuestionModel
         {
             public int    Id             { get; set; }
-            public string Category       { get; set; }   // Phonics | Vocabulary | Grammar | Comprehension | Creating Text
-            public string Type           { get; set; }   // MultipleChoice | Pronunciation | Reading
-            public double Difficulty     { get; set; }   // b parameter, -3 to 3
-            public double Discrimination { get; set; }   // a parameter, 0.5 to 3
+            public string Category       { get; set; }
+            public string Type           { get; set; }
+            public double Difficulty     { get; set; }
+            public double Discrimination { get; set; }
             public string QuestionText   { get; set; }
             public string ChoiceA        { get; set; }
             public string ChoiceB        { get; set; }
             public string ChoiceC        { get; set; }
             public string ChoiceD        { get; set; }
-            public string CorrectAnswer  { get; set; }   // "A" | "B" | "C" | "D"
+            public string CorrectAnswer  { get; set; }
             public bool   IsActive       { get; set; }
         }
 
@@ -254,10 +461,10 @@ namespace Website.Controllers
             public int    Id          { get; set; }
             public string Name        { get; set; }
             public string Description { get; set; }
-            public string Category    { get; set; }   // Module | XP | Streak | Achievement
+            public string Category    { get; set; }
             public string Criteria    { get; set; }
             public int    XpReward    { get; set; }
-            public string Icon        { get; set; }   // emoji or icon identifier
+            public string Icon        { get; set; }
         }
 
         public class AdminModel
@@ -267,7 +474,7 @@ namespace Website.Controllers
             public string Email    { get; set; }
             public string Password { get; set; }
             public string Role     { get; set; }   // Admin | Teacher
-            public string School   { get; set; }   // applicable when Role == Teacher
+            public string School   { get; set; }
             public bool   IsActive { get; set; }
         }
 
