@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,9 +17,11 @@ namespace Website.Controllers
     public class ReportsController : AsyncController
     {
         // ─────────────────────────────────────────────────────────────────────
-        // Shared API service helper
+        // Shared helpers
         // ─────────────────────────────────────────────────────────────────────
         private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
 
         // ═════════════════════════════════════════════════════════════════════
         // Index – loads the Reports dashboard view
@@ -57,40 +61,239 @@ namespace Website.Controllers
         [HttpPost]
         public async Task<ActionResult> GenerateStudentReport(int studentId)
         {
-            var api = _api;
+            // ── Pull all data directly from SQL ───────────────────────────────
+            // profile fields
+            string studentName = "Unknown Student";
+            string schoolName  = "—";
+            string grade       = "—";
+            string gender      = "—";
+            string level       = "—";
+            string preTheta    = "—";
+            string postTheta   = "—";
+            string thetaGrowth = "—";
+            string totalXp     = "—";
+            string streak      = "—";
+            string lastActive  = "—";
 
-            // 6 parallel API calls — same pattern as StudentController.Details
-            var studentTask   = api.GetPortalStudentAsync(studentId);
-            var placementTask = api.GetPlacementProgressAsync(studentId);
-            var nodeTask      = api.GetNodeProgressAsync(studentId);
-            var ladderTask    = api.GetModuleLadderAsync(studentId);
-            var gamesTask     = api.GetGameResultsAsync(studentId);
-            var badgesTask    = api.GetBadgesAsync(studentId);
+            // placement / category fields
+            double? preVocab = null, prePhono = null, preRead = null, preGram = null;
+            double? preCat1T = null, preCat2T = null, preCat3T = null, preCat4T = null;
+            string  preLevelName  = "—";
+            double? postVocab = null, postPhono = null, postRead = null, postGram = null;
+            double? postCat1T = null, postCat2T = null, postCat3T = null, postCat4T = null;
+            string  postLevelName = "—";
 
-            await Task.WhenAll(studentTask, placementTask, nodeTask, ladderTask, gamesTask, badgesTask);
+            // row collections
+            var lessonRows = new List<(string title, string type, string status, string score, string attempts)>();
+            var gameRows   = new List<(string game, string score, string xp, string date)>();
+            var badgeRows  = new List<(string name, string cat, string desc, string date)>();
 
-            dynamic student   = studentTask.Result;
-            dynamic placement = placementTask.Result;
-            dynamic nodes     = nodeTask.Result;
-            dynamic ladder    = ladderTask.Result;
-            dynamic games     = gamesTask.Result;
-            dynamic badges    = badgesTask.Result;
+            try
+            {
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    await conn.OpenAsync();
 
-            // ── Student profile section ───────────────────────────────────────
-            string studentName   = student?.full_name  ?? student?.name ?? "Unknown Student";
-            string schoolName    = student?.school_name ?? "—";
-            string grade         = student?.grade       ?? "—";
-            string gender        = student?.gender      ?? "—";
-            string level         = student?.placement_level ?? "—";
-            string preTheta      = student?.pre_theta  != null  ? ((double)student.pre_theta).ToString("F4")  : "—";
-            string postTheta     = student?.post_theta != null  ? ((double)student.post_theta).ToString("F4") : "—";
-            string thetaGrowth   = (student?.pre_theta != null && student?.post_theta != null)
-                                        ? (((double)student.post_theta) - ((double)student.pre_theta)).ToString("+0.0000;-0.0000")
-                                        : "—";
-            string totalXp       = student?.total_xp   != null  ? ((int)student.total_xp).ToString("N0")     : "—";
-            string streak        = student?.current_streak != null ? student.current_streak.ToString() + " days" : "—";
-            string lastActive    = student?.last_active ?? "—";
+                    // ── 1. Student profile ────────────────────────────────────
+                    const string profileSql = @"
+                        SELECT RTRIM(s.FirstName + ' ' + ISNULL(s.LastName,'')) AS full_name,
+                               CAST(s.GradeLevel AS NVARCHAR(10))               AS grade,
+                               ISNULL(s.Gender, '—')                            AS gender,
+                               s.PreAssessmentTheta,
+                               s.PostAssessmentTheta,
+                               ISNULL(s.TotalXP, 0)                             AS total_xp,
+                               ISNULL(s.CurrentStreak, 0)                       AS current_streak,
+                               s.LastActivityDate,
+                               ISNULL(sch.SchoolName, '—')                      AS school_name
+                        FROM   dbo.Students s
+                        LEFT JOIN dbo.Schools sch ON s.SchoolID = sch.SchoolID
+                        WHERE  s.StudentID = @sid";
 
+                    using (var cmd = new SqlCommand(profileSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", studentId);
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await rdr.ReadAsync())
+                            {
+                                studentName = rdr["full_name"]?.ToString() ?? "—";
+                                schoolName  = rdr["school_name"]?.ToString() ?? "—";
+                                grade       = rdr["grade"]?.ToString() ?? "—";
+                                gender      = rdr["gender"]?.ToString() ?? "—";
+
+                                double? preTh  = rdr["PreAssessmentTheta"]  == DBNull.Value ? (double?)null : (double)rdr["PreAssessmentTheta"];
+                                double? postTh = rdr["PostAssessmentTheta"] == DBNull.Value ? (double?)null : (double)rdr["PostAssessmentTheta"];
+
+                                preTheta  = preTh  != null ? preTh.Value.ToString("F4")  : "—";
+                                postTheta = postTh != null ? postTh.Value.ToString("F4") : "—";
+                                thetaGrowth = (preTh != null && postTh != null)
+                                    ? (postTh.Value - preTh.Value).ToString("+0.0000;-0.0000")
+                                    : "—";
+
+                                if (preTh != null)
+                                {
+                                    if      (preTh.Value < -0.5) level = "Beginner";
+                                    else if (preTh.Value <= 0.5) level = "Intermediate";
+                                    else                          level = "Advanced";
+                                }
+
+                                totalXp    = ((int)rdr["total_xp"]).ToString("N0");
+                                streak     = ((int)rdr["current_streak"]).ToString() + " days";
+                                lastActive = rdr["LastActivityDate"] == DBNull.Value
+                                    ? "—"
+                                    : ((DateTime)rdr["LastActivityDate"]).ToString("dd MMM yyyy");
+                            }
+                        }
+                    }
+
+                    // ── 2. Placement results (latest pre & post) ──────────────
+                    const string placeSql = @"
+                        SELECT TOP 1 AssessmentType,
+                               VocabularyScore, PhonologicalScore, ReadingScore, GrammarScore,
+                               Category1Theta,  Category2Theta,   Category3Theta, Category4Theta,
+                               LevelName
+                        FROM   dbo.PlacementResults
+                        WHERE  StudentID = @sid AND AssessmentType = @atype
+                        ORDER BY CompletedDate DESC";
+
+                    using (var cmd = new SqlCommand(placeSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid",   studentId);
+                        cmd.Parameters.AddWithValue("@atype", "PreAssessment");
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await rdr.ReadAsync())
+                            {
+                                preVocab = rdr["VocabularyScore"]  == DBNull.Value ? (double?)null : (double)rdr["VocabularyScore"];
+                                prePhono = rdr["PhonologicalScore"] == DBNull.Value ? (double?)null : (double)rdr["PhonologicalScore"];
+                                preRead  = rdr["ReadingScore"]      == DBNull.Value ? (double?)null : (double)rdr["ReadingScore"];
+                                preGram  = rdr["GrammarScore"]      == DBNull.Value ? (double?)null : (double)rdr["GrammarScore"];
+                                preCat1T = rdr["Category1Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category1Theta"];
+                                preCat2T = rdr["Category2Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category2Theta"];
+                                preCat3T = rdr["Category3Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category3Theta"];
+                                preCat4T = rdr["Category4Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category4Theta"];
+                                preLevelName = rdr["LevelName"]?.ToString() ?? "—";
+                            }
+                        }
+                    }
+
+                    using (var cmd = new SqlCommand(placeSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid",   studentId);
+                        cmd.Parameters.AddWithValue("@atype", "PostAssessment");
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await rdr.ReadAsync())
+                            {
+                                postVocab = rdr["VocabularyScore"]  == DBNull.Value ? (double?)null : (double)rdr["VocabularyScore"];
+                                postPhono = rdr["PhonologicalScore"] == DBNull.Value ? (double?)null : (double)rdr["PhonologicalScore"];
+                                postRead  = rdr["ReadingScore"]      == DBNull.Value ? (double?)null : (double)rdr["ReadingScore"];
+                                postGram  = rdr["GrammarScore"]      == DBNull.Value ? (double?)null : (double)rdr["GrammarScore"];
+                                postCat1T = rdr["Category1Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category1Theta"];
+                                postCat2T = rdr["Category2Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category2Theta"];
+                                postCat3T = rdr["Category3Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category3Theta"];
+                                postCat4T = rdr["Category4Theta"]    == DBNull.Value ? (double?)null : (double)rdr["Category4Theta"];
+                                postLevelName = rdr["LevelName"]?.ToString() ?? "—";
+                            }
+                        }
+                    }
+
+                    if (preLevelName != "—") level = preLevelName;
+
+                    // ── 3. Lesson progress ────────────────────────────────────
+                    const string lessonSql = @"
+                        SELECT l.LessonTitle,
+                               ISNULL(l.LessonType, '—')          AS lesson_type,
+                               ISNULL(sp.CompletionStatus, '—')   AS status,
+                               sp.Score,
+                               ISNULL(sp.AttemptsCount, 0)        AS attempts
+                        FROM   dbo.StudentProgress sp
+                        JOIN   dbo.Lessons l ON sp.LessonID = l.LessonID
+                        WHERE  sp.StudentID = @sid
+                        ORDER BY sp.ProgressID";
+
+                    using (var cmd = new SqlCommand(lessonSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", studentId);
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                lessonRows.Add((
+                                    rdr["LessonTitle"]?.ToString() ?? "—",
+                                    rdr["lesson_type"]?.ToString() ?? "—",
+                                    rdr["status"]?.ToString()      ?? "—",
+                                    rdr["Score"] == DBNull.Value   ? "—" : ((double)rdr["Score"]).ToString("F1"),
+                                    rdr["attempts"]?.ToString()    ?? "0"
+                                ));
+                            }
+                        }
+                    }
+
+                    // ── 4. Game history ───────────────────────────────────────
+                    const string gameSql = @"
+                        SELECT TOP 20
+                               GameType,
+                               Score,
+                               ISNULL(XPEarned, 0)                               AS XPEarned,
+                               CONVERT(nvarchar(20), DatePlayed, 105)             AS DatePlayed
+                        FROM   dbo.GameResults
+                        WHERE  StudentID = @sid
+                        ORDER BY DatePlayed DESC";
+
+                    using (var cmd = new SqlCommand(gameSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", studentId);
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                gameRows.Add((
+                                    rdr["GameType"]?.ToString()   ?? "—",
+                                    rdr["Score"]?.ToString()      ?? "—",
+                                    rdr["XPEarned"]?.ToString()   ?? "0",
+                                    rdr["DatePlayed"]?.ToString() ?? "—"
+                                ));
+                            }
+                        }
+                    }
+
+                    // ── 5. Badges ─────────────────────────────────────────────
+                    const string badgeSql = @"
+                        SELECT b.BadgeName,
+                               ISNULL(b.BadgeCategory, '—')                      AS BadgeCategory,
+                               ISNULL(b.BadgeDescription, '—')                   AS BadgeDescription,
+                               CONVERT(nvarchar(20), sb.DateEarned, 105)          AS DateEarned
+                        FROM   dbo.StudentBadges sb
+                        JOIN   dbo.Badges b ON sb.BadgeID = b.BadgeID
+                        WHERE  sb.StudentID = @sid
+                        ORDER BY sb.DateEarned DESC";
+
+                    using (var cmd = new SqlCommand(badgeSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", studentId);
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await rdr.ReadAsync())
+                            {
+                                badgeRows.Add((
+                                    rdr["BadgeName"]?.ToString()        ?? "—",
+                                    rdr["BadgeCategory"]?.ToString()    ?? "—",
+                                    rdr["BadgeDescription"]?.ToString() ?? "—",
+                                    rdr["DateEarned"]?.ToString()       ?? "—"
+                                ));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return Content(BuildReportHtml("Report Error",
+                    $"<p class=\"error\">Unable to load student data: {HtmlEncode(ex.Message)}</p>"), "text/html");
+            }
+
+            // ── Build: Student Profile ────────────────────────────────────────
             var profileSb = new StringBuilder();
             profileSb.Append("<div class=\"report-section\">");
             profileSb.Append("<h2 class=\"section-heading\">Student Profile</h2>");
@@ -102,7 +305,7 @@ namespace Website.Controllers
             profileSb.Append("</table>");
             profileSb.Append("</div>");
 
-            // ── Pre / Post assessment comparison ─────────────────────────────
+            // ── Build: Assessment Summary ─────────────────────────────────────
             var assessSb = new StringBuilder();
             assessSb.Append("<div class=\"report-section\">");
             assessSb.Append("<h2 class=\"section-heading\">Assessment Summary</h2>");
@@ -111,143 +314,103 @@ namespace Website.Controllers
             assessSb.Append("<tbody>");
             assessSb.AppendFormat("<tr><td>IRT Theta (θ)</td><td>{0}</td><td>{1}</td><td class=\"growth\">{2}</td></tr>",
                 HtmlEncode(preTheta), HtmlEncode(postTheta), HtmlEncode(thetaGrowth));
-            assessSb.AppendFormat("<tr><td>Placement Level</td><td colspan=\"3\">{0}</td></tr>", HtmlEncode(level));
+            assessSb.AppendFormat("<tr><td>Placement Level</td><td>{0}</td><td>{1}</td><td>—</td></tr>",
+                HtmlEncode(preLevelName), HtmlEncode(postLevelName));
             assessSb.Append("</tbody></table>");
             assessSb.Append("</div>");
 
-            // ── Category scores table (from placement progress) ───────────────
+            // ── Build: Category Scores ────────────────────────────────────────
             var catSb = new StringBuilder();
             catSb.Append("<div class=\"report-section\">");
             catSb.Append("<h2 class=\"section-heading\">Category Scores</h2>");
             catSb.Append("<table class=\"data-table\">");
-            catSb.Append("<thead><tr><th>Category</th><th>Score / Theta</th><th>Level</th></tr></thead>");
+            catSb.Append("<thead><tr><th>Category</th><th>Pre-Score</th><th>Pre θ</th><th>Post-Score</th><th>Post θ</th></tr></thead>");
             catSb.Append("<tbody>");
-            try
+            var catDefs = new[]
             {
-                if (placement != null)
+                ("Phonics",                prePhono, preCat1T, postPhono, postCat1T),
+                ("Vocabulary",             preVocab, preCat2T, postVocab, postCat2T),
+                ("Grammar",                preGram,  preCat3T, postGram,  postCat3T),
+                ("Reading / Comprehension", preRead,  preCat4T, postRead,  postCat4T),
+            };
+            bool hasCatData = catDefs.Any(c => c.Item2 != null || c.Item3 != null);
+            if (hasCatData)
+            {
+                foreach (var (lbl, preScore, preTh, postScore, postTh) in catDefs)
                 {
-                    var categories = new[] { "phonics", "vocabulary", "grammar", "comprehension", "creating_text" };
-                    var catLabels  = new[] { "Phonics", "Vocabulary", "Grammar", "Comprehension", "Creating Text" };
-                    for (int i = 0; i < categories.Length; i++)
-                    {
-                        string cat = categories[i];
-                        string lbl = catLabels[i];
-                        dynamic catData = placement?[cat];
-                        string score = catData?.theta    != null ? ((double)catData.theta).ToString("F4")  : "—";
-                        string clvl  = catData?.level    != null ? (string)catData.level                    : "—";
-                        catSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>", HtmlEncode(lbl), HtmlEncode(score), HtmlEncode(clvl));
-                    }
-                }
-                else
-                {
-                    catSb.Append("<tr><td colspan=\"3\">No category data available.</td></tr>");
+                    catSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
+                        HtmlEncode(lbl),
+                        preScore  != null ? preScore.Value.ToString("F4")  : "—",
+                        preTh     != null ? preTh.Value.ToString("F4")     : "—",
+                        postScore != null ? postScore.Value.ToString("F4") : "—",
+                        postTh    != null ? postTh.Value.ToString("F4")    : "—");
                 }
             }
-            catch
+            else
             {
-                catSb.Append("<tr><td colspan=\"3\">Category data could not be loaded.</td></tr>");
+                catSb.Append("<tr><td colspan=\"5\">No category data available.</td></tr>");
             }
             catSb.Append("</tbody></table>");
             catSb.Append("</div>");
 
-            // ── Lesson / node progress table ──────────────────────────────────
+            // ── Build: Lesson Progress ────────────────────────────────────────
             var lessonSb = new StringBuilder();
             lessonSb.Append("<div class=\"report-section\">");
             lessonSb.Append("<h2 class=\"section-heading\">Lesson Progress</h2>");
             lessonSb.Append("<table class=\"data-table\">");
-            lessonSb.Append("<thead><tr><th>#</th><th>Lesson / Node</th><th>Module</th><th>Status</th><th>Score</th><th>Attempts</th></tr></thead>");
+            lessonSb.Append("<thead><tr><th>#</th><th>Lesson</th><th>Type</th><th>Status</th><th>Score</th><th>Attempts</th></tr></thead>");
             lessonSb.Append("<tbody>");
-            try
+            if (lessonRows.Count > 0)
             {
-                if (nodes != null)
-                {
-                    int row = 1;
-                    foreach (var n in nodes)
-                    {
-                        string nName    = n?.node_name    ?? n?.name     ?? "—";
-                        string mName    = n?.module_name  ?? "—";
-                        string nStatus  = n?.status       ?? "—";
-                        string nScore   = n?.score        != null ? ((double)n.score).ToString("F1") : "—";
-                        string nAttempts= n?.attempts     != null ? n.attempts.ToString()             : "—";
-                        lessonSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>",
-                            row++, HtmlEncode(nName), HtmlEncode(mName), HtmlEncode(nStatus), HtmlEncode(nScore), HtmlEncode(nAttempts));
-                    }
-                }
-                else
-                {
-                    lessonSb.Append("<tr><td colspan=\"6\">No lesson progress data available.</td></tr>");
-                }
+                int row = 1;
+                foreach (var (title, type, status, score, attempts) in lessonRows)
+                    lessonSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>",
+                        row++, HtmlEncode(title), HtmlEncode(type), HtmlEncode(status), HtmlEncode(score), HtmlEncode(attempts));
             }
-            catch
+            else
             {
-                lessonSb.Append("<tr><td colspan=\"6\">Lesson data could not be loaded.</td></tr>");
+                lessonSb.Append("<tr><td colspan=\"6\">No lesson progress data available.</td></tr>");
             }
             lessonSb.Append("</tbody></table>");
             lessonSb.Append("</div>");
 
-            // ── Game history ──────────────────────────────────────────────────
+            // ── Build: Game History ───────────────────────────────────────────
             var gameSb = new StringBuilder();
             gameSb.Append("<div class=\"report-section\">");
             gameSb.Append("<h2 class=\"section-heading\">Game History</h2>");
             gameSb.Append("<table class=\"data-table\">");
             gameSb.Append("<thead><tr><th>#</th><th>Game</th><th>Score</th><th>XP Earned</th><th>Date</th></tr></thead>");
             gameSb.Append("<tbody>");
-            try
+            if (gameRows.Count > 0)
             {
-                if (games != null)
-                {
-                    int row = 1;
-                    foreach (var g in games)
-                    {
-                        string gName  = g?.game_name  ?? g?.game_type ?? "—";
-                        string gScore = g?.score      != null ? g.score.ToString()    : "—";
-                        string gXp    = g?.xp_earned  != null ? g.xp_earned.ToString(): "—";
-                        string gDate  = g?.played_at  ?? g?.date ?? "—";
-                        gameSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
-                            row++, HtmlEncode(gName), HtmlEncode(gScore), HtmlEncode(gXp), HtmlEncode(gDate));
-                    }
-                }
-                else
-                {
-                    gameSb.Append("<tr><td colspan=\"5\">No game history available.</td></tr>");
-                }
+                int row = 1;
+                foreach (var (game, score, xp, date) in gameRows)
+                    gameSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
+                        row++, HtmlEncode(game), HtmlEncode(score), HtmlEncode(xp), HtmlEncode(date));
             }
-            catch
+            else
             {
-                gameSb.Append("<tr><td colspan=\"5\">Game data could not be loaded.</td></tr>");
+                gameSb.Append("<tr><td colspan=\"5\">No game history available.</td></tr>");
             }
             gameSb.Append("</tbody></table>");
             gameSb.Append("</div>");
 
-            // ── Badges ────────────────────────────────────────────────────────
+            // ── Build: Badges ─────────────────────────────────────────────────
             var badgeSb = new StringBuilder();
             badgeSb.Append("<div class=\"report-section\">");
             badgeSb.Append("<h2 class=\"section-heading\">Badges Earned</h2>");
             badgeSb.Append("<table class=\"data-table\">");
             badgeSb.Append("<thead><tr><th>Badge</th><th>Category</th><th>Description</th><th>Date Earned</th></tr></thead>");
             badgeSb.Append("<tbody>");
-            try
+            if (badgeRows.Count > 0)
             {
-                if (badges != null)
-                {
-                    foreach (var b in badges)
-                    {
-                        string bName  = b?.name        ?? "—";
-                        string bCat   = b?.category    ?? "—";
-                        string bDesc  = b?.description ?? "—";
-                        string bDate  = b?.earned_at   ?? b?.date ?? "—";
-                        badgeSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>",
-                            HtmlEncode(bName), HtmlEncode(bCat), HtmlEncode(bDesc), HtmlEncode(bDate));
-                    }
-                }
-                else
-                {
-                    badgeSb.Append("<tr><td colspan=\"4\">No badges earned yet.</td></tr>");
-                }
+                foreach (var (name, cat, desc, date) in badgeRows)
+                    badgeSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>",
+                        HtmlEncode(name), HtmlEncode(cat), HtmlEncode(desc), HtmlEncode(date));
             }
-            catch
+            else
             {
-                badgeSb.Append("<tr><td colspan=\"4\">Badge data could not be loaded.</td></tr>");
+                badgeSb.Append("<tr><td colspan=\"4\">No badges earned yet.</td></tr>");
             }
             badgeSb.Append("</tbody></table>");
             badgeSb.Append("</div>");

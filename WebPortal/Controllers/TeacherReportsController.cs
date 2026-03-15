@@ -121,30 +121,89 @@ namespace Website.Controllers
         {
             try
             {
-                // Run all four API calls in parallel
-                var studentTask   = _api.GetPortalStudentAsync(studentId);
-                var placementTask = _api.GetPlacementProgressAsync(studentId);
-                var nodeTask      = _api.GetNodeProgressAsync(studentId);
-                var ladderTask    = _api.GetModuleLadderAsync(studentId);
-
-                await Task.WhenAll(studentTask, placementTask, nodeTask, ladderTask);
-
-                return Json(new
+                using (var conn = new SqlConnection(ConnStr))
                 {
-                    success      = true,
-                    student      = studentTask.Result,
-                    placement    = placementTask.Result,
-                    nodeProgress = nodeTask.Result,
-                    moduleLadder = ladderTask.Result
-                }, JsonRequestBehavior.AllowGet);
+                    await conn.OpenAsync();
+
+                    // ── Profile + assessment dates ────────────────────────────
+                    const string profileSql = @"
+                        SELECT RTRIM(s.FirstName + ' ' + ISNULL(s.LastName,''))  AS full_name,
+                               CAST(s.GradeLevel AS NVARCHAR(10))                AS grade,
+                               ISNULL(s.Gender, '—')                             AS gender,
+                               ISNULL(sch.SchoolName, '—')                       AS school_name,
+                               s.PreAssessmentTheta                              AS pre_theta,
+                               s.PostAssessmentTheta                             AS post_theta,
+                               ISNULL(s.TotalXP, 0)                             AS total_xp,
+                               ISNULL(s.CurrentStreak, 0)                       AS streak_days,
+                               s.LastActivityDate                                AS last_active,
+                               s.PreAssessmentDate                               AS pre_date,
+                               s.PostAssessmentDate                              AS post_date,
+                               (SELECT COUNT(*) FROM dbo.StudentProgress sp2
+                                WHERE sp2.StudentID = s.StudentID
+                                  AND sp2.CompletionStatus = 'Completed')        AS lessons_done
+                        FROM   dbo.Students s
+                        LEFT JOIN dbo.Schools sch ON s.SchoolID = sch.SchoolID
+                        WHERE  s.StudentID = @sid";
+
+                    object studentObj = null;
+
+                    using (var cmd = new SqlCommand(profileSql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@sid", studentId);
+                        using (var rdr = await cmd.ExecuteReaderAsync())
+                        {
+                            if (await rdr.ReadAsync())
+                            {
+                                double? preTh  = rdr["pre_theta"]  == DBNull.Value ? (double?)null : (double)rdr["pre_theta"];
+                                double? postTh = rdr["post_theta"] == DBNull.Value ? (double?)null : (double)rdr["post_theta"];
+
+                                string placementLevel = null;
+                                if (preTh != null)
+                                {
+                                    if      (preTh.Value < -0.5) placementLevel = "Beginner";
+                                    else if (preTh.Value <= 0.5) placementLevel = "Intermediate";
+                                    else                          placementLevel = "Advanced";
+                                }
+
+                                studentObj = new
+                                {
+                                    full_name       = rdr["full_name"]?.ToString(),
+                                    FullName        = rdr["full_name"]?.ToString(),
+                                    grade           = rdr["grade"]?.ToString(),
+                                    gender          = rdr["gender"]?.ToString(),
+                                    school_name     = rdr["school_name"]?.ToString(),
+                                    school          = rdr["school_name"]?.ToString(),
+                                    pre_theta       = preTh,
+                                    post_theta      = postTh,
+                                    total_xp        = (int)rdr["total_xp"],
+                                    streak_days     = (int)rdr["streak_days"],
+                                    last_active     = rdr["last_active"] == DBNull.Value ? null
+                                                        : ((DateTime)rdr["last_active"]).ToString("yyyy-MM-dd"),
+                                    pre_date        = rdr["pre_date"]  == DBNull.Value ? null
+                                                        : ((DateTime)rdr["pre_date"]).ToString("yyyy-MM-dd"),
+                                    post_date       = rdr["post_date"] == DBNull.Value ? null
+                                                        : ((DateTime)rdr["post_date"]).ToString("yyyy-MM-dd"),
+                                    placement_level = placementLevel,
+                                    lessons_done    = (int)rdr["lessons_done"]
+                                };
+                            }
+                        }
+                    }
+
+                    if (studentObj == null)
+                        return Json(new { success = false, message = "Student not found." }, JsonRequestBehavior.AllowGet);
+
+                    return Json(new
+                    {
+                        success        = true,
+                        student        = studentObj,
+                        moduleProgress = (object)null   // JS uses estimateModuleCompletion(lessons_done)
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
             catch (Exception ex)
             {
-                return Json(new
-                {
-                    success = false,
-                    message = ex.Message
-                }, JsonRequestBehavior.AllowGet);
+                return Json(new { success = false, message = ex.Message }, JsonRequestBehavior.AllowGet);
             }
         }
 
