@@ -68,7 +68,7 @@ namespace Website.Controllers
                         SELECT TeacherID,
                                RTRIM(ISNULL(FirstName,'') + ' ' + ISNULL(LastName,'')) AS name,
                                Email,
-                               ISNULL(Department, '')    AS school,
+                               ISNULL(School, '')        AS school,
                                CAST(IsActive AS BIT)     AS is_active
                         FROM   dbo.Teachers
                         ORDER BY name";
@@ -170,8 +170,11 @@ namespace Website.Controllers
 
             try
             {
-                string hash = !string.IsNullOrWhiteSpace(model.password)
-                    ? BCrypt.Net.BCrypt.HashPassword(model.password)
+                string salt = !string.IsNullOrWhiteSpace(model.password)
+                    ? BCrypt.Net.BCrypt.GenerateSalt()
+                    : null;
+                string hash = salt != null
+                    ? BCrypt.Net.BCrypt.HashPassword(model.password, salt)
                     : null;
 
                 string email = model.email.Trim();
@@ -182,9 +185,9 @@ namespace Website.Controllers
                     conn.Open();
 
                     if (isNew)
-                        return CreateAccount(conn, role, name, email, hash, model.school);
+                        return CreateAccount(conn, role, name, email, hash, salt, model.school);
                     else
-                        return UpdateAccount(conn, model.id, role, name, email, hash, model.school);
+                        return UpdateAccount(conn, model.id, role, name, email, hash, salt, model.school);
                 }
             }
             catch (Exception ex)
@@ -212,7 +215,7 @@ namespace Website.Controllers
         // ─────────────────────────────────────────────────────────────────────
 
         private JsonResult CreateAccount(SqlConnection conn, string role, string name,
-                                         string email, string hash, string school)
+                                         string email, string hash, string salt, string school)
         {
             if (role == "Admin")
             {
@@ -225,15 +228,16 @@ namespace Website.Controllers
                 }
 
                 const string sql = @"
-                    INSERT INTO dbo.Admins (Username, Email, PasswordHash, IsActive, CreatedDate)
+                    INSERT INTO dbo.Admins (Username, Email, PasswordHash, Salt, IsActive)
                     OUTPUT INSERTED.AdminID
-                    VALUES (@name, @email, @hash, 1, GETUTCDATE())";
+                    VALUES (@name, @email, @hash, @salt, 1)";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@name",  name);
                     cmd.Parameters.AddWithValue("@email", email);
                     cmd.Parameters.AddWithValue("@hash",  hash);
+                    cmd.Parameters.AddWithValue("@salt",  salt);
                     int newId = (int)cmd.ExecuteScalar();
                     return Json(new { success = true, message = "Admin account created.", id = "admin_" + newId });
                 }
@@ -251,20 +255,20 @@ namespace Website.Controllers
                 var   parts     = name.Split(new[] { ' ' }, 2);
                 string firstName = parts[0];
                 string lastName  = parts.Length > 1 ? parts[1] : "";
-                string dept      = ResolveSchoolName(conn, school);
+                string schoolName = ResolveSchoolName(conn, school);
 
                 const string sql = @"
-                    INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, Department, IsActive, DateCreated)
+                    INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, School, IsActive)
                     OUTPUT INSERTED.TeacherID
-                    VALUES (@first, @last, @email, @hash, @dept, 1, GETUTCDATE())";
+                    VALUES (@first, @last, @email, @hash, @school, 1)";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@first", firstName);
-                    cmd.Parameters.AddWithValue("@last",  lastName);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@hash",  hash);
-                    cmd.Parameters.AddWithValue("@dept",  (object)dept ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@first",  firstName);
+                    cmd.Parameters.AddWithValue("@last",   lastName);
+                    cmd.Parameters.AddWithValue("@email",  email);
+                    cmd.Parameters.AddWithValue("@hash",   hash);
+                    cmd.Parameters.AddWithValue("@school", (object)schoolName ?? DBNull.Value);
                     int newId = (int)cmd.ExecuteScalar();
                     return Json(new { success = true, message = "Teacher account created.", id = "teacher_" + newId });
                 }
@@ -272,7 +276,7 @@ namespace Website.Controllers
         }
 
         private JsonResult UpdateAccount(SqlConnection conn, string id, string role,
-                                         string name, string email, string hash, string school)
+                                         string name, string email, string hash, string salt, string school)
         {
             var idParts = (id ?? "").Split('_');
             if (idParts.Length < 2 || !int.TryParse(idParts[1], out int rawId) || rawId <= 0)
@@ -292,7 +296,7 @@ namespace Website.Controllers
                 }
 
                 string sql = hash != null
-                    ? "UPDATE dbo.Admins SET Username=@name, Email=@email, PasswordHash=@hash WHERE AdminID=@id"
+                    ? "UPDATE dbo.Admins SET Username=@name, Email=@email, PasswordHash=@hash, Salt=@salt WHERE AdminID=@id"
                     : "UPDATE dbo.Admins SET Username=@name, Email=@email WHERE AdminID=@id";
 
                 using (var cmd = new SqlCommand(sql, conn))
@@ -300,7 +304,11 @@ namespace Website.Controllers
                     cmd.Parameters.AddWithValue("@name",  name);
                     cmd.Parameters.AddWithValue("@email", email);
                     cmd.Parameters.AddWithValue("@id",    rawId);
-                    if (hash != null) cmd.Parameters.AddWithValue("@hash", hash);
+                    if (hash != null)
+                    {
+                        cmd.Parameters.AddWithValue("@hash", hash);
+                        cmd.Parameters.AddWithValue("@salt", salt);
+                    }
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -315,22 +323,22 @@ namespace Website.Controllers
                         return Json(new { success = false, message = "Another teacher with this email already exists." });
                 }
 
-                var    parts     = name.Split(new[] { ' ' }, 2);
-                string firstName = parts[0];
-                string lastName  = parts.Length > 1 ? parts[1] : "";
-                string dept      = ResolveSchoolName(conn, school);
+                var    parts      = name.Split(new[] { ' ' }, 2);
+                string firstName  = parts[0];
+                string lastName   = parts.Length > 1 ? parts[1] : "";
+                string schoolName = ResolveSchoolName(conn, school);
 
                 string sql = hash != null
-                    ? "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Password=@hash, Department=@dept WHERE TeacherID=@id"
-                    : "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Department=@dept WHERE TeacherID=@id";
+                    ? "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Password=@hash, School=@school WHERE TeacherID=@id"
+                    : "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, School=@school WHERE TeacherID=@id";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@first", firstName);
-                    cmd.Parameters.AddWithValue("@last",  lastName);
-                    cmd.Parameters.AddWithValue("@email", email);
-                    cmd.Parameters.AddWithValue("@dept",  (object)dept ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@id",    rawId);
+                    cmd.Parameters.AddWithValue("@first",  firstName);
+                    cmd.Parameters.AddWithValue("@last",   lastName);
+                    cmd.Parameters.AddWithValue("@email",  email);
+                    cmd.Parameters.AddWithValue("@school", (object)schoolName ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@id",     rawId);
                     if (hash != null) cmd.Parameters.AddWithValue("@hash", hash);
                     cmd.ExecuteNonQuery();
                 }

@@ -154,11 +154,12 @@ function renderAdmins(list) {
 
         const schoolCell = roleIsAdmin ? '—' : (school || '—');
 
+        const safeName = (name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const deactivateBtn = active
-            ? `<button class="btn btn-sm btn-outline-danger ms-1" onclick="deactivateAdmin(${JSON.stringify(id)}, ${JSON.stringify(name)})">
+            ? `<button class="btn btn-sm btn-outline-danger ms-1" onclick="deactivateAdmin('${id}', '${safeName}')">
                    <i class="bi bi-slash-circle"></i> Deactivate
                </button>`
-            : `<button class="btn btn-sm btn-outline-success ms-1" onclick="reactivateAdmin(${JSON.stringify(id)})">
+            : `<button class="btn btn-sm btn-outline-success ms-1" onclick="reactivateAdmin('${id}')">
                    <i class="bi bi-check-circle"></i> Reactivate
                </button>`;
 
