@@ -154,12 +154,13 @@ function renderAdmins(list) {
 
         const schoolCell = roleIsAdmin ? '—' : (school || '—');
 
-        const safeName = (name || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         const deactivateBtn = active
-            ? `<button class="btn btn-sm btn-outline-danger ms-1" onclick="deactivateAdmin('${id}', '${safeName}')">
+            ? `<button class="btn btn-sm btn-outline-danger ms-1"
+                       data-action="deactivate" data-id="${escAttr(id)}">
                    <i class="bi bi-slash-circle"></i> Deactivate
                </button>`
-            : `<button class="btn btn-sm btn-outline-success ms-1" onclick="reactivateAdmin('${id}')">
+            : `<button class="btn btn-sm btn-outline-success ms-1"
+                       data-action="reactivate" data-id="${escAttr(id)}">
                    <i class="bi bi-check-circle"></i> Reactivate
                </button>`;
 
@@ -180,7 +181,8 @@ function renderAdmins(list) {
                 <td class="align-middle">${formatDate(admin.lastLogin || admin.last_login)}</td>
                 <td class="align-middle">${statusBadge}</td>
                 <td class="align-middle">
-                    <button class="btn btn-sm btn-outline-primary" onclick="openEditAdmin('${id}')">
+                    <button class="btn btn-sm btn-outline-primary"
+                            data-action="edit" data-id="${escAttr(id)}">
                         <i class="bi bi-pencil"></i> Edit
                     </button>
                     ${deactivateBtn}
@@ -190,7 +192,7 @@ function renderAdmins(list) {
     });
 }
 
-// ─── HTML escape ──────────────────────────────────────────────────────────────
+// ─── HTML / attribute escape ───────────────────────────────────────────────────
 function escHtml(str) {
     return String(str)
         .replace(/&/g,  '&amp;')
@@ -198,6 +200,10 @@ function escHtml(str) {
         .replace(/>/g,  '&gt;')
         .replace(/"/g,  '&quot;')
         .replace(/'/g,  '&#39;');
+}
+
+function escAttr(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 }
 
 // ─── Add account modal ────────────────────────────────────────────────────────
@@ -222,10 +228,7 @@ function openAddAdmin() {
 // ─── Edit account modal ───────────────────────────────────────────────────────
 function openEditAdmin(id) {
     const admin = window.allAdmins.find(a => String(a.id || a.userId) === String(id));
-    if (!admin) {
-        showToast('Account not found.', 'danger');
-        return;
-    }
+    if (!admin) { showToast('Account not found.', 'danger'); return; }
 
     document.getElementById('aId').value       = admin.id || admin.userId || '';
     document.getElementById('aName').value     = admin.name || admin.fullName || '';
@@ -395,20 +398,27 @@ function showToast(message, type) {
 
 // ─── Bind UI events ───────────────────────────────────────────────────────────
 function bindEvents() {
-    // Search / filter inputs
     document.getElementById('adminSearch')?.addEventListener('input', filterAdmins);
     document.getElementById('adminRoleFilter')?.addEventListener('change', filterAdmins);
     document.getElementById('statusFilter')?.addEventListener('change', filterAdmins);
-
-    // Add button
     document.getElementById('addAdminBtn')?.addEventListener('click', openAddAdmin);
-
-    // Save button inside modal
     document.getElementById('saveAdminBtn')?.addEventListener('click', saveAdmin);
-
-    // Role change inside modal
     document.getElementById('aRole')?.addEventListener('change', handleAdminRoleChange);
 
+    // Delegated clicks for Edit / Deactivate / Reactivate buttons in table rows
+    const tbody = document.getElementById('adminsTableBody');
+    if (tbody) {
+        tbody.addEventListener('click', function (e) {
+            const btn = e.target.closest('[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const id     = btn.dataset.id;
+            const admin  = window.allAdmins.find(a => String(a.id || a.userId) === String(id));
+            if (action === 'edit')       openEditAdmin(id);
+            if (action === 'deactivate') deactivateAdmin(id, admin ? (admin.name || admin.fullName || '') : '');
+            if (action === 'reactivate') reactivateAdmin(id);
+        });
+    }
 }
 
 // ─── Entry point ──────────────────────────────────────────────────────────────
