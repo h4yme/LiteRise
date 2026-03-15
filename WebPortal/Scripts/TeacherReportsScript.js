@@ -5,6 +5,9 @@
 
 'use strict';
 
+// Holds the last generated report HTML (for print)
+var _lastStudentReportHtml = '';
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const TR_MODULES = [
     { label: 'Module 1: Phonics',         totalNodes: 13 },
@@ -304,6 +307,41 @@ function buildModulesFromApi(moduleProgress) {
     });
 }
 
+// ─── Render report HTML into an iframe inside #reportPreview ─────────────────
+function renderPreview(html) {
+    const container = document.getElementById('reportPreview');
+    if (!container) return;
+
+    container.style.display = 'block';
+
+    const placeholder = document.getElementById('trPreviewPlaceholder');
+    if (placeholder) placeholder.style.display = 'none';
+
+    let iframe = document.getElementById('trReportIframe');
+    if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = 'trReportIframe';
+        iframe.style.cssText = 'width:100%;min-height:600px;border:none;border-radius:4px;display:block;';
+        container.appendChild(iframe);
+    }
+
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    iframe.onload = function () {
+        try {
+            iframe.style.height = (iframe.contentDocument.body.scrollHeight + 40) + 'px';
+        } catch (e) { /* cross-origin safety */ }
+    };
+
+    const previewActions = document.getElementById('trPreviewActions');
+    if (previewActions) previewActions.style.display = 'block';
+
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // ─── Generate student report ──────────────────────────────────────────────────
 function generateStudentReport() {
     const select = document.getElementById('studentSelect');
@@ -312,39 +350,45 @@ function generateStudentReport() {
         return;
     }
 
+    const studentId = parseInt(select.value, 10);
     showLoading('generateStudentBtn');
+    showTrLoadingOverlay('Generating student report\u2026');
 
-    try {
-        const form        = document.createElement('form');
-        form.method       = 'POST';
-        form.action       = '/TeacherReports/GenerateStudentReport';
-        form.target       = '_blank';
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/TeacherReports/GenerateStudentReport', true);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-        const idInput     = document.createElement('input');
-        idInput.type      = 'hidden';
-        idInput.name      = 'studentId';
-        idInput.value     = select.value;
-        form.appendChild(idInput);
+    const tokenEl = document.querySelector('input[name="__RequestVerificationToken"]');
+    if (tokenEl) xhr.setRequestHeader('RequestVerificationToken', tokenEl.value);
 
-        // Include anti-forgery token if present
-        const token = document.querySelector('input[name="__RequestVerificationToken"]');
-        if (token) {
-            const hidden       = document.createElement('input');
-            hidden.type        = 'hidden';
-            hidden.name        = '__RequestVerificationToken';
-            hidden.value       = token.value;
-            form.appendChild(hidden);
-        }
+    xhr.timeout = 60000;
 
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
-    } catch (err) {
-        console.error('[TeacherReportsScript] generateStudentReport failed:', err);
-        showTrToast('Failed to generate student report: ' + err.message, 'danger');
-    } finally {
+    xhr.onload = function () {
+        hideTrLoadingOverlay();
         hideLoading('generateStudentBtn');
-    }
+        if (xhr.status >= 200 && xhr.status < 300) {
+            _lastStudentReportHtml = xhr.responseText;
+            renderPreview(_lastStudentReportHtml);
+            showTrToast('Student report generated successfully.', 'success');
+        } else {
+            showTrToast('Server error ' + xhr.status + ' generating report.', 'danger');
+        }
+    };
+
+    xhr.onerror = function () {
+        hideTrLoadingOverlay();
+        hideLoading('generateStudentBtn');
+        showTrToast('Network error generating report.', 'danger');
+    };
+
+    xhr.ontimeout = function () {
+        hideTrLoadingOverlay();
+        hideLoading('generateStudentBtn');
+        showTrToast('Request timed out.', 'danger');
+    };
+
+    xhr.send(JSON.stringify({ studentId: studentId }));
 }
 
 // ─── Generate class report ────────────────────────────────────────────────────
@@ -388,39 +432,36 @@ function exportCsv() {
 
 // ─── Print report ─────────────────────────────────────────────────────────────
 function printReport() {
-    const preview = document.getElementById('reportPreview');
-    if (!preview || !preview.innerHTML.trim()) {
+    if (!_lastStudentReportHtml) {
         showTrToast('Nothing to print. Generate a report first.', 'warning');
         return;
     }
 
-    const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
-        .map(el => el.outerHTML)
-        .join('\n');
-
-    const win = window.open('', '_blank');
+    const win = window.open('', '_blank', 'width=900,height=700');
     if (!win) {
         showTrToast('Pop-up blocked. Please allow pop-ups for this site.', 'warning');
         return;
     }
 
-    win.document.write(`<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>LiteRise Student Report</title>
-    ${styles}
-    <style>
-        @media print { .btn, button, .d-print-none { display: none !important; } }
-        body { padding: 24px; background: #fff; }
-    </style>
-</head>
-<body>
-${preview.innerHTML}
-</body>
-</html>`);
+    win.document.open();
+    win.document.write(_lastStudentReportHtml);
     win.document.close();
-    win.addEventListener('load', () => win.print());
+    win.onload = function () {
+        try { win.print(); } catch (e) { /* ignored */ }
+    };
+}
+
+// ─── Loading overlay helpers ──────────────────────────────────────────────────
+function showTrLoadingOverlay(message) {
+    const overlay = document.getElementById('trLoadingOverlay');
+    const msg     = document.getElementById('trLoadingMessage');
+    if (overlay) overlay.classList.add('active');
+    if (msg)     msg.textContent = message || 'Loading\u2026';
+}
+
+function hideTrLoadingOverlay() {
+    const overlay = document.getElementById('trLoadingOverlay');
+    if (overlay) overlay.classList.remove('active');
 }
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
