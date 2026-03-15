@@ -334,6 +334,7 @@ async function generateStudentReport() {
         if (!data) throw new Error('No data returned from server.');
 
         if (preview) {
+            preview.style.display = 'block';
             preview.innerHTML = buildStudentReportHtml(data);
             preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
@@ -345,6 +346,7 @@ async function generateStudentReport() {
         const localStudent = (optIdx >= 0 && window.studentsData) ? window.studentsData[optIdx] : null;
         if (localStudent) {
             if (preview) {
+                preview.style.display = 'block';
                 preview.innerHTML = buildStudentReportHtml(localStudent);
                 preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }

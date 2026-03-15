@@ -52,7 +52,7 @@
             </div>
 
             <div class="btn-group-stack">
-                <button class="btn btn-primary" onclick="generateStudentReport()">
+                <button id="generateStudentBtn" class="btn btn-primary" onclick="generateStudentReport()">
                     <i class="fas fa-file-alt me-2"></i>Generate Report
                 </button>
             </div>
@@ -71,10 +71,10 @@
             </p>
 
             <div class="btn-group-stack">
-                <button class="btn btn-primary" onclick="generateClassReport()">
+                <button id="generateClassBtn" class="btn btn-primary" onclick="generateClassReport()">
                     <i class="fas fa-print me-2"></i>Generate Class Report
                 </button>
-                <button class="btn btn-outline-secondary" onclick="exportCsv()">
+                <button id="exportCsvBtn" class="btn btn-outline-secondary" onclick="exportCsv()">
                     <i class="fas fa-file-csv me-2"></i>Export CSV
                 </button>
             </div>
@@ -108,4 +108,4 @@
     window.studentsData = @Html.Raw(ViewBag.StudentsJson ?? "[]");
 </script>
 
-@section scripts { <script src="/Scripts/TeacherReportsScript.js?v=2"></script> }
+@section scripts { <script src="/Scripts/TeacherReportsScript.js?v=3"></script> }
