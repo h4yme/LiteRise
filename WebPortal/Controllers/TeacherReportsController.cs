@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +25,9 @@ namespace Website.Controllers
         // ─────────────────────────────────────────────────────────────────────
         private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
 
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
+
         // ─────────────────────────────────────────────────────────────────────
         // Module / node constants (curriculum structure)
         // ─────────────────────────────────────────────────────────────────────
@@ -32,33 +37,74 @@ namespace Website.Controllers
         // =========================================================================
         // Index — Teacher Reports dashboard
         // =========================================================================
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
             int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid0) ? sid0 : (int?)null;
-            List<dynamic> students;
+            var students  = new List<object>();
+            string schoolName = "My School";
 
             try
             {
-                students = await _api.GetAllStudentsAsync(schoolId) ?? new List<dynamic>();
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    const string sql = @"
+                        SELECT s.StudentID                                           AS student_id,
+                               RTRIM(s.FirstName + ' ' + s.LastName)                AS name,
+                               CAST(s.GradeLevel AS NVARCHAR(10))                   AS grade,
+                               s.PreAssessmentTheta                                 AS pre_theta,
+                               s.PostAssessmentTheta                                AS post_theta,
+                               ISNULL(sch.SchoolName, '')                           AS school_name,
+                               CAST(ISNULL(s.IsActive, 0) AS BIT)                  AS is_active,
+                               s.LastActivityDate                                   AS last_active,
+                               ISNULL(s.TotalXP, 0)                                AS total_xp,
+                               ISNULL(s.CurrentStreak, 0)                          AS streak_days
+                        FROM   dbo.Students s
+                        LEFT JOIN dbo.Schools sch ON s.SchoolID = sch.SchoolID
+                        WHERE  (@schoolId IS NULL OR s.SchoolID = @schoolId)
+                        ORDER BY name";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@schoolId", (object)schoolId ?? DBNull.Value);
+                        using (var rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                students.Add(new
+                                {
+                                    student_id  = (int)rdr["student_id"],
+                                    name        = rdr["name"]?.ToString(),
+                                    grade       = rdr["grade"]?.ToString(),
+                                    pre_theta   = rdr["pre_theta"]  == DBNull.Value ? (double?)null : (double)rdr["pre_theta"],
+                                    post_theta  = rdr["post_theta"] == DBNull.Value ? (double?)null : (double)rdr["post_theta"],
+                                    school_name = rdr["school_name"]?.ToString(),
+                                    is_active   = rdr["is_active"] != DBNull.Value && (bool)rdr["is_active"],
+                                    last_active = rdr["last_active"] == DBNull.Value ? null : ((DateTime)rdr["last_active"]).ToString("yyyy-MM-dd"),
+                                    total_xp    = (int)rdr["total_xp"],
+                                    streak_days = (int)rdr["streak_days"]
+                                });
+                            }
+                        }
+                    }
+                }
+
+                if (students.Count > 0)
+                    schoolName = ((dynamic)students[0]).school_name ?? "My School";
             }
             catch (Exception ex)
             {
                 ViewBag.Error        = "Unable to load student data: " + ex.Message;
                 ViewBag.StudentsJson = "[]";
-                ViewBag.Students     = new List<dynamic>();
                 ViewBag.TotalStudents = 0;
-                ViewBag.SchoolName   = "My School";
+                ViewBag.SchoolName   = schoolName;
                 ViewBag.UserName     = Session["UserName"]?.ToString() ?? "Teacher";
                 return View("Index");
             }
 
-            // ── ViewBag population ────────────────────────────────────────────
-            ViewBag.Students      = students;
             ViewBag.StudentsJson  = JsonConvert.SerializeObject(students);
             ViewBag.TotalStudents = students.Count;
-            ViewBag.SchoolName    = students.Count > 0
-                ? ((string)students[0].school_name ?? "My School")
-                : "My School";
+            ViewBag.SchoolName    = schoolName;
             ViewBag.UserName      = Session["UserName"]?.ToString() ?? "Teacher";
 
             return View("Index");
