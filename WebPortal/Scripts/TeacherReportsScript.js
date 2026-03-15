@@ -305,55 +305,43 @@ function buildModulesFromApi(moduleProgress) {
 }
 
 // ─── Generate student report ──────────────────────────────────────────────────
-async function generateStudentReport() {
+function generateStudentReport() {
     const select = document.getElementById('studentSelect');
     if (!select || !select.value) {
         showTrToast('Please select a student first.', 'warning');
         return;
     }
 
-    const studentId = select.value;
-    const optIdx    = parseInt(select.options[select.selectedIndex]?.dataset?.index ?? '-1');
-    const preview   = document.getElementById('reportPreview');
-
     showLoading('generateStudentBtn');
-    if (preview) preview.innerHTML = '';
 
     try {
-        const res = await fetch(`/TeacherReports/GetStudentReportData?studentId=${encodeURIComponent(studentId)}`, {
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        });
+        const form        = document.createElement('form');
+        form.method       = 'POST';
+        form.action       = '/TeacherReports/GenerateStudentReport';
+        form.target       = '_blank';
 
-        let data;
-        if (res.ok) {
-            const json = await res.json();
-            // Support both { success, student } and flat student shape
-            data = json.success === false ? null : (json.student ? json : { student: json });
+        const idInput     = document.createElement('input');
+        idInput.type      = 'hidden';
+        idInput.name      = 'studentId';
+        idInput.value     = select.value;
+        form.appendChild(idInput);
+
+        // Include anti-forgery token if present
+        const token = document.querySelector('input[name="__RequestVerificationToken"]');
+        if (token) {
+            const hidden       = document.createElement('input');
+            hidden.type        = 'hidden';
+            hidden.name        = '__RequestVerificationToken';
+            hidden.value       = token.value;
+            form.appendChild(hidden);
         }
 
-        if (!data) throw new Error('No data returned from server.');
-
-        if (preview) {
-            preview.style.display = 'block';
-            preview.innerHTML = buildStudentReportHtml(data);
-            preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
     } catch (err) {
-        console.warn('[TeacherReportsScript] API error, falling back to local data:', err.message);
-
-        // Fallback: local studentsData
-        const localStudent = (optIdx >= 0 && window.studentsData) ? window.studentsData[optIdx] : null;
-        if (localStudent) {
-            if (preview) {
-                preview.style.display = 'block';
-                preview.innerHTML = buildStudentReportHtml(localStudent);
-                preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-            showTrToast('Showing report from local data (API unavailable).', 'warning');
-        } else {
-            showTrToast('Failed to load student report: ' + err.message, 'danger');
-        }
+        console.error('[TeacherReportsScript] generateStudentReport failed:', err);
+        showTrToast('Failed to generate student report: ' + err.message, 'danger');
     } finally {
         hideLoading('generateStudentBtn');
     }

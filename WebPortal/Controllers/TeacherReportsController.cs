@@ -149,6 +149,251 @@ namespace Website.Controllers
         }
 
         // =========================================================================
+        // GenerateStudentReport — builds a print-ready HTML report for one student
+        // (mirrors admin format, scoped to the teacher's school)
+        // =========================================================================
+        [HttpPost]
+        public async Task<ActionResult> GenerateStudentReport(int studentId)
+        {
+            // ── Verify the student belongs to this teacher's school ────────────
+            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sidCheck) ? sidCheck : (int?)null;
+            if (schoolId.HasValue)
+            {
+                try
+                {
+                    using (var conn = new SqlConnection(ConnStr))
+                    {
+                        conn.Open();
+                        const string checkSql = "SELECT COUNT(1) FROM dbo.Students WHERE StudentID = @sid AND SchoolID = @schId";
+                        using (var cmd = new SqlCommand(checkSql, conn))
+                        {
+                            cmd.Parameters.AddWithValue("@sid",   studentId);
+                            cmd.Parameters.AddWithValue("@schId", schoolId.Value);
+                            int count = (int)cmd.ExecuteScalar();
+                            if (count == 0)
+                                return Content(BuildReportHtml("Access Denied",
+                                    "<p class=\"error\">You are not authorised to view this student's report.</p>"), "text/html");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return Content(BuildReportHtml("Report Error",
+                        $"<p class=\"error\">Unable to verify student access: {HtmlEncode(ex.Message)}</p>"), "text/html");
+                }
+            }
+
+            // ── 6 parallel API calls (same as admin) ──────────────────────────
+            var studentTask   = _api.GetPortalStudentAsync(studentId);
+            var placementTask = _api.GetPlacementProgressAsync(studentId);
+            var nodeTask      = _api.GetNodeProgressAsync(studentId);
+            var ladderTask    = _api.GetModuleLadderAsync(studentId);
+            var gamesTask     = _api.GetGameResultsAsync(studentId);
+            var badgesTask    = _api.GetBadgesAsync(studentId);
+
+            await Task.WhenAll(studentTask, placementTask, nodeTask, ladderTask, gamesTask, badgesTask);
+
+            dynamic student   = studentTask.Result;
+            dynamic placement = placementTask.Result;
+            dynamic nodes     = nodeTask.Result;
+            dynamic ladder    = ladderTask.Result;
+            dynamic games     = gamesTask.Result;
+            dynamic badges    = badgesTask.Result;
+
+            // ── Student profile section ───────────────────────────────────────
+            string studentName = student?.full_name  ?? student?.name ?? "Unknown Student";
+            string schoolName  = student?.school_name ?? "—";
+            string grade       = student?.grade       ?? "—";
+            string gender      = student?.gender      ?? "—";
+            string level       = student?.placement_level ?? "—";
+            string preTheta    = student?.pre_theta  != null ? ((double)student.pre_theta).ToString("F4")  : "—";
+            string postTheta   = student?.post_theta != null ? ((double)student.post_theta).ToString("F4") : "—";
+            string thetaGrowth = (student?.pre_theta != null && student?.post_theta != null)
+                                    ? (((double)student.post_theta) - ((double)student.pre_theta)).ToString("+0.0000;-0.0000")
+                                    : "—";
+            string totalXp     = student?.total_xp      != null ? ((int)student.total_xp).ToString("N0")          : "—";
+            string streak      = student?.current_streak != null ? student.current_streak.ToString() + " days"      : "—";
+            string lastActive  = student?.last_active ?? "—";
+
+            var profileSb = new StringBuilder();
+            profileSb.Append("<div class=\"report-section\">");
+            profileSb.Append("<h2 class=\"section-heading\">Student Profile</h2>");
+            profileSb.Append("<table class=\"info-table\">");
+            profileSb.AppendFormat("<tr><th>Full Name</th><td>{0}</td><th>School</th><td>{1}</td></tr>", HtmlEncode(studentName), HtmlEncode(schoolName));
+            profileSb.AppendFormat("<tr><th>Grade</th><td>{0}</td><th>Gender</th><td>{1}</td></tr>", HtmlEncode(grade), HtmlEncode(gender));
+            profileSb.AppendFormat("<tr><th>Placement Level</th><td>{0}</td><th>Total XP</th><td>{1}</td></tr>", HtmlEncode(level), HtmlEncode(totalXp));
+            profileSb.AppendFormat("<tr><th>Current Streak</th><td>{0}</td><th>Last Active</th><td>{1}</td></tr>", HtmlEncode(streak), HtmlEncode(lastActive));
+            profileSb.Append("</table>");
+            profileSb.Append("</div>");
+
+            // ── Assessment summary ────────────────────────────────────────────
+            var assessSb = new StringBuilder();
+            assessSb.Append("<div class=\"report-section\">");
+            assessSb.Append("<h2 class=\"section-heading\">Assessment Summary</h2>");
+            assessSb.Append("<table class=\"data-table\">");
+            assessSb.Append("<thead><tr><th>Metric</th><th>Pre-Assessment</th><th>Post-Assessment</th><th>Growth</th></tr></thead>");
+            assessSb.Append("<tbody>");
+            assessSb.AppendFormat("<tr><td>IRT Theta (θ)</td><td>{0}</td><td>{1}</td><td class=\"growth\">{2}</td></tr>",
+                HtmlEncode(preTheta), HtmlEncode(postTheta), HtmlEncode(thetaGrowth));
+            assessSb.AppendFormat("<tr><td>Placement Level</td><td colspan=\"3\">{0}</td></tr>", HtmlEncode(level));
+            assessSb.Append("</tbody></table>");
+            assessSb.Append("</div>");
+
+            // ── Category scores ───────────────────────────────────────────────
+            var catSb = new StringBuilder();
+            catSb.Append("<div class=\"report-section\">");
+            catSb.Append("<h2 class=\"section-heading\">Category Scores</h2>");
+            catSb.Append("<table class=\"data-table\">");
+            catSb.Append("<thead><tr><th>Category</th><th>Score / Theta</th><th>Level</th></tr></thead>");
+            catSb.Append("<tbody>");
+            try
+            {
+                if (placement != null)
+                {
+                    var categories = new[] { "phonics", "vocabulary", "grammar", "comprehension", "creating_text" };
+                    var catLabels  = new[] { "Phonics", "Vocabulary", "Grammar", "Comprehension", "Creating Text" };
+                    for (int i = 0; i < categories.Length; i++)
+                    {
+                        string cat    = categories[i];
+                        string lbl    = catLabels[i];
+                        dynamic catData = placement?[cat];
+                        string score  = catData?.theta != null ? ((double)catData.theta).ToString("F4") : "—";
+                        string clvl   = catData?.level != null ? (string)catData.level                   : "—";
+                        catSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td></tr>",
+                            HtmlEncode(lbl), HtmlEncode(score), HtmlEncode(clvl));
+                    }
+                }
+                else
+                {
+                    catSb.Append("<tr><td colspan=\"3\">No category data available.</td></tr>");
+                }
+            }
+            catch
+            {
+                catSb.Append("<tr><td colspan=\"3\">Category data could not be loaded.</td></tr>");
+            }
+            catSb.Append("</tbody></table>");
+            catSb.Append("</div>");
+
+            // ── Lesson / node progress ────────────────────────────────────────
+            var lessonSb = new StringBuilder();
+            lessonSb.Append("<div class=\"report-section\">");
+            lessonSb.Append("<h2 class=\"section-heading\">Lesson Progress</h2>");
+            lessonSb.Append("<table class=\"data-table\">");
+            lessonSb.Append("<thead><tr><th>#</th><th>Lesson / Node</th><th>Module</th><th>Status</th><th>Score</th><th>Attempts</th></tr></thead>");
+            lessonSb.Append("<tbody>");
+            try
+            {
+                if (nodes != null)
+                {
+                    int row = 1;
+                    foreach (var n in nodes)
+                    {
+                        string nName     = n?.node_name   ?? n?.name    ?? "—";
+                        string mName     = n?.module_name ?? "—";
+                        string nStatus   = n?.status      ?? "—";
+                        string nScore    = n?.score    != null ? ((double)n.score).ToString("F1")  : "—";
+                        string nAttempts = n?.attempts != null ? n.attempts.ToString()              : "—";
+                        lessonSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td></tr>",
+                            row++, HtmlEncode(nName), HtmlEncode(mName), HtmlEncode(nStatus), HtmlEncode(nScore), HtmlEncode(nAttempts));
+                    }
+                }
+                else
+                {
+                    lessonSb.Append("<tr><td colspan=\"6\">No lesson progress data available.</td></tr>");
+                }
+            }
+            catch
+            {
+                lessonSb.Append("<tr><td colspan=\"6\">Lesson data could not be loaded.</td></tr>");
+            }
+            lessonSb.Append("</tbody></table>");
+            lessonSb.Append("</div>");
+
+            // ── Game history ──────────────────────────────────────────────────
+            var gameSb = new StringBuilder();
+            gameSb.Append("<div class=\"report-section\">");
+            gameSb.Append("<h2 class=\"section-heading\">Game History</h2>");
+            gameSb.Append("<table class=\"data-table\">");
+            gameSb.Append("<thead><tr><th>#</th><th>Game</th><th>Score</th><th>XP Earned</th><th>Date</th></tr></thead>");
+            gameSb.Append("<tbody>");
+            try
+            {
+                if (games != null)
+                {
+                    int row = 1;
+                    foreach (var g in games)
+                    {
+                        string gName  = g?.game_name ?? g?.game_type ?? "—";
+                        string gScore = g?.score     != null ? g.score.ToString()     : "—";
+                        string gXp    = g?.xp_earned != null ? g.xp_earned.ToString() : "—";
+                        string gDate  = g?.played_at ?? g?.date ?? "—";
+                        gameSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td></tr>",
+                            row++, HtmlEncode(gName), HtmlEncode(gScore), HtmlEncode(gXp), HtmlEncode(gDate));
+                    }
+                }
+                else
+                {
+                    gameSb.Append("<tr><td colspan=\"5\">No game history available.</td></tr>");
+                }
+            }
+            catch
+            {
+                gameSb.Append("<tr><td colspan=\"5\">Game data could not be loaded.</td></tr>");
+            }
+            gameSb.Append("</tbody></table>");
+            gameSb.Append("</div>");
+
+            // ── Badges ────────────────────────────────────────────────────────
+            var badgeSb = new StringBuilder();
+            badgeSb.Append("<div class=\"report-section\">");
+            badgeSb.Append("<h2 class=\"section-heading\">Badges Earned</h2>");
+            badgeSb.Append("<table class=\"data-table\">");
+            badgeSb.Append("<thead><tr><th>Badge</th><th>Category</th><th>Description</th><th>Date Earned</th></tr></thead>");
+            badgeSb.Append("<tbody>");
+            try
+            {
+                if (badges != null)
+                {
+                    foreach (var b in badges)
+                    {
+                        string bName = b?.name        ?? "—";
+                        string bCat  = b?.category    ?? "—";
+                        string bDesc = b?.description ?? "—";
+                        string bDate = b?.earned_at   ?? b?.date ?? "—";
+                        badgeSb.AppendFormat("<tr><td>{0}</td><td>{1}</td><td>{2}</td><td>{3}</td></tr>",
+                            HtmlEncode(bName), HtmlEncode(bCat), HtmlEncode(bDesc), HtmlEncode(bDate));
+                    }
+                }
+                else
+                {
+                    badgeSb.Append("<tr><td colspan=\"4\">No badges earned yet.</td></tr>");
+                }
+            }
+            catch
+            {
+                badgeSb.Append("<tr><td colspan=\"4\">Badge data could not be loaded.</td></tr>");
+            }
+            badgeSb.Append("</tbody></table>");
+            badgeSb.Append("</div>");
+
+            // ── Assemble and return ───────────────────────────────────────────
+            string body = profileSb.ToString()
+                        + assessSb.ToString()
+                        + catSb.ToString()
+                        + lessonSb.ToString()
+                        + gameSb.ToString()
+                        + badgeSb.ToString();
+
+            string htmlString = BuildReportHtml(
+                $"Student Report — {HtmlEncode(studentName)}",
+                $"<p class=\"report-meta\">School: {HtmlEncode(schoolName)} &nbsp;|&nbsp; Grade: {HtmlEncode(grade)} &nbsp;|&nbsp; Generated: {DateTime.Now:MMMM dd, yyyy HH:mm}</p>"
+                + body);
+
+            return Content(htmlString, "text/html");
+        }
+
+        // =========================================================================
         // GenerateClassReport — builds a print-ready HTML class-summary report
         // =========================================================================
         [HttpPost]
