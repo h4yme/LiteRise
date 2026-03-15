@@ -166,7 +166,7 @@ function renderGrowthChart(students) {
             s.post_theta !== null && s.post_theta !== undefined && !isNaN(s.post_theta)
         )
         .map(s => ({
-            name:      s.FullName || 'Unknown',
+            name:      s.FullName || s.full_name || s.name || 'Unknown',
             pre:       parseFloat(s.pre_theta),
             post:      parseFloat(s.post_theta),
             growth:    parseFloat(s.post_theta) - parseFloat(s.pre_theta),
@@ -357,7 +357,7 @@ function renderCategoryTable(students, categoryData) {
 
         tbody.insertAdjacentHTML('beforeend', `
             <tr>
-                <td>${s.FullName || '—'}</td>
+                <td>${s.FullName || s.full_name || s.name || '—'}</td>
                 <td>${s.grade || '—'}</td>
                 ${catCells}
                 ${overallCell}
@@ -450,7 +450,7 @@ function renderXpChart(students) {
     destroyAndCreate('taXpChart', {
         type: 'bar',
         data: {
-            labels: top10.map(s => s.FullName || 'Unknown'),
+            labels: top10.map(s => s.FullName || s.full_name || s.name || 'Unknown'),
             datasets: [{
                 label: 'Total XP',
                 data: top10.map(s => parseInt(s.total_xp) || 0),
@@ -484,7 +484,7 @@ function exportCsv() {
 
     const headers = ['Name', 'Grade', 'Level', 'PreTheta', 'PostTheta', 'LessonsDone', 'XP', 'StreakDays', 'LastActive'];
     const rows = students.map(s => [
-        `"${(s.FullName || '').replace(/"/g, '""')}"`,
+        `"${(s.FullName || s.full_name || s.name || '').replace(/"/g, '""')}"`,
         `"${s.grade || ''}"`,
         `"${s.placement_level || classifyTheta(s.pre_theta)}"`,
         s.pre_theta  !== null && s.pre_theta  !== undefined ? parseFloat(s.pre_theta).toFixed(4)  : '',

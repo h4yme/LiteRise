@@ -67,13 +67,13 @@ function populateStudentSelect() {
 
     // Sort alphabetically
     const sorted = [...students].sort((a, b) => {
-        const na = (a.FullName || a.full_name || '').toLowerCase();
-        const nb = (b.FullName || b.full_name || '').toLowerCase();
+        const na = (a.FullName || a.full_name || a.name || '').toLowerCase();
+        const nb = (b.FullName || b.full_name || b.name || '').toLowerCase();
         return na < nb ? -1 : na > nb ? 1 : 0;
     });
 
     sorted.forEach((s, i) => {
-        const name  = s.FullName || s.full_name || 'Unknown';
+        const name  = s.FullName || s.full_name || s.name || 'Unknown';
         const grade = s.grade    || '?';
         const level = s.placement_level || trClassifyTheta(s.pre_theta) || 'Not Taken';
         const id    = s.id || s.userId || s.student_id || i;
@@ -139,7 +139,7 @@ function estimateModuleCompletion(lessonsTotal) {
 // ─── Student report HTML builder ──────────────────────────────────────────────
 function buildStudentReportHtml(data) {
     const s          = data.student || data;
-    const name       = s.FullName      || s.full_name    || '—';
+    const name       = s.FullName      || s.full_name    || s.name || '—';
     const grade      = s.grade                           || '—';
     const school     = s.school        || s.school_name  || '—';
     const preTheta   = s.pre_theta  != null ? parseFloat(s.pre_theta)  : null;
