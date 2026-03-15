@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LiteRise – User Manual</title>
+<style>
+  /* ─── RESET & BASE ─── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --purple:   #7C3AED;
+    --purple-lt:#F0EBFF;
+    --purple-md:#EDE9FE;
+    --orange:   #F97316;
+    --green:    #22C55E;
+    --red:      #EF4444;
+    --blue:     #3B82F6;
+    --amber:    #F59E0B;
+    --gray-900: #111827;
+    --gray-700: #374151;
+    --gray-500: #6B7280;
+    --gray-200: #E5E7EB;
+    --gray-100: #F9FAFB;
+    --white:    #FFFFFF;
+    --radius:   14px;
+    --shadow:   0 2px 12px rgba(0,0,0,.08);
+  }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 11pt;
+    color: var(--gray-700);
+    background: #fff;
+    line-height: 1.6;
+  }
+
+  /* ─── PRINT ─── */
+  @media print {
+    .page-break { page-break-before: always; }
+    .no-break   { page-break-inside: avoid; }
+    body { font-size: 10.5pt; }
+  }
+
+  /* ─── COVER PAGE ─── */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(145deg, #5B21B6 0%, #7C3AED 45%, #9D4EDD 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    width: 420px; height: 420px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.05);
+    top: -80px; right: -80px;
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.05);
+    bottom: -60px; left: -60px;
+  }
+  .cover-badge {
+    background: rgba(255,255,255,.15);
+    border: 1.5px solid rgba(255,255,255,.3);
+    color: #fff;
+    font-size: 10pt;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    padding: 6px 20px;
+    border-radius: 50px;
+    margin-bottom: 28px;
+  }
+  .cover-logo {
+    width: 100px; height: 100px;
+    background: rgba(255,255,255,.18);
+    border-radius: 28px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 52px;
+    margin: 0 auto 28px;
+  }
+  .cover h1 {
+    font-size: 48pt;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -.02em;
+    line-height: 1.1;
+    margin-bottom: 10px;
+  }
+  .cover h1 span { color: #FCD34D; }
+  .cover-tagline {
+    font-size: 14pt;
+    color: rgba(255,255,255,.8);
+    margin-bottom: 40px;
+  }
+  .cover-divider {
+    width: 60px; height: 3px;
+    background: rgba(255,255,255,.4);
+    border-radius: 3px;
+    margin: 0 auto 32px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item {
+    color: rgba(255,255,255,.75);
+    font-size: 10pt;
+  }
+  .cover-meta-item strong {
+    display: block;
+    color: #fff;
+    font-size: 11pt;
+    margin-bottom: 2px;
+  }
+
+  /* ─── TOC ─── */
+  .toc-page {
+    padding: 60px 64px;
+    min-height: 80vh;
+  }
+  .toc-header {
+    margin-bottom: 32px;
+  }
+  .section-label {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 6px;
+  }
+  .toc-header h2 {
+    font-size: 26pt;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.15;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 16px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+    transition: background .15s;
+  }
+  .toc-list li:hover { background: var(--purple-lt); }
+  .toc-num {
+    width: 32px; height: 32px;
+    background: var(--purple-lt);
+    color: var(--purple);
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 10pt;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .toc-icon { font-size: 16px; }
+  .toc-text { flex: 1; font-weight: 600; color: var(--gray-900); font-size: 11pt; }
+  .toc-dots {
+    flex: 1;
+    border-bottom: 2px dotted var(--gray-200);
+    margin: 0 8px;
+    min-width: 20px;
+  }
+  .toc-page-num { color: var(--gray-500); font-size: 10pt; }
+
+  /* ─── CONTENT SECTIONS ─── */
+  .content-section {
+    padding: 56px 64px;
+  }
+  .content-section + .content-section {
+    border-top: 1px solid var(--gray-200);
+  }
+
+  /* Section header */
+  .sec-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 32px;
+  }
+  .sec-icon {
+    width: 52px; height: 52px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+  .sec-icon.purple { background: var(--purple-lt); }
+  .sec-icon.orange { background: #FFF7ED; }
+  .sec-icon.green  { background: #F0FDF4; }
+  .sec-icon.blue   { background: #EFF6FF; }
+  .sec-icon.amber  { background: #FFFBEB; }
+  .sec-icon.red    { background: #FEF2F2; }
+  .sec-title-block {}
+  .sec-num {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 3px;
+  }
+  .sec-title {
+    font-size: 20pt;
+    font-weight: 800;
+    color: var(--gray-900);
+    line-height: 1.2;
+  }
+  .sec-intro {
+    font-size: 11pt;
+    color: var(--gray-500);
+    margin-bottom: 28px;
+    max-width: 600px;
+    line-height: 1.7;
+  }
+
+  /* ─── SCREENSHOT PLACEHOLDER ─── */
+  .screenshot-wrap {
+    margin: 20px 0 28px;
+  }
+  .screenshot-label {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+  }
+  .screenshot {
+    width: 100%;
+    min-height: 220px;
+    border: 2px dashed var(--gray-200);
+    border-radius: var(--radius);
+    background: var(--gray-100);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-500);
+    gap: 8px;
+  }
+  .screenshot-sm { min-height: 160px; }
+  .screenshot-lg { min-height: 320px; }
+  .screenshot-phone {
+    width: 200px;
+    min-height: 360px;
+    border-radius: 32px;
+    margin: 0 auto;
+  }
+  .screenshot .icon { font-size: 32px; opacity: .4; }
+  .screenshot .hint {
+    font-size: 9.5pt;
+    font-weight: 600;
+    text-align: center;
+    max-width: 200px;
+  }
+
+  /* Two-column screenshot row */
+  .ss-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0 28px;
+  }
+  .ss-row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  /* ─── STEPS ─── */
+  .steps { list-style: none; counter-reset: step; }
+  .step {
+    display: flex;
+    gap: 16px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--gray-200);
+    counter-increment: step;
+  }
+  .step:last-child { border-bottom: none; }
+  .step-num {
+    width: 34px; height: 34px;
+    background: var(--purple);
+    color: #fff;
+    border-radius: 50%;
+    font-weight: 800;
+    font-size: 12pt;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .step-body {}
+  .step-title {
+    font-weight: 700;
+    color: var(--gray-900);
+    font-size: 11pt;
+    margin-bottom: 3px;
+  }
+  .step-desc {
+    font-size: 10.5pt;
+    color: var(--gray-500);
+    line-height: 1.6;
+  }
+
+  /* ─── INFO CARDS ─── */
+  .card {
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 14px;
+  }
+  .card.purple { background: var(--purple-lt); border-left: 4px solid var(--purple); }
+  .card.orange { background: #FFF7ED; border-left: 4px solid var(--orange); }
+  .card.green  { background: #F0FDF4; border-left: 4px solid var(--green); }
+  .card.blue   { background: #EFF6FF; border-left: 4px solid var(--blue); }
+  .card.amber  { background: #FFFBEB; border-left: 4px solid var(--amber); }
+  .card.red    { background: #FEF2F2; border-left: 4px solid var(--red); }
+  .card-title {
+    font-weight: 700;
+    color: var(--gray-900);
+    margin-bottom: 4px;
+    font-size: 11pt;
+  }
+  .card p { font-size: 10.5pt; color: var(--gray-700); line-height: 1.65; }
+
+  /* ─── TABLE ─── */
+  .styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 24px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .styled-table thead { background: var(--purple); color: #fff; }
+  .styled-table thead th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 10pt;
+    font-weight: 700;
+    letter-spacing: .04em;
+  }
+  .styled-table tbody tr:nth-child(even) { background: var(--purple-lt); }
+  .styled-table tbody tr:nth-child(odd)  { background: #fff; }
+  .styled-table tbody td {
+    padding: 11px 16px;
+    font-size: 10.5pt;
+    color: var(--gray-700);
+    border-bottom: 1px solid var(--gray-200);
+  }
+  .styled-table tbody tr:last-child td { border-bottom: none; }
+
+  /* ─── BADGE PILL ─── */
+  .pill {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 50px;
+    font-size: 9pt;
+    font-weight: 700;
+  }
+  .pill.green  { background: #DCFCE7; color: #166534; }
+  .pill.orange { background: #FEF3C7; color: #92400E; }
+  .pill.red    { background: #FEE2E2; color: #991B1B; }
+  .pill.blue   { background: #DBEAFE; color: #1E40AF; }
+  .pill.purple { background: var(--purple-md); color: var(--purple); }
+
+  /* ─── TIP BOX ─── */
+  .tip {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    background: #FFFBEB;
+    border: 1.5px solid #FDE68A;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin: 16px 0;
+  }
+  .tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .tip-text { font-size: 10.5pt; color: #78350F; line-height: 1.6; }
+  .tip-text strong { color: #92400E; }
+
+  /* ─── FLOW DIAGRAM ─── */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .flow-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    background: var(--gray-100);
+    border-radius: 12px;
+    margin-bottom: 2px;
+  }
+  .flow-item:first-child { border-radius: 12px 12px 4px 4px; }
+  .flow-item:last-child  { border-radius: 4px 4px 12px 12px; }
+  .flow-arrow {
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 16px;
+    margin: 1px 0;
+    line-height: 1;
+  }
+  .flow-dot {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .flow-body {}
+  .flow-title { font-weight: 700; color: var(--gray-900); font-size: 11pt; }
+  .flow-sub   { font-size: 10pt; color: var(--gray-500); }
+
+  /* ─── ADAPTIVE DECISION TABLE ─── */
+  .decision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .decision-card {
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .decision-card .d-badge {
+    font-size: 9pt;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .decision-card h4 { font-size: 11pt; font-weight: 700; margin-bottom: 4px; }
+  .decision-card p  { font-size: 10pt; line-height: 1.6; }
+
+  .dc-green  { background: #F0FDF4; }
+  .dc-green  .d-badge { color: #166534; }
+  .dc-green  h4 { color: #166534; }
+
+  .dc-blue   { background: #EFF6FF; }
+  .dc-blue   .d-badge { color: #1D4ED8; }
+  .dc-blue   h4 { color: #1D4ED8; }
+
+  .dc-amber  { background: #FFFBEB; }
+  .dc-amber  .d-badge { color: #B45309; }
+  .dc-amber  h4 { color: #B45309; }
+
+  .dc-red    { background: #FEF2F2; }
+  .dc-red    .d-badge { color: #B91C1C; }
+  .dc-red    h4 { color: #B91C1C; }
+
+  /* ─── GAME GRID ─── */
+  .game-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .game-card {
+    background: var(--gray-100);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+  }
+  .game-card .g-icon { font-size: 28px; margin-bottom: 8px; }
+  .game-card .g-name { font-weight: 700; font-size: 10.5pt; color: var(--gray-900); margin-bottom: 4px; }
+  .game-card .g-desc { font-size: 9.5pt; color: var(--gray-500); line-height: 1.5; }
+
+  /* ─── NAV BAR DIAGRAM ─── */
+  .nav-bar-demo {
+    background: #1C1C2E;
+    border-radius: 24px;
+    padding: 18px 24px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+    gap: 8px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .nav-item .n-icon { font-size: 20px; }
+  .nav-item .n-label { font-size: 8pt; color: rgba(255,255,255,.5); }
+  .nav-item.active .n-label { color: #A78BFA; font-weight: 700; }
+  .nav-item.active .n-icon { filter: drop-shadow(0 0 6px rgba(167,139,250,.8)); }
+
+  /* ─── FOOTER ─── */
+  .page-footer {
+    padding: 24px 64px;
+    border-top: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--gray-500);
+    font-size: 9pt;
+  }
+  .footer-logo { font-weight: 800; color: var(--purple); font-size: 11pt; }
+
+  /* ─── HORIZONTAL RULE ─── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--gray-200);
+    margin: 32px 0;
+  }
+
+  h3.sub-heading {
+    font-size: 13pt;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 24px 0 12px;
+  }
+
+  ul.check-list { list-style: none; padding: 0; margin: 0 0 16px; }
+  ul.check-list li {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 6px 0;
+    font-size: 10.5pt;
+    color: var(--gray-700);
+    line-height: 1.6;
+  }
+  ul.check-list li::before { content: '✅'; flex-shrink: 0; }
+
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  COVER PAGE                                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-badge">📖 Official User Manual</div>
+  <div class="cover-logo">📚</div>
+  <h1>Lite<span>Rise</span></h1>
+  <p class="cover-tagline">Your Smart Reading & Learning Companion</p>
+  <div class="cover-divider"></div>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><strong>Version</strong>1.0</div>
+    <div class="cover-meta-item"><strong>Audience</strong>Students & Parents</div>
+    <div class="cover-meta-item"><strong>Platform</strong>Android</div>
+    <div class="cover-meta-item"><strong>Year</strong>2026</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  TABLE OF CONTENTS                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="toc-page">
+  <div class="toc-header">
+    <p class="section-label">Navigation</p>
+    <h2>Table of Contents</h2>
+  </div>
+  <ul class="toc-list">
+    <li><div class="toc-num">1</div><span class="toc-icon">📲</span><span class="toc-text">Getting Started</span><span class="toc-dots"></span><span class="toc-page-num">3</span></li>
+    <li><div class="toc-num">2</div><span class="toc-icon">📝</span><span class="toc-text">Creating an Account</span><span class="toc-dots"></span><span class="toc-page-num">4</span></li>
+    <li><div class="toc-num">3</div><span class="toc-icon">🔑</span><span class="toc-text">Logging In</span><span class="toc-dots"></span><span class="toc-page-num">5</span></li>
+    <li><div class="toc-num">4</div><span class="toc-icon">👋</span><span class="toc-text">Welcome Onboarding</span><span class="toc-dots"></span><span class="toc-page-num">6</span></li>
+    <li><div class="toc-num">5</div><span class="toc-icon">🎯</span><span class="toc-text">Placement Test</span><span class="toc-dots"></span><span class="toc-page-num">7</span></li>
+    <li><div class="toc-num">6</div><span class="toc-icon">🏠</span><span class="toc-text">Dashboard (Home Screen)</span><span class="toc-dots"></span><span class="toc-page-num">9</span></li>
+    <li><div class="toc-num">7</div><span class="toc-icon">📚</span><span class="toc-text">Taking a Lesson</span><span class="toc-dots"></span><span class="toc-page-num">11</span></li>
+    <li><div class="toc-num">8</div><span class="toc-icon">🎮</span><span class="toc-text">Mini-Games</span><span class="toc-dots"></span><span class="toc-page-num">13</span></li>
+    <li><div class="toc-num">9</div><span class="toc-icon">🏅</span><span class="toc-text">Badges & Achievements</span><span class="toc-dots"></span><span class="toc-page-num">15</span></li>
+    <li><div class="toc-num">10</div><span class="toc-icon">📊</span><span class="toc-text">Progress & Reports</span><span class="toc-dots"></span><span class="toc-page-num">16</span></li>
+    <li><div class="toc-num">11</div><span class="toc-icon">👤</span><span class="toc-text">Profile & Settings</span><span class="toc-dots"></span><span class="toc-page-num">17</span></li>
+    <li><div class="toc-num">12</div><span class="toc-icon">🎓</span><span class="toc-text">Certificates</span><span class="toc-dots"></span><span class="toc-page-num">18</span></li>
+  </ul>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 1 — GETTING STARTED                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon purple">📲</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 01</p>
+      <h2 class="sec-title">Getting Started</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Welcome to <strong>LiteRise</strong> — an adaptive reading and literacy app designed to help students learn at their own pace. Follow the steps below to get the app up and running on your Android phone.</p>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <span class="tip-text"><strong>What you'll need:</strong> An Android smartphone and a working internet connection to create your account and load lessons.</span>
+  </div>
+
+  <ol class="steps">
+    <li class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p class="step-title">Install the App</p>
+        <p class="step-desc">Download LiteRise from the Google Play Store or install the APK file shared by your teacher/school.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p class="step-title">Open the App</p>
+        <p class="step-desc">Tap the LiteRise icon on your home screen. The app will open with a short splash screen while it loads.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p class="step-title">Choose to Login or Register</p>
+        <p class="step-desc">If you're new, tap <strong>Register</strong> to create a free account. If you already have one, tap <strong>Login</strong>.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Splash &amp; Login/Register Selection Screen</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Splash Screen here</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Login or Register Screen here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 2 — CREATING AN ACCOUNT                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon orange">📝</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 02</p>
+      <h2 class="sec-title">Creating an Account</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Signing up is quick and easy. The registration is split into <strong>4 short steps</strong> so it never feels overwhelming.</p>
+
+  <table class="styled-table no-break">
+    <thead>
+      <tr><th>Step</th><th>What You'll Fill In</th><th>Why We Ask</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>Step 1</strong></td><td>Full name, nickname, profile photo</td><td>So the app can greet you personally</td></tr>
+      <tr><td><strong>Step 2</strong></td><td>Birthday, gender</td><td>Helps set age-appropriate content</td></tr>
+      <tr><td><strong>Step 3</strong></td><td>School name, grade level</td><td>Aligns lessons to your curriculum level</td></tr>
+      <tr><td><strong>Step 4</strong></td><td>Email address, password</td><td>Secures your account and saves progress</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip">
+    <span class="tip-icon">🔒</span>
+    <span class="tip-text"><strong>Password tip:</strong> Use at least 8 characters with a mix of letters and numbers. Keep it somewhere safe!</span>
+  </div>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshots — Registration Steps 1 to 4</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Step 1 — Name &amp; Profile Photo</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Step 2 — Birthday &amp; Gender</div>
+      </div>
+    </div>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Step 3 — School &amp; Grade</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Step 4 — Email &amp; Password</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 3 — LOGGING IN                                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon blue">🔑</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 03</p>
+      <h2 class="sec-title">Logging In</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Already have an account? Logging in only takes a few seconds.</p>
+
+  <ol class="steps">
+    <li class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p class="step-title">Enter your Email</p>
+        <p class="step-desc">Type the email address you used when signing up.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p class="step-title">Enter your Password</p>
+        <p class="step-desc">Tap the eye icon 👁 to show or hide your password as you type.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p class="step-title">Tap "Login"</p>
+        <p class="step-desc">The app will check your info and bring you straight to your dashboard.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="card orange no-break">
+    <p class="card-title">🔓 Forgot your password?</p>
+    <p>Tap <strong>"Forgot Password"</strong> on the login screen. Enter your email and you'll receive steps to reset it. Check your inbox (and spam folder!) after a minute.</p>
+  </div>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Login Screen</p>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Add screenshot of the Login Screen here</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 4 — WELCOME ONBOARDING                            -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon purple">👋</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 04</p>
+      <h2 class="sec-title">Welcome Onboarding</h2>
+    </div>
+  </div>
+  <p class="sec-intro">The first time you log in, <strong>Leo</strong> — the LiteRise mascot — will greet you with a short 3-slide tour. This only appears once.</p>
+
+  <div class="ss-row ss-row-3">
+    <div style="text-align:center;">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Slide 1 Screenshot</div>
+      </div>
+      <p style="font-size:9.5pt;font-weight:700;color:#374151;margin-top:8px;">Slide 1</p>
+      <p style="font-size:9pt;color:#6B7280;">"Hi! I'm Leo!" — app introduction</p>
+    </div>
+    <div style="text-align:center;">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Slide 2 Screenshot</div>
+      </div>
+      <p style="font-size:9.5pt;font-weight:700;color:#374151;margin-top:8px;">Slide 2</p>
+      <p style="font-size:9pt;color:#6B7280;">"A Quick Reading Check" — about the test</p>
+    </div>
+    <div style="text-align:center;">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Slide 3 Screenshot</div>
+      </div>
+      <p style="font-size:9.5pt;font-weight:700;color:#374151;margin-top:8px;">Slide 3</p>
+      <p style="font-size:9pt;color:#6B7280;">"What to Expect" — modules overview</p>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">➡️</span>
+    <span class="tip-text">Swipe left to go to the next slide, or tap the arrow button at the bottom. After the 3rd slide, you'll move on to the <strong>Placement Test</strong>.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 5 — PLACEMENT TEST                                -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon amber">🎯</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 05</p>
+      <h2 class="sec-title">Placement Test</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Before your first lesson, LiteRise gives you a short reading check. This helps the app understand your current level so it can give you the right lessons — not too easy, not too hard.</p>
+
+  <div class="card amber no-break">
+    <p class="card-title">📋 About the Test</p>
+    <p>The placement test has <strong>25 questions</strong> across 5 reading skill areas. It adapts as you go — meaning if you answer correctly, the next question may be slightly harder, and vice versa. There's no passing or failing. Just answer honestly!</p>
+  </div>
+
+  <h3 class="sub-heading">5 Skill Areas Covered</h3>
+  <table class="styled-table no-break">
+    <thead>
+      <tr><th>#</th><th>Skill Area</th><th>What It Checks</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>📗 Phonics &amp; Word Study</td><td>Letter sounds, blends, word patterns</td></tr>
+      <tr><td>2</td><td>📙 Vocabulary &amp; Word Knowledge</td><td>Word meanings, context clues</td></tr>
+      <tr><td>3</td><td>📘 Grammar Awareness</td><td>Sentence structure, parts of speech</td></tr>
+      <tr><td>4</td><td>📕 Comprehending Text</td><td>Reading passages, main idea, details</td></tr>
+      <tr><td>5</td><td>📓 Creating &amp; Composing</td><td>Writing ideas, sentence completion</td></tr>
+    </tbody>
+  </table>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshots — Placement Test Intro &amp; Test Question</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Placement Test Intro Screen with Leo</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">A Sample Placement Test Question</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">Understanding Your Results</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:14px;">After finishing all questions, you'll see your placement result. This shows your level and a breakdown of each skill.</p>
+
+  <div class="ss-row">
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Placement Result Screen — top half (level badge &amp; score)</div>
+    </div>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Placement Result Screen — bottom half (category breakdown)</div>
+    </div>
+  </div>
+
+  <table class="styled-table no-break">
+    <thead><tr><th>Level</th><th>What it Means</th></tr></thead>
+    <tbody>
+      <tr><td>🟢 <strong>Beginner</strong></td><td>Starting out — lessons will build foundational skills step by step</td></tr>
+      <tr><td>🟡 <strong>Intermediate</strong></td><td>Some skills in place — lessons will reinforce and expand knowledge</td></tr>
+      <tr><td>🔵 <strong>Advanced</strong></td><td>Strong reading base — lessons will challenge and enrich further</td></tr>
+    </tbody>
+  </table>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <span class="tip-text"><strong>Don't worry about your level!</strong> LiteRise automatically adjusts your lessons based on where you are. You can always improve — that's what the app is for.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 6 — DASHBOARD                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon green">🏠</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 06</p>
+      <h2 class="sec-title">Dashboard (Home Screen)</h2>
+    </div>
+  </div>
+  <p class="sec-intro">The Dashboard is your main hub. Everything you need is one tap away from here.</p>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Dashboard / Home Screen</p>
+    <div class="screenshot screenshot-lg">
+      <div class="icon">📱</div>
+      <div class="hint">Add a full screenshot of the Dashboard / Home Screen here</div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">What You'll See on the Dashboard</h3>
+  <div class="card purple no-break">
+    <p class="card-title">⭐ XP (Experience Points)</p>
+    <p>Shown at the top. You earn XP every time you complete a lesson or quiz. Watch it grow as you learn!</p>
+  </div>
+  <div class="card green no-break">
+    <p class="card-title">🔥 Daily Streak</p>
+    <p>The number of days in a row you've used the app. Try to keep your streak going — it shows your dedication!</p>
+  </div>
+  <div class="card blue no-break">
+    <p class="card-title">📚 Learning Modules</p>
+    <p>Five colorful module cards — one for each reading skill area. Tap any card to start or continue a lesson in that skill.</p>
+  </div>
+
+  <h3 class="sub-heading">Bottom Navigation Bar</h3>
+  <div class="nav-bar-demo">
+    <div class="nav-item active">
+      <span class="n-icon">🏠</span>
+      <span class="n-label">Home</span>
+    </div>
+    <div class="nav-item">
+      <span class="n-icon">📚</span>
+      <span class="n-label">Modules</span>
+    </div>
+    <div class="nav-item">
+      <span class="n-icon">📊</span>
+      <span class="n-label">Progress</span>
+    </div>
+    <div class="nav-item">
+      <span class="n-icon">🏅</span>
+      <span class="n-label">Badges</span>
+    </div>
+    <div class="nav-item">
+      <span class="n-icon">👤</span>
+      <span class="n-label">Profile</span>
+    </div>
+  </div>
+
+  <table class="styled-table no-break">
+    <thead><tr><th>Tab</th><th>What It Shows</th></tr></thead>
+    <tbody>
+      <tr><td>🏠 <strong>Home</strong></td><td>Dashboard with XP, streak, and module shortcuts</td></tr>
+      <tr><td>📚 <strong>Modules</strong></td><td>All 5 learning modules with lesson progress trees</td></tr>
+      <tr><td>📊 <strong>Progress</strong></td><td>Your learning statistics, daily activity, XP history</td></tr>
+      <tr><td>🏅 <strong>Badges</strong></td><td>All badges you can earn — tap one to see how to unlock it</td></tr>
+      <tr><td>👤 <strong>Profile</strong></td><td>Your account info, completion percentage, and settings</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 7 — TAKING A LESSON                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon purple">📚</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 07</p>
+      <h2 class="sec-title">Taking a Lesson</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Every lesson in LiteRise follows a simple 3-phase process: <strong>Learn → Practice → Results</strong>. Here's how it works step by step.</p>
+
+  <!-- Flow diagram -->
+  <div class="flow">
+    <div class="flow-item" style="background:#F3F0FF;">
+      <div class="flow-dot" style="background:#EDE9FE;">📚</div>
+      <div class="flow-body">
+        <p class="flow-title">Phase 1 — Learn</p>
+        <p class="flow-sub">Read through the lesson content at your own pace</p>
+      </div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item" style="background:#FFF7ED;">
+      <div class="flow-dot" style="background:#FFEDD5;">✏️</div>
+      <div class="flow-body">
+        <p class="flow-title">Phase 2 — Practice Quiz</p>
+        <p class="flow-sub">Answer 5–10 questions to test what you've learned</p>
+      </div>
+    </div>
+    <div class="flow-arrow">↓</div>
+    <div class="flow-item" style="background:#F0FDF4;">
+      <div class="flow-dot" style="background:#DCFCE7;">🏆</div>
+      <div class="flow-body">
+        <p class="flow-title">Phase 3 — Results</p>
+        <p class="flow-sub">See your score, earn XP, and unlock the next lesson</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">Phase 1 — Learn</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:12px;">The lesson page shows you reading content, examples, vocabulary, and grammar rules. Read through everything, then tap <strong>"Complete Lesson"</strong> at the bottom to move on.</p>
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Lesson Content Screen</p>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Add screenshot of the Lesson Content Screen here</div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">Phase 2 — Practice Quiz</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:12px;">After the lesson, a short quiz will appear. Select the best answer for each question and tap <strong>"Submit"</strong> when done. There's a progress bar at the top so you always know how many questions are left.</p>
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Quiz Screen</p>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Add screenshot of the Quiz / Question Screen here</div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">Phase 3 — Quiz Results &amp; What Happens Next</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:14px;">Based on your score, LiteRise will decide the best next step for you automatically.</p>
+
+  <div class="decision-grid no-break">
+    <div class="decision-card dc-green">
+      <p class="d-badge">Score 80–89%</p>
+      <h4>✓ Ready to Proceed</h4>
+      <p>Great job! The next lesson is now unlocked. Tap "Continue Adventure" to keep going.</p>
+    </div>
+    <div class="decision-card dc-amber">
+      <p class="d-badge">Score 90%+ (Advanced)</p>
+      <h4>🏆 Enrichment Available</h4>
+      <p>Outstanding! You can take on an optional challenge lesson for extra practice and XP.</p>
+    </div>
+    <div class="decision-card dc-blue">
+      <p class="d-badge">Score 70–79% (Beginner)</p>
+      <h4>💡 Extra Practice Available</h4>
+      <p>Good effort! An optional supplemental lesson is unlocked to help reinforce the topic.</p>
+    </div>
+    <div class="decision-card dc-red">
+      <p class="d-badge">Score Below 70%</p>
+      <h4>⚠ More Practice Needed</h4>
+      <p>No worries! A shorter remedial lesson is unlocked first. Complete it before moving on.</p>
+    </div>
+  </div>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Quiz Result Screen</p>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Add screenshot of the Quiz Result Screen here</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <span class="tip-text"><strong>Can I try a quiz again?</strong> Yes! If you scored below 70%, you'll see a <strong>"Try Again"</strong> button on the results screen. You can retake the quiz as many times as you need.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 8 — MINI-GAMES                                    -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon orange">🎮</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 08</p>
+      <h2 class="sec-title">Mini-Games</h2>
+    </div>
+  </div>
+  <p class="sec-intro">LiteRise includes <strong>11 fun mini-games</strong> that make learning feel like play. Games appear throughout your lessons as practice activities and rewards.</p>
+
+  <div class="game-grid no-break">
+    <div class="game-card">
+      <div class="g-icon">🔀</div>
+      <div class="g-name">Sentence Scramble</div>
+      <div class="g-desc">Drag words into the correct order to build a sentence.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">📖</div>
+      <div class="g-name">Story Sequencing</div>
+      <div class="g-desc">Arrange story events in the right order.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">✏️</div>
+      <div class="g-name">Fill in the Blanks</div>
+      <div class="g-desc">Pick the missing word to complete each sentence.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">🖼️</div>
+      <div class="g-name">Picture Match</div>
+      <div class="g-desc">Match pictures to the words they represent.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">💬</div>
+      <div class="g-name">Dialogue Reading</div>
+      <div class="g-desc">Read a conversation and answer questions about it.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">🔍</div>
+      <div class="g-name">Word Hunt</div>
+      <div class="g-desc">Find hidden words in a letter grid.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">⏱️</div>
+      <div class="g-name">Timed Trail</div>
+      <div class="g-desc">Recognize and tap the correct words before time runs out.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">👂</div>
+      <div class="g-name">Minimal Pairs</div>
+      <div class="g-desc">Tell apart words that sound very similar (e.g., "bat" vs "bad").</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">⚡</div>
+      <div class="g-name">Synonym Sprint</div>
+      <div class="g-desc">Quickly match words that mean the same thing.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">💥</div>
+      <div class="g-name">Word Explosion</div>
+      <div class="g-desc">Tap the correct words as they pop up on screen.</div>
+    </div>
+    <div class="game-card">
+      <div class="g-icon">🥷</div>
+      <div class="g-name">Phonics Ninja</div>
+      <div class="g-desc">Slash the correct sound patterns to level up.</div>
+    </div>
+  </div>
+
+  <h3 class="sub-heading">After Each Game</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:14px;">When a game ends, you'll see a result summary showing your performance and XP earned.</p>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Game Result Dialog</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of a Mini-Game in play here</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Game Result Dialog here</div>
+      </div>
+    </div>
+  </div>
+
+  <table class="styled-table no-break">
+    <thead><tr><th>Stat Shown</th><th>What It Means</th></tr></thead>
+    <tbody>
+      <tr><td>⭐ <strong>Score</strong></td><td>Your total points for this game</td></tr>
+      <tr><td>✅ <strong>Accuracy</strong></td><td>Percentage of correct answers</td></tr>
+      <tr><td>🔥 <strong>Streak</strong></td><td>How many correct answers you got in a row</td></tr>
+      <tr><td>⏱ <strong>Time</strong></td><td>How long you took to finish</td></tr>
+      <tr><td>💰 <strong>XP Earned</strong></td><td>Experience points added to your total</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 9 — BADGES                                        -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon amber">🏅</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 09</p>
+      <h2 class="sec-title">Badges &amp; Achievements</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Badges are your trophies inside LiteRise! You earn them by hitting milestones in your learning journey. Collect them all!</p>
+
+  <h3 class="sub-heading">How to Earn Badges</h3>
+  <ul class="check-list">
+    <li>Complete your first lesson</li>
+    <li>Finish an entire module</li>
+    <li>Keep a daily streak for several days in a row</li>
+    <li>Score 90% or higher on a quiz</li>
+    <li>Complete the post-assessment</li>
+  </ul>
+
+  <div class="card amber no-break">
+    <p class="card-title">🎉 You Earned a Badge!</p>
+    <p>When you unlock a new badge, a celebration pop-up appears automatically — even in the middle of a lesson! Tap anywhere to close it and continue.</p>
+  </div>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshots — Badges Screen &amp; Badge Earned Pop-up</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Badges Collection Screen here</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Badge Earned Pop-up Dialog here</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">💡</span>
+    <span class="tip-text">Go to the <strong>Badges tab</strong> in the bottom navigation to see all available badges and find out how to unlock the ones you haven't earned yet.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 10 — PROGRESS                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon blue">📊</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 10</p>
+      <h2 class="sec-title">Progress &amp; Reports</h2>
+    </div>
+  </div>
+  <p class="sec-intro">Want to see how far you've come? The Progress tab shows all your learning stats in one place.</p>
+
+  <h3 class="sub-heading">What's in the Progress Tab</h3>
+  <div class="card blue no-break">
+    <p class="card-title">📅 Daily Activity</p>
+    <p>A calendar or chart showing which days you studied and how active you were.</p>
+  </div>
+  <div class="card green no-break">
+    <p class="card-title">⭐ Total XP</p>
+    <p>Your all-time experience points accumulated from lessons, quizzes, and games.</p>
+  </div>
+  <div class="card purple no-break">
+    <p class="card-title">📈 Skills Breakdown</p>
+    <p>A detailed view showing your strength level in each of the 5 reading skill areas.</p>
+  </div>
+
+  <h3 class="sub-heading">Pre vs Post Comparison Report</h3>
+  <p style="font-size:10.5pt;color:#374151;margin-bottom:12px;">After you complete enough lessons, you can take a final check-up test. The Comparison Report then shows you side-by-side how much you improved across every skill area since you first started.</p>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshots — Progress Tab &amp; Comparison Report</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Progress / Stats Screen here</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Pre vs Post Comparison Report here</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 11 — PROFILE & SETTINGS                           -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-break"></div>
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon green">👤</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 11</p>
+      <h2 class="sec-title">Profile &amp; Settings</h2>
+    </div>
+  </div>
+  <p class="sec-intro">The Profile tab is where you manage your account and personalize your app experience.</p>
+
+  <h3 class="sub-heading">What's in Your Profile</h3>
+  <table class="styled-table no-break">
+    <thead><tr><th>Feature</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td>📷 <strong>Profile Photo</strong></td><td>Your chosen avatar or photo</td></tr>
+      <tr><td>🏷️ <strong>Name &amp; Nickname</strong></td><td>How Leo and the app address you</td></tr>
+      <tr><td>🏫 <strong>School &amp; Grade</strong></td><td>Your registered school info</td></tr>
+      <tr><td>📈 <strong>Completion %</strong></td><td>Overall percentage of the program you've finished</td></tr>
+      <tr><td>⚙️ <strong>Settings</strong></td><td>Sound, music, and notification preferences</td></tr>
+      <tr><td>🚪 <strong>Logout</strong></td><td>Safely sign out of your account</td></tr>
+    </tbody>
+  </table>
+
+  <h3 class="sub-heading">Settings Options</h3>
+  <ul class="check-list">
+    <li><strong>Background Music</strong> — turn the app's music on or off</li>
+    <li><strong>Sound Effects</strong> — toggle game and button sounds</li>
+    <li><strong>Daily Reminders</strong> — enable notifications to remind you to study each day</li>
+  </ul>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Profile &amp; Settings Screen</p>
+    <div class="ss-row">
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Profile Screen here</div>
+      </div>
+      <div class="screenshot screenshot-sm">
+        <div class="icon">📱</div>
+        <div class="hint">Add screenshot of the Settings Screen here</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card red no-break">
+    <p class="card-title">🚪 How to Log Out</p>
+    <p>Go to the <strong>Profile tab</strong> → scroll to the bottom → tap <strong>"Logout"</strong>. Your progress is saved automatically, so nothing will be lost.</p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  SECTION 12 — CERTIFICATES                                 -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="content-section">
+  <div class="sec-header">
+    <div class="sec-icon purple">🎓</div>
+    <div class="sec-title-block">
+      <p class="sec-num">Section 12</p>
+      <h2 class="sec-title">Certificates</h2>
+    </div>
+  </div>
+  <p class="sec-intro">LiteRise rewards your hard work with a <strong>digital certificate</strong> when you complete the program. This is a great way to show your achievement!</p>
+
+  <h3 class="sub-heading">How to Get Your Certificate</h3>
+  <ol class="steps">
+    <li class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p class="step-title">Complete the Post-Assessment</p>
+        <p class="step-desc">After finishing your lessons, you'll be prompted to take a final check-up test.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p class="step-title">View Your Results</p>
+        <p class="step-desc">The results screen will show your improvement compared to when you first started.</p>
+      </div>
+    </li>
+    <li class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p class="step-title">Download or Share Your Certificate</p>
+        <p class="step-desc">Tap the <strong>"Get Certificate"</strong> button on the results screen to save it to your phone or share it directly.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="screenshot-wrap">
+    <p class="screenshot-label">📸 Screenshot — Certificate Screen</p>
+    <div class="screenshot screenshot-sm">
+      <div class="icon">📱</div>
+      <div class="hint">Add screenshot of the Certificate / Post-Assessment Result Screen here</div>
+    </div>
+  </div>
+
+  <div class="tip">
+    <span class="tip-icon">🎉</span>
+    <span class="tip-text">Your certificate includes your name, the program completion date, and your improvement score. You can share it with your teacher, parents, or friends!</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!--  FOOTER                                                     -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<div class="page-footer">
+  <span class="footer-logo">LiteRise</span>
+  <span>User Manual v1.0 &nbsp;·&nbsp; 2026</span>
+  <span>For students, parents &amp; educators</span>
+</div>
+
+</body>
+</html>
