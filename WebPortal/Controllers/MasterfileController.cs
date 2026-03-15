@@ -131,7 +131,7 @@ namespace Website.Controllers
                         SELECT TeacherID,
                                RTRIM(ISNULL(FirstName,'') + ' ' + ISNULL(LastName,'')) AS name,
                                Email,
-                               ISNULL(School, '')        AS school,
+                               ISNULL(Department, '')    AS school,
                                CAST(IsActive AS BIT)     AS is_active
                         FROM   dbo.Teachers
                         ORDER BY name";
