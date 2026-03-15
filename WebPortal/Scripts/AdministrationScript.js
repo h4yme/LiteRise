@@ -180,7 +180,7 @@ function renderAdmins(list) {
                 <td class="align-middle">${formatDate(admin.lastLogin || admin.last_login)}</td>
                 <td class="align-middle">${statusBadge}</td>
                 <td class="align-middle">
-                    <button class="btn btn-sm btn-outline-primary" onclick="openEditAdmin(${JSON.stringify(id)})">
+                    <button class="btn btn-sm btn-outline-primary" onclick="openEditAdmin('${id}')">
                         <i class="bi bi-pencil"></i> Edit
                     </button>
                     ${deactivateBtn}
@@ -236,7 +236,11 @@ function openEditAdmin(id) {
     const title = document.getElementById('adminModalTitleText');
     if (title) title.textContent = 'Edit Account';
 
-    populateSchoolDropdown(admin.school_id || admin.schoolId || '');
+    // Resolve school name → school_id for the dropdown pre-selection
+    const schoolEntry = window.allSchools.find(s =>
+        (s.school_name || s.SchoolName || '') === (admin.school || ''));
+    const schoolId = schoolEntry ? (schoolEntry.school_id || schoolEntry.SchoolID || '') : '';
+    populateSchoolDropdown(schoolId);
     handleAdminRoleChange();
 
     const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('adminModal'));

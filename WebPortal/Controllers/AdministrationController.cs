@@ -68,7 +68,7 @@ namespace Website.Controllers
                         SELECT TeacherID,
                                RTRIM(ISNULL(FirstName,'') + ' ' + ISNULL(LastName,'')) AS name,
                                Email,
-                               ISNULL(School, '')        AS school,
+                               ISNULL(Department, '')    AS school,
                                CAST(IsActive AS BIT)     AS is_active
                         FROM   dbo.Teachers
                         ORDER BY name";
@@ -258,7 +258,7 @@ namespace Website.Controllers
                 string schoolName = ResolveSchoolName(conn, school);
 
                 const string sql = @"
-                    INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, School, IsActive)
+                    INSERT INTO dbo.Teachers (FirstName, LastName, Email, Password, Department, IsActive)
                     OUTPUT INSERTED.TeacherID
                     VALUES (@first, @last, @email, @hash, @school, 1)";
 
@@ -329,8 +329,8 @@ namespace Website.Controllers
                 string schoolName = ResolveSchoolName(conn, school);
 
                 string sql = hash != null
-                    ? "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Password=@hash, School=@school WHERE TeacherID=@id"
-                    : "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, School=@school WHERE TeacherID=@id";
+                    ? "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Password=@hash, Department=@school WHERE TeacherID=@id"
+                    : "UPDATE dbo.Teachers SET FirstName=@first, LastName=@last, Email=@email, Department=@school WHERE TeacherID=@id";
 
                 using (var cmd = new SqlCommand(sql, conn))
                 {
