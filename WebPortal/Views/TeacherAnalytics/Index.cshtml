@@ -489,4 +489,388 @@
     };
 </script>
 
-@section scripts { <script src="/Scripts/TeacherAnalyticsScript.js"></script> }
+@section scripts {
+<script>
+'use strict';
+
+// ── Chart registry ─────────────────────────────────────────────────────────
+var _charts = {};
+function mkChart(id, cfg) {
+    if (_charts[id]) { _charts[id].destroy(); delete _charts[id]; }
+    var el = document.getElementById(id);
+    if (!el) return null;
+    var c = new Chart(el, cfg);
+    _charts[id] = c;
+    return c;
+}
+
+// ── Palette ────────────────────────────────────────────────────────────────
+var C = {
+    green:   '#11B067',  blue:   '#0d6efd',
+    orange:  '#F6AD55',  red:    '#FC8181',
+    purple:  '#B794F4',  teal:   '#4FD1C5',
+    gray:    '#A0AEC0',
+    greenA:  'rgba(17,176,103,0.75)',
+    blueA:   'rgba(13,110,253,0.75)',
+    purpleA: 'rgba(183,148,244,0.75)',
+};
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+function classifyTheta(t) {
+    if (t === null || t === undefined || isNaN(parseFloat(t))) return 'Not Taken';
+    var v = parseFloat(t);
+    if (v < -0.5)  return 'Beginner';
+    if (v <= 0.5)  return 'Intermediate';
+    return 'Advanced';
+}
+function levelColor(lv) {
+    return lv === 'Beginner' ? C.red : lv === 'Intermediate' ? C.orange : lv === 'Advanced' ? C.green : C.gray;
+}
+function daysSince(ds) {
+    if (!ds) return Infinity;
+    return (Date.now() - new Date(ds).getTime()) / 86400000;
+}
+
+// ── Tab switching ──────────────────────────────────────────────────────────
+function initTabs() {
+    var headers = document.querySelectorAll('.tab-header[data-tab]');
+    var panels  = document.querySelectorAll('.tab-panel');
+    headers.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            headers.forEach(function(h) { h.classList.remove('active'); });
+            panels.forEach(function(p)  { p.classList.remove('active'); });
+            btn.classList.add('active');
+            var target = document.getElementById('tab-' + btn.dataset.tab);
+            if (target) target.classList.add('active');
+        });
+    });
+}
+
+// ── Level doughnut → levelDistChart ───────────────────────────────────────
+function renderLevelChart(students) {
+    var cnt = { Beginner: 0, Intermediate: 0, Advanced: 0, 'Not Taken': 0 };
+    students.forEach(function(s) {
+        var lv = classifyTheta(s.pre_theta);
+        if (cnt[lv] !== undefined) cnt[lv]++; else cnt['Not Taken']++;
+    });
+    mkChart('levelDistChart', {
+        type: 'doughnut',
+        data: {
+            labels: ['Beginner', 'Intermediate', 'Advanced', 'Not Taken'],
+            datasets: [{ data: [cnt.Beginner, cnt.Intermediate, cnt.Advanced, cnt['Not Taken']],
+                backgroundColor: [C.red, C.orange, C.green, C.gray], borderWidth: 2, borderColor: '#fff' }]
+        },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' },
+                tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.label + ': ' + ctx.parsed + ' students'; } } } } }
+    });
+}
+
+// ── Pre vs Post bar → prePostChart ─────────────────────────────────────────
+function renderPrePostChart(students) {
+    var both = students.filter(function(s) {
+        return s.pre_theta != null && s.post_theta != null && !isNaN(s.pre_theta) && !isNaN(s.post_theta);
+    }).map(function(s) {
+        return { name: s.name || 'Unknown', pre: parseFloat(s.pre_theta), post: parseFloat(s.post_theta) };
+    }).sort(function(a, b) { return b.post - a.post; }).slice(0, 15);
+
+    if (!both.length) {
+        mkChart('prePostChart', { type: 'bar', data: { labels: ['No data'], datasets: [{ data: [0] }] },
+            options: { responsive: true, maintainAspectRatio: false } });
+        return;
+    }
+    mkChart('prePostChart', {
+        type: 'bar',
+        data: {
+            labels: both.map(function(s) { return s.name; }),
+            datasets: [
+                { label: 'Pre-\u03B8',  data: both.map(function(s) { return s.pre; }),  backgroundColor: C.blueA,  borderColor: C.blue,  borderWidth: 1 },
+                { label: 'Post-\u03B8', data: both.map(function(s) { return s.post; }), backgroundColor: C.greenA, borderColor: C.green, borderWidth: 1 }
+            ]
+        },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'top' } },
+            scales: { x: { min: -3, max: 3, title: { display: true, text: 'Theta (\u03B8)' } } } }
+    });
+}
+
+// ── Lessons by module → moduleCompletionChart ──────────────────────────────
+function renderModuleChart(students) {
+    var NODES = 13;
+    var totals = [0, 0, 0, 0, 0];
+    students.forEach(function(s) {
+        var done = parseInt(s.lessons_done) || 0;
+        var full = Math.floor(done / NODES), partial = done % NODES;
+        for (var m = 0; m < 5; m++) {
+            if      (m < full)    totals[m] += NODES;
+            else if (m === full)  totals[m] += partial;
+        }
+    });
+    var avg = totals.map(function(t) { return students.length ? parseFloat((t / students.length).toFixed(1)) : 0; });
+    mkChart('moduleCompletionChart', {
+        type: 'bar',
+        data: { labels: ['Module 1', 'Module 2', 'Module 3', 'Module 4', 'Module 5'],
+            datasets: [{ label: 'Avg Nodes Completed', data: avg, backgroundColor: C.greenA, borderColor: C.green, borderWidth: 1 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+                tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.parsed.y + ' / ' + NODES + ' avg nodes'; } } } },
+            scales: { y: { min: 0, max: NODES, title: { display: true, text: 'Avg Nodes Completed' } } } }
+    });
+}
+
+// ── Scatter XP vs theta → studentScatterChart ──────────────────────────────
+function renderScatterChart(students) {
+    var pts = students
+        .filter(function(s) { return s.pre_theta != null && s.total_xp != null; })
+        .map(function(s) { return { x: parseFloat(s.pre_theta), y: parseInt(s.total_xp) || 0 }; });
+
+    if (!pts.length) {
+        mkChart('studentScatterChart', { type: 'scatter', data: { datasets: [] },
+            options: { responsive: true, maintainAspectRatio: false } });
+        return;
+    }
+    mkChart('studentScatterChart', {
+        type: 'scatter',
+        data: { datasets: [{ label: 'Student', data: pts,
+            backgroundColor: C.greenA, pointRadius: 5, pointHoverRadius: 7 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false },
+                tooltip: { callbacks: { label: function(ctx) {
+                    return '\u03B8 ' + ctx.parsed.x.toFixed(2) + '  XP ' + ctx.parsed.y;
+                } } } },
+            scales: {
+                x: { title: { display: true, text: 'Pre-Assessment \u03B8' } },
+                y: { title: { display: true, text: 'Total XP' }, beginAtZero: true }
+            } }
+    });
+}
+
+// ── Category radar → categoryRadarChart ───────────────────────────────────
+var CAT_LABELS = ['Phonics', 'Vocabulary', 'Grammar', 'Comprehension', 'Creating Text'];
+function renderCategoryChart(vals) {
+    mkChart('categoryRadarChart', {
+        type: 'radar',
+        data: { labels: CAT_LABELS,
+            datasets: [{ label: 'Class Average (%)', data: vals || [0,0,0,0,0],
+                backgroundColor: 'rgba(17,176,103,0.2)', borderColor: C.green,
+                borderWidth: 2, pointBackgroundColor: C.green, pointRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            scales: { r: { min: 0, max: 100, ticks: { stepSize: 20, callback: function(v) { return v + '%'; } },
+                pointLabels: { font: { size: 13 } } } },
+            plugins: { legend: { position: 'top' } } }
+    });
+}
+
+// ── Login freq (last-active bucketed) → loginFreqChart ─────────────────────
+function renderLoginFreqChart(students) {
+    var now = Date.now();
+    var weeks = ['This week', '1–2 wks ago', '2–3 wks ago', '3–4 wks ago', '4–6 wks ago', '6+ wks ago / never'];
+    var counts = [0, 0, 0, 0, 0, 0];
+    students.forEach(function(s) {
+        var d = daysSince(s.last_active);
+        if      (d <= 7)   counts[0]++;
+        else if (d <= 14)  counts[1]++;
+        else if (d <= 21)  counts[2]++;
+        else if (d <= 28)  counts[3]++;
+        else if (d <= 42)  counts[4]++;
+        else               counts[5]++;
+    });
+    mkChart('loginFreqChart', {
+        type: 'bar',
+        data: { labels: weeks,
+            datasets: [{ label: 'Students', data: counts,
+                backgroundColor: [C.green, C.teal, C.orange, C.orange, C.red, C.gray], borderWidth: 1 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 },
+                title: { display: true, text: 'Students' } } } }
+    });
+}
+
+// ── Streak distribution → streakDistChart ─────────────────────────────────
+function renderStreakChart(students) {
+    var bk = { '0 days': 0, '1-3': 0, '4-7': 0, '8-14': 0, '15-30': 0, '30+': 0 };
+    students.forEach(function(s) {
+        var st = parseInt(s.streak_days) || 0;
+        if      (st === 0)  bk['0 days']++;
+        else if (st <= 3)   bk['1-3']++;
+        else if (st <= 7)   bk['4-7']++;
+        else if (st <= 14)  bk['8-14']++;
+        else if (st <= 30)  bk['15-30']++;
+        else                bk['30+']++;
+    });
+    mkChart('streakDistChart', {
+        type: 'bar',
+        data: { labels: Object.keys(bk),
+            datasets: [{ label: 'Students', data: Object.values(bk),
+                backgroundColor: [C.red, C.orange, C.orange, C.teal, C.green, C.green], borderWidth: 1 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Students' } } } }
+    });
+}
+
+// ── XP distribution → xpDistChart ─────────────────────────────────────────
+function renderXpChart(students) {
+    var top = students.slice().sort(function(a, b) {
+        return (parseInt(b.total_xp) || 0) - (parseInt(a.total_xp) || 0);
+    }).slice(0, 10);
+    mkChart('xpDistChart', {
+        type: 'bar',
+        data: { labels: top.map(function(s) { return s.name || 'Unknown'; }),
+            datasets: [{ label: 'Total XP', data: top.map(function(s) { return parseInt(s.total_xp) || 0; }),
+                backgroundColor: C.purpleA, borderColor: C.purple, borderWidth: 1 }] },
+        options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { x: { beginAtZero: true, title: { display: true, text: 'Total XP' } } } }
+    });
+}
+
+// ── Category heatmap table ─────────────────────────────────────────────────
+function cellStyle(pct) {
+    if (pct < 60) return 'heatmap-red';
+    if (pct < 80) return 'heatmap-yellow';
+    return 'heatmap-green';
+}
+function renderCategoryTable(students, catData) {
+    var tbody = document.getElementById('categoryHeatmapBody');
+    if (!tbody) return;
+    if (!students.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No students found.</td></tr>';
+        return;
+    }
+    var html = '';
+    students.forEach(function(s, i) {
+        var scores = catData ? catData[i] : CAT_LABELS.map(function() { return null; });
+        var lv = classifyTheta(s.pre_theta);
+        var cells = scores.map(function(v) {
+            return v !== null
+                ? '<td class="' + cellStyle(v) + '" style="text-align:center;">' + v + '%</td>'
+                : '<td style="text-align:center;color:#A0AEC0;">—</td>';
+        }).join('');
+        var validScores = scores.filter(function(v) { return v !== null; });
+        var overall = validScores.length
+            ? Math.round(validScores.reduce(function(a, v) { return a + v; }, 0) / validScores.length)
+            : null;
+        var overallCell = overall !== null
+            ? '<td class="' + cellStyle(overall) + '" style="text-align:center;font-weight:600;">' + overall + '%</td>'
+            : '<td style="text-align:center;color:#A0AEC0;">—</td>';
+        html += '<tr><td>' + (s.name || '—') + '</td>' + cells + overallCell + '</tr>';
+    });
+    tbody.innerHTML = html;
+}
+
+// ── Dark mode ──────────────────────────────────────────────────────────────
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    var isDark = document.body.classList.contains('dark-mode');
+    var tick = isDark ? '#E2E8F0' : '#4A5568';
+    var grid = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+    Object.values(_charts).forEach(function(ch) {
+        if (ch.options.scales) {
+            Object.values(ch.options.scales).forEach(function(sc) {
+                if (sc.ticks)       sc.ticks.color       = tick;
+                if (sc.grid)        sc.grid.color        = grid;
+                if (sc.pointLabels) sc.pointLabels.color = tick;
+                if (sc.title)       sc.title.color       = tick;
+            });
+        }
+        if (ch.options.plugins && ch.options.plugins.legend && ch.options.plugins.legend.labels)
+            ch.options.plugins.legend.labels.color = tick;
+        ch.update();
+    });
+}
+
+// ── Export CSV ─────────────────────────────────────────────────────────────
+function exportCsv() {
+    var students = window.STUDENTS_DATA || [];
+    if (!students.length) { showToast('No student data to export.', 'warning'); return; }
+    var rows = [['Name','Grade','Level','Pre-Theta','Post-Theta','XP','StreakDays','LastActive']];
+    students.forEach(function(s) {
+        rows.push([
+            '"' + (s.name || '').replace(/"/g, '""') + '"',
+            s.grade || '',
+            classifyTheta(s.pre_theta),
+            s.pre_theta  != null ? parseFloat(s.pre_theta).toFixed(4)  : '',
+            s.post_theta != null ? parseFloat(s.post_theta).toFixed(4) : '',
+            parseInt(s.total_xp)    || 0,
+            parseInt(s.streak_days) || 0,
+            '"' + (s.last_active || '') + '"'
+        ]);
+    });
+    var csv  = rows.map(function(r) { return r.join(','); }).join('\r\n');
+    var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    var url  = URL.createObjectURL(blob);
+    var a    = document.createElement('a');
+    a.href = url; a.download = 'class_analytics_' + new Date().toISOString().slice(0,10) + '.csv';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+// ── Demo category loader ───────────────────────────────────────────────────
+function loadCategoryData() {
+    var students = window.STUDENTS_DATA || [];
+    var demo = CAT_LABELS.map(function() { return Math.round(50 + Math.random() * 45); });
+    renderCategoryChart(demo);
+    var perStudent = students.map(function() {
+        return CAT_LABELS.map(function() { return Math.round(40 + Math.random() * 55); });
+    });
+    renderCategoryTable(students, perStudent);
+    showToast('Demo category scores loaded.', 'info');
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function showToast(msg, type) {
+    var bgMap = { success:'bg-success', danger:'bg-danger', warning:'bg-warning text-dark', info:'bg-info text-dark' };
+    var bg = bgMap[type || 'info'] || 'bg-secondary';
+    var cont = document.getElementById('taToastContainer');
+    if (!cont) {
+        cont = document.createElement('div');
+        cont.id = 'taToastContainer';
+        cont.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+        cont.style.zIndex = '1100';
+        document.body.appendChild(cont);
+    }
+    var id   = 'toast_' + Date.now();
+    cont.insertAdjacentHTML('beforeend',
+        '<div id="' + id + '" class="toast align-items-center ' + bg + ' border-0" role="alert" aria-live="assertive" aria-atomic="true">' +
+        '<div class="d-flex"><div class="toast-body">' + msg + '</div>' +
+        '<button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>' +
+        '</div></div>');
+    var el = document.getElementById(id);
+    var toast = new bootstrap.Toast(el, { delay: 4000 });
+    toast.show();
+    el.addEventListener('hidden.bs.toast', function() { el.remove(); });
+}
+
+// ── Entry ──────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+    var students = Array.isArray(window.STUDENTS_DATA) ? window.STUDENTS_DATA : [];
+
+    initTabs();
+
+    // Overview charts
+    renderLevelChart(students);
+    renderPrePostChart(students);
+    renderModuleChart(students);
+    renderScatterChart(students);
+
+    // Skills placeholder
+    renderCategoryChart([0,0,0,0,0]);
+    renderCategoryTable(students, null);
+
+    // Engagement charts
+    renderLoginFreqChart(students);
+    renderStreakChart(students);
+    renderXpChart(students);
+
+    // Button bindings
+    var expBtn  = document.getElementById('taExportCsvBtn');
+    if (expBtn)  expBtn.addEventListener('click', exportCsv);
+    var drkBtn  = document.getElementById('taToggleDarkMode');
+    if (drkBtn)  drkBtn.addEventListener('click', toggleDarkMode);
+    var catBtn  = document.getElementById('loadCategoryScoresBtn');
+    if (catBtn)  catBtn.addEventListener('click', loadCategoryData);
+});
+</script>
+}

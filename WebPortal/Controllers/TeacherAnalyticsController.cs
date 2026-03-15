@@ -1,159 +1,172 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Web.Mvc;
 using Website.Filters;
-using Website.Services;
 using Newtonsoft.Json;
 
 namespace Website.Controllers
 {
     [AuthFilter]
-    public class TeacherAnalyticsController : AsyncController
+    public class TeacherAnalyticsController : Controller
     {
-        // ─────────────────────────────────────────────────────────────────────
-        // Shared API service helper – scoped to teacher's auth token
-        // ─────────────────────────────────────────────────────────────────────
-        private ApiService _api => new ApiService(Session["AuthToken"]?.ToString());
+        private static string ConnStr =>
+            ConfigurationManager.ConnectionStrings["LiteRiseConnection"].ConnectionString;
 
-        // IRT placement thresholds
-        private const double BegInterBoundary = -0.5;
-        private const double InterAdvBoundary =  0.5;
-
-        // ─────────────────────────────────────────────────────────────────────
-        // Index – loads Class Analytics shell view
-        // ─────────────────────────────────────────────────────────────────────
-        public async Task<ActionResult> Index()
+        public ActionResult Index()
         {
-            int? schoolId = int.TryParse(Session["SchoolId"]?.ToString(), out int sid) ? sid : (int?)null;
+            int teacherId;
+            if (!int.TryParse(Session["UserId"]?.ToString(), out teacherId) || teacherId <= 0)
+            {
+                ViewBag.Error = "Session expired. Please log in again.";
+                SetEmptyViewBag();
+                return View("Index");
+            }
 
-            List<dynamic> students;
+            var students   = new List<Dictionary<string, object>>();
+            string schoolName = "My School";
+
             try
             {
-                students = await _api.GetAllStudentsAsync(schoolId);
+                using (var conn = new SqlConnection(ConnStr))
+                {
+                    conn.Open();
+                    const string sql = @"
+                        SELECT s.StudentID                                          AS student_id,
+                               s.FirstName + ' ' + s.LastName                      AS name,
+                               s.GradeLevel                                        AS grade,
+                               sc.SchoolName                                       AS school_name,
+                               s.PreAssessmentTheta                                AS pre_theta,
+                               s.PostAssessmentTheta                               AS post_theta,
+                               s.TotalXP                                           AS total_xp,
+                               s.CurrentStreak                                     AS streak_days,
+                               s.LastActivityDate                                  AS last_active,
+                               CASE WHEN s.IsActive = 1 THEN 'active'
+                                    ELSE 'inactive' END                            AS status
+                        FROM   dbo.Students  s
+                        INNER JOIN dbo.Schools  sc ON sc.SchoolID  = s.SchoolID
+                        INNER JOIN dbo.Teachers t  ON t.Department = sc.SchoolName
+                                                   AND t.TeacherID = @teacherId
+                        ORDER  BY s.LastName, s.FirstName";
+
+                    using (var cmd = new SqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@teacherId", teacherId);
+                        using (var rdr = cmd.ExecuteReader())
+                        {
+                            while (rdr.Read())
+                            {
+                                schoolName = rdr["school_name"]?.ToString() ?? schoolName;
+                                students.Add(new Dictionary<string, object>
+                                {
+                                    ["student_id"]  = (int)rdr["student_id"],
+                                    ["name"]        = rdr["name"]?.ToString(),
+                                    ["grade"]       = rdr["grade"]      == DBNull.Value ? (object)null : (int)rdr["grade"],
+                                    ["school_name"] = rdr["school_name"]?.ToString(),
+                                    ["pre_theta"]   = rdr["pre_theta"]  == DBNull.Value ? (object)null : (double)rdr["pre_theta"],
+                                    ["post_theta"]  = rdr["post_theta"] == DBNull.Value ? (object)null : (double)rdr["post_theta"],
+                                    ["total_xp"]    = rdr["total_xp"]   == DBNull.Value ? (object)null : (int)rdr["total_xp"],
+                                    ["streak_days"] = rdr["streak_days"] == DBNull.Value ? (object)null : (int)rdr["streak_days"],
+                                    ["last_active"] = rdr["last_active"] == DBNull.Value
+                                                        ? (object)null
+                                                        : ((DateTime)rdr["last_active"]).ToString("yyyy-MM-dd"),
+                                    ["status"]      = rdr["status"]?.ToString() ?? "active",
+                                    ["lessons_done"] = 0
+                                });
+                            }
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
-                ViewBag.Error        = "Unable to load student data: " + ex.Message;
+                ViewBag.Error = "Unable to load analytics: " + ex.Message;
+                SetEmptyViewBag();
+                ViewBag.SchoolName   = schoolName;
                 ViewBag.StudentsJson = "[]";
-                students             = new List<dynamic>();
+                return View("Index");
             }
 
-            // ── Raw JSON for client-side charts ───────────────────────────────
-            ViewBag.StudentsJson = JsonConvert.SerializeObject(students);
+            // ── Aggregate stats ───────────────────────────────────────────────
+            int total = students.Count;
+            int preCount = 0, postCount = 0, bothCount = 0;
+            int beginner = 0, intermediate = 0, advanced = 0;
+            double sumPre = 0, sumPost = 0, sumGrowth = 0, sumXp = 0, sumStreak = 0;
+            int activeCount = 0;
+            var cutoff = DateTime.UtcNow.AddDays(-7);
 
-            // ── Aggregate totals ──────────────────────────────────────────────
-            int total             = 0;
-            int preCount          = 0;
-            int postCount         = 0;
-            int beginnerCount     = 0;
-            int intermediateCount = 0;
-            int advancedCount     = 0;
-            double avgPreTheta    = 0;
-            double avgPostTheta   = 0;
-            double avgGrowth      = 0;
-            double avgLessonsDone = 0;
-            double lessonCompletionRate = 0;
-            double avgStreak      = 0;
-            int activeCount       = 0;
-            double activePercent  = 0;
-            double avgXp          = 0;
-            string schoolName     = "My School";
-
-            try
+            foreach (var s in students)
             {
-                total     = students.Count;
-                preCount  = students.Count(s => (double?)s.pre_theta  != null);
-                postCount = students.Count(s => (double?)s.post_theta != null);
+                double? pre    = s["pre_theta"]   as double?;
+                double? post   = s["post_theta"]  as double?;
+                int?    xp     = s["total_xp"]    as int?;
+                int?    streak = s["streak_days"] as int?;
+                string  la     = s["last_active"]  as string;
 
-                // Level distribution from placement_level field
-                beginnerCount     = students.Count(s => (string)s.placement_level == "beginner");
-                intermediateCount = students.Count(s => (string)s.placement_level == "intermediate");
-                advancedCount     = students.Count(s => (string)s.placement_level == "advanced");
-
-                var preStudents  = students.Where(s => (double?)s.pre_theta  != null).ToList();
-                var postStudents = students.Where(s => (double?)s.post_theta != null).ToList();
-                var bothStudents = students.Where(s => (double?)s.pre_theta  != null && (double?)s.post_theta != null).ToList();
-
-                if (preStudents.Count  > 0) avgPreTheta  = preStudents .Average(s => (double)s.pre_theta);
-                if (postStudents.Count > 0) avgPostTheta = postStudents.Average(s => (double)s.post_theta);
-                if (bothStudents.Count > 0) avgGrowth    = bothStudents.Average(s =>
-                    (double)s.post_theta - (double)s.pre_theta);
-
-                // Average lessons done
-                avgLessonsDone = total > 0
-                    ? students.Average(s => (double?)s.lessons_done != null ? (double)s.lessons_done : 0.0)
-                    : 0;
-
-                // Lesson completion rate (lessons_done / total modules = 13 assumed)
-                const int totalModules = 13;
-                lessonCompletionRate = avgLessonsDone > 0
-                    ? Math.Min(Math.Round(avgLessonsDone / totalModules * 100, 1), 100)
-                    : 0;
-
-                // Engagement stats
-                avgStreak = total > 0
-                    ? students.Average(s => (double?)s.streak_days != null ? (double)s.streak_days : 0.0)
-                    : 0;
-
-                activeCount = students.Count(s =>
+                if (pre.HasValue)
                 {
-                    if (s.last_active == null) return false;
-                    if (DateTime.TryParse((string)s.last_active, out DateTime lastActive))
-                        return (DateTime.UtcNow - lastActive).TotalDays <= 7;
-                    return false;
-                });
+                    preCount++;
+                    sumPre += pre.Value;
+                    if      (pre.Value < -0.5) beginner++;
+                    else if (pre.Value <= 0.5) intermediate++;
+                    else                       advanced++;
+                }
+                if (post.HasValue) { postCount++; sumPost += post.Value; }
+                if (pre.HasValue && post.HasValue) { bothCount++; sumGrowth += post.Value - pre.Value; }
 
-                activePercent = total > 0
-                    ? Math.Round((double)activeCount / total * 100, 1)
-                    : 0;
-
-                avgXp = total > 0
-                    ? students.Average(s => (double?)s.total_xp != null ? (double)s.total_xp : 0.0)
-                    : 0;
-
-                schoolName = students.Count > 0
-                    ? (string)students[0].school_name ?? "My School"
-                    : "My School";
-            }
-            catch
-            {
-                // Server-side stat cards default to 0; charts computed client-side from STUDENTS_DATA
+                if (la != null && DateTime.TryParse(la, out DateTime d) && d >= cutoff) activeCount++;
+                sumXp     += xp.HasValue     ? xp.Value     : 0;
+                sumStreak += streak.HasValue ? streak.Value : 0;
             }
 
-            // ── Category averages placeholder ─────────────────────────────────
-            var categoryAverages = new
-            {
-                phonics        = 0,
-                vocabulary     = 0,
-                grammar        = 0,
-                comprehension  = 0,
-                creatingText   = 0,
-                note           = "Category data loaded client-side via per-student fetch."
-            };
+            double avgPre    = preCount  > 0 ? sumPre    / preCount  : 0;
+            double avgPost   = postCount > 0 ? sumPost   / postCount : 0;
+            double avgGrowth = bothCount > 0 ? sumGrowth / bothCount : 0;
+            double avgXp     = total     > 0 ? sumXp     / total     : 0;
+            double avgStreak = total     > 0 ? sumStreak / total     : 0;
 
-            // ── ViewBag assignments ───────────────────────────────────────────
-            ViewBag.TotalStudents         = total;
-            ViewBag.PreAssessmentCount    = preCount;
-            ViewBag.PostAssessmentCount   = postCount;
-            ViewBag.BeginnerCount         = beginnerCount;
-            ViewBag.IntermediateCount     = intermediateCount;
-            ViewBag.AdvancedCount         = advancedCount;
-            ViewBag.AvgPreTheta           = Math.Round(avgPreTheta,  3);
-            ViewBag.AvgPostTheta          = Math.Round(avgPostTheta, 3);
-            ViewBag.AvgGrowth             = Math.Round(avgGrowth,    3);
-            ViewBag.AvgLessonsDone        = Math.Round(avgLessonsDone, 1);
-            ViewBag.LessonCompletionRate  = lessonCompletionRate;
-            ViewBag.CategoryAveragesJson  = JsonConvert.SerializeObject(categoryAverages);
-            ViewBag.AvgStreak             = Math.Round(avgStreak, 1);
-            ViewBag.ActiveCount           = activeCount;
-            ViewBag.ActivePercent         = activePercent;
-            ViewBag.AvgXp                 = Math.Round(avgXp, 0);
-            ViewBag.SchoolName            = schoolName;
-            ViewBag.UserName              = Session["UserName"]?.ToString() ?? "Teacher";
-
+            ViewBag.StudentsJson         = JsonConvert.SerializeObject(students);
+            ViewBag.TotalStudents        = total;
+            ViewBag.PreAssessmentCount   = preCount;
+            ViewBag.PostAssessmentCount  = postCount;
+            ViewBag.BeginnerCount        = beginner;
+            ViewBag.IntermediateCount    = intermediate;
+            ViewBag.AdvancedCount        = advanced;
+            ViewBag.AvgPreTheta          = Math.Round(avgPre,    3);
+            ViewBag.AvgPostTheta         = Math.Round(avgPost,   3);
+            ViewBag.AvgGrowth            = Math.Round(avgGrowth, 3);
+            ViewBag.AvgLessonsDone       = 0;
+            ViewBag.LessonCompletionRate = 0;
+            ViewBag.AvgStreak            = Math.Round(avgStreak, 1);
+            ViewBag.ActiveCount          = activeCount;
+            ViewBag.ActivePercent        = total > 0 ? Math.Round((double)activeCount / total * 100, 1) : 0;
+            ViewBag.AvgXp                = Math.Round(avgXp, 0);
+            ViewBag.SchoolName           = schoolName;
+            ViewBag.UserName             = Session["UserName"]?.ToString() ?? "Teacher";
             return View("Index");
+        }
+
+        private void SetEmptyViewBag()
+        {
+            ViewBag.StudentsJson         = "[]";
+            ViewBag.TotalStudents        = 0;
+            ViewBag.PreAssessmentCount   = 0;
+            ViewBag.PostAssessmentCount  = 0;
+            ViewBag.BeginnerCount        = 0;
+            ViewBag.IntermediateCount    = 0;
+            ViewBag.AdvancedCount        = 0;
+            ViewBag.AvgPreTheta          = 0;
+            ViewBag.AvgPostTheta         = 0;
+            ViewBag.AvgGrowth            = 0;
+            ViewBag.AvgLessonsDone       = 0;
+            ViewBag.LessonCompletionRate = 0;
+            ViewBag.AvgStreak            = 0;
+            ViewBag.ActiveCount          = 0;
+            ViewBag.ActivePercent        = 0;
+            ViewBag.AvgXp                = 0;
+            ViewBag.SchoolName           = "My School";
+            ViewBag.UserName             = Session["UserName"]?.ToString() ?? "Teacher";
         }
     }
 }
