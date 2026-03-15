@@ -807,16 +807,27 @@ function exportCsv() {
     document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
-// ── Demo category loader ───────────────────────────────────────────────────
+// ── Real category loader from student data ─────────────────────────────────
 function loadCategoryData() {
     var students = window.STUDENTS_DATA || [];
-    var demo = CAT_LABELS.map(function() { return Math.round(50 + Math.random() * 45); });
-    renderCategoryChart(demo);
-    var perStudent = students.map(function() {
-        return CAT_LABELS.map(function() { return Math.round(40 + Math.random() * 55); });
+    var keys = ['cat1', 'cat2', 'cat3', 'cat4', 'cat5'];
+
+    // Per-student scores for the heatmap table
+    var perStudent = students.map(function(s) {
+        return keys.map(function(k) {
+            var v = s[k];
+            return v !== null && v !== undefined ? Math.round(parseFloat(v)) : null;
+        });
     });
+
+    // Class averages for radar chart
+    var classAvg = keys.map(function(k) {
+        var vals = students.map(function(s) { return s[k]; }).filter(function(v) { return v !== null && v !== undefined; });
+        return vals.length ? Math.round(vals.reduce(function(a, v) { return a + parseFloat(v); }, 0) / vals.length) : 0;
+    });
+
+    renderCategoryChart(classAvg);
     renderCategoryTable(students, perStudent);
-    showToast('Demo category scores loaded.', 'info');
 }
 
 // ── Toast ──────────────────────────────────────────────────────────────────
@@ -855,9 +866,8 @@ document.addEventListener('DOMContentLoaded', function() {
     renderModuleChart(students);
     renderScatterChart(students);
 
-    // Skills placeholder
-    renderCategoryChart([0,0,0,0,0]);
-    renderCategoryTable(students, null);
+    // Skills — load real category scores from student data
+    loadCategoryData();
 
     // Engagement charts
     renderLoginFreqChart(students);
@@ -870,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var drkBtn  = document.getElementById('taToggleDarkMode');
     if (drkBtn)  drkBtn.addEventListener('click', toggleDarkMode);
     var catBtn  = document.getElementById('loadCategoryScoresBtn');
-    if (catBtn)  catBtn.addEventListener('click', loadCategoryData);
+    if (catBtn) { catBtn.textContent = 'Refresh'; catBtn.addEventListener('click', loadCategoryData); }
 });
 </script>
 }

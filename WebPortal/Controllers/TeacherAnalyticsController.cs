@@ -43,7 +43,12 @@ namespace Website.Controllers
                                s.CurrentStreak                                     AS streak_days,
                                s.LastActivityDate                                  AS last_active,
                                CASE WHEN s.IsActive = 1 THEN 'active'
-                                    ELSE 'inactive' END                            AS status
+                                    ELSE 'inactive' END                            AS status,
+                               s.Cat1_PhonicsWordStudy                             AS cat1,
+                               s.Cat2_VocabularyWordKnowledge                      AS cat2,
+                               s.Cat3_GrammarAwareness                             AS cat3,
+                               s.Cat4_ComprehendingText                            AS cat4,
+                               s.Cat5_CreatingComposing                            AS cat5
                         FROM   dbo.Students  s
                         INNER JOIN dbo.Schools  sc ON sc.SchoolID  = s.SchoolID
                         INNER JOIN dbo.Teachers t  ON t.Department = sc.SchoolName
@@ -72,7 +77,12 @@ namespace Website.Controllers
                                                         ? (object)null
                                                         : ((DateTime)rdr["last_active"]).ToString("yyyy-MM-dd"),
                                     ["status"]      = rdr["status"]?.ToString() ?? "active",
-                                    ["lessons_done"] = 0
+                                    ["lessons_done"] = 0,
+                                    ["cat1"] = rdr["cat1"] == DBNull.Value ? (object)null : Convert.ToDouble(rdr["cat1"]),
+                                    ["cat2"] = rdr["cat2"] == DBNull.Value ? (object)null : Convert.ToDouble(rdr["cat2"]),
+                                    ["cat3"] = rdr["cat3"] == DBNull.Value ? (object)null : Convert.ToDouble(rdr["cat3"]),
+                                    ["cat4"] = rdr["cat4"] == DBNull.Value ? (object)null : Convert.ToDouble(rdr["cat4"]),
+                                    ["cat5"] = rdr["cat5"] == DBNull.Value ? (object)null : Convert.ToDouble(rdr["cat5"])
                                 });
                             }
                         }
