@@ -416,6 +416,20 @@ function showToast(message, type) {
     el.addEventListener('hidden.bs.toast', function () { el.remove(); });
 }
 
+// ── Password visibility toggle ────────────────────────────────────────────────
+function togglePasswordVisibility() {
+    var input = document.getElementById('aPassword');
+    var icon  = document.getElementById('eyeIcon');
+    if (!input) return;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+    } else {
+        input.type = 'password';
+        if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+    }
+}
+
 // ── Bind events ───────────────────────────────────────────────────────────────
 function bindEvents() {
     var searchEl = document.getElementById('adminSearch');
