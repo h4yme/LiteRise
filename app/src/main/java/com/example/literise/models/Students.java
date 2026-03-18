@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Students {
 
+    @SerializedName("LRN")
+    private String lrn;
+
     @SerializedName("StudentID")
     private int student_id;
 
@@ -56,6 +59,9 @@ public class Students {
     private int cat5CreatingComposing;
 
     // Getters and Setters
+    public String getLrn() { return lrn; }
+    public void setLrn(String lrn) { this.lrn = lrn; }
+
     public int getStudent_id() { return student_id; }
     public void setStudent_id(int student_id) { this.student_id = student_id; }
 
