@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.GradientDrawable;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -37,6 +40,7 @@ import com.example.literise.models.AdaptiveQuestionResponse;
 import com.example.literise.models.PlacementQuestion;
 import com.example.literise.models.SubmitAnswerResponse;
 import com.example.literise.utils.IRTEngine;
+import com.example.literise.utils.LocationHelper;
 import com.example.literise.utils.SessionLogger;
 import com.example.literise.utils.SoundEffectsHelper;
 import com.google.android.material.button.MaterialButton;
@@ -90,6 +94,15 @@ public class PlacementTestActivity extends AppCompatActivity {
     private long startTime;
     private boolean answerAlreadySubmitted = false; // For pronunciation questions
     private static final int PERMISSION_REQUEST_RECORD_AUDIO = 1002;
+    private static final int PERMISSION_REQUEST_LOCATION     = 1003;
+    private static final long LOCATION_TIMEOUT_MS            = 10_000;
+
+    // Location gate — reset each time the app goes to background so we re-check on return
+    private boolean locationVerified = false;
+    private LocationManager locationManager;
+    private LocationListener locationListener;
+    private Handler locationTimeoutHandler;
+    private boolean locationResultDelivered = false;
 
     // Pronunciation first-time tutorial
     private FrameLayout pronunciationTutorialOverlay;
@@ -1445,9 +1458,128 @@ public class PlacementTestActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Resume background music when activity resumes
         if (soundEffectsHelper != null) {
             soundEffectsHelper.resumeBackgroundMusic();
+        }
+        // Re-verify location every time the app returns from background
+        if (!locationVerified) {
+            checkLocationAccess();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Mark location as unverified so it is re-checked when user returns
+        locationVerified = false;
+        stopLocationUpdates();
+    }
+
+    // ─── Location gate ────────────────────────────────────────────────────────
+
+    private void checkLocationAccess() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.ACCESS_COARSE_LOCATION},
+                    PERMISSION_REQUEST_LOCATION);
+            return;
+        }
+        fetchLocationAndEvaluate();
+    }
+
+    private void fetchLocationAndEvaluate() {
+        locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        locationResultDelivered = false;
+
+        // Try last-known location first (instant, no wait)
+        Location best = null;
+        for (String provider : new String[]{LocationManager.GPS_PROVIDER,
+                LocationManager.NETWORK_PROVIDER}) {
+            if (locationManager.isProviderEnabled(provider)) {
+                try {
+                    Location loc = locationManager.getLastKnownLocation(provider);
+                    if (loc != null && (best == null || loc.getAccuracy() < best.getAccuracy())) {
+                        best = loc;
+                    }
+                } catch (SecurityException ignored) { }
+            }
+        }
+
+        if (best != null) {
+            evaluateLocation(best);
+            return;
+        }
+
+        // No last-known — request a fresh fix with a timeout
+        locationTimeoutHandler = new Handler(Looper.getMainLooper());
+        locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                if (!locationResultDelivered) {
+                    locationResultDelivered = true;
+                    stopLocationUpdates();
+                    evaluateLocation(location);
+                }
+            }
+            @Override public void onProviderDisabled(@NonNull String p) { }
+            @Override public void onProviderEnabled(@NonNull String p) { }
+        };
+
+        boolean requested = false;
+        for (String provider : new String[]{LocationManager.GPS_PROVIDER,
+                LocationManager.NETWORK_PROVIDER}) {
+            if (locationManager.isProviderEnabled(provider)) {
+                try {
+                    locationManager.requestLocationUpdates(
+                            provider, 0, 0, locationListener, Looper.getMainLooper());
+                    requested = true;
+                } catch (SecurityException ignored) { }
+            }
+        }
+
+        if (!requested) {
+            showLocationBlockedDialog("Location Unavailable",
+                    "Please enable GPS or Wi-Fi location services and try again.");
+            return;
+        }
+
+        locationTimeoutHandler.postDelayed(() -> {
+            if (!locationResultDelivered) {
+                locationResultDelivered = true;
+                stopLocationUpdates();
+                showLocationBlockedDialog("Location Unavailable",
+                        "Unable to determine your location. Please enable GPS and try again.");
+            }
+        }, LOCATION_TIMEOUT_MS);
+    }
+
+    private void evaluateLocation(Location location) {
+        if (LocationHelper.isWithinAllowedArea(location.getLatitude(), location.getLongitude())) {
+            locationVerified = true;
+        } else {
+            showLocationBlockedDialog("Assessment Unavailable",
+                    "You must be physically present at Holy Spirit Elementary School or "
+                            + "Dona Juana Elementary School to continue this assessment.");
+        }
+    }
+
+    private void showLocationBlockedDialog(String title, String message) {
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK", (d, w) -> finish())
+                .setCancelable(false)
+                .show();
+    }
+
+    private void stopLocationUpdates() {
+        if (locationManager != null && locationListener != null) {
+            locationManager.removeUpdates(locationListener);
+        }
+        if (locationTimeoutHandler != null) {
+            locationTimeoutHandler.removeCallbacksAndMessages(null);
         }
     }
 
@@ -1458,14 +1590,18 @@ public class PlacementTestActivity extends AppCompatActivity {
 
         if (requestCode == PERMISSION_REQUEST_RECORD_AUDIO) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, reload pronunciation question
                 loadPronunciationQuestion();
             } else {
-                // Permission denied, show message and move to next question
                 Toast.makeText(this, "Microphone permission is required for pronunciation questions",
                         Toast.LENGTH_LONG).show();
-                // Auto-advance to next question after short delay
                 new Handler(Looper.getMainLooper()).postDelayed(this::loadNextQuestion, 2000);
+            }
+        } else if (requestCode == PERMISSION_REQUEST_LOCATION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                fetchLocationAndEvaluate();
+            } else {
+                showLocationBlockedDialog("Location Permission Required",
+                        "Location access is needed to verify that you are at an authorized school.");
             }
         }
     }
