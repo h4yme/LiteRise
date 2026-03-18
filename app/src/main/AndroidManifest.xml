@@ -9,6 +9,10 @@
     <!-- ✅ Internet permission required for all API calls -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- ✅ Location permission for school area verification -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <!-- ✅ Audio recording permission for pronunciation assessment -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
