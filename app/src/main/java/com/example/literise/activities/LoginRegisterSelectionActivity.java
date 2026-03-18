@@ -12,7 +12,7 @@ import com.example.literise.R;
 
 public class LoginRegisterSelectionActivity extends AppCompatActivity {
 
-    CardView cardLogin, cardRegister;
+    CardView cardLogin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,60 +20,20 @@ public class LoginRegisterSelectionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login_register_selection);
 
         cardLogin = findViewById(R.id.cardLogin);
-        cardRegister = findViewById(R.id.cardRegister);
 
-        // Fade-in animation on load
         View rootView = findViewById(android.R.id.content);
         AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
         fadeIn.setDuration(800);
         rootView.startAnimation(fadeIn);
 
-        // Login card click
         cardLogin.setOnClickListener(v -> {
-            // Card press animation
             v.animate()
-                    .scaleX(0.97f)
-                    .scaleY(0.97f)
-                    .setDuration(100)
+                    .scaleX(0.97f).scaleY(0.97f).setDuration(100)
                     .withEndAction(() -> {
-                        v.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start();
-                        navigateToLogin();
-                    })
-                    .start();
+                        v.animate().scaleX(1f).scaleY(1f).setDuration(100).start();
+                        startActivity(new Intent(LoginRegisterSelectionActivity.this, LoginActivity.class));
+                        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+                    }).start();
         });
-
-        // Register card click
-        cardRegister.setOnClickListener(v -> {
-            // Card press animation
-            v.animate()
-                    .scaleX(0.97f)
-                    .scaleY(0.97f)
-                    .setDuration(100)
-                    .withEndAction(() -> {
-                        v.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start();
-                        navigateToRegister();
-                    })
-                    .start();
-        });
-    }
-
-    private void navigateToLogin() {
-        Intent intent = new Intent(LoginRegisterSelectionActivity.this, LoginActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-    }
-
-    private void navigateToRegister() {
-        Intent intent = new Intent(LoginRegisterSelectionActivity.this, RegisterActivity.class);
-        startActivity(intent);
-        overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 }
