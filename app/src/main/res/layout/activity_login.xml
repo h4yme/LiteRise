@@ -74,7 +74,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="32dp"
                         android:fontFamily="@font/visby_regular"
-                        android:text="Enter your LRN to start your reading adventure"
+                        android:text="Enter your LRN and login code to start your reading adventure"
                         android:textColor="#636E72"
                         android:textSize="15sp" />
 
@@ -115,6 +115,51 @@
                             android:hint="e.g. 123456789012"
                             android:inputType="number"
                             android:maxLength="12"
+                            android:paddingStart="12dp"
+                            android:paddingEnd="20dp"
+                            android:textColor="#2D3436"
+                            android:textColorHint="#B2BEC3"
+                            android:textSize="15sp" />
+
+                    </RelativeLayout>
+
+                    <!-- Login Code Label -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:fontFamily="@font/visby_medium"
+                        android:text="Login Code (4-digit PIN)"
+                        android:textColor="#2D3436"
+                        android:textSize="14sp" />
+
+                    <!-- Login Code Input -->
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@drawable/bg_input_modern">
+
+                        <TextView
+                            android:id="@+id/tvLoginCodeIcon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginStart="16dp"
+                            android:text="🔑"
+                            android:textSize="20sp" />
+
+                        <EditText
+                            android:id="@+id/etLoginCode"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_toEndOf="@id/tvLoginCodeIcon"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/visby_regular"
+                            android:hint="Enter 4-digit code"
+                            android:inputType="numberPassword"
+                            android:maxLength="4"
                             android:paddingStart="12dp"
                             android:paddingEnd="20dp"
                             android:textColor="#2D3436"

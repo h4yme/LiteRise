@@ -7,9 +7,14 @@ public class LrnLoginRequest {
     @SerializedName("lrn")
     private String lrn;
 
-    public LrnLoginRequest(String lrn) {
-        this.lrn = lrn;
+    @SerializedName("login_code")
+    private String loginCode;
+
+    public LrnLoginRequest(String lrn, String loginCode) {
+        this.lrn       = lrn;
+        this.loginCode = loginCode;
     }
 
-    public String getLrn() { return lrn; }
+    public String getLrn()       { return lrn; }
+    public String getLoginCode() { return loginCode; }
 }

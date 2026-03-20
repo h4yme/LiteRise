@@ -25,6 +25,7 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
 
     private EditText etLrn;
+    private EditText etLoginCode;
     private Button btnLogin;
 
     @Override
@@ -32,8 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        etLrn    = findViewById(R.id.etLrn);
-        btnLogin = findViewById(R.id.btnLogin);
+        etLrn       = findViewById(R.id.etLrn);
+        etLoginCode = findViewById(R.id.etLoginCode);
+        btnLogin    = findViewById(R.id.btnLogin);
 
         // Fade-in animation on load
         View rootView = findViewById(android.R.id.content);
@@ -52,15 +54,20 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void doLogin() {
-        String lrn = etLrn.getText().toString().trim();
+        String lrn       = etLrn.getText().toString().trim();
+        String loginCode = etLoginCode.getText().toString().trim();
 
         if (lrn.isEmpty()) {
             CustomToast.showWarning(this, "Please enter your LRN");
             return;
         }
+        if (loginCode.isEmpty()) {
+            CustomToast.showWarning(this, "Please enter your 4-digit login code");
+            return;
+        }
 
         ApiService apiService = ApiClient.getClient(this).create(ApiService.class);
-        apiService.loginWithLrn(new LrnLoginRequest(lrn)).enqueue(new Callback<Students>() {
+        apiService.loginWithLrn(new LrnLoginRequest(lrn, loginCode)).enqueue(new Callback<Students>() {
             @Override
             public void onResponse(Call<Students> call, Response<Students> response) {
                 if (response.isSuccessful() && response.body() != null
@@ -112,7 +119,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 } else {
                     CustomToast.showError(LoginActivity.this,
-                            "LRN not found. Please check your number and try again.");
+                            "Invalid LRN or login code. Please try again.");
                 }
             }
 
