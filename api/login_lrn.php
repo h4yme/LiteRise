@@ -1,15 +1,15 @@
 <?php
 
 /**
- * LiteRise LRN Login API
+ * LiteRise LRN + Login Code API
  * POST /api/login_lrn.php
  *
- * Students sign in using only their Learner Reference Number (LRN).
- * No password is required — the LRN is the sole identifier.
+ * Students sign in using their 12-digit LRN and 4-digit LoginCode (PIN).
  *
  * Request Body:
  * {
- *   "lrn": "123456789012"
+ *   "lrn": "136654220148",
+ *   "login_code": "1029"
  * }
  *
  * Success Response (same shape as login.php):
@@ -17,7 +17,7 @@
  *   "success": true,
  *   "StudentID": 1,
  *   "FullName": "Juan Dela Cruz",
- *   "LRN": "123456789012",
+ *   "LRN": "136654220148",
  *   "email": "...",
  *   "GradeLevel": 3,
  *   ...
@@ -27,7 +27,7 @@
  * Error Response:
  * {
  *   "success": false,
- *   "error": "LRN not found"
+ *   "error": "Invalid LRN or login code"
  * }
  */
 
@@ -40,21 +40,28 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // Parse JSON body
-$data = getJsonInput();
-$lrn  = trim($data['lrn'] ?? '');
+$data       = getJsonInput();
+$lrn        = trim($data['lrn']        ?? '');
+$login_code = trim($data['login_code'] ?? '');
 
-// Validate
+// Validate LRN
 if (empty($lrn)) {
     sendError("LRN is required", 400);
 }
-
-// LRN must be numeric and exactly 12 digits
 if (!ctype_digit($lrn) || strlen($lrn) !== 12) {
     sendError("LRN must be a 12-digit number", 400);
 }
 
+// Validate login code
+if (empty($login_code)) {
+    sendError("Login code is required", 400);
+}
+if (!ctype_digit($login_code) || strlen($login_code) !== 4) {
+    sendError("Login code must be a 4-digit number", 400);
+}
+
 try {
-    // Look up student by LRN
+    // Look up student by LRN + LoginCode
     $stmt = $conn->prepare("
         SELECT
             s.StudentID,
@@ -63,6 +70,7 @@ try {
             s.Nickname,
             s.Email,
             s.LRN,
+            s.LoginCode,
             s.GradeLevel,
             s.Section,
             s.CurrentAbility,
@@ -85,8 +93,9 @@ try {
 
     $student = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$student) {
-        sendError("LRN not found. Please check your number and try again.", 401);
+    // Use a generic message for both bad LRN and wrong code (security best practice)
+    if (!$student || (string)$student['LoginCode'] !== $login_code) {
+        sendError("Invalid LRN or login code. Please try again.", 401);
     }
 
     // Generate JWT — use email if present, otherwise fall back to LRN
@@ -123,7 +132,7 @@ try {
         'token'                      => $token,
     ];
 
-    logActivity((int)$student['StudentID'], 'LRN_Login', 'Student signed in via LRN');
+    logActivity((int)$student['StudentID'], 'LRN_Login', 'Student signed in via LRN + LoginCode');
 
     sendResponse($response, 200);
 
