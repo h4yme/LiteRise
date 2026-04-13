@@ -16,7 +16,7 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET");
 
-require_once "db.php"; // PDO connection in $pdo
+require_once __DIR__ . '/src/db.php'; // PDO connection in $pdo
 
 $filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'xp';
 $limit  = isset($_GET['limit'])  ? min((int)$_GET['limit'], 100) : 50;
