@@ -317,7 +317,6 @@
         android:layout_height="52dp"
         android:orientation="horizontal"
         android:background="@drawable/bg_white_top_rounded"
-        android:elevation="6dp"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
         android:gravity="center_vertical"
