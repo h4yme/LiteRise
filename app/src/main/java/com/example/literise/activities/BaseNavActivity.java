@@ -11,53 +11,58 @@ import com.example.literise.R;
 /**
  * BaseNavActivity — shared bottom-navigation logic for all main tabs.
  * Subclasses call setupBottomNav(selectedIndex) after setContentView.
- * Indices: 0=Home 1=Modules 2=Progress 3=Badges 4=Profile
+ * Indices: 0=Home 1=Modules 2=Progress 3=Badges 4=Leaderboard 5=Profile
  */
 public abstract class BaseNavActivity extends BaseActivity {
 
     private static final int PURPLE = 0xFF7C3AED;
     private static final int GRAY   = 0xFF9CA3AF;
 
-    private LinearLayout navHome, navModules, navProgress, navBadges, navProfile;
-    private ImageView iconHome, iconModules, iconProgress, iconBadges, iconProfile;
-    private TextView  labelHome, labelModules, labelProgress, labelBadges, labelProfile;
-    private View      indHome, indModules, indProgress, indBadges, indProfile;
+    private LinearLayout navHome, navModules, navProgress, navBadges, navLeaderboard, navProfile;
+    private ImageView iconHome, iconModules, iconProgress, iconBadges, iconLeaderboard, iconProfile;
+    private TextView  labelHome, labelModules, labelProgress, labelBadges, labelLeaderboard, labelProfile;
+    private View      indHome, indModules, indProgress, indBadges, indLeaderboard, indProfile;
 
     protected void setupBottomNav(int selectedIndex) {
-        navHome     = findViewById(R.id.navHome);
-        navModules  = findViewById(R.id.navModules);
-        navProgress = findViewById(R.id.navProgress);
-        navBadges   = findViewById(R.id.navBadges);
-        navProfile  = findViewById(R.id.navProfile);
+        navHome        = findViewById(R.id.navHome);
+        navModules     = findViewById(R.id.navModules);
+        navProgress    = findViewById(R.id.navProgress);
+        navBadges      = findViewById(R.id.navBadges);
+        navLeaderboard = findViewById(R.id.navLeaderboard);
+        navProfile     = findViewById(R.id.navProfile);
 
-        iconHome     = findViewById(R.id.iconHome);
-        iconModules  = findViewById(R.id.iconModules);
-        iconProgress = findViewById(R.id.iconProgress);
-        iconBadges   = findViewById(R.id.iconBadges);
-        iconProfile  = findViewById(R.id.iconProfile);
+        iconHome        = findViewById(R.id.iconHome);
+        iconModules     = findViewById(R.id.iconModules);
+        iconProgress    = findViewById(R.id.iconProgress);
+        iconBadges      = findViewById(R.id.iconBadges);
+        iconLeaderboard = findViewById(R.id.iconLeaderboard);
+        iconProfile     = findViewById(R.id.iconProfile);
 
-        labelHome     = findViewById(R.id.labelHome);
-        labelModules  = findViewById(R.id.labelModules);
-        labelProgress = findViewById(R.id.labelProgress);
-        labelBadges   = findViewById(R.id.labelBadges);
-        labelProfile  = findViewById(R.id.labelProfile);
+        labelHome        = findViewById(R.id.labelHome);
+        labelModules     = findViewById(R.id.labelModules);
+        labelProgress    = findViewById(R.id.labelProgress);
+        labelBadges      = findViewById(R.id.labelBadges);
+        labelLeaderboard = findViewById(R.id.labelLeaderboard);
+        labelProfile     = findViewById(R.id.labelProfile);
 
-        indHome     = findViewById(R.id.indicatorHome);
-        indModules  = findViewById(R.id.indicatorModules);
-        indProgress = findViewById(R.id.indicatorProgress);
-        indBadges   = findViewById(R.id.indicatorBadges);
-        indProfile  = findViewById(R.id.indicatorProfile);
+        indHome        = findViewById(R.id.indicatorHome);
+        indModules     = findViewById(R.id.indicatorModules);
+        indProgress    = findViewById(R.id.indicatorProgress);
+        indBadges      = findViewById(R.id.indicatorBadges);
+        indLeaderboard = findViewById(R.id.indicatorLeaderboard);
+        indProfile     = findViewById(R.id.indicatorProfile);
 
         // Activate the current tab
         resetAll();
         activateIndex(selectedIndex);
 
         // Listeners
-        if (navHome != null)     navHome.setOnClickListener(v     -> navigate(0));
-        if (navModules != null)  navModules.setOnClickListener(v  -> navigate(1));
-        if (navProgress != null) navProgress.setOnClickListener(v -> navigate(2));
-        if (navBadges != null)   navBadges.setOnClickListener(v   -> navigate(3));
-        if (navProfile != null)  navProfile.setOnClickListener(v  -> navigate(4));
+        if (navHome != null)        navHome.setOnClickListener(v        -> navigate(0));
+        if (navModules != null)     navModules.setOnClickListener(v     -> navigate(1));
+        if (navProgress != null)    navProgress.setOnClickListener(v    -> navigate(2));
+        if (navBadges != null)      navBadges.setOnClickListener(v      -> navigate(3));
+        if (navLeaderboard != null) navLeaderboard.setOnClickListener(v -> navigate(4));
+        if (navProfile != null)     navProfile.setOnClickListener(v     -> navigate(5));
     }
 
     private void navigate(int index) {
@@ -80,6 +85,9 @@ public abstract class BaseNavActivity extends BaseActivity {
                 startActivity(new Intent(this, BadgesActivity.class));
                 break;
             case 4:
+                startActivity(new Intent(this, LeaderboardActivity.class));
+                break;
+            case 5:
                 startActivity(new Intent(this, ProfileViewActivity.class));
                 break;
         }
@@ -87,13 +95,13 @@ public abstract class BaseNavActivity extends BaseActivity {
     }
 
     private void resetAll() {
-        View[]      inds   = {indHome, indModules, indProgress, indBadges, indProfile};
-        ImageView[] icons  = {iconHome, iconModules, iconProgress, iconBadges, iconProfile};
-        TextView[]  labels = {labelHome, labelModules, labelProgress, labelBadges, labelProfile};
+        View[]      inds   = {indHome, indModules, indProgress, indBadges, indLeaderboard, indProfile};
+        ImageView[] icons  = {iconHome, iconModules, iconProgress, iconBadges, iconLeaderboard, iconProfile};
+        TextView[]  labels = {labelHome, labelModules, labelProgress, labelBadges, labelLeaderboard, labelProfile};
         int[] outlineIcons = {R.drawable.ic_home, R.drawable.ic_book, R.drawable.ic_chart,
-                R.drawable.ic_badge, R.drawable.ic_user};
+                R.drawable.ic_badge, R.drawable.ic_trophy, R.drawable.ic_user};
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             if (inds[i] != null)   inds[i].setVisibility(View.INVISIBLE);
             if (icons[i] != null)  { icons[i].setImageResource(outlineIcons[i]); icons[i].setColorFilter(GRAY); }
             if (labels[i] != null) { labels[i].setTextColor(GRAY); labels[i].setAlpha(1f); }
@@ -101,14 +109,14 @@ public abstract class BaseNavActivity extends BaseActivity {
     }
 
     private void activateIndex(int idx) {
-        View[] inds = {indHome, indModules, indProgress, indBadges, indProfile};
-        ImageView[] icons = {iconHome, iconModules, iconProgress, iconBadges, iconProfile};
-        TextView[] labels = {labelHome, labelModules, labelProgress, labelBadges, labelProfile};
+        View[] inds = {indHome, indModules, indProgress, indBadges, indLeaderboard, indProfile};
+        ImageView[] icons = {iconHome, iconModules, iconProgress, iconBadges, iconLeaderboard, iconProfile};
+        TextView[] labels = {labelHome, labelModules, labelProgress, labelBadges, labelLeaderboard, labelProfile};
         int[] filledIcons = {R.drawable.ic_home_filled, R.drawable.ic_book_filled,
                 R.drawable.ic_chart_filled, R.drawable.ic_badge_filled,
-                R.drawable.ic_user_filled};
+                R.drawable.ic_trophy_filled, R.drawable.ic_user_filled};
 
-        if (idx < 0 || idx > 4) return;
+        if (idx < 0 || idx > 5) return;
         if (inds[idx] != null) {
             inds[idx].setVisibility(View.VISIBLE);
             inds[idx].setAlpha(0f);
@@ -128,6 +136,6 @@ public abstract class BaseNavActivity extends BaseActivity {
         }
     }
 
-    /** Return the nav tab index for this screen (0-4). */
+    /** Return the nav tab index for this screen (0-5). */
     protected abstract int getNavIndex();
 }

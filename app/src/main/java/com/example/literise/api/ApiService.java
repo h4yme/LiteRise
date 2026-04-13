@@ -1,6 +1,7 @@
 package com.example.literise.api;
 
 import com.example.literise.models.GetNextItemRequest;
+import com.example.literise.models.LeaderboardResponse;
 
 import com.example.literise.models.NextItemResponse;
 
@@ -297,5 +298,12 @@ public interface ApiService {
     @POST("award_badge.php")
     Call<com.example.literise.models.AwardBadgeResponse> awardBadge(
             @Body com.example.literise.models.AwardBadgeRequest request
+    );
+
+    // 🏆 Leaderboard — ranked list of all active students
+    @GET("get_leaderboard.php")
+    Call<LeaderboardResponse> getLeaderboard(
+            @Query("filter") String filter,
+            @Query("limit") int limit
     );
 }

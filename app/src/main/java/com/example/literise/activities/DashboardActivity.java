@@ -57,10 +57,10 @@ public class DashboardActivity extends BaseActivity {
     private List<LearningModule> modules;
 
     // Custom Bottom Navigation Views
-    private LinearLayout navHome, navModules, navProgress, navBadges, navProfile;
-    private ImageView iconHome, iconModules, iconProgress, iconBadges, iconProfile;
-    private TextView labelHome, labelModules, labelProgress, labelBadges, labelProfile;
-    private View indicatorHome, indicatorModules, indicatorProgress, indicatorBadges, indicatorProfile;
+    private LinearLayout navHome, navModules, navProgress, navBadges, navLeaderboard, navProfile;
+    private ImageView iconHome, iconModules, iconProgress, iconBadges, iconLeaderboard, iconProfile;
+    private TextView labelHome, labelModules, labelProgress, labelBadges, labelLeaderboard, labelProfile;
+    private View indicatorHome, indicatorModules, indicatorProgress, indicatorBadges, indicatorLeaderboard, indicatorProfile;
 
     // Lottie Animation Views
     private LottieAnimationView lottieHeaderSparkle, lottieStatsSparkle;
@@ -147,30 +147,34 @@ public class DashboardActivity extends BaseActivity {
         rvModules.setLayoutManager(new LinearLayoutManager(this));
 
         // Custom Bottom Navigation
-        navHome     = findViewById(R.id.navHome);
-        navModules  = findViewById(R.id.navModules);
-        navProgress = findViewById(R.id.navProgress);
-        navBadges   = findViewById(R.id.navBadges);
-        navProfile  = findViewById(R.id.navProfile);
+        navHome        = findViewById(R.id.navHome);
+        navModules     = findViewById(R.id.navModules);
+        navProgress    = findViewById(R.id.navProgress);
+        navBadges      = findViewById(R.id.navBadges);
+        navLeaderboard = findViewById(R.id.navLeaderboard);
+        navProfile     = findViewById(R.id.navProfile);
 
-        iconHome     = findViewById(R.id.iconHome);
-        iconModules  = findViewById(R.id.iconModules);
-        iconProgress = findViewById(R.id.iconProgress);
-        iconBadges   = findViewById(R.id.iconBadges);
-        iconProfile  = findViewById(R.id.iconProfile);
+        iconHome        = findViewById(R.id.iconHome);
+        iconModules     = findViewById(R.id.iconModules);
+        iconProgress    = findViewById(R.id.iconProgress);
+        iconBadges      = findViewById(R.id.iconBadges);
+        iconLeaderboard = findViewById(R.id.iconLeaderboard);
+        iconProfile     = findViewById(R.id.iconProfile);
 
-        labelHome     = findViewById(R.id.labelHome);
-        labelModules  = findViewById(R.id.labelModules);
-        labelProgress = findViewById(R.id.labelProgress);
-        labelBadges   = findViewById(R.id.labelBadges);
-        labelProfile  = findViewById(R.id.labelProfile);
+        labelHome        = findViewById(R.id.labelHome);
+        labelModules     = findViewById(R.id.labelModules);
+        labelProgress    = findViewById(R.id.labelProgress);
+        labelBadges      = findViewById(R.id.labelBadges);
+        labelLeaderboard = findViewById(R.id.labelLeaderboard);
+        labelProfile     = findViewById(R.id.labelProfile);
 
         // Nav pill indicators
-        indicatorHome     = findViewById(R.id.indicatorHome);
-        indicatorModules  = findViewById(R.id.indicatorModules);
-        indicatorProgress = findViewById(R.id.indicatorProgress);
-        indicatorBadges   = findViewById(R.id.indicatorBadges);
-        indicatorProfile  = findViewById(R.id.indicatorProfile);
+        indicatorHome        = findViewById(R.id.indicatorHome);
+        indicatorModules     = findViewById(R.id.indicatorModules);
+        indicatorProgress    = findViewById(R.id.indicatorProgress);
+        indicatorBadges      = findViewById(R.id.indicatorBadges);
+        indicatorLeaderboard = findViewById(R.id.indicatorLeaderboard);
+        indicatorProfile     = findViewById(R.id.indicatorProfile);
 
         // Lottie animations
         lottieHeaderSparkle = findViewById(R.id.lottieHeaderSparkle);
@@ -230,7 +234,8 @@ public class DashboardActivity extends BaseActivity {
         navModules.setOnClickListener(v -> selectNavItem(1));
         navProgress.setOnClickListener(v -> selectNavItem(2));
         navBadges.setOnClickListener(v -> selectNavItem(3));
-        navProfile.setOnClickListener(v -> selectNavItem(4));
+        if (navLeaderboard != null) navLeaderboard.setOnClickListener(v -> selectNavItem(4));
+        navProfile.setOnClickListener(v -> selectNavItem(5));
 
         // Show tutorial on first visit
 
@@ -270,7 +275,13 @@ public class DashboardActivity extends BaseActivity {
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
                 break;
 
-            case 4: // Profile
+            case 4: // Leaderboard
+                activateNavItem(iconLeaderboard, labelLeaderboard, indicatorLeaderboard, R.drawable.ic_trophy_filled);
+                startActivity(new Intent(this, LeaderboardActivity.class));
+                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                break;
+
+            case 5: // Profile
                 activateNavItem(iconProfile, labelProfile, indicatorProfile, R.drawable.ic_user_filled);
                 startActivity(new Intent(this, ProfileViewActivity.class));
                 overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
@@ -331,6 +342,7 @@ public class DashboardActivity extends BaseActivity {
         indicatorModules.setVisibility(View.INVISIBLE);
         indicatorProgress.setVisibility(View.INVISIBLE);
         if (indicatorBadges != null) indicatorBadges.setVisibility(View.INVISIBLE);
+        if (indicatorLeaderboard != null) indicatorLeaderboard.setVisibility(View.INVISIBLE);
         indicatorProfile.setVisibility(View.INVISIBLE);
 
         // Set all icons to outline versions
@@ -338,6 +350,7 @@ public class DashboardActivity extends BaseActivity {
         iconModules.setImageResource(R.drawable.ic_book);
         iconProgress.setImageResource(R.drawable.ic_chart);
         if (iconBadges != null) iconBadges.setImageResource(R.drawable.ic_badge);
+        if (iconLeaderboard != null) iconLeaderboard.setImageResource(R.drawable.ic_trophy);
         iconProfile.setImageResource(R.drawable.ic_user);
 
         // Gray all icons
@@ -345,6 +358,7 @@ public class DashboardActivity extends BaseActivity {
         iconModules.setColorFilter(grayColor);
         iconProgress.setColorFilter(grayColor);
         if (iconBadges != null) iconBadges.setColorFilter(grayColor);
+        if (iconLeaderboard != null) iconLeaderboard.setColorFilter(grayColor);
         iconProfile.setColorFilter(grayColor);
 
         // Gray all labels
@@ -352,11 +366,13 @@ public class DashboardActivity extends BaseActivity {
         labelModules.setTextColor(grayColor);
         labelProgress.setTextColor(grayColor);
         if (labelBadges != null) labelBadges.setTextColor(grayColor);
+        if (labelLeaderboard != null) labelLeaderboard.setTextColor(grayColor);
         labelProfile.setTextColor(grayColor);
         labelHome.setAlpha(1f);
         labelModules.setAlpha(1f);
         labelProgress.setAlpha(1f);
         if (labelBadges != null) labelBadges.setAlpha(1f);
+        if (labelLeaderboard != null) labelLeaderboard.setAlpha(1f);
         labelProfile.setAlpha(1f);
     }
 

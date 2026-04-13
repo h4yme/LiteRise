@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F3FF">
+
+    <!-- ─── Header ─────────────────────────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#7C3AED"
+        android:paddingTop="48dp"
+        android:paddingBottom="24dp"
+        android:paddingStart="20dp"
+        android:paddingEnd="20dp"
+        android:gravity="center_horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_trophy_filled"
+            app:tint="#FFFFFF"
+            android:contentDescription="Leaderboard"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Leaderboard"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/visby_bold"
+            android:textColor="#FFFFFF"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/tvFilterLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ranked by Total XP"
+            android:textSize="13sp"
+            android:fontFamily="@font/visby_regular"
+            android:textColor="#DDD6FE"
+            android:layout_marginTop="4dp"/>
+
+    </LinearLayout>
+
+    <!-- ─── Filter chips (horizontal scroll) ───────────────────────── -->
+    <HorizontalScrollView
+        android:id="@+id/filterScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
+        android:background="#FFFFFF"
+        app:layout_constraintTop_toBottomOf="@id/headerLayout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:id="@+id/llFilterChips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/chipXp"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="XP"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_bold"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_filter_chip_active"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipStreak"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Streak"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipPhonics"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Phonics"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipVocabulary"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Vocabulary"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipGrammar"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Grammar"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipComprehension"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Comprehension"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"
+                android:layout_marginEnd="8dp"/>
+
+            <TextView
+                android:id="@+id/chipWriting"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Writing"
+                android:gravity="center"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="13sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#6B7280"
+                android:background="@drawable/bg_filter_chip_inactive"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- ─── Loading indicator ───────────────────────────────────────── -->
+    <ProgressBar
+        android:id="@+id/progressLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"/>
+
+    <!-- ─── Empty state ─────────────────────────────────────────────── -->
+    <LinearLayout
+        android:id="@+id/layoutEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav">
+
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:src="@drawable/ic_trophy"
+            app:tint="#D1D5DB"
+            android:contentDescription="Empty leaderboard"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No data yet"
+            android:textSize="16sp"
+            android:fontFamily="@font/visby_bold"
+            android:textColor="#9CA3AF"
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+
+    <!-- ─── Leaderboard list ─────────────────────────────────────────── -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLeaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- ─── Bottom Navigation ────────────────────────────────────────── -->
+    <include
+        android:id="@+id/customBottomNav"
+        layout="@layout/custom_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

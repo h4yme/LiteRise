@@ -117,5 +117,5 @@ public class ProfileViewActivity extends BaseNavActivity {
     }
 
     @Override
-    protected int getNavIndex() { return 4; }
+    protected int getNavIndex() { return 5; }
 }
