@@ -1,77 +1,89 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:padding="14dp"
-    android:layout_marginBottom="8dp"
-    android:background="@drawable/bg_leaderboard_item">
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="18dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#FFFFFF">
 
-    <!-- Rank number -->
-    <TextView
-        android:id="@+id/tvRank"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:gravity="center"
-        android:text="1"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/visby_bold"
-        android:textColor="#6B7280"/>
-
-    <!-- Medal icon (shown for top 3) -->
-    <ImageView
-        android:id="@+id/ivMedal"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/ic_trophy"
-        android:contentDescription="Medal"
-        android:visibility="gone"/>
-
-    <!-- Name + Grade -->
     <LinearLayout
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical"
-        android:layout_marginStart="12dp">
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="14dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp">
 
+        <!-- Rank number -->
         <TextView
-            android:id="@+id/tvName"
-            android:layout_width="wrap_content"
+            android:id="@+id/tvRank"
+            android:layout_width="28dp"
             android:layout_height="wrap_content"
-            android:text="Student Name"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            android:gravity="center"
+            android:textSize="15sp"
             android:fontFamily="@font/visby_bold"
-            android:textColor="#111827"
-            android:maxLines="1"
-            android:ellipsize="end"/>
+            android:textColor="#9CA3AF"/>
 
+        <!-- Avatar circle with initial -->
+        <FrameLayout
+            android:id="@+id/ivMedal"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/bg_circle">
+            <TextView
+                android:id="@+id/tvAvatarInitial"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="16sp"
+                android:fontFamily="@font/visby_bold"
+                android:textColor="#FFFFFF"/>
+        </FrameLayout>
+
+        <!-- Name + Grade -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:fontFamily="@font/visby_bold"
+                android:textColor="#1F1F2E"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+            <TextView
+                android:id="@+id/tvGrade"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:fontFamily="@font/visby_regular"
+                android:textColor="#9CA3AF"
+                android:layout_marginTop="1dp"/>
+
+        </LinearLayout>
+
+        <!-- Score -->
         <TextView
-            android:id="@+id/tvGrade"
+            android:id="@+id/tvValue"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Grade 3"
-            android:textSize="11sp"
-            android:fontFamily="@font/visby_regular"
-            android:textColor="#9CA3AF"
-            android:layout_marginTop="2dp"/>
+            android:textSize="17sp"
+            android:fontFamily="@font/visby_bold"
+            android:textColor="#7C3AED"/>
 
     </LinearLayout>
 
-    <!-- Score value -->
-    <TextView
-        android:id="@+id/tvValue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="0"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/visby_bold"
-        android:textColor="#7C3AED"
-        android:layout_marginStart="8dp"/>
-
-</LinearLayout>
+</androidx.cardview.widget.CardView>

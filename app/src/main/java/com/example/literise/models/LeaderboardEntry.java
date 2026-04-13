@@ -14,7 +14,7 @@ public class LeaderboardEntry {
     private String name;
 
     @SerializedName("grade")
-    private String grade;
+    private int grade;
 
     @SerializedName("value")
     private int value;
@@ -25,7 +25,7 @@ public class LeaderboardEntry {
     public int getRank()       { return rank; }
     public int getStudentId()  { return studentId; }
     public String getName()    { return name; }
-    public String getGrade()   { return grade; }
+    public int getGrade()      { return grade; }
     public int getValue()      { return value; }
     public String getLabel()   { return label; }
 }
