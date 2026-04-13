@@ -87,6 +87,7 @@
             android:gravity="bottom"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
+            android:paddingBottom="16dp"
             android:visibility="gone">
 
             <!-- 2nd place ─────────────────────────── -->
