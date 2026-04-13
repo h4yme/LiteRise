@@ -315,66 +315,57 @@
     <!-- end headerSection -->
 
     <!-- ═══════════════════════════════════════════════
-         FILTER CHIPS  (floats seamlessly after header)
+         FILTER CHIPS  — full-width, equal-weight row
          ═══════════════════════════════════════════════ -->
-    <HorizontalScrollView
+    <LinearLayout
         android:id="@+id/filterScrollView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:scrollbars="none"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
         android:background="#FFFFFF"
-        android:paddingTop="8dp"
-        android:paddingBottom="12dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:gravity="center_vertical"
         app:layout_constraintTop_toBottomOf="@id/headerSection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <LinearLayout
-            android:id="@+id/llFilterChips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+        <TextView android:id="@+id/chipXp"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="XP" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_filter_chip_active"
+            android:layout_marginEnd="6dp"/>
 
-            <TextView android:id="@+id/chipXp"
-                android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="XP" android:gravity="center"
-                android:paddingStart="20dp" android:paddingEnd="20dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_bold"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/bg_filter_chip_active"
-                android:layout_marginEnd="8dp"/>
+        <TextView android:id="@+id/chipStreak"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Streak" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"
+            android:layout_marginEnd="6dp"/>
 
-            <TextView android:id="@+id/chipStreak"
-                android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="Streak" android:gravity="center"
-                android:paddingStart="20dp" android:paddingEnd="20dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"
-                android:layout_marginEnd="8dp"/>
+        <TextView android:id="@+id/chipLessons"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Lessons" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"
+            android:layout_marginEnd="6dp"/>
 
-            <TextView android:id="@+id/chipLessons"
-                android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="Lessons" android:gravity="center"
-                android:paddingStart="20dp" android:paddingEnd="20dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"
-                android:layout_marginEnd="8dp"/>
+        <TextView android:id="@+id/chipBadges"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Badges" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"/>
 
-            <TextView android:id="@+id/chipBadges"
-                android:layout_width="wrap_content" android:layout_height="36dp"
-                android:text="Badges" android:gravity="center"
-                android:paddingStart="20dp" android:paddingEnd="20dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"/>
-
-        </LinearLayout>
-    </HorizontalScrollView>
+    </LinearLayout>
 
     <!-- 1dp divider under chips -->
     <View
