@@ -37,8 +37,9 @@ $col   = $filterMap[$filter]['col'];
 $label = $filterMap[$filter]['label'];
 
 try {
+    $limitInt = (int) $limit; // already validated — safe to interpolate
     $stmt = $conn->prepare("
-        SELECT TOP (:lim)
+        SELECT TOP ($limitInt)
             StudentID,
             FullName,
             GradeLevel,
@@ -47,7 +48,6 @@ try {
         WHERE Status = 'active'
         ORDER BY $col DESC
     ");
-    $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
     $stmt->execute();
 
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
