@@ -48,7 +48,7 @@ public class SplashActivity extends AppCompatActivity {
                     intent = new Intent(SplashActivity.this, DashboardActivity.class);
                 }
             } else {
-                // Not logged in - show login/register selection
+                // Not logged in - show selection screen
                 intent = new Intent(SplashActivity.this, LoginRegisterSelectionActivity.class);
             }
 

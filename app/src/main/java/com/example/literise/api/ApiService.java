@@ -20,6 +20,7 @@ import com.example.literise.models.ScrambleSentenceResponse;
 
 import com.example.literise.models.SingleResponseResult;
 
+import com.example.literise.models.LrnLoginRequest;
 import com.example.literise.models.Students;
 
 import com.example.literise.models.SubmitRequest;
@@ -69,10 +70,15 @@ import retrofit2.http.Query;
 
 public interface ApiService {
 
-    // 🧾 Login
+    // 🧾 Login (email + password — kept for backwards compatibility)
     @Headers("Content-Type: application/json")
     @POST("login.php")
     Call<Students> login(@Body Students student);
+
+    // 🪪 LRN Login — student enters their LRN to sign in
+    @Headers("Content-Type: application/json")
+    @POST("login_lrn.php")
+    Call<Students> loginWithLrn(@Body LrnLoginRequest request);
 
     // 📝 Register
     @Headers("Content-Type: application/json")
