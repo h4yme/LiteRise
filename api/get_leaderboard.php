@@ -1,15 +1,15 @@
 <?php
 /**
  * get_leaderboard.php
- * Returns a ranked leaderboard of all students.
+ * Returns a ranked leaderboard of all active students.
  *
  * Query params:
- *   filter  — "xp" | "streak" | "phonics" | "vocabulary" | "grammar" | "comprehension" | "writing"
- *             Default: "xp"
- *   limit   — number of entries to return (default 50, max 100)
+ *   filter  — "xp" | "streak" | "lessons" | "badges"   (default: "xp")
+ *   limit   — max entries to return (default 50, max 100)
  *
  * Response:
- *   { "success": true, "filter": "xp", "leaderboard": [ { rank, student_id, name, grade, value, label } ] }
+ *   { "success": true, "filter": "xp", "filter_label": "Total XP",
+ *     "leaderboard": [ { rank, student_id, name, grade, value, label } ] }
  */
 
 require_once __DIR__ . '/src/db.php'; // sets $conn (PDO)
@@ -18,38 +18,79 @@ $filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'xp';
 $limit  = isset($_GET['limit'])  ? min((int)$_GET['limit'], 100) : 50;
 if ($limit < 1) $limit = 50;
 
-// Map filter key → column name and display label
-$filterMap = [
-    'xp'            => ['col' => 'TotalXP',                       'label' => 'Total XP'],
-    'streak'        => ['col' => 'CurrentStreak',                  'label' => 'Day Streak'],
-    'phonics'       => ['col' => 'Cat1_PhonicsWordStudy',          'label' => 'Phonics & Word Study'],
-    'vocabulary'    => ['col' => 'Cat2_VocabularyWordKnowledge',   'label' => 'Vocabulary'],
-    'grammar'       => ['col' => 'Cat3_GrammarAwareness',          'label' => 'Grammar Awareness'],
-    'comprehension' => ['col' => 'Cat4_ComprehendingText',         'label' => 'Comprehension'],
-    'writing'       => ['col' => 'Cat5_CreatingComposing',         'label' => 'Writing & Composing'],
+$validFilters = ['xp', 'streak', 'lessons', 'badges'];
+if (!in_array($filter, $validFilters, true)) $filter = 'xp';
+
+$labelMap = [
+    'xp'      => 'Total XP',
+    'streak'  => 'Day Streak',
+    'lessons' => 'Lessons Completed',
+    'badges'  => 'Badges Earned',
 ];
+$label    = $labelMap[$filter];
+$limitInt = (int) $limit;
 
-if (!array_key_exists($filter, $filterMap)) {
-    $filter = 'xp';
-}
-
-$col   = $filterMap[$filter]['col'];
-$label = $filterMap[$filter]['label'];
-
-try {
-    $limitInt = (int) $limit; // already validated — safe to interpolate
-    $stmt = $conn->prepare("
+// Build the appropriate query for each filter
+if ($filter === 'xp') {
+    $sql = "
         SELECT TOP ($limitInt)
             StudentID,
             FirstName + ' ' + LastName AS FullName,
             GradeLevel,
-            $col AS score
+            COALESCE(TotalXP, 0) AS score
         FROM Students
         WHERE IsActive = 1
-        ORDER BY $col DESC
-    ");
-    $stmt->execute();
+        ORDER BY score DESC
+    ";
+} elseif ($filter === 'streak') {
+    $sql = "
+        SELECT TOP ($limitInt)
+            StudentID,
+            FirstName + ' ' + LastName AS FullName,
+            GradeLevel,
+            COALESCE(CurrentStreak, 0) AS score
+        FROM Students
+        WHERE IsActive = 1
+        ORDER BY score DESC
+    ";
+} elseif ($filter === 'lessons') {
+    $sql = "
+        SELECT TOP ($limitInt)
+            s.StudentID,
+            s.FirstName + ' ' + s.LastName AS FullName,
+            s.GradeLevel,
+            COALESCE(lp.lesson_count, 0) AS score
+        FROM Students s
+        LEFT JOIN (
+            SELECT StudentID, COUNT(*) AS lesson_count
+            FROM   StudentNodeProgress
+            WHERE  LessonCompleted = 1
+            GROUP  BY StudentID
+        ) lp ON s.StudentID = lp.StudentID
+        WHERE s.IsActive = 1
+        ORDER BY score DESC
+    ";
+} else { // badges
+    $sql = "
+        SELECT TOP ($limitInt)
+            s.StudentID,
+            s.FirstName + ' ' + s.LastName AS FullName,
+            s.GradeLevel,
+            COALESCE(b.badge_count, 0) AS score
+        FROM Students s
+        LEFT JOIN (
+            SELECT StudentID, COUNT(*) AS badge_count
+            FROM   StudentBadges
+            GROUP  BY StudentID
+        ) b ON s.StudentID = b.StudentID
+        WHERE s.IsActive = 1
+        ORDER BY score DESC
+    ";
+}
 
+try {
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
     $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $leaderboard = [];

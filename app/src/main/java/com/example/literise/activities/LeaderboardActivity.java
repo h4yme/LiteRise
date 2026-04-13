@@ -47,8 +47,7 @@ public class LeaderboardActivity extends BaseNavActivity {
     private LottieAnimationView lottieCrown;
 
     // Filter chips
-    private TextView chipXp, chipStreak, chipPhonics, chipVocabulary,
-            chipGrammar, chipComprehension, chipWriting;
+    private TextView chipXp, chipStreak, chipLessons, chipBadges;
 
     private String activeFilter = "xp";
     private SessionManager session;
@@ -89,25 +88,19 @@ public class LeaderboardActivity extends BaseNavActivity {
         podScore3rd = findViewById(R.id.podScore3rd);
         lottieCrown = findViewById(R.id.lottieCrown);
 
-        chipXp            = findViewById(R.id.chipXp);
-        chipStreak        = findViewById(R.id.chipStreak);
-        chipPhonics       = findViewById(R.id.chipPhonics);
-        chipVocabulary    = findViewById(R.id.chipVocabulary);
-        chipGrammar       = findViewById(R.id.chipGrammar);
-        chipComprehension = findViewById(R.id.chipComprehension);
-        chipWriting       = findViewById(R.id.chipWriting);
+        chipXp      = findViewById(R.id.chipXp);
+        chipStreak  = findViewById(R.id.chipStreak);
+        chipLessons = findViewById(R.id.chipLessons);
+        chipBadges  = findViewById(R.id.chipBadges);
 
         rvLeaderboard.setLayoutManager(new LinearLayoutManager(this));
     }
 
     private void setupFilterChips() {
-        chipXp.setOnClickListener(v            -> applyFilter("xp",            chipXp));
-        chipStreak.setOnClickListener(v        -> applyFilter("streak",        chipStreak));
-        chipPhonics.setOnClickListener(v       -> applyFilter("phonics",       chipPhonics));
-        chipVocabulary.setOnClickListener(v    -> applyFilter("vocabulary",    chipVocabulary));
-        chipGrammar.setOnClickListener(v       -> applyFilter("grammar",       chipGrammar));
-        chipComprehension.setOnClickListener(v -> applyFilter("comprehension", chipComprehension));
-        chipWriting.setOnClickListener(v       -> applyFilter("writing",       chipWriting));
+        chipXp.setOnClickListener(v      -> applyFilter("xp",      chipXp));
+        chipStreak.setOnClickListener(v  -> applyFilter("streak",  chipStreak));
+        chipLessons.setOnClickListener(v -> applyFilter("lessons", chipLessons));
+        chipBadges.setOnClickListener(v  -> applyFilter("badges",  chipBadges));
     }
 
     private void applyFilter(String filter, TextView selected) {
@@ -120,8 +113,7 @@ public class LeaderboardActivity extends BaseNavActivity {
     }
 
     private void resetChips() {
-        for (TextView chip : new TextView[]{chipXp, chipStreak, chipPhonics,
-                chipVocabulary, chipGrammar, chipComprehension, chipWriting}) {
+        for (TextView chip : new TextView[]{chipXp, chipStreak, chipLessons, chipBadges}) {
             chip.setBackgroundResource(R.drawable.bg_filter_chip_inactive);
             chip.setTextColor(0xFF6B7280);
         }

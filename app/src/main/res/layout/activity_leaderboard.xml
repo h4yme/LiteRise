@@ -341,45 +341,18 @@
                 android:background="@drawable/bg_filter_chip_inactive"
                 android:layout_marginEnd="8dp"/>
 
-            <TextView android:id="@+id/chipPhonics"
+            <TextView android:id="@+id/chipLessons"
                 android:layout_width="wrap_content" android:layout_height="34dp"
-                android:text="Phonics" android:gravity="center"
+                android:text="Lessons" android:gravity="center"
                 android:paddingStart="18dp" android:paddingEnd="18dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_regular"
                 android:textColor="#6B7280"
                 android:background="@drawable/bg_filter_chip_inactive"
                 android:layout_marginEnd="8dp"/>
 
-            <TextView android:id="@+id/chipVocabulary"
+            <TextView android:id="@+id/chipBadges"
                 android:layout_width="wrap_content" android:layout_height="34dp"
-                android:text="Vocabulary" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView android:id="@+id/chipGrammar"
-                android:layout_width="wrap_content" android:layout_height="34dp"
-                android:text="Grammar" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView android:id="@+id/chipComprehension"
-                android:layout_width="wrap_content" android:layout_height="34dp"
-                android:text="Comprehension" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
-                android:textSize="13sp" android:fontFamily="@font/visby_regular"
-                android:textColor="#6B7280"
-                android:background="@drawable/bg_filter_chip_inactive"
-                android:layout_marginEnd="8dp"/>
-
-            <TextView android:id="@+id/chipWriting"
-                android:layout_width="wrap_content" android:layout_height="34dp"
-                android:text="Writing" android:gravity="center"
+                android:text="Badges" android:gravity="center"
                 android:paddingStart="18dp" android:paddingEnd="18dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_regular"
                 android:textColor="#6B7280"
