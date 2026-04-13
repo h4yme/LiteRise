@@ -12,11 +12,7 @@
  *   { "success": true, "filter": "xp", "leaderboard": [ { rank, student_id, name, grade, value, label } ] }
  */
 
-header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Methods: GET");
-
-require_once __DIR__ . '/src/db.php'; // PDO connection in $pdo
+require_once __DIR__ . '/src/db.php'; // sets $conn (PDO)
 
 $filter = isset($_GET['filter']) ? trim($_GET['filter']) : 'xp';
 $limit  = isset($_GET['limit'])  ? min((int)$_GET['limit'], 100) : 50;
@@ -41,8 +37,8 @@ $col   = $filterMap[$filter]['col'];
 $label = $filterMap[$filter]['label'];
 
 try {
-    $stmt = $pdo->prepare("
-        SELECT
+    $stmt = $conn->prepare("
+        SELECT TOP (:lim)
             StudentID,
             FullName,
             GradeLevel,
@@ -50,7 +46,6 @@ try {
         FROM Students
         WHERE Status = 'active'
         ORDER BY $col DESC
-        LIMIT :lim
     ");
     $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
     $stmt->execute();
@@ -71,10 +66,10 @@ try {
     }
 
     echo json_encode([
-        'success'     => true,
-        'filter'      => $filter,
-        'filter_label'=> $label,
-        'leaderboard' => $leaderboard,
+        'success'      => true,
+        'filter'       => $filter,
+        'filter_label' => $label,
+        'leaderboard'  => $leaderboard,
     ]);
 
 } catch (Exception $e) {
