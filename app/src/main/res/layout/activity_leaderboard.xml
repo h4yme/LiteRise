@@ -305,12 +305,6 @@
         </LinearLayout>
         <!-- end podium -->
 
-        <!-- White rounded scallop — creates smooth curve into content area -->
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="28dp"
-            android:background="@drawable/bg_white_top_rounded"/>
-
     </LinearLayout>
     <!-- end headerSection -->
 
