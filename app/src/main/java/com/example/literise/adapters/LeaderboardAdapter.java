@@ -42,8 +42,15 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     public void onBindViewHolder(@NonNull ViewHolder h, int position) {
         LeaderboardEntry entry = entries.get(position);
 
+        // Rank badge
         h.tvRank.setText(String.valueOf(entry.getRank()));
+        styleRankBadge(h.tvRank, entry.getRank());
+
+        // Score value
         h.tvValue.setText(String.valueOf(entry.getValue()));
+
+        // Short unit label below score
+        h.tvLabel.setText(shortUnit(entry.getLabel()));
 
         // Name — highlight current user
         boolean isMe = entry.getStudentId() == currentStudentId;
@@ -64,15 +71,44 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
         bg.setColor(color);
         h.avatarFrame.setBackground(bg);
 
-        // Current user card highlight
-        if (isMe) {
-            h.itemView.setAlpha(1f);
-            ((androidx.cardview.widget.CardView) h.itemView)
-                    .setCardBackgroundColor(0xFFF5F3FF);
+        // Card highlight for current user
+        ((androidx.cardview.widget.CardView) h.itemView)
+                .setCardBackgroundColor(isMe ? 0xFFF5F3FF : 0xFFFFFFFF);
+    }
+
+    /** Maps full label to compact unit string shown below the score. */
+    private String shortUnit(String label) {
+        if (label == null) return "";
+        if (label.contains("XP"))       return "XP";
+        if (label.contains("Streak"))   return "day streak";
+        if (label.contains("Lesson"))   return "lessons";
+        if (label.contains("Badge"))    return "badges";
+        return label;
+    }
+
+    /** Colors the rank badge differently for top-tier positions. */
+    private void styleRankBadge(TextView tv, int rank) {
+        if (rank <= 6) {
+            // Top 6: vibrant purple badge
+            GradientDrawable gd = new GradientDrawable();
+            gd.setShape(GradientDrawable.OVAL);
+            gd.setColor(0xFF7C3AED);
+            tv.setBackground(gd);
+            tv.setTextColor(0xFFFFFFFF);
+        } else if (rank <= 10) {
+            // Rank 7-10: lighter purple badge
+            GradientDrawable gd = new GradientDrawable();
+            gd.setShape(GradientDrawable.OVAL);
+            gd.setColor(0xFFEDE9FE);
+            tv.setBackground(gd);
+            tv.setTextColor(0xFF6D28D9);
         } else {
-            h.itemView.setAlpha(1f);
-            ((androidx.cardview.widget.CardView) h.itemView)
-                    .setCardBackgroundColor(0xFFFFFFFF);
+            // Rank 11+: soft gray badge
+            GradientDrawable gd = new GradientDrawable();
+            gd.setShape(GradientDrawable.OVAL);
+            gd.setColor(0xFFF3F4F6);
+            tv.setBackground(gd);
+            tv.setTextColor(0xFF9CA3AF);
         }
     }
 
@@ -87,17 +123,18 @@ public class LeaderboardAdapter extends RecyclerView.Adapter<LeaderboardAdapter.
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvRank, tvName, tvGrade, tvValue, tvAvatarInitial;
+        TextView tvRank, tvName, tvGrade, tvValue, tvLabel, tvAvatarInitial;
         FrameLayout avatarFrame;
 
         ViewHolder(@NonNull View v) {
             super(v);
-            tvRank         = v.findViewById(R.id.tvRank);
-            tvName         = v.findViewById(R.id.tvName);
-            tvGrade        = v.findViewById(R.id.tvGrade);
-            tvValue        = v.findViewById(R.id.tvValue);
+            tvRank          = v.findViewById(R.id.tvRank);
+            tvName          = v.findViewById(R.id.tvName);
+            tvGrade         = v.findViewById(R.id.tvGrade);
+            tvValue         = v.findViewById(R.id.tvValue);
+            tvLabel         = v.findViewById(R.id.tvLabel);
             tvAvatarInitial = v.findViewById(R.id.tvAvatarInitial);
-            avatarFrame    = v.findViewById(R.id.ivMedal);
+            avatarFrame     = v.findViewById(R.id.ivMedal);
         }
     }
 }

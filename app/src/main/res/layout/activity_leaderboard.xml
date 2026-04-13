@@ -4,22 +4,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0EDFB">
+    android:background="#F5F3FF">
 
     <!-- ═══════════════════════════════════════════════
-         PURPLE HEADER  (title + Lottie + podium)
+         GRADIENT HEADER  (title + Lottie + podium)
          ═══════════════════════════════════════════════ -->
     <LinearLayout
         android:id="@+id/headerSection"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="#7C3AED"
+        android:background="@drawable/bg_header_gradient"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Sparkle Lottie behind title (plays in loop) -->
+        <!-- Sparkle Lottie behind title -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -31,7 +31,7 @@
                 app:lottie_rawRes="@raw/lottie_sparkle_stars"
                 app:lottie_autoPlay="true"
                 app:lottie_loop="true"
-                android:alpha="0.35"/>
+                android:alpha="0.40"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -41,21 +41,29 @@
                 android:paddingTop="44dp"
                 android:paddingBottom="12dp">
 
-                <ImageView
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:src="@drawable/ic_trophy_filled"
-                    app:tint="#FFFFFF"
-                    android:contentDescription="Trophy"/>
+                <!-- Trophy icon with glow ring -->
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_trophy_glow">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_trophy_filled"
+                        app:tint="#FFFFFF"
+                        android:contentDescription="Trophy"/>
+                </FrameLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Leaderboard"
-                    android:textSize="22sp"
+                    android:textSize="24sp"
                     android:fontFamily="@font/visby_bold"
                     android:textColor="#FFFFFF"
-                    android:layout_marginTop="6dp"/>
+                    android:layout_marginTop="6dp"
+                    android:letterSpacing="0.02"/>
 
                 <TextView
                     android:id="@+id/tvFilterLabel"
@@ -74,11 +82,11 @@
         <LinearLayout
             android:id="@+id/podiumSection"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="220dp"
             android:orientation="horizontal"
             android:gravity="bottom"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
             android:visibility="gone">
 
             <!-- 2nd place ─────────────────────────── -->
@@ -90,11 +98,10 @@
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
-                <!-- Avatar circle -->
                 <FrameLayout
                     android:id="@+id/avatar2nd"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:background="@drawable/bg_circle"
                     android:layout_marginBottom="6dp">
                     <TextView
@@ -102,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"/>
                 </FrameLayout>
@@ -124,27 +131,28 @@
                     android:id="@+id/podScore2nd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:fontFamily="@font/visby_bold"
                     android:textColor="#E9D5FF"
-                    android:layout_marginBottom="6dp"/>
+                    android:layout_marginBottom="8dp"/>
 
                 <!-- Silver bar -->
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="80dp"
+                    android:layout_height="88dp"
                     android:background="@drawable/bg_podium_silver"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="4dp"
+                    android:elevation="4dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="2"
-                        android:textSize="22sp"
+                        android:textSize="26sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"
-                        android:alpha="0.85"/>
+                        android:alpha="0.90"/>
                 </FrameLayout>
 
             </LinearLayout>
@@ -154,23 +162,23 @@
                 android:id="@+id/pod1st"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1.1"
+                android:layout_weight="1.2"
                 android:orientation="vertical"
                 android:gravity="center_horizontal">
 
-                <!-- Tiny crown Lottie -->
+                <!-- Crown Lottie -->
                 <com.airbnb.lottie.LottieAnimationView
                     android:id="@+id/lottieCrown"
-                    android:layout_width="44dp"
-                    android:layout_height="24dp"
+                    android:layout_width="48dp"
+                    android:layout_height="26dp"
                     app:lottie_rawRes="@raw/lottie_sparkle_stars"
                     app:lottie_autoPlay="true"
                     app:lottie_loop="true"/>
 
                 <FrameLayout
                     android:id="@+id/avatar1st"
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
                     android:background="@drawable/bg_circle"
                     android:layout_marginBottom="6dp">
                     <TextView
@@ -178,7 +186,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textSize="24sp"
+                        android:textSize="28sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"/>
                 </FrameLayout>
@@ -203,24 +211,25 @@
                     android:textSize="14sp"
                     android:fontFamily="@font/visby_bold"
                     android:textColor="#FDE68A"
-                    android:layout_marginBottom="6dp"/>
+                    android:layout_marginBottom="8dp"/>
 
                 <!-- Gold bar (tallest) -->
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="110dp"
+                    android:layout_height="124dp"
                     android:background="@drawable/bg_podium_gold"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="4dp"
+                    android:elevation="6dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="1"
-                        android:textSize="28sp"
+                        android:textSize="32sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"
-                        android:alpha="0.85"/>
+                        android:alpha="0.90"/>
                 </FrameLayout>
 
             </LinearLayout>
@@ -236,8 +245,8 @@
 
                 <FrameLayout
                     android:id="@+id/avatar3rd"
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
                     android:background="@drawable/bg_circle"
                     android:layout_marginBottom="6dp">
                     <TextView
@@ -245,7 +254,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
-                        android:textSize="20sp"
+                        android:textSize="22sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"/>
                 </FrameLayout>
@@ -267,27 +276,28 @@
                     android:id="@+id/podScore3rd"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="13sp"
+                    android:textSize="12sp"
                     android:fontFamily="@font/visby_bold"
                     android:textColor="#E9D5FF"
-                    android:layout_marginBottom="6dp"/>
+                    android:layout_marginBottom="8dp"/>
 
                 <!-- Bronze bar -->
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
+                    android:layout_height="68dp"
                     android:background="@drawable/bg_podium_bronze"
                     android:layout_marginStart="4dp"
-                    android:layout_marginEnd="4dp">
+                    android:layout_marginEnd="4dp"
+                    android:elevation="4dp">
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:text="3"
-                        android:textSize="22sp"
+                        android:textSize="24sp"
                         android:fontFamily="@font/visby_bold"
                         android:textColor="#FFFFFF"
-                        android:alpha="0.85"/>
+                        android:alpha="0.90"/>
                 </FrameLayout>
 
             </LinearLayout>
@@ -295,11 +305,17 @@
         </LinearLayout>
         <!-- end podium -->
 
+        <!-- White rounded scallop — creates smooth curve into content area -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:background="@drawable/bg_white_top_rounded"/>
+
     </LinearLayout>
     <!-- end headerSection -->
 
     <!-- ═══════════════════════════════════════════════
-         FILTER CHIPS
+         FILTER CHIPS  (floats seamlessly after header)
          ═══════════════════════════════════════════════ -->
     <HorizontalScrollView
         android:id="@+id/filterScrollView"
@@ -307,11 +323,10 @@
         android:layout_height="wrap_content"
         android:scrollbars="none"
         android:background="#FFFFFF"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:paddingStart="14dp"
-        android:paddingEnd="14dp"
-        android:elevation="4dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="12dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
         app:layout_constraintTop_toBottomOf="@id/headerSection"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -324,36 +339,36 @@
             android:gravity="center_vertical">
 
             <TextView android:id="@+id/chipXp"
-                android:layout_width="wrap_content" android:layout_height="34dp"
+                android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="XP" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
+                android:paddingStart="20dp" android:paddingEnd="20dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_bold"
                 android:textColor="#FFFFFF"
                 android:background="@drawable/bg_filter_chip_active"
                 android:layout_marginEnd="8dp"/>
 
             <TextView android:id="@+id/chipStreak"
-                android:layout_width="wrap_content" android:layout_height="34dp"
+                android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="Streak" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
+                android:paddingStart="20dp" android:paddingEnd="20dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_regular"
                 android:textColor="#6B7280"
                 android:background="@drawable/bg_filter_chip_inactive"
                 android:layout_marginEnd="8dp"/>
 
             <TextView android:id="@+id/chipLessons"
-                android:layout_width="wrap_content" android:layout_height="34dp"
+                android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="Lessons" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
+                android:paddingStart="20dp" android:paddingEnd="20dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_regular"
                 android:textColor="#6B7280"
                 android:background="@drawable/bg_filter_chip_inactive"
                 android:layout_marginEnd="8dp"/>
 
             <TextView android:id="@+id/chipBadges"
-                android:layout_width="wrap_content" android:layout_height="34dp"
+                android:layout_width="wrap_content" android:layout_height="36dp"
                 android:text="Badges" android:gravity="center"
-                android:paddingStart="18dp" android:paddingEnd="18dp"
+                android:paddingStart="20dp" android:paddingEnd="20dp"
                 android:textSize="13sp" android:fontFamily="@font/visby_regular"
                 android:textColor="#6B7280"
                 android:background="@drawable/bg_filter_chip_inactive"/>
@@ -361,13 +376,23 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <!-- 1dp divider under chips -->
+    <View
+        android:id="@+id/chipDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EDE9FE"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
     <!-- Loading -->
     <ProgressBar
         android:id="@+id/progressLoading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/customBottomNav"/>
@@ -380,18 +405,22 @@
         android:orientation="vertical"
         android:gravity="center"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@id/customBottomNav">
 
-        <ImageView android:layout_width="56dp" android:layout_height="56dp"
-            android:src="@drawable/ic_trophy" app:tint="#D1D5DB"
+        <ImageView android:layout_width="64dp" android:layout_height="64dp"
+            android:src="@drawable/ic_trophy" app:tint="#C4B5FD"
             android:contentDescription="Empty"/>
         <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
-            android:text="No data yet" android:textSize="15sp"
-            android:fontFamily="@font/visby_bold" android:textColor="#9CA3AF"
-            android:layout_marginTop="10dp"/>
+            android:text="No data yet" android:textSize="16sp"
+            android:fontFamily="@font/visby_bold" android:textColor="#A78BFA"
+            android:layout_marginTop="12dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Check back soon!" android:textSize="13sp"
+            android:fontFamily="@font/visby_regular" android:textColor="#C4B5FD"
+            android:layout_marginTop="4dp"/>
     </LinearLayout>
 
     <!-- ═══════════════════════════════════════════════
@@ -401,13 +430,13 @@
         android:id="@+id/rvLeaderboard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
         android:paddingTop="10dp"
         android:paddingBottom="8dp"
         android:clipToPadding="false"
         android:scrollbars="none"
-        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
         app:layout_constraintBottom_toTopOf="@id/customBottomNav"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>

@@ -164,17 +164,17 @@ public class LeaderboardActivity extends BaseNavActivity {
 
         // 1st place
         LeaderboardEntry e1 = all.get(0);
-        setAvatarCircle(avatar1st, initial1st, e1.getName(), 0xFFFFD700);
+        setAvatarCircle(avatar1st, initial1st, e1.getName(), 0xFFFFD700, 5);
         podName1st.setText(firstName(e1.getName()));
-        podScore1st.setText(String.valueOf(e1.getValue()));
+        podScore1st.setText(e1.getValue() + " " + unitLabel(activeFilter));
         lottieCrown.playAnimation();
 
         // 2nd place
         if (all.size() >= 2) {
             LeaderboardEntry e2 = all.get(1);
-            setAvatarCircle(avatar2nd, initial2nd, e2.getName(), 0xFFC8D0DA);
+            setAvatarCircle(avatar2nd, initial2nd, e2.getName(), 0xFFC8D0DA, 3);
             podName2nd.setText(firstName(e2.getName()));
-            podScore2nd.setText(String.valueOf(e2.getValue()));
+            podScore2nd.setText(e2.getValue() + " " + unitLabel(activeFilter));
         } else {
             findViewById(R.id.pod2nd).setVisibility(View.INVISIBLE);
         }
@@ -182,23 +182,34 @@ public class LeaderboardActivity extends BaseNavActivity {
         // 3rd place
         if (all.size() >= 3) {
             LeaderboardEntry e3 = all.get(2);
-            setAvatarCircle(avatar3rd, initial3rd, e3.getName(), 0xFFE8A87C);
+            setAvatarCircle(avatar3rd, initial3rd, e3.getName(), 0xFFCD7F32, 3);
             podName3rd.setText(firstName(e3.getName()));
-            podScore3rd.setText(String.valueOf(e3.getValue()));
+            podScore3rd.setText(e3.getValue() + " " + unitLabel(activeFilter));
         } else {
             findViewById(R.id.pod3rd).setVisibility(View.INVISIBLE);
         }
     }
 
-    private void setAvatarCircle(FrameLayout frame, TextView initial, String name, int ringColor) {
+    private String unitLabel(String filter) {
+        switch (filter) {
+            case "streak":  return "days";
+            case "lessons": return "lessons";
+            case "badges":  return "badges";
+            default:        return "XP";
+        }
+    }
+
+    private void setAvatarCircle(FrameLayout frame, TextView initial, String name,
+                                  int ringColor, int strokeDp) {
         String letter = (name != null && !name.isEmpty())
                 ? String.valueOf(name.charAt(0)).toUpperCase() : "?";
         initial.setText(letter);
         int bg = avatarColor(name);
+        float density = frame.getResources().getDisplayMetrics().density;
         GradientDrawable gd = new GradientDrawable();
         gd.setShape(GradientDrawable.OVAL);
         gd.setColor(bg);
-        gd.setStroke(3, ringColor);
+        gd.setStroke((int)(strokeDp * density), ringColor);
         frame.setBackground(gd);
     }
 
