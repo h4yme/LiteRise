@@ -41,11 +41,11 @@ try {
     $stmt = $conn->prepare("
         SELECT TOP ($limitInt)
             StudentID,
-            FullName,
+            FirstName + ' ' + LastName AS FullName,
             GradeLevel,
             $col AS score
         FROM Students
-        WHERE Status = 'active'
+        WHERE IsActive = 1
         ORDER BY $col DESC
     ");
     $stmt->execute();
@@ -59,7 +59,7 @@ try {
             'rank'       => $rank++,
             'student_id' => (int) $row['StudentID'],
             'name'       => $row['FullName'],
-            'grade'      => $row['GradeLevel'],
+            'grade'      => (int) $row['GradeLevel'],
             'value'      => (int) $row['score'],
             'label'      => $label,
         ];
