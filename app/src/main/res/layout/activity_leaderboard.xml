@@ -1,0 +1,439 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F3FF">
+
+    <!-- ═══════════════════════════════════════════════
+         GRADIENT HEADER  (title + Lottie + podium)
+         ═══════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/headerSection"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_header_gradient"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Sparkle Lottie behind title -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/lottieSparkle"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                app:lottie_autoPlay="true"
+                app:lottie_loop="true"
+                android:alpha="0.40"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:paddingTop="44dp"
+                android:paddingBottom="12dp">
+
+                <!-- Trophy icon with glow ring -->
+                <FrameLayout
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_trophy_glow">
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_trophy_filled"
+                        app:tint="#FFFFFF"
+                        android:contentDescription="Trophy"/>
+                </FrameLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Leaderboard"
+                    android:textSize="24sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="6dp"
+                    android:letterSpacing="0.02"/>
+
+                <TextView
+                    android:id="@+id/tvFilterLabel"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ranked by Total XP"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/visby_regular"
+                    android:textColor="#DDD6FE"
+                    android:layout_marginTop="2dp"/>
+
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- ─── Podium (top 3) ─────────────────────────────── -->
+        <LinearLayout
+            android:id="@+id/podiumSection"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:visibility="gone">
+
+            <!-- 2nd place ─────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/pod2nd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <FrameLayout
+                    android:id="@+id/avatar2nd"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_circle"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:id="@+id/avatarInitial2nd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/podName2nd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="11sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#FFFFFF"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/podScore2nd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#E9D5FF"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Silver bar -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="88dp"
+                    android:background="@drawable/bg_podium_silver"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:elevation="4dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="2"
+                        android:textSize="26sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"
+                        android:alpha="0.90"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- 1st place (center, tallest) ───────── -->
+            <LinearLayout
+                android:id="@+id/pod1st"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <!-- Crown Lottie -->
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieCrown"
+                    android:layout_width="48dp"
+                    android:layout_height="26dp"
+                    app:lottie_rawRes="@raw/lottie_sparkle_stars"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"/>
+
+                <FrameLayout
+                    android:id="@+id/avatar1st"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/bg_circle"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:id="@+id/avatarInitial1st"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="28sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/podName1st"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#FFFFFF"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/podScore1st"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#FDE68A"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Gold bar (tallest) -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="124dp"
+                    android:background="@drawable/bg_podium_gold"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:elevation="6dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="1"
+                        android:textSize="32sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"
+                        android:alpha="0.90"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+            <!-- 3rd place ─────────────────────────── -->
+            <LinearLayout
+                android:id="@+id/pod3rd"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center_horizontal">
+
+                <FrameLayout
+                    android:id="@+id/avatar3rd"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:background="@drawable/bg_circle"
+                    android:layout_marginBottom="6dp">
+                    <TextView
+                        android:id="@+id/avatarInitial3rd"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:textSize="22sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/podName3rd"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="11sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#FFFFFF"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:paddingStart="4dp"
+                    android:paddingEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/podScore3rd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:fontFamily="@font/visby_bold"
+                    android:textColor="#E9D5FF"
+                    android:layout_marginBottom="8dp"/>
+
+                <!-- Bronze bar -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="68dp"
+                    android:background="@drawable/bg_podium_bronze"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:elevation="4dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="3"
+                        android:textSize="24sp"
+                        android:fontFamily="@font/visby_bold"
+                        android:textColor="#FFFFFF"
+                        android:alpha="0.90"/>
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+        <!-- end podium -->
+
+    </LinearLayout>
+    <!-- end headerSection -->
+
+    <!-- ═══════════════════════════════════════════════
+         FILTER CHIPS  — full-width, equal-weight row
+         ═══════════════════════════════════════════════ -->
+    <LinearLayout
+        android:id="@+id/filterScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:orientation="horizontal"
+        android:background="#FFFFFF"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:gravity="center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/headerSection"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView android:id="@+id/chipXp"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="XP" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_bold"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_filter_chip_active"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView android:id="@+id/chipStreak"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Streak" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView android:id="@+id/chipLessons"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Lessons" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView android:id="@+id/chipBadges"
+            android:layout_width="0dp" android:layout_height="36dp"
+            android:layout_weight="1"
+            android:text="Badges" android:gravity="center"
+            android:textSize="13sp" android:fontFamily="@font/visby_regular"
+            android:textColor="#6B7280"
+            android:background="@drawable/bg_filter_chip_inactive"/>
+
+    </LinearLayout>
+
+    <!-- 1dp divider under chips -->
+    <View
+        android:id="@+id/chipDivider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#EDE9FE"
+        app:layout_constraintTop_toBottomOf="@id/filterScrollView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Loading -->
+    <ProgressBar
+        android:id="@+id/progressLoading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"/>
+
+    <!-- Empty state -->
+    <LinearLayout
+        android:id="@+id/layoutEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav">
+
+        <ImageView android:layout_width="64dp" android:layout_height="64dp"
+            android:src="@drawable/ic_trophy" app:tint="#C4B5FD"
+            android:contentDescription="Empty"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="No data yet" android:textSize="16sp"
+            android:fontFamily="@font/visby_bold" android:textColor="#A78BFA"
+            android:layout_marginTop="12dp"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Check back soon!" android:textSize="13sp"
+            android:fontFamily="@font/visby_regular" android:textColor="#C4B5FD"
+            android:layout_marginTop="4dp"/>
+    </LinearLayout>
+
+    <!-- ═══════════════════════════════════════════════
+         RANK 4+ LIST
+         ═══════════════════════════════════════════════ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLeaderboard"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:paddingStart="14dp"
+        android:paddingEnd="14dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/chipDivider"
+        app:layout_constraintBottom_toTopOf="@id/customBottomNav"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Bottom nav -->
+    <include
+        android:id="@+id/customBottomNav"
+        layout="@layout/custom_bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

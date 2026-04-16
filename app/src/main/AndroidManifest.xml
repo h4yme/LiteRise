@@ -322,6 +322,11 @@
             android:exported="false"
             android:theme="@style/Theme.LiteRise.NoActionBar" />
 
+        <activity
+            android:name=".activities.LeaderboardActivity"
+            android:exported="false"
+            android:theme="@style/Theme.LiteRise.NoActionBar" />
+
 
         <!-- ✅ Daily Reminder BroadcastReceiver -->
         <receiver

@@ -24,7 +24,7 @@
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
             android:gravity="center"
-            android:weightSum="5">
+            android:weightSum="6">
 
             <!-- Home -->
             <LinearLayout
@@ -192,6 +192,49 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Badges"
+                    android:textSize="10sp"
+                    android:textColor="#9CA3AF"
+                    android:fontFamily="@font/visby_regular"
+                    android:layout_marginTop="3dp"/>
+            </LinearLayout>
+
+            <!-- Leaderboard -->
+            <LinearLayout
+                android:id="@+id/navLeaderboard"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="6dp">
+
+                <FrameLayout
+                    android:layout_width="48dp"
+                    android:layout_height="30dp">
+
+                    <View
+                        android:id="@+id/indicatorLeaderboard"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/bg_nav_pill_indicator"
+                        android:visibility="invisible"/>
+
+                    <ImageView
+                        android:id="@+id/iconLeaderboard"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/ic_trophy"
+                        app:tint="#9CA3AF"
+                        android:contentDescription="Leaderboard"/>
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/labelLeaderboard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ranks"
                     android:textSize="10sp"
                     android:textColor="#9CA3AF"
                     android:fontFamily="@font/visby_regular"
